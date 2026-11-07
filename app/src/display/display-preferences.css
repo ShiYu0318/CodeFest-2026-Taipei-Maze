@@ -270,3 +270,39 @@ html[data-maze-theme="dark"] {
   --demo-warning: var(--warning-bg);
   --demo-warning-ink: #f5e7cb;
 }
+
+/* High contrast (SPEC FR-UI / NFR-10): stronger text, borders, focus and
+   underlined links. Map artwork keeps its palette so it stays recognisable. */
+html[data-maze-contrast="high"] .display-page {
+  --muted: var(--ink);
+  --border: var(--tp-gray-700);
+  --tp-page: #ffffff;
+  --tp-gray-100: #91a0a8;
+  --tp-gray-200: #475259;
+  --tp-gray-500: #30383d;
+  --tp-gray-600: #171b1d;
+  --tp-gray-700: #0b0d0e;
+  --tp-primary-700: #22474e;
+  --tp-shadow-card: 0 0 0 1.5px var(--tp-gray-700);
+}
+html[data-maze-contrast="high"] .display-page[data-theme="dark"] {
+  --tp-page: #000000;
+  --tp-surface: #0b1215;
+  --tp-gray-100: #7a8d97;
+  --tp-gray-200: #c2cdd3;
+  --tp-gray-500: #e5edf1;
+  --tp-gray-600: #f5f8fa;
+  --tp-gray-700: #ffffff;
+  --tp-primary-700: #c6e3e9;
+  --tp-shadow-card: 0 0 0 1.5px #c2cdd3;
+}
+html[data-maze-contrast="high"] .display-page a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+html[data-maze-contrast="high"] .display-page :focus-visible {
+  outline-width: 4px !important;
+}
+html[data-maze-contrast="high"] .display-page button:not(:disabled) {
+  border-width: 2px;
+}

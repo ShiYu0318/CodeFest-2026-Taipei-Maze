@@ -70,6 +70,27 @@
         ><ZhuyinText :text="t('display.dark')"
       /></span>
     </button>
+    <button
+      class="display-theme-switch display-contrast-switch"
+      type="button"
+      role="switch"
+      :aria-checked="contrast === 'high'"
+      :title="t('display.contrast')"
+      @click="toggleContrast"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle
+          cx="12"
+          cy="12"
+          r="8.5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        />
+        <path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" fill="currentColor" />
+      </svg>
+      <span class="display-visually-hidden">{{ t("display.contrast") }}</span>
+    </button>
     <label class="display-mode-label">
       <span class="display-visually-hidden">{{ t("display.mode") }}</span>
       <select
@@ -91,8 +112,14 @@ import { LOCALES, useI18n } from "../i18n/index.mjs";
 import ZhuyinText from "./ZhuyinText.vue";
 import "../display/display-preferences.css";
 
-const { theme, displayMode, toggleTheme, setDisplayMode } =
-  useDisplayPreferences();
+const {
+  theme,
+  displayMode,
+  contrast,
+  toggleTheme,
+  toggleContrast,
+  setDisplayMode,
+} = useDisplayPreferences();
 const { locale, setLocale, t } = useI18n();
 const shortCode = computed(() =>
   locale.value === "zh-TW" ? "中" : locale.value.toUpperCase()

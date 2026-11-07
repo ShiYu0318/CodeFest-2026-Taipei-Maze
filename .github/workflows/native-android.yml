@@ -42,6 +42,9 @@ jobs:
       - name: Bundle the web application for on-device loading
         run: |
           npm ci --prefix app
+          npm test --prefix app
+          npm run lint --prefix app
+          npm run validate:assets --prefix app
           npm run build --prefix app
           python3 tools/package-townpass-web.py "$RUNNER_TEMP/TownPass/assets/codefest_web.bundle"
       - name: Resolve and generate official host code

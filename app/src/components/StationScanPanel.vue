@@ -66,6 +66,38 @@
         t("scan.destination", { place: place(destination) })
       }}</strong>
     </p>
+    <button
+      v-if="destination"
+      type="button"
+      class="scan-staff"
+      @click="staffOpen = true"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect
+          x="4"
+          y="3"
+          width="16"
+          height="18"
+          rx="2.5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        />
+        <path
+          d="M8 8h8M8 12h8M8 16h5"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        />
+      </svg>
+      {{ t("staff.open") }}
+    </button>
+    <StaffCard
+      v-if="staffOpen && destination"
+      :point="destination"
+      :step-free="view.stepFree"
+      @close="closeStaffCard"
+    />
     <p role="status">
       {{
         position
@@ -138,6 +170,7 @@
 import { computed, ref } from "vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import DestinationSearch from "./DestinationSearch.vue";
+import StaffCard from "./StaffCard.vue";
 import { stationCatalog } from "../search/catalog.mjs";
 import { stationPoints } from "../station/scan.mjs";
 import data from "../views/station-points.json";
@@ -163,6 +196,13 @@ const notice = computed(() =>
   view.value.noticeKey ? t(view.value.noticeKey) : ""
 );
 const destination = computed(() => byId.get(view.value.destinationId));
+const staffOpen = ref(false);
+function closeStaffCard(event) {
+  staffOpen.value = false;
+  // Return focus to the button that opened the card.
+  document.querySelector(".scan-staff")?.focus();
+  return event;
+}
 const confirmedTime = computed(() =>
   view.value.position?.confirmedAt
     ? new Date(view.value.position.confirmedAt).toLocaleTimeString(
@@ -330,6 +370,16 @@ async function start() {
 }
 .scan-target {
   font-size: 16px;
+}
+.station-scan-panel .scan-staff {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.scan-staff svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
 }
 .station-scan-panel :deep(.destination-search) {
   background: var(--surface, #fff);

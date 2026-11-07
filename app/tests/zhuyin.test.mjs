@@ -162,6 +162,11 @@ test("the Vue component annotates child mode only and escapes unknown text", asy
   );
   const settings = preferences.useDisplayPreferences();
   const original = settings.displayMode.value;
+  // Newer Node versions expose navigator.languages (e.g. en-US); pin the
+  // locale so the result does not depend on the machine running the tests.
+  const language = i18n.useI18n();
+  const originalLocale = language.locale.value;
+  language.setLocale("zh-TW");
   try {
     for (const mode of ["standard", "senior", "child"]) {
       settings.setDisplayMode(mode);
@@ -177,15 +182,13 @@ test("the Vue component annotates child mode only and escapes unknown text", asy
       }
     }
     // Zhuyin is for Traditional Chinese readers only.
-    const language = i18n.useI18n();
-    const before = language.locale.value;
     language.setLocale("en");
     const html = await renderToString(
       Vue.createSSRApp(compiled.exports.default, { text: "電梯" })
     );
-    language.setLocale(before);
     assert.equal(html.includes("<ruby"), false);
   } finally {
+    language.setLocale(originalLocale);
     settings.setDisplayMode(original);
   }
 });

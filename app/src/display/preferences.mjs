@@ -3,21 +3,31 @@ import { reactive, readonly, toRefs } from "vue";
 
 const modes = ["standard", "child", "senior"];
 export const themeStorageKey = "taipei-maze.theme.v1";
+export const contrastStorageKey = "taipei-maze.contrast.v1";
 const browserStorage = () =>
   typeof window === "undefined" ? undefined : window.localStorage;
 
 /** Remember only a manually chosen theme; age presets still start standard. */
 export function createDisplayPreferences(storage = browserStorage) {
-  let savedTheme;
+  let savedTheme, savedContrast;
   try {
     savedTheme = storage()?.getItem(themeStorageKey);
+    savedContrast = storage()?.getItem(contrastStorageKey);
   } catch {
     /* Storage is optional. */
   }
   const state = reactive({
     theme: savedTheme === "dark" ? "dark" : "light",
     displayMode: "standard",
+    contrast: savedContrast === "high" ? "high" : "standard",
   });
+  function remember(key, value) {
+    try {
+      storage()?.setItem(key, value);
+    } catch {
+      /* Keep in-memory choice. */
+    }
+  }
   return {
     ...toRefs(readonly(state)),
     toggleTheme() {
@@ -27,6 +37,10 @@ export function createDisplayPreferences(storage = browserStorage) {
       } catch {
         /* Keep in-memory choice. */
       }
+    },
+    toggleContrast() {
+      state.contrast = state.contrast === "high" ? "standard" : "high";
+      remember(contrastStorageKey, state.contrast);
     },
     setDisplayMode(value) {
       if (!modes.includes(value)) return;
