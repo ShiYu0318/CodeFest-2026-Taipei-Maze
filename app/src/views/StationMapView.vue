@@ -813,7 +813,10 @@ function pointTypes(point) {
 }
 
 function pointIconType(point) {
-  return pointTypes(point)[0];
+  const types = pointTypes(point);
+  return types[0] === "exit" && types.includes(activeTheme.value)
+    ? activeTheme.value
+    : types[0];
 }
 
 function pointHelpType(point) {
@@ -903,7 +906,7 @@ function pinStyle(point) {
   return {
     left: x * 100 + "%",
     top: y * 100 + "%",
-    ...pointThemeStyle(point.type),
+    ...pointThemeStyle(pointIconType(point)),
   };
 }
 
@@ -932,8 +935,7 @@ function mapPointLabel(point) {
 }
 
 function pointThemeStyle(type) {
-  const primaryType = Array.isArray(type) ? type[0] : type;
-  const category = categories[primaryType];
+  const category = categories[type];
   const colorToken = category?.colorToken || "gray-700";
   const iconColor = category?.iconColor;
   return {

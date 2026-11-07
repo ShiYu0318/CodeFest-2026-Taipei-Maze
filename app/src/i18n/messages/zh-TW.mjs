@@ -2,6 +2,8 @@
 // Reference catalog. Every other locale must provide exactly these keys and
 // the same {placeholders}; tests/i18n.test.mjs enforces it.
 export default {
+  "type.exit": "出口",
+  "help.exit": "請依出口編號及現場指標確認方向。",
   "floor.1F": "一樓",
   "zone.1f-hall": "車站大廳",
   "map.firstFloorNote":

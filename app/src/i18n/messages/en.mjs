@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "type.exit": "Exit",
+  "help.exit": "Check the exit number and follow station signage.",
   "floor.1F": "Ground floor",
   "zone.1f-hall": "Station hall",
   "map.firstFloorNote":

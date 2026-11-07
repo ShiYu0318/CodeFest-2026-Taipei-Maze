@@ -60,7 +60,9 @@ test("remaining QR points keep their fixed IDs and boundary positions outside pl
   assert.equal(new Set(qrPoints.map((point) => point.id)).size, 20);
   for (const floor of ["B1", "B2", "B3", "B4"]) {
     const points = qrPoints.filter((point) => point.floor === floor);
-    const obstacles = data.points[floor].filter((point) => !isQrPoint(point));
+    const obstacles = data.points[floor].filter(
+      (point) => !isQrPoint(point) && point.type !== "exit"
+    );
     assert.equal(points.length, { B1: 8, B2: 8, B3: 4, B4: 0 }[floor]);
     const generated = scatterBoundary(plans[floor], {
       seed: 20261108 + Number(floor.slice(1)),

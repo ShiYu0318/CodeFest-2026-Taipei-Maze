@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "type.exit": "Lối ra",
+  "help.exit": "Kiểm tra số lối ra và đi theo biển chỉ dẫn trong ga.",
   "floor.1F": "Tầng 1",
   "zone.1f-hall": "Sảnh nhà ga",
   "map.firstFloorNote":

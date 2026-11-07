@@ -26,7 +26,8 @@ for (const floor of ["B1", "B2", "B3", "B4"]) {
   );
   const positions = scatterBoundary(plans[floor], {
     seed: 20261108 + Number(floor.slice(1)),
-    obstacles: existing,
+    // Exit annotations added later do not move existing QR anchors.
+    obstacles: existing.filter((point) => point.type !== "exit"),
   });
   const generated = positions.map((position, index) => {
     const number = String(index + 1).padStart(2, "0");

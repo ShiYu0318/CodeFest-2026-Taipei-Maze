@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "type.exit": "出口",
+  "help.exit": "出口番号を確認し、駅の案内表示に従ってください。",
   "floor.1F": "地上1階",
   "zone.1f-hall": "駅コンコース",
   "map.firstFloorNote":

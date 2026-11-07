@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "type.exit": "Pintu keluar",
+  "help.exit": "Periksa nomor pintu keluar dan ikuti petunjuk di stasiun.",
   "floor.1F": "Lantai 1",
   "zone.1f-hall": "Aula stasiun",
   "map.firstFloorNote":
