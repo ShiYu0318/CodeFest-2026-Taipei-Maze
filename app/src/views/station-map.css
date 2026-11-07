@@ -347,9 +347,9 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: calc(100vh - 10rem);
-  min-height: calc(100svh - 10rem);
-  aspect-ratio: var(--map-aspect);
+  min-height: calc(150vh - 15rem);
+  min-height: calc(150svh - 15rem);
+  aspect-ratio: var(--map-viewport-aspect);
   overflow: hidden;
   overflow: clip;
   touch-action: pan-x pan-y;
@@ -767,16 +767,17 @@
 
 @media (max-width: 719px) {
   .map-viewport {
+    --map-screen-height: 150vh;
     --map-height: max(
-      10rem,
-      calc(var(--map-screen-height, 100vh) - var(--map-top) - 20px)
+      15rem,
+      calc(var(--map-screen-height) - var(--map-top) - 30px)
     );
     min-height: 0;
     height: var(--map-height);
   }
   @supports (height: 100svh) {
     .map-viewport {
-      --map-screen-height: 100svh;
+      --map-screen-height: 150svh;
     }
   }
   .map-board {

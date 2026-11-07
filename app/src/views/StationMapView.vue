@@ -92,7 +92,7 @@
             <div
               ref="mapStage"
               class="map-stage"
-              :style="{ '--map-top': mapTop + 'px' }"
+              :style="{ '--map-top': mapTop * 1.5 + 'px' }"
               @keydown.esc="closeConnectorDetails"
             >
               <div class="map-corner">
@@ -117,7 +117,11 @@
                   ref="viewport"
                   class="map-viewport"
                   :class="{ 'map-zoomed': zoom > 1, 'map-dragging': dragging }"
-                  :style="{ '--map-aspect': bounds[2] + ' / ' + bounds[3] }"
+                  :style="{
+                    '--map-aspect': bounds[2] + ' / ' + bounds[3],
+                    '--map-viewport-aspect':
+                      bounds[2] + ' / ' + bounds[3] * 1.5,
+                  }"
                   role="region"
                   :aria-label="level + ' 互動地圖，可用加減鍵縮放，0 鍵重設'"
                   tabindex="0"
