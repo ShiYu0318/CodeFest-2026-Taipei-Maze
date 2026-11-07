@@ -1,6 +1,9 @@
 <template>
   <g aria-hidden="true">
-    <g v-if="floor === 'B2'" transform="translate(512.5 960) scale(.5)">
+    <g
+      v-if="floor === 'B2'"
+      :transform="`translate(${plan.offset.join(' ')}) scale(${plan.scale})`"
+    >
       <StationB2Plan :outline-only="outlineOnly" />
     </g>
     <g
@@ -62,7 +65,7 @@
 
 <script>
 import StationB2Plan from "./StationB2Plan.vue";
-import { plans } from "../views/station-floor-plans";
+import { plans } from "../views/station-floor-plans.mjs";
 import stationData from "../views/station-points.json";
 
 const stairwayTypes = new Set([

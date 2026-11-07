@@ -36,6 +36,8 @@ export default {
   "type.water": "Drinking water",
   "type.locker": "Lockers",
   "type.accessible": "Wheelchair waiting area",
+  "type.qrcode": "QR location point",
+  "help.qrcode": "Demo location point; no QR sign has been installed on site.",
   "help.elevator": "Elevator: change floors without using stairs.",
   "help.stairs": "Stairs: walk step by step to another floor.",
   "help.escalator":

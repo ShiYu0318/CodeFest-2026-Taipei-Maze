@@ -37,6 +37,8 @@ export default {
   "type.water": "飲水機",
   "type.locker": "置物櫃",
   "type.accessible": "輪椅候車區",
+  "type.qrcode": "QR 定位點",
+  "help.qrcode": "示意定位點；尚未現地設置。",
   "help.elevator": "電梯：可以換樓層，不用走樓梯。",
   "help.stairs": "樓梯：一步一步走，可以到別的樓層。",
   "help.escalator": "電扶梯：會移動的樓梯，搭乘前請確認方向。",

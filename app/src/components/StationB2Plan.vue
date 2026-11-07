@@ -1,10 +1,7 @@
 <template>
   <g aria-hidden="true">
     <!-- Solid B2 perimeter from the Taipei Metro plan. Reference outlines are omitted. -->
-    <path
-      class="floor"
-      d="M34 495H634L708 61l91 17 4-17 100 45-1-12 88 15-68 386h427v57l18 1-34 77h16v59H34v-62H18l34-79H34Z"
-    />
+    <path class="floor" :d="b2Outline" />
     <g v-if="!outlineOnly">
       <path
         class="walkable"
@@ -52,7 +49,11 @@
 </template>
 
 <script>
-export default { props: { outlineOnly: Boolean } };
+import { b2Outline } from "../views/station-floor-plans.mjs";
+export default {
+  props: { outlineOnly: Boolean },
+  setup: () => ({ b2Outline }),
+};
 </script>
 
 <style scoped>

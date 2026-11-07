@@ -59,6 +59,11 @@
       "name": "輪椅候車區",
       "colorToken": "gray-900",
       "iconColor": "#181b1d"
+    },
+    "qrcode": {
+      "name": "QR 定位點",
+      "colorToken": "primary-900",
+      "iconColor": "#244e57"
     }
   },
   "points": {
@@ -341,6 +346,126 @@
         "description": "可往地面層 M4；地面層在目前圖外。",
         "angle": 0,
         "zone": "b1-passage"
+      },
+      {
+        "id": "b1-qr-01",
+        "type": "qrcode",
+        "name": "QR 01 號示意定位點",
+        "x": 47,
+        "y": 811.8,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 3,
+          "fraction": 0.010527334059410465
+        }
+      },
+      {
+        "id": "b1-qr-02",
+        "type": "qrcode",
+        "name": "QR 02 號示意定位點",
+        "x": 631.18,
+        "y": 611.33,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 1,
+          "edge": 4,
+          "fraction": 0.42614179532319696
+        }
+      },
+      {
+        "id": "b1-qr-03",
+        "type": "qrcode",
+        "name": "QR 03 號示意定位點",
+        "x": 912.09,
+        "y": 713.74,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 1,
+          "edge": 24,
+          "fraction": 0.33713940901018463
+        }
+      },
+      {
+        "id": "b1-qr-04",
+        "type": "qrcode",
+        "name": "QR 04 號示意定位點",
+        "x": 193.23,
+        "y": 676.29,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 1,
+          "edge": 34,
+          "fraction": 0.8701167067258977
+        }
+      },
+      {
+        "id": "b1-qr-05",
+        "type": "qrcode",
+        "name": "QR 05 號示意定位點",
+        "x": 1071.05,
+        "y": 711.95,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 2,
+          "edge": 1,
+          "fraction": 0.4188111888183239
+        }
+      },
+      {
+        "id": "b1-qr-06",
+        "type": "qrcode",
+        "name": "QR 06 號示意定位點",
+        "x": 936.76,
+        "y": 1126.2,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 3,
+          "edge": 4,
+          "fraction": 0.864976759999197
+        }
+      },
+      {
+        "id": "b1-qr-07",
+        "type": "qrcode",
+        "name": "QR 07 號示意定位點",
+        "x": 797.85,
+        "y": 1245,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 3,
+          "edge": 20,
+          "fraction": 0.6906086490668032
+        }
+      },
+      {
+        "id": "b1-qr-08",
+        "type": "qrcode",
+        "name": "QR 08 號示意定位點",
+        "x": 567.54,
+        "y": 1175,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 3,
+          "edge": 32,
+          "fraction": 0.2854770721279561
+        }
       }
     ],
     "B2": [
@@ -570,6 +695,126 @@
         "description": "靠近 1 號電梯北側、往市民大道的另一組梯口，梯種及端點待核對。",
         "angle": 12,
         "zone": "b2-concourse"
+      },
+      {
+        "id": "b2-qr-01",
+        "type": "qrcode",
+        "name": "QR 01 號示意定位點",
+        "x": 702.56,
+        "y": 1207.5,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 0,
+          "fraction": 0.5768503588484094
+        }
+      },
+      {
+        "id": "b2-qr-02",
+        "type": "qrcode",
+        "name": "QR 02 號示意定位點",
+        "x": 815.69,
+        "y": 1207.5,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 0,
+          "fraction": 0.9539647983537367
+        }
+      },
+      {
+        "id": "b2-qr-03",
+        "type": "qrcode",
+        "name": "QR 03 號示意定位點",
+        "x": 963.63,
+        "y": 1008.57,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 5,
+          "fraction": 0.738008644298567
+        }
+      },
+      {
+        "id": "b2-qr-04",
+        "type": "qrcode",
+        "name": "QR 04 號示意定位點",
+        "x": 1020.52,
+        "y": 1207.5,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 8,
+          "fraction": 0.22022592918526854
+        }
+      },
+      {
+        "id": "b2-qr-05",
+        "type": "qrcode",
+        "name": "QR 05 號示意定位點",
+        "x": 1187,
+        "y": 1277.49,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 13,
+          "fraction": 0.08436005859402386
+        }
+      },
+      {
+        "id": "b2-qr-06",
+        "type": "qrcode",
+        "name": "QR 06 號示意定位點",
+        "x": 937.32,
+        "y": 1304.5,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 14,
+          "fraction": 0.37974421871747693
+        }
+      },
+      {
+        "id": "b2-qr-07",
+        "type": "qrcode",
+        "name": "QR 07 號示意定位點",
+        "x": 858.22,
+        "y": 1304.5,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 14,
+          "fraction": 0.5000479421007462
+        }
+      },
+      {
+        "id": "b2-qr-08",
+        "type": "qrcode",
+        "name": "QR 08 號示意定位點",
+        "x": 625.13,
+        "y": 1304.5,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 14,
+          "fraction": 0.85455206222409
+        }
       }
     ],
     "B3": [
@@ -829,6 +1074,126 @@
         "description": "連接 B2 高鐵月台區，該站區在目前圖外。",
         "angle": -6,
         "zone": "b3-red"
+      },
+      {
+        "id": "b3-qr-01",
+        "type": "qrcode",
+        "name": "QR 01 號示意定位點",
+        "x": 1130.72,
+        "y": 431.56,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 5,
+          "fraction": 0.9641461350282947
+        }
+      },
+      {
+        "id": "b3-qr-02",
+        "type": "qrcode",
+        "name": "QR 02 號示意定位點",
+        "x": 1073.13,
+        "y": 784.5,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 10,
+          "fraction": 0.3577480931495716
+        }
+      },
+      {
+        "id": "b3-qr-03",
+        "type": "qrcode",
+        "name": "QR 03 號示意定位點",
+        "x": 932.97,
+        "y": 1045.99,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 14,
+          "fraction": 0.5007409468917592
+        }
+      },
+      {
+        "id": "b3-qr-04",
+        "type": "qrcode",
+        "name": "QR 04 號示意定位點",
+        "x": 840.61,
+        "y": 607.18,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 20,
+          "fraction": 0.6696273854531544
+        }
+      },
+      {
+        "id": "b3-qr-05",
+        "type": "qrcode",
+        "name": "QR 05 號示意定位點",
+        "x": 561.39,
+        "y": 1209,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 1,
+          "edge": 0,
+          "fraction": 0.00983279559727066
+        }
+      },
+      {
+        "id": "b3-qr-06",
+        "type": "qrcode",
+        "name": "QR 06 號示意定位點",
+        "x": 999.54,
+        "y": 1209,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 1,
+          "edge": 0,
+          "fraction": 0.683907735933855
+        }
+      },
+      {
+        "id": "b3-qr-07",
+        "type": "qrcode",
+        "name": "QR 07 號示意定位點",
+        "x": 1092.96,
+        "y": 1308,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 1,
+          "edge": 6,
+          "fraction": 0.17363962940699826
+        }
+      },
+      {
+        "id": "b3-qr-08",
+        "type": "qrcode",
+        "name": "QR 08 號示意定位點",
+        "x": 725.57,
+        "y": 1308,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 1,
+          "edge": 6,
+          "fraction": 0.7379880427096147
+        }
       }
     ],
     "B4": [
@@ -916,6 +1281,126 @@
         "description": "往 B3 淡水信義線大廳。梯種依平面圖、剖面圖與設備數量推定。",
         "angle": 12,
         "zone": "b4-platform"
+      },
+      {
+        "id": "b4-qr-01",
+        "type": "qrcode",
+        "name": "QR 01 號示意定位點",
+        "x": 1110.06,
+        "y": 459.5,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 4,
+          "fraction": 0.7853071715509021
+        }
+      },
+      {
+        "id": "b4-qr-02",
+        "type": "qrcode",
+        "name": "QR 02 號示意定位點",
+        "x": 1100.99,
+        "y": 550.14,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 5,
+          "fraction": 0.14059666004053495
+        }
+      },
+      {
+        "id": "b4-qr-03",
+        "type": "qrcode",
+        "name": "QR 03 號示意定位點",
+        "x": 1043.51,
+        "y": 851.28,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 5,
+          "fraction": 0.615579203490409
+        }
+      },
+      {
+        "id": "b4-qr-04",
+        "type": "qrcode",
+        "name": "QR 04 號示意定位點",
+        "x": 1018.59,
+        "y": 981.89,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 5,
+          "fraction": 0.8215977871919903
+        }
+      },
+      {
+        "id": "b4-qr-05",
+        "type": "qrcode",
+        "name": "QR 05 號示意定位點",
+        "x": 960.08,
+        "y": 1095.25,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 7,
+          "fraction": 0.9169867860500214
+        }
+      },
+      {
+        "id": "b4-qr-06",
+        "type": "qrcode",
+        "name": "QR 06 號示意定位點",
+        "x": 921.52,
+        "y": 937.25,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 11,
+          "fraction": 0.21919333743786085
+        }
+      },
+      {
+        "id": "b4-qr-07",
+        "type": "qrcode",
+        "name": "QR 07 號示意定位點",
+        "x": 967.38,
+        "y": 697.33,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 11,
+          "fraction": 0.5982157051590494
+        }
+      },
+      {
+        "id": "b4-qr-08",
+        "type": "qrcode",
+        "name": "QR 08 號示意定位點",
+        "x": 995.83,
+        "y": 548.52,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 11,
+          "fraction": 0.8333043278652966
+        }
       }
     ]
   }

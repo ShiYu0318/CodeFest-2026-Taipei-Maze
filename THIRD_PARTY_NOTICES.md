@@ -39,6 +39,7 @@ MIT、常見 BSD-2-Clause／BSD-3-Clause、Apache-2.0 可作優先候選，但�
 
 - `app/` 地圖原型和 `backend/` 本機診斷 API 來自 [Team10 Webview 快照 `d88e71e`](https://github.com/Clare0808/team10_townpass_webview/commit/d88e71e)。匯入版本保留程式來源紀錄，原倉庫無獨立授權檔，公開交付前須釐清各部分的再散布權利。
 - 地圖 SVG 與 JSON 為依 [臺北捷運站圖](https://web.metro.taipei/img/ALL/INFOPDF/051.pdf) 和 [臺北捷運剖面圖](https://web.metro.taipei/pages2026/WebStation/051/4) 重繪的示意原型。官方原圖及原 Webview 的示範圖片、favicon、環境檔與 Python 快取未匯入。站圖和衍生資料的公開交付權利仍待核對。
+- 2026-11-08 新增的 `qrcode` SVG 圖示、邊界抽樣程式、固定 seed 產生的 32 個示意點及七語名稱為團隊原創，採 AGPL-3.0-or-later；座標依上項既有站圖外輪廓計算，原圖與衍生資料的權利限制仍適用。未新增外部圖資、圖示套件或執行期依賴；示意點不是現地設置或通行認證。
 - npm 直接依賴見 `app/package.json`，鎖定版本、下載來源、完整性摘要及上游宣告授權見 `app/package-lock.json`。目前 lockfile 的下載來源為 `registry.npmjs.org`。`backend/requirements.txt` 為原有 Flask 診斷工具依賴，與地圖執行分開。以上均為 private 原型，供應鏈及發行授權審查仍待完成。
 
 

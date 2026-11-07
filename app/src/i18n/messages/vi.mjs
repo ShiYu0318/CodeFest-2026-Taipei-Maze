@@ -36,6 +36,8 @@ export default {
   "type.water": "Nước uống",
   "type.locker": "Tủ gửi đồ",
   "type.accessible": "Khu chờ cho xe lăn",
+  "type.qrcode": "Điểm định vị QR",
+  "help.qrcode": "Điểm định vị minh họa; chưa có biển QR tại đây.",
   "help.elevator": "Thang máy: đổi tầng mà không cần đi cầu thang.",
   "help.stairs": "Cầu thang bộ: đi từng bậc để sang tầng khác.",
   "help.escalator":

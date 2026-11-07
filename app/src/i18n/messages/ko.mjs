@@ -36,6 +36,8 @@ export default {
   "type.water": "음수대",
   "type.locker": "물품보관함",
   "type.accessible": "휠체어 대기 구역",
+  "type.qrcode": "QR 위치 지점",
+  "help.qrcode": "예시 위치 지점입니다. 현장에 QR 표지가 설치된 것은 아닙니다.",
   "help.elevator": "엘리베이터: 계단 없이 층을 이동할 수 있어요.",
   "help.stairs": "계단: 한 걸음씩 걸어서 다른 층으로 가요.",
   "help.escalator":

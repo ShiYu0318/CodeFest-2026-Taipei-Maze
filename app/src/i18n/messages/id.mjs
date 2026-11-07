@@ -36,6 +36,8 @@ export default {
   "type.water": "Air minum",
   "type.locker": "Loker",
   "type.accessible": "Area tunggu kursi roda",
+  "type.qrcode": "Titik lokasi QR",
+  "help.qrcode": "Titik lokasi contoh; tanda QR belum dipasang di lokasi.",
   "help.elevator": "Lift: pindah lantai tanpa naik tangga.",
   "help.stairs": "Tangga: berjalan selangkah demi selangkah ke lantai lain.",
   "help.escalator": "Eskalator: tangga berjalan. Periksa arahnya sebelum naik.",

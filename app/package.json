@@ -9,7 +9,7 @@
     "backend": "python ../backend/app.py",
     "dev": "npm run serve",
     "test": "node --test tests/*.test.mjs",
-    "validate:assets": "node scripts/validate-assets.mjs"
+    "validate:assets": "node scripts/validate-assets.mjs && node ../tools/scatter-station-qrcode.mjs --check"
   },
   "dependencies": {
     "core-js": "^3.8.3",

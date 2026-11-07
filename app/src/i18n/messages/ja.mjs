@@ -36,6 +36,8 @@ export default {
   "type.water": "給水機",
   "type.locker": "コインロッカー",
   "type.accessible": "車いす待合スペース",
+  "type.qrcode": "QR 位置ポイント",
+  "help.qrcode": "位置のサンプルです。現地にQR標識は設置されていません。",
   "help.elevator": "エレベーター：階段を使わずに階を移動できます。",
   "help.stairs": "階段：一段ずつ歩いてほかの階へ行きます。",
   "help.escalator":

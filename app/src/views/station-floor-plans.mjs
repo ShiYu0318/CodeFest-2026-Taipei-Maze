@@ -1,6 +1,8 @@
 // Coordinates follow the corresponding pages of the Taipei Metro PDF at 1349 px wide.
 // The two lower pages are offset to align their reference footprints with page 2.
 // Centers are the area centroids of the solid outlines in shared map coordinates.
+export const b2Outline =
+  "M34 495H634L708 61l91 17 4-17 100 45-1-12 88 15-68 386h427v57l18 1-34 77h16v59H34v-62H18l34-79H34Z";
 export const floors = {
   B1: {
     name: "站內通道與出口",
@@ -27,6 +29,11 @@ export const floors = {
 export const stackBounds = [-65, 235, 1385, 1190];
 
 export const plans = {
+  B2: {
+    offset: [512.5, 960],
+    scale: 0.5,
+    outlines: [b2Outline],
+  },
   B1: {
     outlines: [
       "M47 605l134-4 20 163-154 50Z",

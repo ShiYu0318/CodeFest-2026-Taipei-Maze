@@ -45,7 +45,24 @@ export function validateStationData(pointData, connectionData) {
           issues.push(`${where}: unknown type ${type}`);
       if (![point.x, point.y].every((n) => Number.isFinite(n) && n >= 0))
         issues.push(`${where}: invalid coordinates`);
+      const boundaryDemo =
+        point.type === "qrcode" && point.placement === "boundary-demo";
+      if (
+        point.placement === "boundary-demo" &&
+        (!boundaryDemo ||
+          point.zone !== null ||
+          !Number.isInteger(point.boundary?.outline) ||
+          point.boundary.outline < 0 ||
+          !Number.isInteger(point.boundary?.edge) ||
+          point.boundary.edge < 0 ||
+          !Number.isFinite(point.boundary?.fraction) ||
+          point.boundary.fraction < 0 ||
+          point.boundary.fraction > 1)
+      )
+        issues.push(`${where}: invalid demo QR boundary placement`);
       const zone = zones.get(point.zone);
+      // Random demonstration markers have no surveyed zone or walking edges.
+      if (boundaryDemo && point.zone === null) continue;
       if (!zone) issues.push(`${where}: unknown zone ${point.zone}`);
       else if (zone.floor !== floor)
         issues.push(`${where}: zone ${zone.id} belongs to floor ${zone.floor}`);

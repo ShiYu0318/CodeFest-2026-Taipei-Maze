@@ -434,7 +434,7 @@ import { buildInfo, summarizeStationData } from "../about/about.mjs";
 import { htmlLang, useI18n } from "../i18n/index.mjs";
 import { placeName } from "../i18n/places.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
-import { floors, stackBounds } from "./station-floor-plans";
+import { floors, stackBounds } from "./station-floor-plans.mjs";
 import stationData from "./station-points.json";
 import stationConnections from "./station-connections.json";
 import { zones, transfersFromPoint } from "./station-routing";

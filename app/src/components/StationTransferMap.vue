@@ -36,7 +36,7 @@
 <script>
 import StationFloorPlan from "./StationFloorPlan.vue";
 import StationMapIcon from "./StationMapIcon.vue";
-import { floors } from "../views/station-floor-plans";
+import { floors } from "../views/station-floor-plans.mjs";
 
 export default {
   components: { StationFloorPlan, StationMapIcon },
