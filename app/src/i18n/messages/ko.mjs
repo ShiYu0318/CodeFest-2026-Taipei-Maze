@@ -349,6 +349,7 @@ export default {
   "map.faceChoose": "역내 안내판을 바라본 뒤 목적지를 고르세요.",
   "map.badgeStart": "출",
   "map.badgeEnd": "도",
+  "scan.actions": "이동 작업",
   "scan.cancelTrip": "여정 취소",
   "endpoint.close": "위치 닫기",
   "endpoint.roles": "출발점 또는 목적지 선택",

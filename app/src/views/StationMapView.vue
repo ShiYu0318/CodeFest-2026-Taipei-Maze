@@ -41,11 +41,6 @@
         @scanned="onQrScanned"
         @cancel-trip="openTripDialog('cancel')"
       />
-      <StationNavigationRescan
-        v-if="navigationMap.active && !endpointPickerOpen && !tripDialog"
-        :location="location"
-        @scanned="onQrScanned"
-      />
       <div
         ref="floorControls"
         class="floor-controls horizontal-scroll"
@@ -468,7 +463,6 @@ import { useRoute, useRouter } from "vue-router";
 // import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationScanPanel from "../components/StationScanPanel.vue";
-import StationNavigationRescan from "../components/StationNavigationRescan.vue";
 import StaffCard from "../components/StaffCard.vue";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
 import StationInformationDialog from "../components/StationInformationDialog.vue";

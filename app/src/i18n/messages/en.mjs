@@ -360,6 +360,7 @@ export default {
   "map.faceChoose": "Face the station signs, then choose a destination.",
   "map.badgeStart": "S",
   "map.badgeEnd": "E",
+  "scan.actions": "Trip actions",
   "scan.cancelTrip": "Cancel trip",
   "endpoint.close": "Close locate",
   "endpoint.roles": "Choose start or destination",

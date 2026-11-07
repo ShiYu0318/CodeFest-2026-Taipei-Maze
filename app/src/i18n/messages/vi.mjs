@@ -357,6 +357,7 @@ export default {
   "map.faceChoose": "Hãy hướng về biển chỉ dẫn trong ga rồi chọn điểm đến.",
   "map.badgeStart": "Đi",
   "map.badgeEnd": "Đến",
+  "scan.actions": "Thao tác hành trình",
   "scan.cancelTrip": "Hủy chuyến đi",
   "endpoint.close": "Đóng định vị",
   "endpoint.roles": "Chọn điểm xuất phát hoặc điểm đến",
