@@ -84,3 +84,29 @@ test("same zone is not arrival or walking route; unverified and stairs are never
   assert.equal(disconnected.snapshot().relation.status, "unavailable");
   assert.equal(disconnected.snapshot().destinationId, "m-e4");
 });
+
+test("search restrictions and unavailable devices survive later destination choices and scans", () => {
+  const session = setup();
+  session.applySearchSelection({
+    poiId: "m-e4",
+    proposedOptions: {
+      mobilityProfile: "stepFree",
+      excludedEdgeTypes: ["stairs"],
+    },
+  });
+  session.markUnavailable("metro-e4");
+  session.scan(stationQrPayload("b1-e4", points));
+  assert.ok(
+    session
+      .snapshot()
+      .relation.steps.every((e) => e.id !== "metro-e4" && e.type === "elevator")
+  );
+  session.applySearchSelection({
+    poiId: "m-e4",
+    proposedOptions: { mobilityProfile: "standard", excludedEdgeTypes: [] },
+  });
+  assert.equal(session.snapshot().stepFree, true);
+  assert.deepEqual(session.snapshot().excludedEdgeTypes, ["stairs"]);
+  assert.deepEqual(session.snapshot().unavailableConnectorIds, ["metro-e4"]);
+  assert.equal(session.snapshot().arrived, false);
+});

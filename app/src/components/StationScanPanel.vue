@@ -28,7 +28,7 @@
       >
         將地圖上選取的「{{ props.selectedPoint.name }}」設為終點
       </button>
-      <details>
+      <details ref="searchDetails">
         <summary>用名稱搜尋（七語詞典原型）</summary>
         <DestinationSearch
           id="station-navigation-search"
@@ -109,6 +109,7 @@
 <script setup>
 /* global defineProps, defineEmits */
 import { computed, onBeforeUnmount, ref, shallowRef } from "vue";
+import { useDisplayPreferences } from "../display/preferences.mjs";
 import DestinationSearch from "./DestinationSearch.vue";
 import { stationCatalog } from "../search/catalog.mjs";
 import { createContinuousScanner } from "../navigation/continuous.mjs";
@@ -122,10 +123,12 @@ const catalog = stationPoints(data),
 const byId = new Map(catalog.map((p) => [p.id, p]));
 const session = createStationScanSession(data, connections),
   view = shallowRef(session.snapshot());
+const { displayMode } = useDisplayPreferences();
+const searchDetails = ref(null);
 const active = ref(false),
   available = ref(false),
   notice = ref(""),
-  easyRead = ref(false);
+  easyRead = ref(displayMode.value !== "standard");
 let disposed = false,
   guidanceVersion = 0;
 const destination = computed(() => byId.get(view.value.destinationId));
@@ -209,6 +212,7 @@ function choose(id) {
 function searchSelect(selection) {
   if (active.value || !session.applySearchSelection(selection)) return;
   refresh();
+  if (searchDetails.value) searchDetails.value.open = false;
   emit("destination", destination.value);
   notice.value = "已選擇終點並保留通行限制；請掃描目前位置。";
 }
@@ -256,10 +260,10 @@ onBeforeUnmount(() => {
   margin: 0 0 16px;
   border: 1px solid #bdd0dc;
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface, #fff);
   text-align: left;
-  color: #173649;
-  font: 15px/1.55 system-ui, sans-serif;
+  color: var(--ink, #173649);
+  font: var(--display-main-size, 15px) / 1.55 system-ui, sans-serif;
 }
 .scan-heading {
   display: flex;
@@ -282,25 +286,25 @@ onBeforeUnmount(() => {
 .scan-note,
 .scan-time {
   font-size: 12px;
-  color: #526676;
+  color: var(--muted, #526676);
 }
 .station-scan-panel select {
   display: block;
   max-width: 100%;
   width: 100%;
-  min-height: 44px;
+  min-height: var(--display-control-height, 44px);
   font: inherit;
   border: 1px solid #a3bac8;
   border-radius: 7px;
-  background: #fff;
+  background: var(--surface, #fff);
   padding: 8px;
   margin: 6px 0;
 }
 .station-scan-panel button {
-  min-height: 44px;
+  min-height: var(--display-control-height, 44px);
   margin: 6px 6px 0 0;
   padding: 9px 12px;
-  background: #eef4f7;
+  background: var(--wash, #eef4f7);
   border: 1px solid #afc5d2;
   border-radius: 8px;
   font: inherit;
@@ -343,5 +347,17 @@ onBeforeUnmount(() => {
 }
 .scan-target {
   font-size: 16px;
+}
+.station-scan-panel :deep(.destination-search) {
+  background: var(--surface, #fff);
+  color: var(--ink, #173649);
+}
+.station-scan-panel :deep(.search-hint),
+.station-scan-panel :deep(small) {
+  color: var(--muted, #526676);
+}
+.station-scan-panel button {
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 </style>
