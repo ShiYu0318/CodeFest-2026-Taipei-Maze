@@ -50,6 +50,7 @@ export default {
   "zone.b3-red": "淡水信義線大廳",
   "zone.b4-platform": "淡水信義線月台",
 
+  "type.platform": "月台",
   "type.elevator": "電梯",
   "type.restroom": "廁所",
   "type.nursing": "哺集乳室",

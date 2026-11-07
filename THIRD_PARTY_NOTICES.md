@@ -75,3 +75,13 @@ MIT、常見 BSD-2-Clause／BSD-3-Clause、Apache-2.0 可作優先候選，但�
 ## 正式地圖測試碼產生工具
 
 `python-qrcode` 8.2（Lincoln Loop，BSD-3-Clause）僅用於開發產生 SVG 測試碼；來源 https://github.com/lincolnloop/python-qrcode ，PyPI wheel SHA-256 固定於 `tools/requirements/station-qr.txt`，完整授權位於 `integration/townpass/licenses/python-qrcode-BSD-3-Clause.txt`。未新增網頁或手機 runtime 相依套件，未使用線上 QR 服務。
+
+## 2026-11-08 B2 月台示意與捷運配色
+
+B2 新增四個月台的原創幾何示意（高鐵 1／2、台鐵 3／4），參考使用者提供的樓層指示照片及[高鐵台北站平面圖](https://www.thsrc.com.tw/event/map/Taipei2.pdf)、[台鐵臺北站轉乘資訊](https://www.railway.gov.tw/tra-tip-web/tip/tip00H/tipH41/viewTransfer/1000)。未收錄照片、標誌或官方圖檔；示意位置未經測繪，不納入通行路網或現地定位。捷運識別色依使用者指定紅線 `#d12d33`、藍線 `#0072c6`，不宣稱台鐵／高鐵示意配色為官方標準色。未新增依賴或外部素材。
+
+### 2026-11-08 月台位置核對修正
+
+依[臺鐵臺北站官方 B2 平面圖](https://tip.railway.gov.tw/tra-tip-web/tip/img/0a00114c-3667-4e2f-a897-78b2864d8eba/1140x900)核對：由北到南是臺鐵 4、臺鐵 3、高鐵 2、高鐵 1。前次高鐵順序與過小的局部位置已修正；依捷運 051.pdf 的灰色臺鐵／高鐵參考站區調整相對布局及視野，長軸約為東西向。SVG 與 JSON 均為原型示意座標，不是測繪或核准布點；16 個新增 QR／紫色月台標記沿用 boundary-demo 格式、zone=null，不建立任何虛構步行連結。官方圖僅下載於 repository 外供核對，沒有納入交付。
+
+2026-11-08 整合決策：僅保留上述 B2 的 16 個月台 QR／紫色圖示；B3／B4 的 12 個月台示意 QR 依遠端移除。月台圖示及邊界內縮程式保留供 B2 使用，未新增第三方依賴。

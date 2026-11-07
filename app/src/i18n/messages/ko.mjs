@@ -55,6 +55,7 @@ export default {
   "zone.b3-red": "단수이신이선 대합실",
   "zone.b4-platform": "단수이신이선 승강장",
 
+  "type.platform": "승강장",
   "type.elevator": "엘리베이터",
   "type.restroom": "화장실",
   "type.nursing": "수유실",

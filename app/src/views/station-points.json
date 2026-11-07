@@ -69,6 +69,11 @@
       "name": "QR 定位點",
       "colorToken": "primary-900",
       "iconColor": "#244e57"
+    },
+    "platform": {
+      "name": "月台",
+      "colorToken": "primary-900",
+      "iconColor": "#AC3BFF"
     }
   },
   "points": {
@@ -1321,6 +1326,310 @@
           "edge": 14,
           "fraction": 0.85455206222409
         }
+      },
+      {
+        "id": "b2-tra-4-qr-01",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 4 號月台北側 QR 1 號示意定位點",
+        "x": 357.5,
+        "y": 582.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-4",
+        "boundary": {
+          "outline": 1,
+          "edge": 0,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-tra-4-qr-02",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 4 號月台北側 QR 2 號示意定位點",
+        "x": 832.5,
+        "y": 547.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-4",
+        "boundary": {
+          "outline": 1,
+          "edge": 0,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-tra-4-qr-03",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 4 號月台南側 QR 3 號示意定位點",
+        "x": 832.5,
+        "y": 627.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-4",
+        "boundary": {
+          "outline": 1,
+          "edge": 2,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-tra-4-qr-04",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 4 號月台南側 QR 4 號示意定位點",
+        "x": 357.5,
+        "y": 662.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-4",
+        "boundary": {
+          "outline": 1,
+          "edge": 2,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-tra-3-qr-01",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 3 號月台北側 QR 1 號示意定位點",
+        "x": 357.5,
+        "y": 692.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-3",
+        "boundary": {
+          "outline": 2,
+          "edge": 0,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-tra-3-qr-02",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 3 號月台北側 QR 2 號示意定位點",
+        "x": 832.5,
+        "y": 657.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-3",
+        "boundary": {
+          "outline": 2,
+          "edge": 0,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-tra-3-qr-03",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 3 號月台南側 QR 3 號示意定位點",
+        "x": 832.5,
+        "y": 737.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-3",
+        "boundary": {
+          "outline": 2,
+          "edge": 2,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-tra-3-qr-04",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 3 號月台南側 QR 4 號示意定位點",
+        "x": 357.5,
+        "y": 772.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-3",
+        "boundary": {
+          "outline": 2,
+          "edge": 2,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-hsr-2-qr-01",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 2 號月台北側 QR 1 號示意定位點",
+        "x": 357.5,
+        "y": 802.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-2",
+        "boundary": {
+          "outline": 3,
+          "edge": 0,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-hsr-2-qr-02",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 2 號月台北側 QR 2 號示意定位點",
+        "x": 832.5,
+        "y": 767.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-2",
+        "boundary": {
+          "outline": 3,
+          "edge": 0,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-hsr-2-qr-03",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 2 號月台南側 QR 3 號示意定位點",
+        "x": 832.5,
+        "y": 847.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-2",
+        "boundary": {
+          "outline": 3,
+          "edge": 2,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-hsr-2-qr-04",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 2 號月台南側 QR 4 號示意定位點",
+        "x": 357.5,
+        "y": 882.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-2",
+        "boundary": {
+          "outline": 3,
+          "edge": 2,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-hsr-1-qr-01",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 1 號月台北側 QR 1 號示意定位點",
+        "x": 357.5,
+        "y": 912.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-1",
+        "boundary": {
+          "outline": 4,
+          "edge": 0,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-hsr-1-qr-02",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 1 號月台北側 QR 2 號示意定位點",
+        "x": 832.5,
+        "y": 877.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-1",
+        "boundary": {
+          "outline": 4,
+          "edge": 0,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-hsr-1-qr-03",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 1 號月台南側 QR 3 號示意定位點",
+        "x": 832.5,
+        "y": 957.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-1",
+        "boundary": {
+          "outline": 4,
+          "edge": 2,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-hsr-1-qr-04",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 1 號月台南側 QR 4 號示意定位點",
+        "x": 357.5,
+        "y": 992.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-1",
+        "boundary": {
+          "outline": 4,
+          "edge": 2,
+          "fraction": 0.75
+        }
       }
     ],
     "B3": [
@@ -1640,6 +1949,78 @@
           "edge": 20,
           "fraction": 0.6696273854531544
         }
+      },
+      {
+        "id": "b3-qr-05",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 05 號示意定位點",
+        "x": 561.39,
+        "y": 1209,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 1,
+          "edge": 0,
+          "fraction": 0.00983279559727066
+        }
+      },
+      {
+        "id": "b3-qr-06",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 06 號示意定位點",
+        "x": 999.54,
+        "y": 1209,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 1,
+          "edge": 0,
+          "fraction": 0.683907735933855
+        }
+      },
+      {
+        "id": "b3-qr-07",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 07 號示意定位點",
+        "x": 1092.96,
+        "y": 1308,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 1,
+          "edge": 6,
+          "fraction": 0.17363962940699826
+        }
+      },
+      {
+        "id": "b3-qr-08",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 08 號示意定位點",
+        "x": 725.57,
+        "y": 1308,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 1,
+          "edge": 6,
+          "fraction": 0.7379880427096147
+        }
       }
     ],
     "B4": [
@@ -1727,6 +2108,150 @@
         "description": "往 B3 淡水信義線大廳。梯種依平面圖、剖面圖與設備數量推定。",
         "angle": 12,
         "zone": "b4-platform"
+      },
+      {
+        "id": "b4-qr-01",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 01 號示意定位點",
+        "x": 1110.06,
+        "y": 459.5,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 4,
+          "fraction": 0.7853071715509021
+        }
+      },
+      {
+        "id": "b4-qr-02",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 02 號示意定位點",
+        "x": 1100.99,
+        "y": 550.14,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 5,
+          "fraction": 0.14059666004053495
+        }
+      },
+      {
+        "id": "b4-qr-03",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 03 號示意定位點",
+        "x": 1043.51,
+        "y": 851.28,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 5,
+          "fraction": 0.615579203490409
+        }
+      },
+      {
+        "id": "b4-qr-04",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 04 號示意定位點",
+        "x": 1018.59,
+        "y": 981.89,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 5,
+          "fraction": 0.8215977871919903
+        }
+      },
+      {
+        "id": "b4-qr-05",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 05 號示意定位點",
+        "x": 960.08,
+        "y": 1095.25,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 7,
+          "fraction": 0.9169867860500214
+        }
+      },
+      {
+        "id": "b4-qr-06",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 06 號示意定位點",
+        "x": 921.52,
+        "y": 937.25,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 11,
+          "fraction": 0.21919333743786085
+        }
+      },
+      {
+        "id": "b4-qr-07",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 07 號示意定位點",
+        "x": 967.38,
+        "y": 697.33,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 11,
+          "fraction": 0.5982157051590494
+        }
+      },
+      {
+        "id": "b4-qr-08",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "QR 08 號示意定位點",
+        "x": 995.83,
+        "y": 548.52,
+        "description": "站圖邊界上的示意定位點，尚未現地設置。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "boundary": {
+          "outline": 0,
+          "edge": 11,
+          "fraction": 0.8333043278652966
+        }
       }
     ]
   }

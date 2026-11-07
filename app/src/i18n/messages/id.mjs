@@ -58,6 +58,7 @@ export default {
   "zone.b3-red": "Hall Jalur Tamsui-Xinyi",
   "zone.b4-platform": "Peron Jalur Tamsui-Xinyi",
 
+  "type.platform": "Peron",
   "type.elevator": "Lift",
   "type.restroom": "Toilet",
   "type.nursing": "Ruang menyusui",

@@ -58,6 +58,7 @@ export default {
   "zone.b3-red": "Sảnh tuyến Tamsui-Xinyi",
   "zone.b4-platform": "Sân ga tuyến Tamsui-Xinyi",
 
+  "type.platform": "Sân ga",
   "type.elevator": "Thang máy",
   "type.restroom": "Nhà vệ sinh",
   "type.nursing": "Phòng cho con bú",
