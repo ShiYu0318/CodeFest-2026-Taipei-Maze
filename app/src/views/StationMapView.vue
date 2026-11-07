@@ -52,9 +52,6 @@
       <div class="facility-header">
         <div class="facility-title-group">
           <h2 id="facility-title"><ZhuyinText text="設施主題" /></h2>
-          <router-link class="navigation-demo-link" to="/navigation-demo">
-            <ZhuyinText text="測試導航流程" />
-          </router-link>
         </div>
         <span>
           {{ visibleFloorPoints.length }} <ZhuyinText text="個標點" />

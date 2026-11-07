@@ -1,0 +1,30 @@
+name: Publish approved Gemma model
+on:
+  workflow_dispatch:
+permissions:
+  # Draft releases are listed only for tokens with push access.
+  contents: write
+concurrency:
+  group: model-publication
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: [self-hosted, Linux, X64]
+    timeout-minutes: 20
+    env:
+      DEPLOY_DIR: /home/user/Taipei-Codefest-2026-Big-Dumb
+    steps:
+      - name: Synchronize reviewed main
+        run: |
+          cd "$DEPLOY_DIR"
+          git pull --ff-only
+      - name: Publish immutable verified model from private draft
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd "$DEPLOY_DIR"
+          python3 tools/publish-gemma-origin.py --destination "$DEPLOY_DIR/.models"
+      - name: Verify local static model route
+        run: |
+          test "$(curl -fsS -I http://localhost:8001/models/gemma3-1b-it-int4.litertlm | tr -d '\r' | awk 'tolower($1)=="content-length:" {print $2}')" = 584417280
+          curl -fsS http://localhost:8001/models/receipt.json > /dev/null

@@ -25,3 +25,11 @@ payload = json.dumps({'schema':1,'revision':revision,'files':files},separators=(
 destination.parent.mkdir(parents=True,exist_ok=True)
 destination.write_bytes(gzip.compress(payload,mtime=0))
 print(f'Bundled {len(files)} local web files ({destination.stat().st_size} bytes). Model weights excluded.')
+
+# Model metadata and complete terms ship with the App, never an account token.
+release = json.loads((root / 'integration/townpass/gemma-release.json').read_text())
+license_dir = root / 'integration/townpass/licenses'
+release['agreement'] = (license_dir / 'Gemma-Terms.txt').read_text()
+release['policy'] = (license_dir / 'Gemma-Prohibited-Use-Policy.txt').read_text()
+release['notice'] = 'Gemma is provided under and subject to the Gemma Terms of Use found at ai.google.dev/gemma/terms'
+(destination.parent / 'gemma_release.json').write_text(json.dumps(release,ensure_ascii=False,indent=2)+'\n')

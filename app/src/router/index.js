@@ -10,8 +10,7 @@ const routes = [
   },
   {
     path: "/navigation-demo",
-    name: "navigation-demo",
-    component: () => import("../views/NavigationDemoView.vue"),
+    redirect: "/station-map",
   },
   {
     path: "/",
