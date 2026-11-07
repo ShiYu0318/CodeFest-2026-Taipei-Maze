@@ -78,14 +78,14 @@ test("a platform badge clears both edges near a corner of a narrow outline", () 
 });
 
 test("the original eight QR points per floor retain their transformed boundary coordinates", () => {
-  assert.equal(qrPoints.length, 36);
-  assert.equal(new Set(qrPoints.map((point) => point.id)).size, 36);
+  assert.equal(qrPoints.length, 48);
+  assert.equal(new Set(qrPoints.map((point) => point.id)).size, 48);
   for (const floor of Object.keys(floors)) {
     const points = qrPoints.filter(
       (point) => point.floor === floor && !point.platformId
     );
     const obstacles = data.points[floor].filter((point) => !isQrPoint(point));
-    assert.equal(points.length, { B1: 8, B2: 8, B3: 4, B4: 0 }[floor]);
+    assert.equal(points.length, { B1: 8, B2: 8, B3: 8, B4: 8 }[floor]);
     const basePlan =
       floor === "B2"
         ? { ...plans.B2, outlines: plans.B2.outlines.slice(0, 1) }
@@ -126,28 +126,36 @@ test("the original eight QR points per floor retain their transformed boundary c
   }
 });
 
-test("only the 16 B2 railway QR points retain purple platform badges", () => {
+test("B2 railway and restored B3/B4 platform points retain purple badges and red markers remain", () => {
   const platformPoints = stationPoints(data).filter((p) =>
     [p.type].flat().includes("platform")
   );
-  assert.equal(platformPoints.length, 16);
-  assert.ok(platformPoints.every((p) => p.floor === "B2" && p.platformId));
+  assert.equal(platformPoints.length, 28);
+  assert.equal(
+    platformPoints.filter((p) => p.floor === "B2" && p.platformId).length,
+    16
+  );
+  assert.equal(platformPoints.filter((p) => p.floor === "B3").length, 4);
+  assert.equal(platformPoints.filter((p) => p.floor === "B4").length, 8);
+  assert.equal(data.categories.platform.iconColor, "#AC3BFF");
+  assert.equal(data.categories.aed.iconColor, "#CE0000");
+  assert.ok(stationPoints(data).some((p) => [p.type].flat().includes("aed")));
 });
-test("removed B3 and B4 QR anchors cannot be scanned or used as destinations", () => {
+test("restored B3 and B4 QR anchors retain their original scan and destination IDs", () => {
   const session = createStationScanSession(data, connections);
   session.scan(stationQrPayload("b1-e4", data));
   session.setDestination("b4-e1");
-  const before = session.snapshot();
   for (const id of [
     ...[5, 6, 7, 8].map((n) => `b3-qr-0${n}`),
     ...[1, 2, 3, 4, 5, 6, 7, 8].map((n) => `b4-qr-0${n}`),
   ]) {
-    assert.throws(() => stationQrPayload(id, data), RangeError);
-    const payload = JSON.parse(stationQrPayload("b1-qr-01", data));
-    payload.anchor_id = `station_${id}`;
-    assert.notEqual(session.scan(JSON.stringify(payload)).type, "success");
-    assert.equal(session.setDestination(id), false);
-    assert.deepEqual(session.snapshot(), before);
+    assert.equal(session.scan(stationQrPayload(id, data)).type, "success");
+    assert.equal(session.snapshot().position.pointId, id);
+    assert.equal(session.snapshot().destinationId, "b4-e1");
+    assert.equal(session.snapshot().relation.status, "unavailable");
+    assert.equal(session.setDestination(id), true);
+    assert.equal(session.snapshot().relation.status, "at_destination");
+    session.setDestination("b4-e1");
   }
 });
 

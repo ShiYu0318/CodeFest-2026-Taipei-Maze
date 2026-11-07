@@ -44,7 +44,10 @@ for (const [floor, points] of Object.entries(data.points)) {
       throw new Error(`Point ID already exists: ${id}`);
     return {
       id,
-      type: "qrcode",
+      type:
+        platformOutline[floor] === position.boundary.outline
+          ? ["qrcode", "platform"]
+          : "qrcode",
       name: `QR ${number} 號示意定位點`,
       x: position.x,
       y: position.y,
@@ -89,13 +92,7 @@ for (const [floor, points] of Object.entries(data.points)) {
       }
     });
   }
-  data.points[floor] = [
-    ...existing,
-    ...generated.filter(
-      (point) =>
-        floor === "B2" || point.boundary.outline !== platformOutline[floor]
-    ),
-  ];
+  data.points[floor] = [...existing, ...generated];
 }
 const output = JSON.stringify(data, null, 2) + "\n";
 if (process.argv.includes("--check")) {
@@ -104,4 +101,6 @@ if (process.argv.includes("--check")) {
       "Regenerate boundary QR points with node tools/scatter-station-qrcode.mjs"
     );
 } else writeFileSync(file, output);
-console.log("20 non-platform QR points plus 16 B2 railway platform points.");
+console.log(
+  "32 original QR points plus 16 B2 railway platform points; colored markers preserved."
+);
