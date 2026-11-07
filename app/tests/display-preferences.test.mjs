@@ -5,6 +5,7 @@ import {
   createDisplayPreferences,
   useDisplayPreferences,
   themeStorageKey,
+  contrastStorageKey,
 } from "../src/display/preferences.mjs";
 
 test("fresh document state always starts light/standard after any prior mode", () => {
@@ -81,4 +82,30 @@ test("denied or malformed storage never prevents manual theme changes", () => {
   assert.equal(invalid.theme.value, "light");
   invalid.toggleTheme();
   assert.equal(invalid.theme.value, "dark");
+});
+
+test("high contrast is independent of theme and mode and is remembered", () => {
+  const values = new Map();
+  const storage = () => ({
+    getItem: (key) => values.get(key),
+    setItem: (key, value) => values.set(key, value),
+  });
+  const first = createDisplayPreferences(storage);
+  assert.equal(first.contrast.value, "standard");
+  first.toggleContrast();
+  first.setDisplayMode("senior");
+  first.toggleTheme();
+  assert.equal(first.contrast.value, "high");
+  assert.equal(values.get(contrastStorageKey), "high");
+  const next = createDisplayPreferences(storage);
+  assert.equal(next.contrast.value, "high");
+  assert.equal(next.displayMode.value, "standard");
+  next.toggleContrast();
+  assert.equal(createDisplayPreferences(storage).contrast.value, "standard");
+  const blocked = () => {
+    throw new Error("blocked");
+  };
+  const offline = createDisplayPreferences(blocked);
+  offline.toggleContrast();
+  assert.equal(offline.contrast.value, "high");
 });
