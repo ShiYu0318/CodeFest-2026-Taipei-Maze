@@ -338,6 +338,21 @@
                 <StationMapIcon name="arrow" />
                 <ZhuyinText :text="t('map.goHere')" />
               </button>
+              <button
+                type="button"
+                class="facility-staff"
+                @click="
+                  staffPoint = { ...selected, floor: selected.floor ?? level }
+                "
+              >
+                <ZhuyinText :text="t('staff.open')" />
+              </button>
+              <StaffCard
+                v-if="staffPoint"
+                :point="staffPoint"
+                :step-free="location.view.value.stepFree"
+                @close="staffPoint = null"
+              />
             </div>
           </section>
         </div>
@@ -402,6 +417,7 @@ import { useRoute, useRouter } from "vue-router";
 // import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationScanPanel from "../components/StationScanPanel.vue";
+import StaffCard from "../components/StaffCard.vue";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
@@ -1278,6 +1294,7 @@ function chooseEndpoint(start, destination, point, role) {
   return saved;
 }
 
+const staffPoint = ref(null);
 // One tap from a facility card to trip guidance.
 function goHere(point) {
   return chooseEndpoint(currentPoint.value?.id, point.id, point, "destination");
