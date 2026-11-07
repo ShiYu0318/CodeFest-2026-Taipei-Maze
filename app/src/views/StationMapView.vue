@@ -8,7 +8,7 @@
     <div class="station-shell">
       <section class="station-heading" aria-labelledby="station-title">
         <div class="station-title-row">
-          <h1 id="station-title"><ZhuyinText text="台北車站" /></h1>
+          <!-- <h1 id="station-title"><ZhuyinText text="台北車站" /></h1> -->
           <DisplayControls />
         </div>
         <p v-if="displayMode !== 'standard'" class="display-floor-label">
