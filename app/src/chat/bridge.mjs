@@ -28,7 +28,44 @@ export function createChatBridge(
     if (message?.name !== "codefest_ai") return;
     const data = message.data,
       entry = pending.get(data?.requestId);
-    if (!entry || !["success", "error"].includes(data.status)) return;
+    if (!entry) return;
+    // Partial generate chunks use consecutive 1-based seq numbers.
+    // Ignore retransmits; fail closed on gaps, invalid frames or other actions.
+    if (data.status === "partial") {
+      if (
+        entry.action !== "generate" ||
+        !Number.isSafeInteger(data.seq) ||
+        data.seq < 1 ||
+        typeof data.text !== "string" ||
+        !data.text
+      ) {
+        api.cancel(data.requestId, "invalid_reply");
+        return;
+      }
+      if (data.seq <= entry.lastSeq) return;
+      if (data.seq !== entry.lastSeq + 1) {
+        api.cancel(data.requestId, "invalid_reply");
+        return;
+      }
+      entry.lastSeq = data.seq;
+      entry.received += data.text.length;
+      if (entry.received > 12000) {
+        api.cancel(data.requestId, "invalid_reply");
+        return;
+      }
+      clearTimeout(entry.timer);
+      entry.timer = setTimeout(
+        () => api.cancel(data.requestId, "timeout"),
+        entry.idle
+      );
+      try {
+        entry.onPartial?.(data.text);
+      } catch {
+        /* A rendering error must not break the bridge. */
+      }
+      return;
+    }
+    if (!["success", "error"].includes(data.status)) return;
     clearTimeout(entry.timer);
     pending.delete(data.requestId);
     entry.resolve(
@@ -39,7 +76,7 @@ export function createChatBridge(
   }
   if (supported) native.addEventListener("message", receive);
   const api = {
-    request(action, values = {}) {
+    request(action, values = {}, { onPartial } = {}) {
       if (!supported || disposed)
         return Promise.resolve(failure("unavailable"));
       if (
@@ -66,11 +103,18 @@ export function createChatBridge(
       if (!/^[a-f0-9]{32}$/.test(requestId) || pending.has(requestId))
         return Promise.resolve(failure("unavailable"));
       return new Promise((resolve) => {
-        const timer = setTimeout(
-          () => api.cancel(requestId, "timeout"),
-          action === "status" ? 3000 : action === "setup" ? 1800000 : timeoutMs
-        );
-        pending.set(requestId, { resolve, timer });
+        const idle =
+          action === "status" ? 3000 : action === "setup" ? 1800000 : timeoutMs;
+        const timer = setTimeout(() => api.cancel(requestId, "timeout"), idle);
+        pending.set(requestId, {
+          resolve,
+          timer,
+          idle,
+          received: 0,
+          action,
+          lastSeq: 0,
+          onPartial: typeof onPartial === "function" ? onPartial : null,
+        });
         try {
           send({ ...values, action, requestId });
         } catch {
