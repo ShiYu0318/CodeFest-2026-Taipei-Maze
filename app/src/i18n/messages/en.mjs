@@ -140,6 +140,16 @@ export default {
     "Set from a location link. Please check where you are; this is not live tracking.",
   "scan.waiting": "Waiting for the scan…",
   "scan.rescan": "Scan again",
+  "transfer.goTo": "Use the {kind} to go to {floor}",
+  "transfer.checkFloor": "Check the floor signs when you arrive, then confirm.",
+  "transfer.checkDirection":
+    "Check the escalator's direction on the signs first.",
+  "transfer.confirmUp": "I have gone upstairs",
+  "transfer.confirmDown": "I have gone downstairs",
+  "transfer.manualFloor":
+    "You confirmed arrival at {floor} (manually confirmed; scan a QR to update your location).",
+  "transfer.previousLocation": "Previous location: {place}",
+  "transfer.manualPositionBadge": "Manually confirmed location",
   "scan.relocateHint":
     "Lost or unsure? Scan a nearby QR code to update your location and keep your destination.",
   "scan.scan": "Scan location",

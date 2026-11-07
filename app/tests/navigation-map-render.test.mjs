@@ -36,6 +36,7 @@ const realComponents = new Set([
   "StationB2Plan",
   "StationMapIcon",
   "StationNavigationRescan",
+  "StationTransferStep",
 ]);
 function component(name) {
   if (components.has(name)) return components.get(name);
@@ -193,7 +194,7 @@ test("the real fixed scan button calls TownPass once, handles cancel and can rel
   const renderer = Vue.createRenderer({
     createElement(tag) {
       const node = { children: [] };
-      if (tag === "button") button = node;
+      node.tag = tag;
       return node;
     },
     createText: (text) => ({ text }),
@@ -213,6 +214,7 @@ test("the real fixed scan button calls TownPass once, handles cancel and can rel
     nextSibling: () => null,
     patchProp(node, key, _, value) {
       node[key] = value;
+      if (key === "data-tour-target" && value === "scan") button = node;
     },
   });
   const reply = (payload) => {
@@ -252,5 +254,108 @@ test("the real fixed scan button calls TownPass once, handles cancel and can rel
   } finally {
     app.unmount();
     controller.dispose();
+  }
+});
+
+test("the rendered floor action names its target, rejects a repeated old click and keeps native rescanning available", async () => {
+  const language = i18n.useI18n(),
+    previousLocale = language.locale.value;
+  language.setLocale("zh-TW");
+  const receivers = new Set(),
+    nodes = [];
+  const native = {
+    postMessage() {},
+    addEventListener: (_, fn) => receivers.add(fn),
+    removeEventListener: (_, fn) => receivers.delete(fn),
+  };
+  const view = Vue.shallowRef(null);
+  const controller = createStationLocation({
+    data,
+    connections,
+    native,
+    onChange: (state) => {
+      view.value = state;
+    },
+  });
+  controller.applyQuery({ point: "b1-e4" });
+  controller.choose("b4-e1");
+  const location = {
+    view,
+    scan: () => controller.scan(),
+    confirmTransfer: (token) => controller.confirmTransfer(token),
+  };
+  const renderer = Vue.createRenderer({
+    createElement(tag) {
+      const node = { tag, children: [] };
+      nodes.push(node);
+      return node;
+    },
+    createText: (text) => ({ text }),
+    createComment: (text) => ({ text }),
+    insert(node, parent) {
+      parent.children.push(node);
+      node.parent = parent;
+    },
+    remove(node) {
+      node.removed = true;
+    },
+    setText(node, text) {
+      node.text = text;
+    },
+    setElementText(node, text) {
+      node.text = text;
+    },
+    parentNode: (node) => node.parent,
+    nextSibling: () => null,
+    patchProp(node, key, _, value) {
+      node[key] = value;
+    },
+  });
+  const action = () =>
+    nodes.findLast((node) => node.class === "confirm-floor-transfer");
+  const heading = () => nodes.findLast((node) => node.tag === "h3").text;
+  const reply = (payload) => {
+    for (const receiver of receivers)
+      receiver({
+        data: iosWebMessageData({ name: "qr_code_scan", data: payload }),
+      });
+  };
+  const app = renderer.createApp(component("StationNavigationRescan"), {
+    location,
+  });
+  try {
+    app.mount({ children: [] });
+    const qr = nodes.find((node) => node["data-tour-target"] === "scan");
+    assert.match(heading(), /電梯.*B2/);
+    assert.equal(action().text, "我已下樓");
+    const firstClick = action().onClick;
+    firstClick();
+    firstClick(); // Same rendered handler, before Vue updates its DOM.
+    assert.equal(view.value.navigationPosition.floor, "B2");
+    await Vue.nextTick();
+    assert.match(heading(), /B4/);
+    firstClick(); // Removed button cannot advance the new step either.
+    assert.equal(view.value.navigationPosition.floor, "B2");
+    assert.equal(qr.disabled, false);
+    const pending = qr.onClick();
+    await Vue.nextTick();
+    assert.equal(action().disabled, true);
+    assert.equal(qr.disabled, true);
+    reply(scan.stationQrPayload("b4-e1", data));
+    await pending;
+    controller.choose("b1-e4");
+    await Vue.nextTick();
+    assert.equal(view.value.manualPosition, null);
+    assert.match(heading(), /B2/);
+    assert.equal(action().text, "我已上樓");
+    action().onClick();
+    await Vue.nextTick();
+    assert.equal(view.value.navigationPosition.floor, "B2");
+    assert.match(heading(), /B1/);
+    assert.equal(qr.disabled, false);
+  } finally {
+    app.unmount();
+    controller.dispose();
+    language.setLocale(previousLocale);
   }
 });

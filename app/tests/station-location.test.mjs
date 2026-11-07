@@ -99,6 +99,44 @@ test("clearing the destination keeps the last confirmed QR position", async () =
   location.dispose();
 });
 
+test("floor confirmation is blocked during scanning; cancelled scans preserve manual progress and a new QR replaces it", async () => {
+  const { n, location, located } = setup();
+  try {
+    await scan(n, location, "b1-e4");
+    location.choose("b4-e1");
+    location.setStepFree(true);
+    const qr = location.snapshot().position;
+    const first = location.snapshot().transfer.token;
+    const scanning = location.scan();
+    assert.equal(location.confirmTransfer(first), false);
+    n.reply(null);
+    await scanning;
+    assert.equal(location.confirmTransfer(first).type, "success");
+    const middle = location.snapshot();
+    assert.deepEqual(middle.position, qr);
+    assert.equal(middle.navigationPosition.floor, "B2");
+    assert.deepEqual(located, ["b1-e4"]); // Manual progress is never published as a QR.
+    for (const payload of [null, "wrong QR"]) {
+      const pending = location.scan();
+      assert.equal(location.confirmTransfer(middle.transfer.token), false);
+      n.reply(payload);
+      await pending;
+      assert.deepEqual(
+        location.snapshot().manualPosition,
+        middle.manualPosition
+      );
+    }
+    await scan(n, location, "b2-qr-01");
+    assert.equal(location.snapshot().manualPosition, null);
+    assert.equal(location.snapshot().navigationPosition.pointId, "b2-qr-01");
+    assert.equal(location.snapshot().destinationId, "b4-e1");
+    assert.equal(location.snapshot().stepFree, true);
+    assert.equal(location.confirmTransfer(middle.transfer.token), false);
+  } finally {
+    location.dispose();
+  }
+});
+
 test("cancel, malformed/foreign QR and duplicate clicks preserve position, target and restrictions", async () => {
   const { n, location, located } = setup();
   await scan(n, location, "b1-e4");

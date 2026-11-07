@@ -120,6 +120,7 @@ export function createStationLocation({
       mutate(() => session.applySearchSelection(selection)),
     setStepFree: (value) => mutate(() => session.setStepFree(value)),
     markUnavailable: (id) => mutate(() => session.markUnavailable(id)),
+    confirmTransfer: (token) => mutate(() => session.confirmTransfer(token)),
     confirmArrival: (token) => mutate(() => session.confirmArrival(token)),
     async reset() {
       if (disposed) return;

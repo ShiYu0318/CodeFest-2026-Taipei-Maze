@@ -139,6 +139,16 @@ export default {
     "Vị trí lấy từ liên kết. Hãy kiểm tra nơi bạn đứng; đây không phải theo dõi trực tiếp.",
   "scan.waiting": "Đang chờ kết quả quét…",
   "scan.rescan": "Quét lại",
+  "transfer.goTo": "Đi bằng {kind} đến {floor}",
+  "transfer.checkFloor": "Khi đến nơi, kiểm tra biển tầng rồi xác nhận.",
+  "transfer.checkDirection":
+    "Trước tiên, kiểm tra hướng thang cuốn trên biển chỉ dẫn.",
+  "transfer.confirmUp": "Tôi đã lên tầng",
+  "transfer.confirmDown": "Tôi đã xuống tầng",
+  "transfer.manualFloor":
+    "Bạn đã xác nhận đến {floor} (xác nhận thủ công; quét QR để cập nhật vị trí).",
+  "transfer.previousLocation": "Vị trí trước đó: {place}",
+  "transfer.manualPositionBadge": "Vị trí xác nhận thủ công",
   "scan.relocateHint":
     "Bị lạc hoặc chưa chắc? Quét mã QR gần bạn để cập nhật vị trí và giữ nguyên điểm đến.",
   "scan.scan": "Quét vị trí",

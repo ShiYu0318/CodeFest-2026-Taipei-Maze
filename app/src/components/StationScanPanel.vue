@@ -96,7 +96,10 @@
       :step-free="view.stepFree"
       @close="closeStaffCard"
     />
-    <p v-if="position || view.mode !== 'browsing'" role="status">
+    <p v-if="view.manualPosition && position" role="status">
+      {{ t("transfer.previousLocation", { place: place(position) }) }}
+    </p>
+    <p v-else-if="position || view.mode !== 'browsing'" role="status">
       {{
         position
           ? t("scan.youAreHere", { place: place(position) })
@@ -141,9 +144,10 @@
         {{ view.arrived ? t("scan.arrivedTitle") : t("scan.currentHint") }}
       </h3>
       <p>{{ instruction }}</p>
+      <StationTransferStep v-if="!persistentScan" :location="location" />
       <ol v-if="view.relation.steps.length">
         <li v-for="step in view.relation.steps" :key="step.id">
-          {{ stopLabel(step.from) }} ↔ {{ stopLabel(step.to)
+          {{ stopLabel(step.from) }} → {{ stopLabel(step.to)
           }}<button :disabled="active" @click="unavailable(step.id)">
             {{ t("scan.unavailable") }}
           </button>
@@ -183,6 +187,7 @@ import { computed, ref } from "vue";
 import DestinationSearch from "./DestinationSearch.vue";
 import StaffCard from "./StaffCard.vue";
 import ZhuyinText from "./ZhuyinText.vue";
+import StationTransferStep from "./StationTransferStep.vue";
 import { stationCatalog } from "../search/catalog.mjs";
 import { stationPoints } from "../station/scan.mjs";
 import data from "../views/station-points.json";

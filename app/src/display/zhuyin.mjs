@@ -4,6 +4,7 @@
 // Match reviewed phrases only; never guess an unknown character's pronunciation.
 const entries = [
   ["無法處理掃描結果", "ㄨˊ ㄈㄚˇ ㄔㄨˇ ㄌㄧˇ ㄙㄠˇ ㄇㄧㄠˊ ㄐㄧㄝˊ ㄍㄨㄛˇ"],
+  ["手動確認位置", "ㄕㄡˇ ㄉㄨㄥˋ ㄑㄩㄝˋ ㄖㄣˋ ㄨㄟˋ ㄓˋ"],
   ["定位點", "ㄉㄧㄥˋ ㄨㄟˋ ㄉㄧㄢˇ"],
   ["示意定位點", "ㄕˋ ㄧˋ ㄉㄧㄥˋ ㄨㄟˋ ㄉㄧㄢˇ"],
   ["尚未現地設置", "ㄕㄤˋ ㄨㄟˋ ㄒㄧㄢˋ ㄉㄧˋ ㄕㄜˋ ㄓˋ"],

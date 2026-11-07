@@ -264,7 +264,15 @@
                         v-if="point.id === scanPositionId"
                         class="location-badge"
                       >
-                        <ZhuyinText :text="t('map.youAreHere')" />
+                        <ZhuyinText
+                          :text="
+                            t(
+                              location.view.value.manualPosition
+                                ? 'transfer.manualPositionBadge'
+                                : 'map.youAreHere'
+                            )
+                          "
+                        />
                         <span class="location-name"
                           ><ZhuyinText :text="pointName(point)"
                         /></span>
@@ -648,12 +656,15 @@ const tripDirection = computed(() => {
 });
 watch(
   () => {
-    const position = location.view.value.position;
+    const position = location.view.value.navigationPosition;
     return position
       ? `${position.pointId}:${position.source}:${position.confirmedAt}`
       : null;
   },
-  () => setScanPosition(stationById.get(location.view.value.position?.pointId)),
+  () =>
+    setScanPosition(
+      stationById.get(location.view.value.navigationPosition?.pointId)
+    ),
   { flush: "post" }
 );
 // Requests from the floating chat ("show on map").
@@ -899,7 +910,13 @@ function mapPointLabel(point) {
   return (
     pointName(point) +
     (badge ? "・" + badge : "") +
-    (point.id === scanPositionId.value ? t("map.ariaYouAreHere") : "") +
+    (point.id === scanPositionId.value
+      ? t(
+          location.view.value.manualPosition
+            ? "transfer.manualPositionBadge"
+            : "map.ariaYouAreHere"
+        )
+      : "") +
     (point.id === scanTargetId.value ? t("map.ariaDestination") : "")
   );
 }

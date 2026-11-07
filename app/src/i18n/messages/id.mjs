@@ -139,6 +139,16 @@ export default {
     "Lokasi diambil dari tautan. Periksa posisi Anda; ini bukan pelacakan langsung.",
   "scan.waiting": "Menunggu hasil pindai…",
   "scan.rescan": "Pindai lagi",
+  "transfer.goTo": "Gunakan {kind} menuju {floor}",
+  "transfer.checkFloor": "Setelah tiba, periksa tanda lantai lalu konfirmasi.",
+  "transfer.checkDirection":
+    "Periksa arah eskalator pada petunjuk terlebih dahulu.",
+  "transfer.confirmUp": "Saya sudah naik lantai",
+  "transfer.confirmDown": "Saya sudah turun lantai",
+  "transfer.manualFloor":
+    "Anda mengonfirmasi tiba di {floor} (konfirmasi manual; pindai QR untuk memperbarui lokasi).",
+  "transfer.previousLocation": "Lokasi sebelumnya: {place}",
+  "transfer.manualPositionBadge": "Lokasi dikonfirmasi manual",
   "scan.relocateHint":
     "Tersesat atau ragu? Pindai QR terdekat untuk memperbarui lokasi tanpa mengubah tujuan.",
   "scan.scan": "Pindai lokasi",
