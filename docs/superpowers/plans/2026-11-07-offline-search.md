@@ -45,7 +45,7 @@ Files: app/src/components/DestinationSearch.vue; NavigationDemoView.vue; Station
 - [x] Synthetic search explicitly confirms a POI and additive restrictions through session; simple mode hides optional controls/map while navigating, retaining recovery and an expanded-map action.
 - [x] Preserve the original AI document and append feasibility/status/remaining work; update README and source records.
 - [x] Run full tests, lint, production build and local HTTP checks; fresh review and regressions for material findings.
-- [ ] Push branch, rewrite PR in the new open-source format and merge after checks (latest user authorization). Keep private; preserve feature branch.
+- [x] Push branch, rewrite PR in the new open-source format and merge after checks (latest user authorization). Keep private; preserve feature branch.
 
 ## Execution ledger
 

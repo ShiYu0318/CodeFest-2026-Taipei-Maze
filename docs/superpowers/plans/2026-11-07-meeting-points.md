@@ -24,7 +24,7 @@
 - [x] Implement session meeting-destination transition and recipient staged confirmation; no implicit overwrite on link arrival.
 - [x] Add share card with explicit waiting acknowledgement, user-triggered share/copy and manual fallback, /meet read-only receiver, navigation import and route-leave confirmation.
 - [x] Docs: implementation vs proposal, origin/time choices, synthetic/field limits, manual two-device cases and not_run evidence.
-- [ ] Full tests/lint/build/HTTP checks, fresh review, commits/push/PR and merge after material issues fixed (user authorized); preserve feature branch/private visibility and sync main.
+- [x] Full tests/lint/build/HTTP checks, fresh review, commits/push/PR and merge after material issues fixed (user authorized); preserve feature branch/private visibility and sync main.
 
 ## Active work queue
 
