@@ -66,7 +66,7 @@ MIT、常見 BSD-2-Clause／BSD-3-Clause、Apache-2.0 可作優先候選，但�
 
 - Google LiteRT-LM 0.19.1：Apache-2.0，Swift SPM／Google Maven 官方來源；完整授權存於 `integration/townpass/licenses/LiteRT-LM-Apache-2.0.txt`。SDK 自有相依套件與 NOTICE 仍須隨 native 發行版本保留。
 - Dart `crypto` 3.0.7、Flutter `path_provider` 2.1.6：Google Dart／Flutter 作者，BSD-3-Clause；原宿主已鎖定為間接依賴，本輪改為直接使用。完整授權存於 `integration/townpass/licenses/`。
-- Gemma 3 1B INT4：Google 開放權重、Gemma 專屬條款；官方 Gallery 所列 HF commit 與檔案固定，取得使用者授權與 SHA-256 核對後才安裝，不包含權重或 Token。不是 AGPL 權重再授權。
+- Gemma 3 1B INT4：Google 開放權重、Gemma 專屬條款；官方 Gallery 所列 HF commit 與檔案固定。團隊接受條款後，於自有 HTTPS 來源原樣再散布，並附 Gemma Terms of Use、Prohibited Use Policy 全文（`integration/townpass/licenses/`）與規定的 Notice；App 顯示條款並經使用者同意與 SHA-256 核對後才安裝。repo 不包含權重或 Token。不是 AGPL 權重再授權。
 - Apple Speech、Android SpeechRecognizer 是平台 API；只允許 Apple／可識別 Google 的裝置端 provider。未採用中國模型、廠牌服務、代理或來源不明權重。
 - GitHub Android CI 使用 GitHub 官方 `actions/checkout` 固定 SHA、官方 Flutter 固定 commit 與 runner 預裝的 Google SDK／NDK；不自動接受 preview license。
 
