@@ -496,6 +496,7 @@ export function answerLocally(question, points, i18n, { nearFloor } = {}) {
       return {
         kind: "places",
         type: "exit",
+        code,
         floor: null,
         total: toward.length,
         text: t("chat.answer.exitCode", { code }),
