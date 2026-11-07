@@ -130,7 +130,7 @@ export default {
   "scan.choosePlaceholder": "Where do you want to go?",
   "scan.useSelected": "Set “{name}” selected on the map as the destination",
   "scan.searchByName": "Search by name (seven-language prototype)",
-  "scan.stepFree": "Step-free links only",
+  "scan.stepFree": "Accessible route",
   "scan.destination": "Destination: {place}",
   "scan.youAreHere": "You are here: {place}",
   "scan.notLocated": "Location not set yet. Scan the code where you are.",
@@ -383,7 +383,7 @@ export default {
   "chat.answer.staff":
     "Choose a destination, then tap “Show to staff”. Large Chinese text appears — just show your phone to station staff or someone nearby.",
   "chat.answer.stepFree":
-    "After choosing a destination, tick “Step-free links only”. We only suggest ways without stairs, such as elevators, never stairs. If there is none, we will ask you to check with staff.",
+    "After choosing a destination, tick “Accessible route”. We only suggest ways without stairs, such as elevators, never stairs. If there is none, we will ask you to check with staff.",
   "chat.answer.scan":
     "Find the location QR code on a pillar or wall and tap “Scan location”. The map jumps to “You are here”. Scan again when you reach a new spot.",
   "chat.answer.language":

@@ -111,7 +111,7 @@ export default {
   "scan.choosePlaceholder": "請選擇要去的設施",
   "scan.useSelected": "將地圖上選取的「{name}」設為終點",
   "scan.searchByName": "用名稱搜尋（七語詞典原型）",
-  "scan.stepFree": "只參考無階梯連結",
+  "scan.stepFree": "無障礙路線",
   "scan.destination": "終點：{place}",
   "scan.youAreHere": "您在這裡：{place}",
   "scan.notLocated": "目前尚未定位，可先掃描所在點位。",
@@ -328,7 +328,7 @@ export default {
   "chat.answer.staff":
     "選好目的地後，按「給站務人員看」，畫面會出現大字中文，把手機拿給站務人員或附近的人看就可以。",
   "chat.answer.stepFree":
-    "選好目的地後，勾選「只參考無階梯連結」。我們只會建議電梯這類不用走樓梯的方式，不會用樓梯代替；找不到時會請你詢問站務人員。",
+    "選好目的地後，勾選「無障礙路線」。我們只會建議電梯這類不用走樓梯的方式，不會用樓梯代替；找不到時會請你詢問站務人員。",
   "chat.answer.scan":
     "找到柱子或牆上的定位 QR，按「掃描定位」對準它。地圖會跳到你的位置，顯示「您在這裡」。走到新地方時再掃一次就會更新。",
   "chat.answer.language":

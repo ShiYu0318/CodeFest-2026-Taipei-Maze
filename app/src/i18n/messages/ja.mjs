@@ -126,7 +126,7 @@ export default {
   "scan.choosePlaceholder": "どこへ行きますか？",
   "scan.useSelected": "地図で選んだ「{name}」を目的地にする",
   "scan.searchByName": "名前で探す（7言語の試作）",
-  "scan.stepFree": "段差のない経路だけ",
+  "scan.stepFree": "バリアフリールート",
   "scan.destination": "目的地：{place}",
   "scan.youAreHere": "現在地：{place}",
   "scan.notLocated":
@@ -385,7 +385,7 @@ export default {
   "chat.answer.staff":
     "目的地を選んでから「係員に見せる」をタップしてください。大きな中国語が表示されるので、駅の係員や近くの人にスマホを見せるだけです。",
   "chat.answer.stepFree":
-    "目的地を選んだあと「段差のない経路だけ」にチェックを入れてください。エレベーターなど階段を使わない方法だけを案内し、階段で代用することはありません。ない場合は係員に確認するよう案内します。",
+    "目的地を選んだあと「バリアフリールート」にチェックを入れてください。エレベーターなど階段を使わない方法だけを案内し、階段で代用することはありません。ない場合は係員に確認するよう案内します。",
   "chat.answer.scan":
     "柱や壁にある位置QRコードを見つけて「位置を読み取る」をタップしてください。地図に「現在地」が表示されます。新しい場所に着いたら、もう一度読み取ってください。",
   "chat.answer.language":

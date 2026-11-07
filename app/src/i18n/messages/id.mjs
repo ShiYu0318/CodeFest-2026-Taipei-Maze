@@ -129,7 +129,7 @@ export default {
   "scan.choosePlaceholder": "Mau ke mana?",
   "scan.useSelected": "Jadikan “{name}” yang dipilih di peta sebagai tujuan",
   "scan.searchByName": "Cari dengan nama (prototipe tujuh bahasa)",
-  "scan.stepFree": "Hanya penghubung tanpa anak tangga",
+  "scan.stepFree": "Rute aksesibel",
   "scan.destination": "Tujuan: {place}",
   "scan.youAreHere": "Anda di sini: {place}",
   "scan.notLocated": "Lokasi belum diatur. Pindai kode di tempat Anda berada.",
@@ -391,7 +391,7 @@ export default {
   "chat.answer.staff":
     "Pilih tujuan, lalu ketuk “Tunjukkan ke petugas”. Akan muncul tulisan Mandarin besar, tinggal tunjukkan ponsel ke petugas atau orang di dekat Anda.",
   "chat.answer.stepFree":
-    "Setelah memilih tujuan, centang “Hanya penghubung tanpa anak tangga”. Kami hanya menyarankan cara tanpa tangga seperti lift, tidak pernah tangga. Jika tidak ada, silakan tanya petugas.",
+    "Setelah memilih tujuan, centang “Rute aksesibel”. Kami hanya menyarankan cara tanpa tangga seperti lift, tidak pernah tangga. Jika tidak ada, silakan tanya petugas.",
   "chat.answer.scan":
     "Cari kode QR lokasi di tiang atau dinding, lalu ketuk “Pindai lokasi”. Peta akan menampilkan “Anda di sini”. Pindai lagi saat tiba di tempat baru.",
   "chat.answer.language":

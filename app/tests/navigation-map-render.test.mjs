@@ -17,6 +17,12 @@ import * as scan from "../src/station/scan.mjs";
 import * as mapFocus from "../src/station/map-focus.mjs";
 import * as mapTour from "../src/station/map-tour.mjs";
 import * as about from "../src/about/about.mjs";
+import * as searchCatalog from "../src/search/catalog.mjs";
+import * as searchEngine from "../src/search/search.mjs";
+import * as searchFallback from "../src/search/fallback.mjs";
+const dictionary = JSON.parse(
+  readFileSync(new URL("../src/search/dictionary.json", import.meta.url))
+);
 import * as locationHook from "../src/station/useStationLocation.js";
 import { createStationLocation } from "../src/station/location.mjs";
 import { iosWebMessageData } from "./helpers/ios-web-message.mjs";
@@ -37,6 +43,7 @@ const realComponents = new Set([
   "StationMapIcon",
   "StationNavigationRescan",
   "StationTransferStep",
+  "DestinationSearch",
 ]);
 function component(name) {
   if (components.has(name)) return components.get(name);
@@ -84,6 +91,10 @@ function component(name) {
     "map-focus.mjs": mapFocus,
     "map-tour.mjs": mapTour,
     "about.mjs": about,
+    "catalog.mjs": searchCatalog,
+    "search.mjs": searchEngine,
+    "fallback.mjs": searchFallback,
+    "dictionary.json": dictionary,
     useStationLocation: locationHook,
     "station-routing": {
       zones: connections.zones,
@@ -357,5 +368,27 @@ test("the rendered floor action names its target, rejects a repeated old click a
     app.unmount();
     controller.dispose();
     language.setLocale(previousLocale);
+  }
+});
+
+test("navigation exposes destination search before the secondary destination list", async () => {
+  const location = createStationLocation({ data, connections, native: null });
+  try {
+    location.applyQuery({ point: "b1-e4", v: "1" });
+    const html = await renderToString(
+      Vue.createSSRApp(component("StationScanPanel"), {
+        location: { view: Vue.ref(location.snapshot()) },
+      })
+    );
+    const search = html.indexOf('type="search"');
+    const list = html.indexOf("<details");
+    assert.ok(search >= 0, "a search input is visible in navigation");
+    assert.ok(
+      list > search,
+      "search is outside and before the secondary collapsed list"
+    );
+    assert.ok(html.indexOf('id="station-destination"') > list);
+  } finally {
+    location.dispose();
   }
 });

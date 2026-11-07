@@ -130,7 +130,7 @@ export default {
   "scan.choosePlaceholder": "Bạn muốn đi đâu?",
   "scan.useSelected": "Đặt “{name}” đã chọn trên bản đồ làm điểm đến",
   "scan.searchByName": "Tìm theo tên (bản thử bảy ngôn ngữ)",
-  "scan.stepFree": "Chỉ dùng lối không có bậc thang",
+  "scan.stepFree": "Lộ trình tiếp cận",
   "scan.destination": "Điểm đến: {place}",
   "scan.youAreHere": "Bạn đang ở đây: {place}",
   "scan.notLocated": "Chưa có vị trí. Hãy quét mã tại nơi bạn đứng.",
@@ -382,7 +382,7 @@ export default {
   "chat.answer.staff":
     "Chọn điểm đến rồi chạm “Đưa cho nhân viên xem”. Màn hình sẽ hiện chữ Trung lớn, chỉ cần đưa điện thoại cho nhân viên hoặc người gần đó.",
   "chat.answer.stepFree":
-    "Sau khi chọn điểm đến, hãy đánh dấu “Chỉ dùng lối không có bậc thang”. Chúng tôi chỉ gợi ý cách không cần đi cầu thang như thang máy, không bao giờ thay bằng cầu thang. Nếu không có, hãy hỏi nhân viên.",
+    "Sau khi chọn điểm đến, hãy đánh dấu “Lộ trình tiếp cận”. Chúng tôi chỉ gợi ý cách không cần đi cầu thang như thang máy, không bao giờ thay bằng cầu thang. Nếu không có, hãy hỏi nhân viên.",
   "chat.answer.scan":
     "Tìm mã QR định vị trên cột hoặc tường và chạm “Quét vị trí”. Bản đồ sẽ hiện “Bạn đang ở đây”. Đến chỗ mới thì quét lại.",
   "chat.answer.language":

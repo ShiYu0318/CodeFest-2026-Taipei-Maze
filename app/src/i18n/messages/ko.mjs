@@ -126,7 +126,7 @@ export default {
   "scan.choosePlaceholder": "어디로 가시나요?",
   "scan.useSelected": "지도에서 선택한 “{name}”을(를) 목적지로 설정",
   "scan.searchByName": "이름으로 검색(7개 언어 시제품)",
-  "scan.stepFree": "계단 없는 연결만",
+  "scan.stepFree": "접근 가능한 경로",
   "scan.destination": "목적지: {place}",
   "scan.youAreHere": "현재 위치: {place}",
   "scan.notLocated": "아직 위치가 없습니다. 지금 있는 곳의 코드를 스캔하세요.",
@@ -373,7 +373,7 @@ export default {
   "chat.answer.staff":
     "목적지를 고른 뒤 “직원에게 보여주기”를 누르세요. 큰 중국어 글씨가 나오니 역 직원이나 근처 사람에게 휴대폰을 보여 주면 돼요.",
   "chat.answer.stepFree":
-    "목적지를 고른 뒤 “계단 없는 연결만”을 체크하세요. 엘리베이터처럼 계단 없는 방법만 알려 드리고 계단으로 대신하지 않아요. 없으면 직원에게 문의하도록 안내해요.",
+    "목적지를 고른 뒤 “접근 가능한 경로”을 체크하세요. 엘리베이터처럼 계단 없는 방법만 알려 드리고 계단으로 대신하지 않아요. 없으면 직원에게 문의하도록 안내해요.",
   "chat.answer.scan":
     "기둥이나 벽의 위치 QR 코드를 찾아 “위치 스캔”을 누르세요. 지도에 “현재 위치”가 나와요. 새 장소에 가면 다시 스캔하세요.",
   "chat.answer.language":
