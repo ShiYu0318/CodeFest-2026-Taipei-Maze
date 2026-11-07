@@ -197,34 +197,6 @@
                 <p v-else>{{ selected.description }}</p>
               </section>
             </div>
-
-            <div class="map-tools">
-              <span v-if="selected" class="map-selection">{{
-                selected.name
-              }}</span>
-              <span v-else-if="activeTheme" class="map-selection"
-                >{{ categories[activeTheme].name }}・{{
-                  listedPoints.length
-                }}
-                處</span
-              >
-              <span v-else>點選標點顯示圖示，梯口可查看通往哪一層。</span>
-            </div>
-            <div
-              v-if="backgroundLayers.length"
-              class="layer-key"
-              aria-label="背景樓層圖例"
-            >
-              <span
-                v-for="layer in backgroundLayers"
-                :key="layer.floor"
-                :style="{ '--ghost-ink': layer.ink }"
-                >{{ layer.floor }}</span
-              >
-            </div>
-            <p class="map-note">
-              <span aria-hidden="true"></span>{{ mapNote }}
-            </p>
           </section>
         </div>
 
@@ -366,21 +338,6 @@ const availableThemes = computed(() =>
     floorPoints.value.some((point) => matchesTheme(point, type))
   )
 );
-const listedPoints = computed(() =>
-  activeTheme.value
-    ? floorPoints.value.filter((point) =>
-        matchesTheme(point, activeTheme.value)
-      )
-    : floorPoints.value
-);
-// const themeHint = computed(() =>
-//   activeTheme.value
-//     ? categories[activeTheme.value].name +
-//       "・" +
-//       listedPoints.value.length +
-//       " 處，再點主題可恢復圓點。"
-//     : "選一個主題，同類標點會一起顯示圖標。"
-// );
 const bounds = computed(() => {
   return showLayers.value ? stackBounds : floors[level.value].bounds;
 });
@@ -399,10 +356,6 @@ const backgroundLayers = computed(() => {
       },
     ];
   });
-});
-const mapNote = computed(() => {
-  if (showLayers.value) return "實線是目前樓層，淡色虛線是其他樓層的相對輪廓。";
-  return "實線為目前樓層。開啟透視樓層可查看其他樓層的相對位置。";
 });
 const sources = computed(() => [
   [
@@ -818,22 +771,6 @@ function toggleLayers() {
   showLayers.value = !showLayers.value;
   resetZoom();
 }
-
-// async function selectSearchPoint({ poiId }) {
-//   const requestRevision = ++searchPointRevision;
-//   const entry = searchCatalogEntries.find((p) => p.id === poiId);
-//   if (!entry) return;
-//   const point = points[entry.floorId].find((p) => p.id === poiId);
-//   if (!point) return;
-//   await showFloor(entry.floorId);
-//   if (requestRevision !== searchPointRevision || level.value !== entry.floorId)
-//     return;
-//   activeTheme.value = null;
-//   selected.value = point;
-//   await nextTick();
-//   if (zoom.value > 1) centerOn(...normalizedPoint(point));
-//   mapSection.value?.scrollIntoView({ block: "start" });
-// }
 
 function placeConnectorPanel() {
   const panel = connectorPanel.value;
