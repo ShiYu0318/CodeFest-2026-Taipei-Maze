@@ -735,6 +735,7 @@
   display: grid;
   justify-items: center;
   gap: 4px;
+  margin: 30px;
   padding-top: 14px;
   color: #9d9d9d;
   font-size: 12px;
