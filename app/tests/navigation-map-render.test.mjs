@@ -474,3 +474,26 @@ test("information page retains the floor reference, map notes, source links and 
     language.setLocale(previous);
   }
 });
+
+test("first-floor information uses its own source note rather than a metro basement page", async () => {
+  const language = i18n.useI18n(),
+    previous = language.locale.value;
+  language.setLocale("zh-TW");
+  try {
+    const app = Vue.createSSRApp(component("AboutView"), {
+      embedded: true,
+      floor: "1F",
+    });
+    app.use(
+      VueRouter.createRouter({
+        history: VueRouter.createMemoryHistory(),
+        routes: [],
+      })
+    );
+    const html = await renderToString(app);
+    assert.ok(html.includes(language.t("map.firstFloorNote")));
+    assert.equal(html.includes("051.pdf#page="), false);
+  } finally {
+    language.setLocale(previous);
+  }
+});

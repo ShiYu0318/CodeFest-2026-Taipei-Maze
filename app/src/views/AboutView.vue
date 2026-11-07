@@ -51,8 +51,8 @@
 
     <section class="about-card" aria-labelledby="about-map-notes">
       <h2 id="about-map-notes">{{ t("about.mapNotes") }}</h2>
-      <p>{{ t("map.footerNote") }}</p>
-      <ul class="about-links">
+      <p>{{ t(floor === "1F" ? "map.firstFloorNote" : "map.footerNote") }}</p>
+      <ul v-if="mapSources.length" class="about-links">
         <li v-for="source in mapSources" :key="source.url">
           <a :href="source.url" target="_blank" rel="noopener noreferrer">{{
             source.label
@@ -186,6 +186,7 @@ const emit = defineEmits(["close"]);
 const { theme, displayMode } = useDisplayPreferences();
 const { locale, t } = useI18n();
 const mapSources = computed(() => {
+  if (props.floor === "1F") return [];
   const floors = ["B1", "B2", "B3", "B4"];
   const floor = floors.includes(props.floor) ? props.floor : "B2";
   return [

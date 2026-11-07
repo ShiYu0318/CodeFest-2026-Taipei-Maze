@@ -8,7 +8,12 @@ import {
   insetBoundaryMarker,
   scatterBoundary,
 } from "../src/station/boundary.mjs";
-import { plans, floors, b2Outline } from "../src/views/station-floor-plans.mjs";
+import {
+  plans,
+  floors,
+  b2Outline,
+  b2RailPlatforms,
+} from "../src/views/station-floor-plans.mjs";
 import {
   stationPoints,
   stationQrPayload,
@@ -77,15 +82,17 @@ test("a platform badge clears both edges near a corner of a narrow outline", () 
   assert.ok(inward >= 4 && inward <= 4.5);
 });
 
-test("the original eight QR points per floor retain their transformed boundary coordinates", () => {
+test("the original eight QR points per basement floor retain their boundary coordinates", () => {
   assert.equal(qrPoints.length, 48);
   assert.equal(new Set(qrPoints.map((point) => point.id)).size, 48);
-  for (const floor of Object.keys(floors)) {
+  for (const floor of ["B1", "B2", "B3", "B4"]) {
     const points = qrPoints.filter(
       (point) => point.floor === floor && !point.platformId
     );
-    const obstacles = data.points[floor].filter((point) => !isQrPoint(point));
-    assert.equal(points.length, { B1: 8, B2: 8, B3: 8, B4: 8 }[floor]);
+    const obstacles = data.points[floor].filter(
+      (point) => !isQrPoint(point) && point.type !== "exit"
+    );
+    assert.equal(points.length, 8);
     const basePlan =
       floor === "B2"
         ? { ...plans.B2, outlines: plans.B2.outlines.slice(0, 1) }
@@ -219,7 +226,8 @@ test("the actual QR icon and every floor component render with the shared outlin
     const compiled = { exports: {} };
     const load = (path) => {
       if (path === "vue") return Vue;
-      if (path.endsWith("station-floor-plans.mjs")) return { plans, b2Outline };
+      if (path.endsWith("station-floor-plans.mjs"))
+        return { plans, b2Outline, b2RailPlatforms };
       if (path.endsWith("station-points.json")) return data;
       if (path.endsWith("StationB2Plan.vue")) return component("StationB2Plan");
       throw new Error(`Unexpected component dependency ${path}`);

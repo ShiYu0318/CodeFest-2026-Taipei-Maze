@@ -40,7 +40,7 @@ test("malformed, repeated, unknown, disabled and incompatible point parameters a
   ])
     assert.notEqual(parseStationLocationQuery(query, data).type, "success");
   const disabled = structuredClone(data);
-  disabled.points.B1[0].enabled = false;
+  disabled.points.B1.find(({ id }) => id === "b1-e4").enabled = false;
   assert.equal(
     parseStationLocationQuery({ point: "b1-e4" }, disabled).type,
     "UnknownPoint"

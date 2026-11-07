@@ -20,7 +20,8 @@ data.categories.qrcode = {
   colorToken: "primary-900",
   iconColor: "#244e57",
 };
-for (const [floor, points] of Object.entries(data.points)) {
+for (const floor of ["B1", "B2", "B3", "B4"]) {
+  const points = data.points[floor];
   const existing = points.filter(
     (point) =>
       !(
@@ -35,7 +36,8 @@ for (const [floor, points] of Object.entries(data.points)) {
       : plans[floor];
   const positions = scatterBoundary(basePlan, {
     seed: 20261108 + Number(floor.slice(1)),
-    obstacles: existing,
+    // Exit annotations added later do not move existing QR anchors.
+    obstacles: existing.filter((point) => point.type !== "exit"),
   });
   const generated = positions.map((position, index) => {
     const number = String(index + 1).padStart(2, "0");
@@ -96,7 +98,7 @@ for (const [floor, points] of Object.entries(data.points)) {
 }
 const output = JSON.stringify(data, null, 2) + "\n";
 if (process.argv.includes("--check")) {
-  if (original !== output)
+  if (original.replace(/\r\n/g, "\n") !== output)
     throw new Error(
       "Regenerate boundary QR points with node tools/scatter-station-qrcode.mjs"
     );

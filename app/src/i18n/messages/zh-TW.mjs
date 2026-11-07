@@ -2,6 +2,12 @@
 // Reference catalog. Every other locale must provide exactly these keys and
 // the same {placeholders}; tests/i18n.test.mjs enforces it.
 export default {
+  "type.exit": "出口",
+  "help.exit": "請依出口編號及現場指標確認方向。",
+  "floor.1F": "一樓",
+  "zone.1f-hall": "車站大廳",
+  "map.firstFloorNote":
+    "1F 依提供的台北車站一樓平面圖照片重繪。設施位置為示意，請依現場指標。",
   "tour.helper": "點右下角的小幫手，可以詢問站內設施或地圖操作方式。",
   "tour.reopen": "點左上角的圓框問號，就能從第一步重看功能導覽。",
   "tour.step": "導覽 {step}／{total}",
@@ -14,7 +20,7 @@ export default {
   "tour.markerTitle": "地圖標點",
   "tour.themeTitle": "深色／淺色模式",
   "tour.scan": "在城市通掃描站內 QR Code，確認你目前的樓層與位置。",
-  "tour.floors": "點 B1–B4 切換地圖樓層。",
+  "tour.floors": "點 1F 或 B1–B4 切換地圖樓層。",
   "tour.layers": "開啟後可用虛線查看其他樓層的位置，方便比對。",
   "tour.locate": "從清單選起點和終點，或直接在地圖上選點。",
   "tour.facilities": "選擇一種設施，例如廁所或電梯，查看它們在這層的位置。",
@@ -170,7 +176,7 @@ export default {
   "notice.resetUrlFailed": "網址同步失敗，請移除 point 參數後重新開啟地圖。",
   "notice.suspended": "掃碼已暫停，原位置保持不變。請先關閉原生掃碼頁。",
 
-  "title.station": "台北車站地下導航",
+  "title.station": "台北車站地圖",
   "title.meeting": "集合點",
   "title.about": "原始碼與授權",
   "title.default": "北車不迷路",

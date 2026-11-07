@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "type.exit": "Exit",
+  "help.exit": "Check the exit number and follow station signage.",
+  "floor.1F": "Ground floor",
+  "zone.1f-hall": "Station hall",
+  "map.firstFloorNote":
+    "The 1F map is redrawn from the supplied station floor plan photo. Facility locations are approximate. Follow station signage.",
   "tour.helper":
     "Tap the helper in the bottom-right corner to ask about station facilities or how to use the map.",
   "tour.reopen":
@@ -16,7 +22,7 @@ export default {
   "tour.themeTitle": "Light and dark modes",
   "tour.scan":
     "Scan a station QR code in TownPass to confirm your floor and location.",
-  "tour.floors": "Tap B1–B4 to view that floor.",
+  "tour.floors": "Tap 1F or B1–B4 to view that floor.",
   "tour.layers":
     "Turn this on to see other floors as dashed outlines and compare their positions.",
   "tour.locate":
@@ -205,7 +211,7 @@ export default {
   "notice.suspended":
     "Scanning paused. Your location has not changed. Close the scanner first.",
 
-  "title.station": "Taipei Main Station underground guide",
+  "title.station": "Taipei Main Station map",
   "title.meeting": "Meeting point",
   "title.about": "Source code & licenses",
   "title.default": "Taipei Maze",

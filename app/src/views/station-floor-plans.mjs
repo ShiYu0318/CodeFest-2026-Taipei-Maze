@@ -44,6 +44,11 @@ const railOutlines = b2RailPlatforms.map(
   ({ x, y }) => `M${x} ${y}l1900-140v160L${x} ${y + 160}Z`
 );
 export const floors = {
+  "1F": {
+    name: "車站大廳",
+    bounds: [5, 0, 909, 793],
+    center: [459.5, 396.5],
+  },
   B1: {
     name: "站內通道與出口",
     bounds: [14, 375, 1190, 1000],
@@ -69,6 +74,33 @@ export const floors = {
 export const stackBounds = [-65, 235, 1385, 1190];
 
 export const plans = {
+  // The reference plan shows south at the top. The schematic is north-up.
+  "1F": {
+    outlines: ["M68 97H851V696H68Z"],
+    regions: [
+      [
+        "context",
+        "M255 265H648V526H255Z M68 282H200V504H68Z M714 282H851V504H714Z",
+      ],
+      ["blue", "M349 311H608V481H349Z"],
+      ["red", "M255 265H324V526H255Z M714 454H851V504H714Z"],
+    ],
+    labels: [
+      [460, 26, "市民大道"],
+      [218, 76, "北3門"],
+      [456, 76, "北2門"],
+      [695, 76, "北1門"],
+      [32, 254, "W1"],
+      [32, 565, "W3"],
+      [888, 254, "E1"],
+      [888, 565, "E3"],
+      [478, 408, "車站大廳"],
+      [219, 735, "南3門"],
+      [460, 735, "南2門"],
+      [701, 735, "南1門"],
+      [460, 779, "忠孝西路"],
+    ],
+  },
   B2: {
     offset: [512.5, 960],
     scale: 0.5,

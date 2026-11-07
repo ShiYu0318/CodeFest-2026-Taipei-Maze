@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "type.exit": "Pintu keluar",
+  "help.exit": "Periksa nomor pintu keluar dan ikuti petunjuk di stasiun.",
+  "floor.1F": "Lantai 1",
+  "zone.1f-hall": "Aula stasiun",
+  "map.firstFloorNote":
+    "Peta 1F digambar ulang dari foto denah stasiun yang diberikan. Lokasi fasilitas hanya perkiraan. Ikuti petunjuk di stasiun.",
   "tour.helper":
     "Ketuk asisten di pojok kanan bawah untuk bertanya tentang fasilitas stasiun atau cara memakai peta.",
   "tour.reopen":
@@ -16,7 +22,7 @@ export default {
   "tour.themeTitle": "Mode terang dan gelap",
   "tour.scan":
     "Pindai kode QR stasiun di TownPass untuk memastikan lantai dan posisi Anda.",
-  "tour.floors": "Ketuk B1–B4 untuk melihat peta lantai tersebut.",
+  "tour.floors": "Ketuk 1F atau B1–B4 untuk melihat peta lantai tersebut.",
   "tour.layers":
     "Aktifkan untuk melihat garis putus-putus lantai lain dan membandingkan posisinya.",
   "tour.locate":
@@ -206,7 +212,7 @@ export default {
   "notice.suspended":
     "Pemindaian dijeda. Lokasi Anda tidak berubah. Tutup pemindai terlebih dahulu.",
 
-  "title.station": "Panduan bawah tanah Stasiun Utama Taipei",
+  "title.station": "Peta Stasiun Utama Taipei",
   "title.meeting": "Titik temu",
   "title.about": "Kode sumber & lisensi",
   "title.default": "Taipei Maze",

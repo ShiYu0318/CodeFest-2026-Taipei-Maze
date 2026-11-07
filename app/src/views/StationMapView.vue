@@ -75,10 +75,10 @@
             data-tour-target="layers"
             type="button"
             role="switch"
-            :aria-checked="showLayers"
+            :aria-checked="showLayers && level !== '1F'"
             :aria-label="t('map.layersAria')"
             :title="t('map.layers')"
-            :disabled="floorChanging"
+            :disabled="floorChanging || level === '1F'"
             @click="toggleLayers"
           >
             <StationMapIcon name="layers" />
@@ -537,6 +537,12 @@ const connectorTypes = new Set([
 const floorIds = Object.keys(floors);
 const initialMapZoom = 1.15;
 const floorPalette = {
+  "1F": {
+    tone: "primary-400",
+    tint: "primary-50",
+    ink: "primary-700",
+    onTone: "primary-950",
+  },
   B1: {
     tone: "primary-500",
     tint: "primary-100",
@@ -623,7 +629,7 @@ const facilityDetails = ref(null);
 const floorChanging = ref(false);
 const arrivalPointId = ref(null);
 let floorAnimation = null;
-const zoom = ref(initialMapZoom);
+const zoom = ref(level.value === "1F" ? 1 : initialMapZoom);
 const viewport = ref(null);
 const dragging = ref(false);
 let mapDrag = null;
@@ -767,9 +773,8 @@ const availableThemes = computed(() =>
 );
 const bounds = computed(() => {
   const floor = floors[level.value];
-  const [left, top, width, height] = showLayers.value
-    ? stackBounds
-    : floor.bounds;
+  const [left, top, width, height] =
+    showLayers.value && level.value !== "1F" ? stackBounds : floor.bounds;
   const [x, y] = floor.center;
   const halfWidth = Math.max(x - left, left + width - x);
   const halfHeight = Math.max(y - top, top + height - y);
@@ -787,10 +792,10 @@ const platformIcons = computed(() => {
   );
 });
 const backgroundLayers = computed(() => {
-  if (!showLayers.value) return [];
+  if (!showLayers.value || level.value === "1F") return [];
   const activeIndex = floorIds.indexOf(level.value);
   return floorIds.flatMap((floor, index) => {
-    if (floor === level.value) return [];
+    if (floor === level.value || floor === "1F") return [];
     const offset = index - activeIndex;
     return [
       {
@@ -819,7 +824,10 @@ function pointTypes(point) {
 }
 
 function pointIconType(point) {
-  return pointTypes(point)[0];
+  const types = pointTypes(point);
+  return types[0] === "exit" && types.includes(activeTheme.value)
+    ? activeTheme.value
+    : types[0];
 }
 
 function pointHelpType(point) {
@@ -909,7 +917,7 @@ function pinStyle(point) {
   return {
     left: x * 100 + "%",
     top: y * 100 + "%",
-    ...pointThemeStyle(point.type),
+    ...pointThemeStyle(pointIconType(point)),
   };
 }
 
@@ -965,8 +973,7 @@ function mapPointLabel(point) {
 }
 
 function pointThemeStyle(type) {
-  const primaryType = Array.isArray(type) ? type[0] : type;
-  const category = categories[primaryType];
+  const category = categories[type];
   const colorToken = category?.colorToken || "gray-700";
   const iconColor = category?.iconColor;
   return {
@@ -994,7 +1001,7 @@ function focusVisiblePin(point, event) {
 }
 
 function constrainZoom(scale) {
-  const minZoom = mobileZoomQuery.matches ? 1.5 : 1;
+  const minZoom = mobileZoomQuery.matches && level.value !== "1F" ? 1.5 : 1;
   return Math.min(3, Math.max(minZoom, scale));
 }
 
@@ -1271,7 +1278,7 @@ async function showFloor(floor, { arrival, origin } = {}) {
     } else if (!availableThemes.value.includes(activeTheme.value)) {
       activeTheme.value = null;
     }
-    await resetZoom(initialMapZoom);
+    await resetZoom(floor === "1F" ? 1 : initialMapZoom);
     if (!frame.isConnected) return;
     if (origin) await zoomAt(origin.scale, viewportCenter(), origin.center);
     else if (arrival)

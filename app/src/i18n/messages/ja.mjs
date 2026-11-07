@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "type.exit": "出口",
+  "help.exit": "出口番号を確認し、駅の案内表示に従ってください。",
+  "floor.1F": "地上1階",
+  "zone.1f-hall": "駅コンコース",
+  "map.firstFloorNote":
+    "提供された駅構内図の写真をもとに1Fの地図を描き直しました。施設の位置は目安です。現地の案内表示に従ってください。",
   "tour.helper":
     "右下のヘルパーをタップすると、駅の施設や地図の使い方について質問できます。",
   "tour.reopen":
@@ -16,7 +22,7 @@ export default {
   "tour.themeTitle": "ライト／ダークモード",
   "tour.scan":
     "TownPassで駅構内のQRコードを読み取り、現在の階と位置を確認します。",
-  "tour.floors": "B1〜B4をタップすると、その階の地図が表示されます。",
+  "tour.floors": "1FまたはB1〜B4をタップすると、その階の地図が表示されます。",
   "tour.layers":
     "オンにすると、他の階の輪郭が破線で表示され、位置を比較できます。",
   "tour.locate": "一覧または地図から出発地と目的地を選びます。",
@@ -204,7 +210,7 @@ export default {
   "notice.suspended":
     "読み取りを一時停止しました。位置は変わっていません。先にスキャナーを閉じてください。",
 
-  "title.station": "台北駅 地下ナビ",
+  "title.station": "台北駅構内図",
   "title.meeting": "待ち合わせ場所",
   "title.about": "ソースコードとライセンス",
   "title.default": "Taipei Maze",

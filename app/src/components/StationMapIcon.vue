@@ -15,6 +15,7 @@
 <script>
 const paths = {
   map: "m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Zm6-3v15m6-12v15",
+  exit: "M10 3H5v18h5m4-13 4 4-4 4m4-4H9",
   locate:
     "M12 2v3m0 14v3M2 12h3m14 0h3M12 5a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm0 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z",
   qrcode:

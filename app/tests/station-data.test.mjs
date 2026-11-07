@@ -14,6 +14,42 @@ test("the shipped station map data passes every rule", () => {
   assert.deepEqual(validateStationData(points, connections), []);
 });
 
+test("1F contains only the facilities represented on its reference plan", () => {
+  const counts = {};
+  for (const point of points.points["1F"]) {
+    counts[point.type] = (counts[point.type] ?? 0) + 1;
+    assert.equal(point.zone, "1f-hall");
+  }
+  assert.deepEqual(counts, {
+    exit: 10,
+    elevator: 4,
+    restroom: 4,
+    nursing: 1,
+    info: 4,
+    ticket: 4,
+    stairs: 7,
+    escalator: 12,
+  });
+  assert.ok(
+    connections.connections.every(
+      ({ from, to }) => from.floor !== "1F" && to.floor !== "1F"
+    )
+  );
+});
+
+test("exit markers exist only on 1F and B1 and share M4 with its escalator", () => {
+  const counts = Object.fromEntries(
+    Object.entries(points.points).map(([floor, list]) => [
+      floor,
+      list.filter((point) => [point.type].flat().includes("exit")).length,
+    ])
+  );
+  assert.deepEqual(counts, { "1F": 10, B1: 8, B2: 0, B3: 0, B4: 0 });
+  const m4 = points.points.B1.find(({ id }) => id === "b1-m4-street");
+  assert.deepEqual(m4.type, ["exit", "escalator"]);
+  assert.equal(points.categories.exit.iconColor, "#00D1D1");
+});
+
 test("duplicate ids, unknown zones and broken coordinates are reported", () => {
   const p = clone(points);
   p.points.B1.push({ ...p.points.B1[0] });
