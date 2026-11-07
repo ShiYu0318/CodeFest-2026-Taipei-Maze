@@ -436,6 +436,24 @@
       "original_signage": "未連通測試點",
       "enabled": true,
       "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "poi_meet_a",
+      "node_id": "b1_a",
+      "category": "meeting_point",
+      "name_key": "meeting_a",
+      "original_signage": "TEST-A 合成集合點",
+      "enabled": true,
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "poi_meet_b",
+      "node_id": "b2_lift",
+      "category": "meeting_point",
+      "name_key": "meeting_b",
+      "original_signage": "TEST-B 合成集合點",
+      "enabled": true,
+      "source_ids": ["src_fixture"]
     }
   ],
   "qr_anchors": [
@@ -687,7 +705,11 @@
     "guide_lift_1_e_j_lift_reverse": "到層後先確認「B1 電梯口」測試標誌，再前往下一個點。",
     "guide_lift_1_e_lift_dest": "到層後先確認「B2 電梯口」測試標誌，再前往下一個點。",
     "guide_stairs_1_e_j_stairs_reverse": "到層後先確認「B1 樓梯口」測試標誌，再前往下一個點。",
-    "guide_stairs_1_e_stairs_dest": "到層後先確認「B2 樓梯口」測試標誌，再前往下一個點。"
+    "guide_stairs_1_e_stairs_dest": "到層後先確認「B2 樓梯口」測試標誌，再前往下一個點。",
+    "meeting_a": "A 區合成集合點",
+    "meeting_b": "B 區合成集合點",
+    "wait_a": "測試用等候區 A；不對應真實站場，也不要阻擋任何通道。",
+    "wait_b": "測試用等候區 B；此點不是核准的真實電梯門前等候空間。"
   },
   "sources": [
     {

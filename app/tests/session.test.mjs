@@ -189,3 +189,34 @@ test("invalid search choices do not replace an active destination or plan", () =
     assert.equal(s.state.phase, "navigating");
   }
 });
+
+test("meeting destination selection clears B location, preserves B restrictions and waits for B scan", () => {
+  const s = ready();
+  s.setMobility("stepFree");
+  s.confirmLocation();
+  s.prepareMeetingDestination("poi_meet_b");
+  assert.equal(s.state.destinationId, "poi_meet_b");
+  assert.equal(s.state.position, null);
+  assert.equal(s.state.phase, "unlocated");
+  assert.equal(s.state.mobilityProfile, "stepFree");
+  assert.equal(s.state.plan, null);
+  s.acceptQr(payload());
+  s.confirmLocation();
+  assert.equal(s.state.phase, "ready");
+  assert.ok(s.state.plan.route.edgeIds.includes("e_lift_up"));
+  assert.equal(s.state.position.nodeId, "b1_a");
+});
+test("meeting at recipient origin requires arrival confirmation; unavailable elevator keeps NoRoute", () => {
+  const s = ready();
+  s.prepareMeetingDestination("poi_meet_a");
+  s.acceptQr(payload());
+  s.confirmLocation();
+  assert.equal(s.state.phase, "arrival_confirmation");
+  s.setMobility("stepFree");
+  s.markConnectorUnavailable("lift_1");
+  s.prepareMeetingDestination("poi_meet_b");
+  s.acceptQr(payload());
+  s.confirmLocation();
+  assert.equal(s.state.phase, "no_route");
+  assert.equal(s.state.plan, null);
+});

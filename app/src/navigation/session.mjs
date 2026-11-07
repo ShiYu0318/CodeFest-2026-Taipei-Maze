@@ -213,6 +213,23 @@ export function createSession(input) {
       recompute();
     },
     selectDestination,
+    prepareMeetingDestination(poiId) {
+      if (
+        errors.length ||
+        !graph.pois.some(
+          (p) => p.id === poiId && p.enabled && p.category === "meeting_point"
+        )
+      )
+        return { type: "UnknownDestination" };
+      invalidate();
+      state.destinationId = poiId;
+      state.position = null;
+      state.pendingAnchorId = null;
+      state.needsLocationConfirmation = false;
+      state.phase = "unlocated";
+      previousPhase = null;
+      return { type: "success" };
+    },
     applySearchSelection(selection) {
       const proposal = selection?.proposedOptions;
       if (
