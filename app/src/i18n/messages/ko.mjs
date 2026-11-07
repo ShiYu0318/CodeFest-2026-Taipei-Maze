@@ -90,7 +90,6 @@ export default {
 
   "scan.navigation": "길 안내",
   "scan.browsing": "지도 보기",
-  "scan.easyRead": "쉬운 글",
   "scan.caveat":
     "위치 코드는 아직 역에 설치되지 않았습니다. 지금은 편의시설과 층간 연결만 보여 주며, 전체 보행 경로망은 아직 없습니다.",
   "scan.browseHint": "가까운 위치 QR 코드를 스캔하면 지금 위치를 알 수 있어요.",

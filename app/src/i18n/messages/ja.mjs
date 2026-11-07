@@ -89,7 +89,6 @@ export default {
 
   "scan.navigation": "ナビ",
   "scan.browsing": "地図を見る",
-  "scan.easyRead": "やさしい表示",
   "scan.caveat":
     "位置コードはまだ駅に設置されていません。今は設備と階のつながりだけを表示しており、歩行ネットワークは未整備です。",
   "scan.browseHint": "近くの位置QRコードを読み取ると、今いる場所がわかります。",

@@ -81,7 +81,6 @@ export default {
 
   "scan.navigation": "導航模式",
   "scan.browsing": "瀏覽模式",
-  "scan.easyRead": "簡明模式",
   "scan.caveat":
     "定位碼尚未現地布設；目前提供設施與樓層關係，完整步行路網待補。",
   "scan.browseHint": "掃描附近的定位 QR，就能知道你在哪裡。",

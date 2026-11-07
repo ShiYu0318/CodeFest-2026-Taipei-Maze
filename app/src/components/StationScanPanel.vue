@@ -7,11 +7,6 @@
           view.mode === "navigation" ? t("scan.navigation") : t("scan.browsing")
         }}
       </h2>
-      <label
-        ><input v-model="easyRead" type="checkbox" />{{
-          t("scan.easyRead")
-        }}</label
-      >
     </div>
     <p class="scan-caveat">
       {{ t("scan.caveat") }}
@@ -19,9 +14,7 @@
     <p v-if="view.mode === 'browsing'">
       {{ t("scan.browseHint") }}
     </p>
-    <template
-      v-if="view.mode === 'navigation' && (!easyRead || !view.destinationId)"
-    >
+    <template v-if="view.mode === 'navigation'">
       <label for="station-destination">{{ t("scan.chooseDestination") }}</label>
       <select
         id="station-destination"
@@ -133,7 +126,7 @@
         {{ view.arrived ? t("scan.arrivedTitle") : t("scan.currentHint") }}
       </h3>
       <p>{{ instruction }}</p>
-      <ol v-if="!easyRead && view.relation.steps.length">
+      <ol v-if="view.relation.steps.length">
         <li v-for="step in view.relation.steps" :key="step.id">
           {{ stopLabel(step.from) }} ↔ {{ stopLabel(step.to)
           }}<button :disabled="active" @click="unavailable(step.id)">
@@ -168,7 +161,6 @@
 <script setup>
 /* global defineProps, defineEmits */
 import { computed, ref } from "vue";
-import { useDisplayPreferences } from "../display/preferences.mjs";
 import DestinationSearch from "./DestinationSearch.vue";
 import StaffCard from "./StaffCard.vue";
 import { stationCatalog } from "../search/catalog.mjs";
@@ -185,11 +177,9 @@ const view = computed(() => props.location.view.value);
 const catalog = stationPoints(data),
   searchEntries = stationCatalog(data);
 const byId = new Map(catalog.map((p) => [p.id, p]));
-const { displayMode } = useDisplayPreferences();
 const i18n = useI18n();
 const { locale, t } = i18n;
-const searchDetails = ref(null),
-  easyRead = ref(displayMode.value !== "standard");
+const searchDetails = ref(null);
 const active = computed(() => view.value.active);
 const available = computed(() => view.value.available);
 const notice = computed(() =>
@@ -286,10 +276,6 @@ async function start() {
   font-size: 18px;
   font-weight: 600;
   margin: 0;
-}
-.scan-heading label {
-  font-size: 13px;
-  white-space: nowrap;
 }
 .station-scan-panel p {
   margin: 8px 0;

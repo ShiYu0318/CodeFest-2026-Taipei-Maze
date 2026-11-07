@@ -91,7 +91,6 @@ export default {
 
   "scan.navigation": "Navigation",
   "scan.browsing": "Browsing",
-  "scan.easyRead": "Easy read",
   "scan.caveat":
     "Location codes are not installed in the station yet. For now we show facilities and floor links; a full walking network is still missing.",
   "scan.browseHint": "Scan a nearby location QR code to see where you are.",
