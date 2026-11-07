@@ -7,7 +7,9 @@
 **Tech Stack:** Existing Vue, local JSON, native qr_scan_session protocol; no new dependencies.
 **Spec:** User explicitly says integrate into formal map; scans keep destination and update location without reopening camera.
 
-- [ ] Tests first: strict QR namespace/unknown/malformed rejection, destination required, persistence over successive scans, invalid scans preserve state, accessibility filters, disconnected/same-zone/same-point cases, stale arrival token rejection.
-- [ ] Implement station scan module and production-map panel, persistent native guidance, latest confirmed map marker/floor focus, manual arrival confirmation and clear task.
-- [ ] Document QR format, generate deterministic printable-test payload catalog, clearly mark no installed real-world tags / missing walking graph.
+- [x] Tests first: strict QR namespace/unknown/malformed rejection, destination required, persistence over successive scans, invalid scans preserve state, accessibility filters, disconnected/same-zone/same-point cases, stale arrival token rejection.
+- [x] Implement station scan module and production-map panel, persistent native guidance, latest confirmed map marker/floor focus, manual arrival confirmation and clear task.
+- [x] Document QR format, generate deterministic printable-test payload catalog, clearly mark no installed real-world tags / missing walking graph.
 - [ ] Run full web checks, review, package/install updated simulator and push/merge after checks; keep chat PR separate until Android CI passes.
+
+- Reviewed: fixed scan-focus async teardown race; final review reports no remaining material issue. Current main also restored the old synthetic developer page; this implementation preserves it while making station-map the actual integrated flow.
