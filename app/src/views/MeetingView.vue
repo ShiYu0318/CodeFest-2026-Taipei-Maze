@@ -30,9 +30,19 @@
           :text="graph.messages[resolved.point.waiting_guidance_key]"
         />
       </p>
+      <p>
+        <ZhuyinText text="分享者定位確認時間" />：{{ resolved.confirmedAt
+        }}<ZhuyinText text="（來自分享端，未經伺服器驗證）" />
+      </p>
       <p role="status"><ZhuyinText :text="timeText" /></p>
-      <p><ZhuyinText text="此舊版合成集合點尚未對應正式地圖的已核准等候區，不能據此提供北車實際路線，也不代表你目前的位置。" /></p>
-      <router-link class="primary" to="/station-map"><ZhuyinText text="前往正式地圖選擇實際設施" /></router-link>
+      <p>
+        <ZhuyinText
+          text="此舊版合成集合點尚未對應正式地圖的已核准等候區，不能據此提供北車實際路線，也不代表你目前的位置。"
+        />
+      </p>
+      <router-link class="primary" to="/station-map"
+        ><ZhuyinText text="前往正式地圖選擇實際設施"
+      /></router-link>
     </section>
     <section v-else role="alert">
       <h2><ZhuyinText text="集合連結無法使用" /></h2>
