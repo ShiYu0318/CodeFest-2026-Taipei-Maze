@@ -29,6 +29,11 @@ const routes = [
     meta: { title: "台北車站地下導航" },
     component: () => import("../views/StationMapView.vue"),
   },
+  {
+    path: "/station-orientation",
+    name: "station-orientation",
+    component: () => import("../views/StationOrientationView.vue"),
+  },
 ];
 
 const router = createRouter({

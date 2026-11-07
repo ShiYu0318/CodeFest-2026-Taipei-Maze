@@ -53,9 +53,10 @@
         <div class="facility-title-group">
           <h2 id="facility-title"><ZhuyinText text="設施主題" /></h2>
         </div>
-        <span>
-          {{ visibleFloorPoints.length }} <ZhuyinText text="個標點" />
-        </span>
+        <router-link class="location-link" :to="orientationLink">
+          <StationMapIcon name="locate" />
+          定位
+        </router-link>
       </div>
 
       <div
@@ -90,7 +91,13 @@
               <div class="map-corner">
                 <div class="compass" aria-label="北方朝上略偏左" role="img">
                   <span>N</span>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <svg
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                    :style="{
+                      transform: 'rotate(' + MAP_NORTH_DEGREES + 'deg)',
+                    }"
+                  >
                     <path d="M12 3 20 21l-8-4-8 4Z" />
                   </svg>
                 </div>
@@ -163,14 +170,13 @@
                         'pin-scan-position': point.id === scanPositionId,
                         'pin-scan-target': point.id === scanTargetId,
                         'pin-arrival': point.id === arrivalPointId,
+                        'pin-endpoint':
+                          point.id === currentPoint?.id ||
+                          point.id === targetPoint?.id,
                       }"
                       type="button"
                       :style="pinStyle(point)"
-                      :aria-label="
-                        point.name +
-                        (point.id === scanPositionId ? '，您在這裡' : '') +
-                        (point.id === scanTargetId ? '，目的地' : '')
-                      "
+                      :aria-label="mapPointLabel(point)"
                       :aria-pressed="point.id === selected?.id"
                       :aria-hidden="!isPointVisible(point)"
                       :tabindex="isPointVisible(point) ? undefined : -1"
@@ -202,6 +208,60 @@
                           ><ZhuyinText :text="point.name"
                         /></span>
                       </span>
+                      <svg
+                        v-if="
+                          point.id === selected?.id ||
+                          point.id === currentPoint?.id
+                        "
+                        class="map-location-arrow"
+                        viewBox="0 0 80 80"
+                        aria-hidden="true"
+                      >
+                        <defs>
+                          <linearGradient
+                            :id="'location-arrow-' + point.id"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              stop-color="currentColor"
+                              stop-opacity=".45"
+                            />
+                            <stop offset="1" stop-color="currentColor" />
+                          </linearGradient>
+                        </defs>
+                        <g
+                          v-if="
+                            point.id === currentPoint?.id && mapHeading !== null
+                          "
+                          :transform="'rotate(' + mapHeading + ' 40 40)'"
+                        >
+                          <path
+                            d="M40 2 50 19 40 15 30 19Z"
+                            :fill="'url(#location-arrow-' + point.id + ')'"
+                          />
+                          <path d="M27 16l3 3m23-3-3 3" />
+                        </g>
+                        <g v-else>
+                          <path
+                            d="M30 5h20L40 19Z"
+                            :fill="'url(#location-arrow-' + point.id + ')'"
+                          />
+                          <path d="M27 7l3 4m23-4-3 4" />
+                        </g>
+                      </svg>
+                      <span
+                        v-if="
+                          point.id === currentPoint?.id ||
+                          point.id === targetPoint?.id
+                        "
+                        class="map-endpoint"
+                        :class="{
+                          'map-endpoint-target': point.id === targetPoint?.id,
+                        }"
+                        aria-hidden="true"
+                        >{{ endpointBadge(point) }}</span
+                      >
                     </button>
                   </div>
                 </div>
@@ -285,6 +345,7 @@ import {
   ref,
   watch,
 } from "vue";
+import { useRoute } from "vue-router";
 // import DestinationSearch from "../components/DestinationSearch.vue";
 // import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
@@ -295,6 +356,11 @@ import ZhuyinText from "../components/ZhuyinText.vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { useStationLocation } from "../station/useStationLocation";
 import { stationPoints } from "../station/scan.mjs";
+import {
+  findStationPoint,
+  MAP_NORTH_DEGREES,
+} from "../navigation/orientation.mjs";
+import { stationHeading } from "../navigation/station-compass";
 import { floors, stackBounds } from "./station-floor-plans";
 import stationData from "./station-points.json";
 import stationConnections from "./station-connections.json";
@@ -324,6 +390,16 @@ const facilityHelp = {
   locker: "置物櫃：暫時寄放行李的地方。",
   accessible: "輪椅候車區：提供輪椅使用者候車的空間。",
 };
+const route = useRoute();
+const currentPoint = computed(() =>
+  findStationPoint(points, route.query.start)
+);
+const targetPoint = computed(() =>
+  findStationPoint(points, route.query.destination)
+);
+const mapHeading = computed(() =>
+  stationHeading.value ? stationHeading.value.degrees + MAP_NORTH_DEGREES : null
+);
 // const searchCatalogEntries = stationCatalog(stationData);
 // let searchPointRevision = 0;
 const mobileZoomQuery = window.matchMedia(
@@ -364,7 +440,9 @@ const floorPalette = {
     onTone: "gray-50",
   },
 };
-const level = ref("B2");
+const level = ref(
+  currentPoint.value?.floorId ?? targetPoint.value?.floorId ?? "B2"
+);
 const showLayers = ref(false);
 const activeTheme = ref(null);
 const selected = ref(null);
@@ -395,6 +473,13 @@ function setScanTarget(point) {
   scanTargetId.value = point?.id ?? null;
   focusScanPoint(point);
 }
+const orientationLink = computed(() => ({
+  name: "station-orientation",
+  query: {
+    start: selected.value?.id ?? currentPoint.value?.id,
+    destination: targetPoint.value?.id,
+  },
+}));
 const originView = ref(null);
 const connectorHeading = ref(null);
 const connectorPanel = ref(null);
@@ -462,7 +547,10 @@ onMounted(() => {
   for (const type of webkitGestures) {
     document.addEventListener(type, handleWebkitGesture, captureGesture);
   }
-  nextTick(() => centerOn(0.5, 0.5));
+  nextTick(() => {
+    const point = currentPoint.value ?? targetPoint.value;
+    centerOn(...(point ? normalizedPoint(point) : [0.5, 0.5]));
+  });
 });
 
 onBeforeUnmount(() => {
@@ -624,6 +712,22 @@ function pinStyle(point) {
     top: y * 100 + "%",
     ...pointThemeStyle(point.type),
   };
+}
+
+function endpointBadge(point) {
+  const start = point.id === currentPoint.value?.id ? "起" : "";
+  const destination = point.id === targetPoint.value?.id ? "終" : "";
+  return start + destination;
+}
+
+function mapPointLabel(point) {
+  const badge = endpointBadge(point);
+  return (
+    point.name +
+    (badge ? "・" + badge : "") +
+    (point.id === scanPositionId.value ? "，您在這裡" : "") +
+    (point.id === scanTargetId.value ? "，目的地" : "")
+  );
 }
 
 function pointThemeStyle(type) {
@@ -1073,7 +1177,8 @@ function closeConnectorDetails() {
 function dismissConnectorOutside(event) {
   const panel = connectorPanel.value;
   if (!panel || panel.contains(event.target)) return;
-  if (event.target.closest?.(".display-controls")) return;
+  // The location link uses the selected point as its starting position.
+  if (event.target.closest?.(".display-controls, .location-link")) return;
   if (viewport.value.contains(event.target)) {
     // Marker clicks handle selection, and a click following a drag is ignored.
     const dragClick = ignoreMouseClick && event.detail !== 0;
