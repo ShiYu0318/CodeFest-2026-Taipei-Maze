@@ -47,3 +47,10 @@ MIT、常見 BSD-2-Clause／BSD-3-Clause、Apache-2.0 可作優先候選，但�
 - `app/src/navigation/` 的核心模組、合成 fixture，以及 NavigationDemoView／NavigationDemoMap 與 `app/tests/` 為本專案新增原創內容，依根目錄 AGPL-3.0-or-later；不改寫匯入 Webview 各部分的權利狀態。
 - 合成地圖為程式繪製的簡單線段與節點，座標、文案與來源紀錄皆為測試用自製內容，沒有新增第三方圖資、照片、字型、模型、音檔、生成服務或 npm 依賴。
 - 新測試只使用 Node.js built-in test runner；Vue CLI 與既有依賴仍沿用現有 lockfile，未宣稱完成整棵供應鏈或匯入原型的發行審查。
+
+
+## 2026-11-07 規則式多語搜尋
+
+- `app/src/search/`、DestinationSearch 元件與新增測試為原創程式，依 AGPL-3.0-or-later，未新增 npm 依賴或模型。
+- `dictionary.json` 為團隊撰寫的七語原型種子詞及意圖，不含下載詞庫或外部翻譯服務產出；全部 alias／規則保留 draft、來源與待語言校對狀態。原型頁面明示草稿，正式詞典發布仍需逐語審查。
+- 真實設施名稱沿用已記錄的站圖原型資料，不將搜尋命中當成場站或權利驗證。合成廁所可及性是測試假設，不是實地認證。
