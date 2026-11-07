@@ -29,9 +29,25 @@ export function createChatBridge(
     const data = message.data,
       entry = pending.get(data?.requestId);
     if (!entry) return;
-    // SSE-style partial chunks: forward them and keep the request alive.
+    // Partial generate chunks use consecutive 1-based seq numbers.
+    // Ignore retransmits; fail closed on gaps, invalid frames or other actions.
     if (data.status === "partial") {
-      if (typeof data.text !== "string") return;
+      if (
+        entry.action !== "generate" ||
+        !Number.isSafeInteger(data.seq) ||
+        data.seq < 1 ||
+        typeof data.text !== "string" ||
+        !data.text
+      ) {
+        api.cancel(data.requestId, "invalid_reply");
+        return;
+      }
+      if (data.seq <= entry.lastSeq) return;
+      if (data.seq !== entry.lastSeq + 1) {
+        api.cancel(data.requestId, "invalid_reply");
+        return;
+      }
+      entry.lastSeq = data.seq;
       entry.received += data.text.length;
       if (entry.received > 12000) {
         api.cancel(data.requestId, "invalid_reply");
@@ -95,6 +111,8 @@ export function createChatBridge(
           timer,
           idle,
           received: 0,
+          action,
+          lastSeq: 0,
           onPartial: typeof onPartial === "function" ? onPartial : null,
         });
         try {

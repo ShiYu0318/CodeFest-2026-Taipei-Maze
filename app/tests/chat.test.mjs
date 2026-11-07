@@ -130,9 +130,10 @@ test("partial replies stream to the caller and keep a busy request alive", async
     { onPartial: (text) => parts.push(text) }
   );
   const id = h.sent.at(-1).data.requestId;
+  let seq = 0;
   for (const text of ["Hel", "lo ", "there"]) {
     await new Promise((r) => setTimeout(r, 25));
-    h.reply({ requestId: id, status: "partial", text });
+    h.reply({ requestId: id, status: "partial", seq: ++seq, text });
   }
   h.reply({ requestId: id, status: "success", text: "Hello there" });
   const result = await p;
@@ -151,10 +152,30 @@ test("partials after cancel are ignored and oversized streams are cut off", asyn
     { onPartial: (t) => parts.push(t) }
   );
   const id = h.sent.at(-1).data.requestId;
-  h.reply({ requestId: id, status: "partial", text: "x".repeat(7000) });
-  h.reply({ requestId: id, status: "partial", text: "x".repeat(7000) });
+  h.reply({ requestId: id, status: "partial", seq: 1, text: "x".repeat(7000) });
+  h.reply({ requestId: id, status: "partial", seq: 2, text: "x".repeat(7000) });
   assert.equal((await p).code, "invalid_reply");
   h.reply({ requestId: id, status: "partial", text: "late" });
   assert.equal(parts.length, 1);
   b.dispose();
+});
+
+test("duplicate partials are ignored and gaps or missing sequence fail closed", async () => {
+  for (const bad of [{ seq: 3 }, {}]) {
+    const h = host(),
+      b = createChatBridge(h, { idFactory });
+    const parts = [];
+    const pending = b.request(
+      "generate",
+      { prompt: "hi" },
+      { onPartial: (text) => parts.push(text) }
+    );
+    const requestId = h.sent.at(-1).data.requestId;
+    h.reply({ requestId, status: "partial", seq: 1, text: "Hello" });
+    h.reply({ requestId, status: "partial", seq: 1, text: "Hello" });
+    h.reply({ requestId, status: "partial", text: "bad", ...bad });
+    b.dispose();
+    assert.deepEqual(parts, ["Hello"]);
+    assert.equal((await pending).code, "invalid_reply");
+  }
 });
