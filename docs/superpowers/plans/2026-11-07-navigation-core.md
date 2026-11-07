@@ -60,7 +60,7 @@ Files: app/src/views/NavigationDemoView.vue; app/src/components/NavigationDemoMa
 - [x] Document fixture vs real graph contract, test commands, manual scenarios and unfinished P0 gates.
 - [x] Run full tests, lint changed files, production build and browser-like HTTP/asset checks; report any warnings and UI verification restrictions.
 - [x] Fresh final review and material fixes with regression tests; commit UI and documentation.
-- [ ] Push feature branch and open Draft PR; keep main unchanged for teammate integration.
+- [x] Push feature branch and open Draft PR; keep main unchanged for teammate integration.
 
 ## Execution ledger
 
@@ -76,3 +76,5 @@ Files: app/src/views/NavigationDemoView.vue; app/src/components/NavigationDemoMa
 - Browser computer-use permission was denied; browser clicks, layout QA and native camera remain not_run.
 - Ruling: origin/main received a map UI simplification during implementation. Rebased and preserved it; placed navigation link outside the hidden header.
 - Ruling: use authenticated local gh for PR because GitHub connector cannot access this private repository (404).
+
+- Delivery: feature branch feat/navigation-core pushed; Draft PR https://github.com/yoyo899843/Taipei-Codefest-2026-Big-Dumb/pull/1. Main was not merged.
