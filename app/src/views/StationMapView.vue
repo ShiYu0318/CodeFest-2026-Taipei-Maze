@@ -406,6 +406,7 @@ import { stationPoints } from "../station/scan.mjs";
 import { buildInfo, summarizeStationData } from "../about/about.mjs";
 import { htmlLang, useI18n } from "../i18n/index.mjs";
 import { placeName } from "../i18n/places.mjs";
+import { useMapFocus } from "../station/map-focus.mjs";
 import { floors, stackBounds } from "./station-floor-plans";
 import stationData from "./station-points.json";
 import stationConnections from "./station-connections.json";
@@ -564,6 +565,21 @@ watch(
   },
   () => setScanPosition(stationById.get(location.view.value.position?.pointId)),
   { flush: "post" }
+);
+// Requests from the floating chat ("show on map").
+const mapFocus = useMapFocus();
+watch(
+  () => mapFocus.request.value,
+  async (request) => {
+    const point = stationById.get(request?.pointId);
+    if (!point) return;
+    mapFocus.clear();
+    await nextTick();
+    // Bring the map itself into view; the scan panel sits above it.
+    mapSection.value?.scrollIntoView({ block: "start", behavior: "smooth" });
+    focusScanPoint(point);
+  },
+  { immediate: true, flush: "post" }
 );
 watch(
   () => location.view.value.destinationId,
