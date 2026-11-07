@@ -125,6 +125,8 @@ test("facility categories, child explanations and browsing messages have annotat
         key.startsWith("notice.") ||
         // The onboarding tour is shown to children too.
         key.startsWith("tour.") ||
+        key.startsWith("walk.") ||
+        key.startsWith("route.") ||
         [
           "scan.browsing",
           "scan.navigation",

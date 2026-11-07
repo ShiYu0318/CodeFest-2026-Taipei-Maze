@@ -54,6 +54,46 @@
         @scanned="onQrScanned"
         @cancel-trip="openTripDialog('cancel')"
       />
+      <section class="walk-panel" :aria-label="t('walk.routeTitle')">
+        <p
+          v-if="walkStatus"
+          class="walk-status"
+          :data-state="walk.type === 'success' ? 'ok' : 'warn'"
+          role="status"
+        >
+          <ZhuyinText :text="walkStatus" />
+        </p>
+        <StationRouteSteps
+          v-if="walkSteps.length"
+          :steps="walkSteps"
+          :index="walkStepIndex"
+          :points-by-id="stationById"
+          @update:index="goWalkStep"
+        />
+        <div v-if="walkStart" class="walk-nearest" role="group">
+          <span class="walk-nearest-label"
+            ><ZhuyinText :text="t('walk.nearest')"
+          /></span>
+          <button
+            v-for="category in nearestCategories"
+            :key="category"
+            type="button"
+            class="walk-nearest-button"
+            @click="goNearest(category)"
+          >
+            <StationMapIcon :name="category" />
+            <ZhuyinText :text="t('type.' + category)" />
+          </button>
+        </div>
+        <p
+          v-if="nearestNotice"
+          class="walk-status"
+          data-state="warn"
+          role="status"
+        >
+          <ZhuyinText :text="nearestNotice" />
+        </p>
+      </section>
       <div
         ref="floorControls"
         class="floor-controls horizontal-scroll"
@@ -224,6 +264,33 @@
                           :visible-point-ids="
                             navigationMap.active ? navigationMap.pointIds : null
                           "
+                        />
+                      </g>
+                      <g class="walk-route" aria-hidden="true">
+                        <polyline
+                          v-for="(line, index) in walkLines"
+                          :key="index"
+                          :points="line.map((p) => p.join(',')).join(' ')"
+                        />
+                        <polyline
+                          v-if="
+                            currentWalkStep?.line &&
+                            currentWalkStep.floor === level
+                          "
+                          class="walk-route-current"
+                          :points="
+                            currentWalkStep.line
+                              .map((p) => p.join(','))
+                              .join(' ')
+                          "
+                        />
+                        <circle
+                          v-for="point in walkCheckpoints"
+                          :key="point.id"
+                          class="walk-checkpoint"
+                          :cx="point.x"
+                          :cy="point.y"
+                          r="9"
                         />
                       </g>
                     </svg>
@@ -443,6 +510,7 @@
       v-if="tripDialog"
       :key="tripDialog"
       :direction="tripDirection"
+      :arrow="tripArrow"
       :cancel-only="tripDialog === 'cancel'"
       @continue="closeTripDialog"
       @cancel="cancelTrip"
@@ -474,6 +542,7 @@ import StaffCard from "../components/StaffCard.vue";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
 import StationInformationDialog from "../components/StationInformationDialog.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
+import StationRouteSteps from "../components/StationRouteSteps.vue";
 import StationMapTour from "../components/StationMapTour.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import DisplayControls from "../components/DisplayControls.vue";
@@ -484,6 +553,15 @@ import { stationPoints } from "../station/scan.mjs";
 import { htmlLang, useI18n } from "../i18n/index.mjs";
 import { placeName } from "../i18n/places.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
+import walkingNetwork from "../station/walking-network.json";
+import {
+  nearestPlace,
+  nextArrow,
+  routeSteps,
+  planWalk,
+  routeLines,
+  walkingRouter,
+} from "../station/walk-route.mjs";
 import {
   navigationMapState,
   navigationPointVisible,
@@ -647,6 +725,114 @@ const mapBoard = ref(null);
 const mapBoardWidth = ref(0);
 let mapBoardObserver;
 const location = useStationLocation(stationData, stationConnections);
+// Walking network: routes, nearest facilities and the first-step arrow.
+const walkRouter = walkingRouter(walkingNetwork);
+const nearestCategories = ["restroom", "elevator", "info", "water", "nursing"];
+const walkStart = computed(
+  () => currentPoint.value?.id ?? location.view.value.position?.pointId ?? null
+);
+const walkDestination = computed(
+  () => targetPoint.value?.id ?? location.view.value.destinationId ?? null
+);
+const walk = computed(() =>
+  walkDestination.value
+    ? planWalk(walkRouter, {
+        startId: walkStart.value,
+        destinationId: walkDestination.value,
+        stepFree: location.view.value.stepFree,
+        unavailableConnectorIds: location.view.value.unavailableConnectorIds,
+      })
+    : { type: "Idle" }
+);
+const walkLines = computed(() =>
+  walk.value.type === "success" ? routeLines(walk.value.route, level.value) : []
+);
+// Step-by-step view of the whole route: one walk per floor with the named
+// checkpoints passed, each floor change, then arrival.
+const walkSteps = computed(() =>
+  walk.value.type === "success" ? routeSteps(walk.value.route) : []
+);
+const walkStepIndex = ref(0);
+watch(walkSteps, () => (walkStepIndex.value = 0));
+const currentWalkStep = computed(
+  () => walkSteps.value[walkStepIndex.value] ?? null
+);
+const walkCheckpoints = computed(() => {
+  const step = currentWalkStep.value;
+  if (!step || step.floor !== level.value) return [];
+  const ids =
+    step.kind === "walk"
+      ? [step.fromId, ...step.viaIds, step.toId]
+      : [step.kind === "floor" ? step.fromId : step.toId];
+  return ids.map((id) => stationById.get(id)).filter(Boolean);
+});
+async function goWalkStep(index) {
+  walkStepIndex.value = index;
+  const step = walkSteps.value[index];
+  if (!step) return;
+  if (step.floor !== level.value) await showFloor(step.floor);
+  await nextTick();
+  if (walkStepIndex.value !== index || level.value !== step.floor) return;
+  // Bring this step's stretch of the route (or its lift/stairs) into view.
+  const anchor = stationById.get(step.fromId) ?? stationById.get(step.toId);
+  const line = step.line ?? (anchor ? [[anchor.x, anchor.y]] : []);
+  if (!line.length) return;
+  const xs = line.map((p) => p[0]),
+    ys = line.map((p) => p[1]);
+  const [x, y] = normalizedPoint({
+    x: (Math.min(...xs) + Math.max(...xs)) / 2,
+    y: (Math.min(...ys) + Math.max(...ys)) / 2,
+  });
+  centerOn(x, y);
+}
+const walkStatus = computed(() => {
+  const type = walk.value.type;
+  if (type === "success") return t("walk.routeTitle");
+  if (type === "NoStart") return t("walk.noStart");
+  if (type === "UnknownStart") return t("walk.unknownStart");
+  if (type === "UnknownDestination") return t("walk.unknownDestination");
+  if (type === "NoRoute")
+    return location.view.value.stepFree
+      ? t("walk.noRouteStepFree")
+      : t("walk.noRoute");
+  return "";
+});
+const tripArrow = computed(() => {
+  if (walk.value.type !== "success") return null;
+  const arrow = nextArrow(walk.value.route);
+  if (arrow.kind === "none") return null;
+  const point = stationById.get(arrow.toward);
+  const name = point ? placeName(point, i18n) : "";
+  return {
+    ...arrow,
+    text:
+      arrow.kind === "map"
+        ? t("walk.arrowMap", { name })
+        : t(arrow.kind === "up" ? "walk.arrowUp" : "walk.arrowDown", {
+            via: t(`type.${arrow.via}`),
+            floor: arrow.floor,
+          }),
+    note: t("walk.arrowNote"),
+  };
+});
+function goNearest(category) {
+  const found = nearestPlace(walkRouter, {
+    startId: walkStart.value,
+    category,
+    stepFree: location.view.value.stepFree,
+    unavailableConnectorIds: location.view.value.unavailableConnectorIds,
+  });
+  const point = found.type === "success" && stationById.get(found.pointId);
+  if (!point) {
+    nearestNotice.value = t("walk.nearestNone", {
+      type: t(`type.${category}`),
+    });
+    return;
+  }
+  nearestNotice.value = "";
+  chooseEndpoint(walkStart.value, point.id, point, "destination");
+}
+const nearestNotice = ref("");
 const navigationMap = computed(() =>
   navigationMapState(location.view.value, {
     startId: currentPoint.value?.id,

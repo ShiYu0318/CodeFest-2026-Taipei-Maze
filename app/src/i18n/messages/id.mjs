@@ -133,7 +133,7 @@ export default {
   "scan.navigation": "Navigasi",
   "scan.browsing": "Lihat peta",
   "scan.caveat":
-    "Kode lokasi belum dipasang di stasiun. Saat ini hanya ada fasilitas dan penghubung antarlantai; jaringan jalan kaki lengkap belum tersedia.",
+    "Kode lokasi belum dipasang di stasiun. Rute jalan kaki diperkirakan dari denah dan belum dicek di lokasi.",
   "scan.browseHint": "Pindai kode QR lokasi terdekat untuk tahu posisi Anda.",
   "scan.chooseDestination": "Pilih tujuan",
   "scan.choosePlaceholder": "Mau ke mana?",
@@ -178,7 +178,7 @@ export default {
   "scan.instr.atDestination":
     "Lokasi Anda sama dengan tujuan. Periksa nama dan lantai di lokasi, lalu konfirmasi bahwa Anda sudah tiba.",
   "scan.instr.sameZone":
-    "Anda berada di area yang sama dengan tujuan. Belum ada rute jalan kaki yang dicek; ikuti papan petunjuk dan pindai lagi di jalan.",
+    "Anda berada di area yang sama dengan tujuan. Garis titik di peta adalah rute perkiraan dari denah; ikuti papan petunjuk dan pindai lagi di jalan.",
   "scan.instr.connections":
     "Penghubung antarlantai yang bisa dipakai: {steps}. Ini menunjukkan hubungan antarlantai, bukan rute jalan kaki lengkap. Ikuti papan petunjuk.",
   "scan.instr.none":
@@ -476,4 +476,31 @@ export default {
   "chat.think.noAnswer": "Tidak ada jawaban yang cocok di data stasiun",
   "chat.think.model": "Menyusun jawaban di ponsel Anda (Gemma 3)",
   "chat.think.compose": "Merangkum jawaban",
+  "walk.routeTitle": "Rute jalan kaki (perkiraan dari denah)",
+  "walk.noStart":
+    "Pindai lokasi atau pilih titik awal untuk merencanakan rute jalan kaki.",
+  "walk.unknownStart":
+    "Lokasi Anda belum terhubung ke jaringan jalan kaki. Ikuti papan petunjuk ke lorong terdekat lalu pindai lagi.",
+  "walk.unknownDestination":
+    "Tujuan ini belum terhubung ke jaringan jalan kaki. Ikuti papan petunjuk, atau pakai “Tunjukkan ke petugas” untuk bertanya.",
+  "walk.noRoute":
+    "Tidak ada rute yang cocok dengan pilihan Anda. Silakan tanya petugas stasiun.",
+  "walk.noRouteStepFree":
+    "Rute tanpa anak tangga tidak ditemukan. Kami tidak menggantinya dengan tangga atau alat yang belum dipastikan. Silakan tanya petugas stasiun.",
+  "walk.nearest": "Terdekat",
+  "walk.nearestNone": "Tidak ada {type} terdekat yang bisa dicapai.",
+  "walk.arrowMap":
+    "Berjalanlah sesuai arah panah di peta (utara di atas), menuju “{name}”.",
+  "walk.arrowUp": "Naik {via} ke {floor}.",
+  "walk.arrowDown": "Turun dengan {via} ke {floor}.",
+  "walk.arrowNote":
+    "Ponsel tidak tahu arah hadap Anda. Bandingkan peta dengan papan petunjuk.",
+  "route.title": "Langkah rute",
+  "route.step": "Langkah {current}/{total}",
+  "route.walk": "Di {floor}, berjalan menuju “{name}”",
+  "route.via": "Di jalan Anda melewati: {list}",
+  "route.arrive": "Tiba di “{name}”",
+  "route.prev": "Sebelumnya",
+  "route.next": "Berikutnya",
+  "route.all": "Semua langkah",
 };

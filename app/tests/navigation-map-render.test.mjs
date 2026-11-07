@@ -16,6 +16,7 @@ import * as floorPlans from "../src/views/station-floor-plans.mjs";
 import * as navigation from "../src/station/navigation-view.mjs";
 import * as scan from "../src/station/scan.mjs";
 import * as mapFocus from "../src/station/map-focus.mjs";
+import * as walkRoute from "../src/station/walk-route.mjs";
 import * as mapTour from "../src/station/map-tour.mjs";
 import * as about from "../src/about/about.mjs";
 import * as searchCatalog from "../src/search/catalog.mjs";
@@ -97,6 +98,13 @@ function component(name) {
     "navigation-view.mjs": navigation,
     "scan.mjs": scan,
     "map-focus.mjs": mapFocus,
+    "walk-route.mjs": walkRoute,
+    "walking-network.json": JSON.parse(
+      readFileSync(
+        new URL("../src/station/walking-network.json", import.meta.url),
+        "utf8"
+      )
+    ),
     "map-tour.mjs": mapTour,
     "about.mjs": about,
     "catalog.mjs": searchCatalog,

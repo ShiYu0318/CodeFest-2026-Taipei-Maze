@@ -114,8 +114,7 @@ export default {
 
   "scan.navigation": "導航模式",
   "scan.browsing": "瀏覽模式",
-  "scan.caveat":
-    "定位碼尚未現地布設；目前提供設施與樓層關係，完整步行路網待補。",
+  "scan.caveat": "定位碼尚未現地布設；步行路線依圖面估算，尚未現場核對。",
   "scan.browseHint": "掃描附近的定位 QR，就能知道你在哪裡。",
   "scan.chooseDestination": "選擇目的地",
   "scan.choosePlaceholder": "請選擇要去的設施",
@@ -152,7 +151,7 @@ export default {
   "scan.instr.atDestination":
     "目前定位點與目的地相同。請確認現場名稱與樓層是否相符，再確認已抵達。",
   "scan.instr.sameZone":
-    "目前與終點在同一區域。尚無可驗證的走廊指引，請依現場標示確認，沿途掃碼更新。",
+    "目前與終點在同一區域。地圖上的虛線是依圖面估算的路線，請依現場標示確認，沿途掃碼更新。",
   "scan.instr.connections":
     "可參考的樓層連結：{steps}。這是樓層關係，不是完整步行路線，請依現場標示確認。",
   "scan.instr.none":
@@ -410,4 +409,27 @@ export default {
   "chat.think.noAnswer": "車站資料裡沒有對應的答案",
   "chat.think.model": "在手機上產生回答（Gemma 3）",
   "chat.think.compose": "整理回答",
+  "walk.routeTitle": "步行路線（依圖面估算）",
+  "walk.noStart": "先掃描定位或選擇起點，才能規劃步行路線。",
+  "walk.unknownStart":
+    "你的位置還沒接上步行路網，請依現場指標走到附近走道後再掃描。",
+  "walk.unknownDestination":
+    "這個目的地還沒接上步行路網，請依現場指標，或用「給站務人員看」詢問。",
+  "walk.noRoute": "依目前條件找不到可走的路線，請洽站務人員。",
+  "walk.noRouteStepFree":
+    "找不到無障礙路線；不會用樓梯或未確認的設備替代，請洽站務人員。",
+  "walk.nearest": "最近的",
+  "walk.nearestNone": "附近沒有能走到的{type}。",
+  "walk.arrowMap": "依地圖方向（北方朝上）朝箭頭走，往「{name}」。",
+  "walk.arrowUp": "搭{via}往上到 {floor}。",
+  "walk.arrowDown": "搭{via}往下到 {floor}。",
+  "walk.arrowNote": "手機不知道你面向哪裡，請對照地圖和現場指標。",
+  "route.title": "路線步驟",
+  "route.step": "第 {current}／{total} 步",
+  "route.walk": "在 {floor} 往「{name}」走",
+  "route.via": "途中經過：{list}",
+  "route.arrive": "抵達「{name}」",
+  "route.prev": "上一步",
+  "route.next": "下一步",
+  "route.all": "全部步驟",
 };

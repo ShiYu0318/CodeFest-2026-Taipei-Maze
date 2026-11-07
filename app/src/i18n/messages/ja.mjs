@@ -130,7 +130,7 @@ export default {
   "scan.navigation": "ナビ",
   "scan.browsing": "地図を見る",
   "scan.caveat":
-    "位置コードはまだ駅に設置されていません。今は設備と階のつながりだけを表示しており、歩行ネットワークは未整備です。",
+    "位置コードはまだ駅に設置されていません。徒歩ルートは平面図からの推定で、現地ではまだ確認していません。",
   "scan.browseHint": "近くの位置QRコードを読み取ると、今いる場所がわかります。",
   "scan.chooseDestination": "目的地を選ぶ",
   "scan.choosePlaceholder": "どこへ行きますか？",
@@ -175,7 +175,7 @@ export default {
   "scan.instr.atDestination":
     "現在地と目的地が同じです。現地で名前と階を確かめてから、到着を確認してください。",
   "scan.instr.sameZone":
-    "目的地と同じエリアにいます。確認済みの歩行ルートはまだないので、案内表示に従い、途中でもう一度読み取ってください。",
+    "目的地と同じエリアにいます。地図の点線は平面図から推定したルートです。案内表示に従い、途中でもう一度読み取ってください。",
   "scan.instr.connections":
     "使える階のつながり：{steps}。階のつながりを示すだけで、歩行ルートではありません。案内表示に従ってください。",
   "scan.instr.none":
@@ -469,4 +469,29 @@ export default {
   "chat.think.noAnswer": "駅のデータに合う答えがありません",
   "chat.think.model": "スマホで回答を作成中（Gemma 3）",
   "chat.think.compose": "回答をまとめています",
+  "walk.routeTitle": "徒歩ルート（平面図からの推定）",
+  "walk.noStart": "位置を読み取るか出発地点を選ぶと、徒歩ルートを作れます。",
+  "walk.unknownStart":
+    "現在地がまだ徒歩ネットワークにつながっていません。案内表示に従って近くの通路へ行き、もう一度読み取ってください。",
+  "walk.unknownDestination":
+    "この目的地はまだ徒歩ネットワークにつながっていません。案内表示に従うか、「係員に見せる」で尋ねてください。",
+  "walk.noRoute": "条件に合う徒歩ルートがありません。駅係員に尋ねてください。",
+  "walk.noRouteStepFree":
+    "段差のないルートが見つかりません。階段や未確認の設備で代用はしません。駅係員に尋ねてください。",
+  "walk.nearest": "いちばん近い",
+  "walk.nearestNone": "近くに行ける{type}がありません。",
+  "walk.arrowMap":
+    "地図の矢印の向き（北が上）に「{name}」の方へ進んでください。",
+  "walk.arrowUp": "{via}で{floor}へ上がってください。",
+  "walk.arrowDown": "{via}で{floor}へ下りてください。",
+  "walk.arrowNote":
+    "スマホはあなたの向きを知りません。地図と現地の案内表示を見比べてください。",
+  "route.title": "ルートの手順",
+  "route.step": "手順 {current}/{total}",
+  "route.walk": "{floor}で「{name}」の方へ歩く",
+  "route.via": "途中で通る場所：{list}",
+  "route.arrive": "「{name}」に到着",
+  "route.prev": "前へ",
+  "route.next": "次へ",
+  "route.all": "すべての手順",
 };
