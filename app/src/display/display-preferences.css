@@ -1,36 +1,46 @@
 /* SPDX-License-Identifier: AGPL-3.0-or-later */
-/* Share the existing TownPass palette; standard/light keeps its original values. */
+/* TownPass TPColors tokens (lib/util/tp_colors.dart); dark values are derived. */
 .display-page {
-  --tp-primary-50: #f0f8fa;
-  --tp-primary-100: #e1f0f4;
-  --tp-primary-200: #c2e1e9;
-  --tp-primary-300: #a8d2dd;
-  --tp-primary-400: #8ec3d3;
+  --tp-primary-50: #edf8fa;
+  --tp-primary-100: #dbf1f5;
+  --tp-primary-200: #b4e2ea;
+  --tp-primary-300: #93d4df;
+  --tp-primary-400: #71c5d5;
   --tp-primary-500: #5ab4c5;
-  --tp-primary-600: #608c99;
-  --tp-primary-700: #496b75;
-  --tp-primary-800: #2f464d;
-  --tp-primary-900: #182629;
-  --tp-primary-950: #0c1315;
-  --tp-secondary-50: #fbf8ee;
-  --tp-secondary-100: #f9f2e1;
-  --tp-secondary-200: #f2e3c1;
+  --tp-primary-600: #468d9b;
+  --tp-primary-700: #356c77;
+  --tp-primary-800: #22474e;
+  --tp-primary-900: #112629;
+  --tp-primary-950: #081315;
+  --tp-secondary-50: #fdf8ed;
+  --tp-secondary-100: #fcf2df;
+  --tp-secondary-200: #f8e3bc;
   --tp-secondary-500: #f5ba4b;
-  --tp-secondary-600: #d7a652;
-  --tp-secondary-700: #a17d3c;
-  --tp-secondary-800: #6c5326;
-  --tp-secondary-900: #382b11;
-  --tp-secondary-950: #1a1306;
+  --tp-secondary-600: #e7a43c;
+  --tp-secondary-700: #ad7b2b;
+  --tp-secondary-800: #74521b;
+  --tp-secondary-900: #3c2b0b;
+  --tp-secondary-950: #1c1304;
   --tp-gray-50: #f1f3f4;
-  --tp-gray-100: #e4e7e9;
+  --tp-gray-100: #e3e7e9;
   --tp-gray-500: #738995;
-  --tp-gray-600: #626d75;
-  --tp-gray-700: #4a5258;
-  --tp-gray-800: #32383c;
-  --tp-gray-900: #181b1d;
-  --tp-gray-950: #0c0d0e;
-  --tp-page: #f8fafa;
-  --tp-surface: #fdfefe;
+  --tp-gray-600: #5e6d76;
+  --tp-gray-700: #475259;
+  --tp-gray-800: #30383d;
+  --tp-gray-900: #171b1d;
+  --tp-gray-950: #0b0d0e;
+  --tp-page: #f1f3f4;
+  --tp-surface: #ffffff;
+  --tp-gray-200: #cad1d5;
+  --tp-gray-300: #adb8be;
+  --tp-gray-400: #91a0a8;
+  --tp-red-500: #d45251;
+  --tp-font: "PingFang TC", "PingFangTC", -apple-system, BlinkMacSystemFont,
+    "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  --tp-radius-button: 10px;
+  --tp-radius-card: 12px;
+  --tp-shadow-card: 0 2px 12px rgb(0 0 0 / 4%);
+  --tp-shadow-sheet: 0 -2px 6px rgb(0 0 0 / 10%);
   --ink: var(--tp-primary-900);
   --muted: var(--tp-gray-700);
   --accent: var(--tp-primary-700);
@@ -75,6 +85,12 @@
   --tp-gray-950: #f5f8fa;
   --tp-page: #101b20;
   --tp-surface: #182930;
+  --tp-gray-200: #45555d;
+  --tp-gray-300: #5d6e77;
+  --tp-gray-400: #7a8d97;
+  --tp-red-500: #e88584;
+  --tp-shadow-card: 0 2px 12px rgb(0 0 0 / 30%);
+  --tp-shadow-sheet: 0 -2px 8px rgb(0 0 0 / 40%);
   --meeting-ink: var(--ink);
   --meeting-link: var(--accent);
   --warning-bg: #352b1b;
@@ -103,74 +119,84 @@ html[data-maze-theme="dark"] {
 
 .display-controls {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 8px 12px;
+  flex: none;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
   color: var(--ink);
+  font-family: var(--tp-font);
   font-size: var(--display-control-size);
   line-height: 1.5;
 }
 .display-theme-switch,
 .display-mode-label select {
   box-sizing: border-box;
-  min-height: var(--display-control-height);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 6px 10px;
+  height: var(--display-control-height);
+  border: 1px solid var(--tp-gray-200);
+  border-radius: var(--tp-radius-button);
   background: var(--surface);
-  color: var(--ink);
+  color: var(--tp-gray-700);
   font: inherit;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 150ms ease, border-color 150ms ease,
+    color 150ms ease, transform 120ms ease;
 }
 .display-theme-switch {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  max-width: 100%;
+  display: grid;
+  place-items: center;
+  width: var(--display-control-height);
+  padding: 0;
+}
+.display-theme-switch:active,
+.display-mode-label select:active {
+  transform: scale(0.96);
+  background: var(--tp-primary-50);
+}
+.display-theme-switch[aria-checked="true"] {
+  border-color: var(--tp-primary-500);
+  color: var(--tp-primary-700);
+  background: var(--tp-primary-50);
 }
 .display-theme-switch > svg {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 20px;
+  width: 22px;
+  height: 22px;
 }
 .display-mode-label {
   display: inline-flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  max-width: 100%;
-}
-.display-mode-label > span {
-  white-space: nowrap;
 }
 .display-mode-label select {
-  max-width: 100%;
-  min-width: min(5.5em, 100%);
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0 30px 0 12px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 15px) 52%, calc(100% - 10px) 52%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  font-weight: 600;
 }
-.display-switch-track {
-  display: inline-flex;
-  align-items: center;
-  flex: 0 0 30px;
-  height: 18px;
-  padding: 2px;
-  border-radius: 12px;
-  background: #738995;
-}
-.display-switch-track::after {
-  content: "";
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: #fff;
-}
-.display-theme-switch[aria-checked="true"] .display-switch-track {
-  justify-content: flex-end;
-  background: #326875;
+.display-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 .display-controls :is(button, select):focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 3px;
+  outline: 3px solid var(--tp-primary-500);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .display-theme-switch,
+  .display-mode-label select {
+    transition: none;
+  }
 }
 .display-hint {
   margin: 0;
@@ -178,9 +204,6 @@ html[data-maze-theme="dark"] {
   font-size: var(--display-main-size, 1rem);
   line-height: 1.65;
   overflow-wrap: anywhere;
-}
-.display-page:not([data-display-mode="standard"]) .display-controls {
-  gap: var(--display-gap);
 }
 
 /* Navigation and its shared search/map keep their original light palette. */

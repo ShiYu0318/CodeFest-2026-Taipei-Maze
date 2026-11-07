@@ -27,6 +27,9 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
+body {
+  margin: 0;
+}
 html[data-maze-theme="dark"] #app {
   color: #e6f2f5;
 }

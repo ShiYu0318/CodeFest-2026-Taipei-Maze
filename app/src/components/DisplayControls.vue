@@ -6,9 +6,26 @@
       type="button"
       role="switch"
       :aria-checked="theme === 'dark'"
+      :title="theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'"
       @click="toggleTheme"
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
+      <svg v-if="theme === 'dark'" viewBox="0 0 24 24" aria-hidden="true">
+        <circle
+          cx="12"
+          cy="12"
+          r="4.2"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        />
+        <path
+          d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        />
+      </svg>
+      <svg v-else viewBox="0 0 24 24" aria-hidden="true">
         <path
           d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"
           fill="none"
@@ -17,11 +34,12 @@
           stroke-linejoin="round"
         />
       </svg>
-      <ZhuyinText text="深色模式" />
-      <span class="display-switch-track" aria-hidden="true"></span>
+      <span class="display-visually-hidden"
+        ><ZhuyinText text="深色模式"
+      /></span>
     </button>
     <label class="display-mode-label">
-      <!-- <span><ZhuyinText text="介面模式" /></span> -->
+      <span class="display-visually-hidden">介面模式</span>
       <select
         :value="displayMode"
         @change="setDisplayMode($event.target.value)"
