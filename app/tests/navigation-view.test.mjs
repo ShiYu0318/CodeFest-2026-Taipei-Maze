@@ -59,8 +59,8 @@ test("navigation keeps endpoints and only its validated transfer points, plus ev
   const visible = points.filter((point) =>
     navigationPointVisible(point, view, false)
   );
-  assert.equal(visible.length, 24);
-  assert.equal(visible.filter(isQrPoint).length, 20);
+  assert.equal(visible.length, 52);
+  assert.equal(visible.filter(isQrPoint).length, 48);
   assert.equal(
     navigationPointVisible(
       points.find((point) => point.id === "b1-e7"),

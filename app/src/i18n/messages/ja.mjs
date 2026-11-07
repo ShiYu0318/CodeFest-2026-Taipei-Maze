@@ -50,6 +50,7 @@ export default {
   "zone.b3-red": "淡水信義線コンコース",
   "zone.b4-platform": "淡水信義線ホーム",
 
+  "type.platform": "ホーム",
   "type.elevator": "エレベーター",
   "type.restroom": "トイレ",
   "type.nursing": "授乳室",

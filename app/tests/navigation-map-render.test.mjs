@@ -23,6 +23,7 @@ import * as searchFallback from "../src/search/fallback.mjs";
 const dictionary = JSON.parse(
   readFileSync(new URL("../src/search/dictionary.json", import.meta.url))
 );
+import * as boundary from "../src/station/boundary.mjs";
 import * as locationHook from "../src/station/useStationLocation.js";
 import { createStationLocation } from "../src/station/location.mjs";
 import { iosWebMessageData } from "./helpers/ios-web-message.mjs";
@@ -95,6 +96,7 @@ function component(name) {
     "search.mjs": searchEngine,
     "fallback.mjs": searchFallback,
     "dictionary.json": dictionary,
+    "boundary.mjs": boundary,
     useStationLocation: locationHook,
     "station-routing": {
       zones: connections.zones,

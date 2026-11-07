@@ -49,6 +49,7 @@ export default {
   "zone.b3-red": "โถงสายตั้นสุ่ย-ซิ่นอี้ (Tamsui-Xinyi)",
   "zone.b4-platform": "ชานชาลาสายตั้นสุ่ย-ซิ่นอี้ (Tamsui-Xinyi)",
 
+  "type.platform": "ชานชาลา",
   "type.elevator": "ลิฟต์",
   "type.restroom": "ห้องน้ำ",
   "type.nursing": "ห้องให้นมบุตร",
