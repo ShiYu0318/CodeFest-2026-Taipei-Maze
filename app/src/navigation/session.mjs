@@ -197,6 +197,24 @@ export function createSession(input) {
       }
       return parsed;
     },
+    applyContinuousAnchor(payload) {
+      if (!state.destinationId) return { type: "DestinationRequired" };
+      if (errors.length) return { type: "InvalidGraph" };
+      const parsed = parseAnchor(payload, graph);
+      if (parsed.type !== "success") return parsed;
+      state.pendingAnchorId = parsed.anchor.id;
+      state.phase = "confirm_location";
+      state.position = {
+        anchorId: parsed.anchor.id,
+        nodeId: parsed.anchor.node_id,
+        confirmedAt: new Date().toISOString(),
+      };
+      state.pendingAnchorId = null;
+      state.needsLocationConfirmation = false;
+      previousPhase = null;
+      recompute();
+      return { type: "success" };
+    },
     confirmLocation() {
       const anchor = graph.qr_anchors?.find(
         (a) => a.id === state.pendingAnchorId && a.enabled
@@ -299,6 +317,22 @@ export function createSession(input) {
         return;
       state.unavailableConnectorIds = [...state.unavailableConnectorIds, id];
       reconfirm();
+    },
+    guidanceToken() {
+      return `${state.revision}:${state.phase}:${state.stepIndex}`;
+    },
+    advanceFromGuidance(token) {
+      if (token !== `${state.revision}:${state.phase}:${state.stepIndex}`)
+        return false;
+      if (state.phase === "ready" && state.plan) state.phase = "navigating";
+      else if (state.phase === "navigating" && state.plan) {
+        if (state.stepIndex < state.plan.instructions.length - 1)
+          state.stepIndex++;
+        else state.phase = "arrival_confirmation";
+      } else if (state.phase === "arrival_confirmation")
+        state.phase = "arrived";
+      else return false;
+      return true;
     },
     start() {
       if (state.phase === "ready" && state.plan) state.phase = "navigating";

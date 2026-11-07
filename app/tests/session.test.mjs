@@ -220,3 +220,40 @@ test("meeting at recipient origin requires arrival confirmation; unavailable ele
   assert.equal(s.state.phase, "no_route");
   assert.equal(s.state.plan, null);
 });
+
+test("destination-first continuous scans update the origin each time and preserve the destination", () => {
+  const s = createSession(fixture());
+  assert.equal(s.applyContinuousAnchor(payload()).type, "DestinationRequired");
+  assert.equal(s.state.position, null);
+  s.selectDestination("poi_restroom");
+  assert.equal(s.applyContinuousAnchor(payload()).type, "success");
+  assert.equal(s.state.position.nodeId, "b1_a");
+  const revision = s.state.revision;
+  assert.equal(s.applyContinuousAnchor(payload("qr_b2_lift")).type, "success");
+  assert.equal(s.state.position.nodeId, "b2_lift");
+  assert.equal(s.state.destinationId, "poi_restroom");
+  assert.ok(s.state.revision > revision);
+  assert.deepEqual(s.state.plan.route.nodeIds, ["b2_lift", "b2_dest"]);
+  const old = s.state.plan;
+  assert.notEqual(
+    s.applyContinuousAnchor("https://example.com/meet").type,
+    "success"
+  );
+  assert.equal(s.state.plan, old);
+  assert.equal(s.state.position.nodeId, "b2_lift");
+});
+
+test("native instruction actions require the current displayed guidance token, rejecting stale QR and double taps", () => {
+  const s = ready();
+  const first = s.guidanceToken();
+  assert.equal(s.advanceFromGuidance(first), true);
+  assert.equal(s.state.phase, "navigating");
+  assert.equal(s.advanceFromGuidance(first), false);
+  assert.equal(s.state.stepIndex, 0);
+  const old = s.guidanceToken();
+  s.applyContinuousAnchor(payload("qr_b2_lift"));
+  assert.equal(s.state.phase, "ready");
+  assert.equal(s.advanceFromGuidance(old), false);
+  assert.equal(s.state.phase, "ready");
+  assert.equal(s.advanceFromGuidance(s.guidanceToken()), true);
+});
