@@ -320,9 +320,7 @@
               </section>
             </div>
             <div
-              v-if="
-                selected && !isConnector(selected) && displayMode !== 'standard'
-              "
+              v-if="selected && !isConnector(selected)"
               class="display-facility-detail"
               role="status"
             >

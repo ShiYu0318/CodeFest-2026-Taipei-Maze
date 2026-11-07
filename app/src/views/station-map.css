@@ -972,8 +972,13 @@
   padding: 16px;
   border-top: 1px solid var(--border);
   overflow-wrap: anywhere;
-  font-size: var(--display-main-size);
+  font-size: var(--display-main-size, 0.9375rem);
   line-height: 1.65;
+}
+.display-facility-detail h3 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
 }
 .display-facility-detail p {
   margin-top: 8px;
