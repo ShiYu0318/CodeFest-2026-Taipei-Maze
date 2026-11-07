@@ -1,12 +1,10 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
   <section class="navigation-rescan-bar" :aria-label="t('scan.rescan')">
-    <div class="navigation-guidance-scroll">
-      <StationTransferStep :location="location" />
-      <p class="navigation-rescan-hint">{{ t("scan.relocateHint") }}</p>
-      <p v-if="!view.available">{{ t("scan.needApp") }}</p>
-      <p v-if="view.noticeKey" role="status">{{ t(view.noticeKey) }}</p>
-    </div>
+    <StationTransferStep :location="location" />
+    <p class="navigation-rescan-hint">{{ t("scan.relocateHint") }}</p>
+    <p v-if="!view.available">{{ t("scan.needApp") }}</p>
+    <p v-if="view.noticeKey" role="status">{{ t(view.noticeKey) }}</p>
     <button
       type="button"
       data-tour-target="scan"
@@ -38,26 +36,13 @@ async function scan() {
 .navigation-rescan-bar {
   display: flex;
   flex-direction: column;
-  position: fixed;
-  left: max(16px, env(safe-area-inset-left));
-  right: max(16px, env(safe-area-inset-right));
-  bottom: calc(80px + env(safe-area-inset-bottom));
-  z-index: 80;
-  max-width: 640px;
-  max-height: 40vh;
-  max-height: 40dvh;
-  margin: 0 auto;
-  padding: 12px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
   border: 1px solid var(--border);
   border-radius: var(--tp-radius-card, 12px);
   background: var(--surface);
   color: var(--ink);
   font: var(--display-main-size, 15px) / 1.5 var(--tp-font);
-  box-shadow: 0 4px 24px rgb(0 0 0 / 16%);
-}
-.navigation-guidance-scroll {
-  min-height: 0;
-  overflow: auto;
 }
 .navigation-rescan-bar p {
   font-size: var(--display-secondary-size, 13px);

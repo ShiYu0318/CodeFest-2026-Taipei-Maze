@@ -2,7 +2,6 @@
   <main
     ref="stationPage"
     class="station-page display-page"
-    :class="{ 'navigation-focused': navigationMap.active }"
     :lang="htmlLang(locale)"
     :data-theme="theme"
     :data-display-mode="displayMode"
@@ -41,6 +40,11 @@
         @destination="planDestination"
         @scanned="onQrScanned"
         @cancel-trip="openTripDialog('cancel')"
+      />
+      <StationNavigationRescan
+        v-if="navigationMap.active && !endpointPickerOpen && !tripDialog"
+        :location="location"
+        @scanned="onQrScanned"
       />
       <div
         ref="floorControls"
@@ -420,11 +424,6 @@
         </footer>
       </div>
     </div>
-    <StationNavigationRescan
-      v-if="navigationMap.active && !endpointPickerOpen && !tripDialog"
-      :location="location"
-      @scanned="onQrScanned"
-    />
     <StationEndpointPicker
       v-if="endpointPickerOpen"
       :start-point="currentPoint"

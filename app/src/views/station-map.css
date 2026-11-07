@@ -32,10 +32,6 @@
   box-sizing: border-box;
 }
 
-.station-page.navigation-focused {
-  padding-bottom: calc(40vh + 100px + env(safe-area-inset-bottom));
-  padding-bottom: calc(40dvh + 100px + env(safe-area-inset-bottom));
-}
 .station-page h1,
 .station-page h2,
 .station-page h3,

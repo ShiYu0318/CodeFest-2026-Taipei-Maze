@@ -144,7 +144,7 @@ function revealTarget() {
   target = findTarget();
   const inMap = target && props.root.contains(target);
   if (inMap) target.scrollIntoView({ block: "nearest", inline: "nearest" });
-  if (inMap && !target.closest(".station-heading, .navigation-rescan-bar")) {
+  if (inMap && !target.closest(".station-heading")) {
     const rect = target.getBoundingClientRect();
     const height = dialog.value.clientHeight;
     const anchorY = height * (height <= 420 ? 0.4 : 0.5);

@@ -95,7 +95,7 @@ function component(name) {
     if (file.endsWith(".vue")) {
       const child = file.slice(0, -4);
       if (realComponents.has(child)) return component(child);
-      // Map marker rendering and the scan dock remain real; unrelated panels
+      // Map marker rendering and the scan section remain real; unrelated panels
       // are stubbed so this test does not depend on chat, search or dialogs.
       return {
         props: ["text", "persistentScan"],
@@ -121,7 +121,7 @@ function component(name) {
   return compiled.exports.default;
 }
 
-test("the map renders only needed icons during a trip, keeps QR markers and the dock, then restores browsing", async () => {
+test("the map renders only needed icons during a trip, keeps QR markers and inline scanning, then restores browsing", async () => {
   const previousWindow = globalThis.window;
   globalThis.window = { matchMedia: () => ({ matches: false }) };
   const language = i18n.useI18n();
@@ -167,7 +167,7 @@ test("the map renders only needed icons during a trip, keeps QR markers and the 
   }
 });
 
-test("the real fixed scan button calls TownPass once, handles cancel and can relocate without changing the target", async () => {
+test("the real inline scan button calls TownPass once, handles cancel and can relocate without changing the target", async () => {
   const replies = new Set(),
     messages = [];
   const native = {
