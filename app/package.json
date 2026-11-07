@@ -5,10 +5,11 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "eslint --ext .js,.mjs,.vue src tests",
+    "lint": "eslint --ext .js,.mjs,.vue src tests scripts",
     "backend": "python ../backend/app.py",
     "dev": "npm run serve",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "validate:assets": "node scripts/validate-assets.mjs"
   },
   "dependencies": {
     "core-js": "^3.8.3",
