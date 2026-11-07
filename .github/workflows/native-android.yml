@@ -52,7 +52,7 @@ jobs:
           dart run build_runner build
       - name: Test chat bridge and QR session
         working-directory: ${{ runner.temp }}/TownPass
-        run: flutter test test/codefest_ai_handler_test.dart test/codefest_scan_session_test.dart test/gemma_model_store_test.dart test/codefest_ai_scope_test.dart test/codefest_bundle_server_test.dart --no-pub
+        run: flutter test test/codefest_ai_handler_test.dart test/codefest_scan_session_test.dart test/gemma_model_store_test.dart test/codefest_ai_scope_test.dart test/codefest_bundle_server_test.dart test/gemma_release_test.dart test/gemma_setup_view_test.dart --no-pub
       - name: Build Android debug APK (no model weights or signing secrets)
         working-directory: ${{ runner.temp }}/TownPass
         run: flutter build apk --debug --no-pub
