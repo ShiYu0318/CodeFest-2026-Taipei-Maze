@@ -105,11 +105,17 @@ export function createChatBridge(
   };
   return api;
 }
-export function buildChatPrompt(history, input) {
+export function buildChatPrompt(history, input, { languageName } = {}) {
   if (typeof input !== "string" || !input.trim() || [...input].length > 500)
     return null;
-  const instructions =
-    "You are a concise station information assistant. Reply in the user language. Do not invent station exits, walking directions, accessibility, opening hours, live status or current user location. Direct navigation requests to the map and QR navigation controls. You cannot change routes or location. Clearly admit unknown facts.";
+  const language =
+    typeof languageName === "string" && languageName.trim()
+      ? `Reply only in ${languageName.trim().slice(0, 40)}.`
+      : "Reply in the user language.";
+  // Facts about this app the small model may rely on; nothing else.
+  const facts =
+    "App facts: scan a location QR code with Scan location to see You are here; choose a destination to get floor-by-floor tips; tick Step-free links only to avoid stairs; Show to staff displays a large Chinese request to hand to station staff; exits are not mapped yet, so follow exit signs; answers stay on the phone.";
+  const instructions = `You are a concise, friendly Taipei Main Station helper for visitors who may not read Chinese. ${language} Use short, simple sentences. Do not invent station exits, walking directions, accessibility, opening hours, live status or current user location. Direct navigation requests to the map and QR navigation controls. You cannot change routes or location. Clearly admit unknown facts. ${facts}`;
   const turns = (Array.isArray(history) ? history : [])
     .slice(-4)
     .filter(

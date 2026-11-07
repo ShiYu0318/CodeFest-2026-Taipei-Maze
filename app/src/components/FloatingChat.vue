@@ -374,7 +374,7 @@ import {
   shouldSendOnEnter,
   isUsableChatReply,
 } from "../chat/bridge.mjs";
-import { useI18n } from "../i18n/index.mjs";
+import { LOCALES, useI18n } from "../i18n/index.mjs";
 import { answerLocally } from "../chat/answers.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
 import { stationPoints } from "../station/scan.mjs";
@@ -572,7 +572,10 @@ async function send() {
   } else if (!modelReady.value) {
     addReply({ text: t("chat.answer.fallback") });
   } else {
-    const prompt = buildChatPrompt(history, text);
+    const prompt = buildChatPrompt(history, text, {
+      languageName: LOCALES.find((item) => item.code === uiLocale.value)
+        ?.nativeName,
+    });
     busy.value = true;
     const result = await bridge.request("generate", { prompt });
     if (current !== epoch || !opened.value) return;
