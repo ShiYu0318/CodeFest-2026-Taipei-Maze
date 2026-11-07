@@ -17,6 +17,26 @@
       "name": "板南線大廳"
     },
     {
+      "id": "b2-tra-4",
+      "floor": "B2",
+      "name": "臺鐵 4 月台"
+    },
+    {
+      "id": "b2-tra-3",
+      "floor": "B2",
+      "name": "臺鐵 3 月台"
+    },
+    {
+      "id": "b2-hsr-2",
+      "floor": "B2",
+      "name": "高鐵 2 月台"
+    },
+    {
+      "id": "b2-hsr-1",
+      "floor": "B2",
+      "name": "高鐵 1 月台"
+    },
+    {
       "id": "b3-blue",
       "floor": "B3",
       "name": "板南線月台"

@@ -2,9 +2,13 @@
 <template>
   <section class="navigation-rescan-bar" :aria-label="t('scan.rescan')">
     <StationTransferStep :location="location" />
-    <p class="navigation-rescan-hint">{{ t("scan.relocateHint") }}</p>
+    <p class="navigation-rescan-hint">
+      <ZhuyinText :text="t('scan.relocateHint')" />
+    </p>
     <p v-if="!view.available">{{ t("scan.needApp") }}</p>
-    <p v-if="view.noticeKey" role="status">{{ t(view.noticeKey) }}</p>
+    <p v-if="view.noticeKey" role="status">
+      <ZhuyinText :text="t(view.noticeKey)" />
+    </p>
     <button
       type="button"
       data-tour-target="scan"
@@ -13,7 +17,7 @@
       @click="scan"
     >
       <StationMapIcon name="qrcode" />
-      {{ view.active ? t("scan.waiting") : t("scan.rescan") }}
+      <ZhuyinText :text="view.active ? t('scan.waiting') : t('scan.rescan')" />
     </button>
   </section>
 </template>
@@ -22,6 +26,7 @@
 import { computed } from "vue";
 import StationMapIcon from "./StationMapIcon.vue";
 import StationTransferStep from "./StationTransferStep.vue";
+import ZhuyinText from "./ZhuyinText.vue";
 import { useI18n } from "../i18n/index.mjs";
 const props = defineProps({ location: { type: Object, required: true } });
 const emit = defineEmits(["scanned"]);

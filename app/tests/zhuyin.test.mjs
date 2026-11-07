@@ -112,6 +112,45 @@ test("tone marks are separate from the vertical symbols; neutral tone is above",
   });
 });
 
+test("navigation actions, transfers and orientation prompts have full Han coverage", () => {
+  const keys = Object.keys(zhTW).filter(
+    (key) =>
+      key.startsWith("trip.") ||
+      key.startsWith("map.face") ||
+      [
+        "scan.relocateHint",
+        "scan.exit",
+        "transfer.goTo",
+        "transfer.checkFloor",
+        "transfer.checkDirection",
+        "transfer.confirmUp",
+        "transfer.confirmDown",
+        "transfer.manualFloor",
+      ].includes(key)
+  );
+  const texts = keys.map((key) => zhTW[key].replace(/\{\w+\}/g, ""));
+  // Interpolated facility/floor labels must retain annotation too.
+  texts.push(
+    zhTW["transfer.goTo"]
+      .replace("{kind}", zhTW["type.elevator"])
+      .replace("{floor}", `B2 · ${zhTW["floor.B2"]}`),
+    zhTW["map.faceConnector"].replace("{name}", "板南線梯口")
+  );
+  for (const text of texts) {
+    assert.deepEqual(
+      annotateZhuyin(text).filter(
+        (part) => /\p{Script=Han}/u.test(part.text) && !part.reading
+      ),
+      [],
+      text
+    );
+  }
+  assert.equal(
+    annotateZhuyin(zhTW["trip.confirmTitle"]).at(-2).reading,
+    "˙ㄇㄚ"
+  );
+});
+
 test("opted-in fixed labels and meeting messages have full Han coverage", () => {
   const texts = [];
   for (const path of [
