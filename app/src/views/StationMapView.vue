@@ -29,7 +29,11 @@
         @scanned="onQrScanned"
         @cancel-trip="openTripDialog('cancel')"
       />
-      <div ref="floorControls" class="floor-controls">
+      <div
+        ref="floorControls"
+        class="floor-controls horizontal-scroll"
+        @wheel="scrollHorizontallyWithWheel"
+      >
         <div
           class="floor-switch"
           role="group"
@@ -75,11 +79,11 @@
       </div>
 
       <div
-        class="theme-group"
+        class="theme-group horizontal-scroll"
         role="group"
         :aria-label="t('map.themesAria')"
         tabindex="0"
-        @wheel="scrollThemesWithWheel"
+        @wheel="scrollHorizontallyWithWheel"
       >
         <button
           v-for="type in availableThemes"
@@ -702,7 +706,7 @@ function zoneName(id) {
   return name === key ? zones.find((zone) => zone.id === id)?.name : name;
 }
 
-function scrollThemesWithWheel(event) {
+function scrollHorizontallyWithWheel(event) {
   const element = event.currentTarget;
   const delta =
     Math.abs(event.deltaX) > Math.abs(event.deltaY)
