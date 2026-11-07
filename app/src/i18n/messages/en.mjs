@@ -486,4 +486,12 @@ export default {
   "walk.arrowDown": "Take the {via} down to {floor}.",
   "walk.arrowNote":
     "Your phone does not know which way you face. Compare the map with the signs.",
+  "route.title": "Route steps",
+  "route.step": "Step {current} of {total}",
+  "route.walk": "On {floor}, walk toward “{name}”",
+  "route.via": "On the way you pass: {list}",
+  "route.arrive": "Arrive at “{name}”",
+  "route.prev": "Previous",
+  "route.next": "Next",
+  "route.all": "All steps",
 };

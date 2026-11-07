@@ -485,4 +485,12 @@ export default {
   "walk.arrowDown": "Đi {via} xuống {floor}.",
   "walk.arrowNote":
     "Điện thoại không biết bạn đang quay mặt hướng nào. Hãy so bản đồ với biển chỉ dẫn.",
+  "route.title": "Các bước đi",
+  "route.step": "Bước {current}/{total}",
+  "route.walk": "Ở {floor}, đi về phía “{name}”",
+  "route.via": "Trên đường sẽ đi qua: {list}",
+  "route.arrive": "Đến “{name}”",
+  "route.prev": "Bước trước",
+  "route.next": "Bước tiếp",
+  "route.all": "Tất cả các bước",
 };

@@ -495,4 +495,12 @@ export default {
   "walk.arrowDown": "Turun dengan {via} ke {floor}.",
   "walk.arrowNote":
     "Ponsel tidak tahu arah hadap Anda. Bandingkan peta dengan papan petunjuk.",
+  "route.title": "Langkah rute",
+  "route.step": "Langkah {current}/{total}",
+  "route.walk": "Di {floor}, berjalan menuju “{name}”",
+  "route.via": "Di jalan Anda melewati: {list}",
+  "route.arrive": "Tiba di “{name}”",
+  "route.prev": "Sebelumnya",
+  "route.next": "Berikutnya",
+  "route.all": "Semua langkah",
 };

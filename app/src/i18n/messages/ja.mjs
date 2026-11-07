@@ -486,4 +486,12 @@ export default {
   "walk.arrowDown": "{via}で{floor}へ下りてください。",
   "walk.arrowNote":
     "スマホはあなたの向きを知りません。地図と現地の案内表示を見比べてください。",
+  "route.title": "ルートの手順",
+  "route.step": "手順 {current}/{total}",
+  "route.walk": "{floor}で「{name}」の方へ歩く",
+  "route.via": "途中で通る場所：{list}",
+  "route.arrive": "「{name}」に到着",
+  "route.prev": "前へ",
+  "route.next": "次へ",
+  "route.all": "すべての手順",
 };

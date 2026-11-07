@@ -462,4 +462,12 @@ export default {
   "walk.arrowDown": "ใช้{via}ลงไปที่ {floor}",
   "walk.arrowNote":
     "โทรศัพท์ไม่รู้ว่าคุณหันไปทางไหน โปรดเทียบแผนที่กับป้ายในสถานที่จริง",
+  "route.title": "ขั้นตอนเส้นทาง",
+  "route.step": "ขั้นที่ {current}/{total}",
+  "route.walk": "ที่ {floor} เดินไปทาง “{name}”",
+  "route.via": "ระหว่างทางจะผ่าน: {list}",
+  "route.arrive": "ถึง “{name}”",
+  "route.prev": "ก่อนหน้า",
+  "route.next": "ถัดไป",
+  "route.all": "ทุกขั้นตอน",
 };

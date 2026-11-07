@@ -424,4 +424,12 @@ export default {
   "walk.arrowUp": "搭{via}往上到 {floor}。",
   "walk.arrowDown": "搭{via}往下到 {floor}。",
   "walk.arrowNote": "手機不知道你面向哪裡，請對照地圖和現場指標。",
+  "route.title": "路線步驟",
+  "route.step": "第 {current}／{total} 步",
+  "route.walk": "在 {floor} 往「{name}」走",
+  "route.via": "途中經過：{list}",
+  "route.arrive": "抵達「{name}」",
+  "route.prev": "上一步",
+  "route.next": "下一步",
+  "route.all": "全部步驟",
 };
