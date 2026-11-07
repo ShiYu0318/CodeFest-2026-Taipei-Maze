@@ -91,7 +91,8 @@ test("rescanning a boundary QR preserves the target and removes the superseded r
   session.setDestination("b4-e1");
   session.scan(stationQrPayload("b2-qr-01", data));
   const view = navigationMapState(session.snapshot(), {
-    startId: "b1-e4",
+    // useStationLocation.onLocated replaces query.start before publishing completion.
+    startId: "b2-qr-01",
     targetId: "b4-e1",
   });
   assert.equal(view.active, true);
@@ -113,4 +114,46 @@ test("a manually selected trip focuses its endpoints without inventing connector
   });
   assert.equal(view.active, true);
   assert.deepEqual(view.pointIds, ["b1-e4", "m-e4"]);
+});
+
+test("an explicit facility category stays visible alongside navigation endpoints and QR markers", () => {
+  const view = { active: true, pointIds: ["start", "target"] };
+  assert.equal(
+    navigationPointVisible({ id: "wc", type: "restroom" }, view, true, true),
+    true
+  );
+  assert.equal(
+    navigationPointVisible({ id: "other", type: "phone" }, view, false, true),
+    false
+  );
+  assert.equal(
+    navigationPointVisible({ id: "start", type: "exit" }, view, false, true),
+    true
+  );
+  assert.equal(
+    navigationPointVisible({ id: "qr", type: "qrcode" }, view, false, true),
+    true
+  );
+});
+
+test("a manually chosen origin replaces an older QR origin and its stale transfer stops", () => {
+  const session = {
+    position: { pointId: "old-qr" },
+    destinationId: "target",
+    relation: {
+      status: "connections",
+      steps: [
+        {
+          from: { pointId: "old-transfer" },
+          to: { pointId: "other-transfer" },
+        },
+      ],
+    },
+  };
+  const view = navigationMapState(session, { startId: "new-manual-start" });
+  assert.deepEqual(view.pointIds, ["new-manual-start", "target"]);
+  assert.equal(
+    navigationPointVisible({ id: "new-manual-start", type: "exit" }, view),
+    true
+  );
 });

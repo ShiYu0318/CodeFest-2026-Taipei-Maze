@@ -100,8 +100,14 @@
           class="endpoint-list"
           :aria-label="t('endpoint.pointsAria', { role: labels[activeRole] })"
         >
-          <section v-for="(floorPoints, floor) in browsePoints" :key="floor">
-            <h3>{{ floor }}</h3>
+          <details
+            v-for="(floorPoints, floor) in browsePoints"
+            :key="floor"
+            class="endpoint-floor"
+            :data-endpoint-floor="floor"
+            :open="floor === (choices[activeRole]?.floor ?? 'B1')"
+          >
+            <summary>{{ floor }}</summary>
             <ul>
               <li v-for="point in floorPoints" :key="point.id">
                 <button
@@ -113,7 +119,7 @@
                 </button>
               </li>
             </ul>
-          </section>
+          </details>
         </div>
       </div>
       <footer>
@@ -382,12 +388,15 @@ function keepFocus(event) {
 .endpoint-list {
   padding-inline: 12px;
 }
-.endpoint-list h3 {
+.endpoint-floor > summary {
   position: sticky;
   z-index: 1;
   top: 0;
   margin: 0;
-  padding: 8px 4px;
+  min-height: var(--display-control-height, 44px);
+  box-sizing: border-box;
+  padding: 12px 4px;
+  cursor: pointer;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   color: var(--accent);

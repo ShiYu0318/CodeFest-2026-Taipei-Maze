@@ -27,17 +27,20 @@
       </svg>
       <div :key="index" class="route-step-text">
         <p class="route-step-main"><ZhuyinText :text="describe(step)" /></p>
-        <p v-if="step.viaIds?.length" class="route-step-via">
-          <ZhuyinText
-            :text="
-              t('route.via', {
-                list: step.viaIds.map(name).join(t('search.listSeparator')),
-              })
-            "
-          />
-        </p>
+        <details v-if="step.viaIds?.length" class="route-step-via">
+          <summary>{{ t("route.viaLabel") }}</summary>
+          <p>
+            <ZhuyinText
+              :text="
+                t('route.via', {
+                  list: step.viaIds.map(name).join(t('search.listSeparator')),
+                })
+              "
+            />
+          </p>
+        </details>
         <p v-if="step.kind === 'walk'" class="route-step-note">
-          {{ t("walk.arrowNote") }}
+          <span aria-hidden="true">↑ N · </span>{{ t("walk.mapBearing") }}
         </p>
       </div>
     </div>

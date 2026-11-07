@@ -1,12 +1,12 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
   <section class="navigation-rescan-bar" :aria-label="t('scan.rescan')">
-    <StationTransferStep :location="location" />
-    <p class="navigation-rescan-hint">
+    <StationTransferStep v-if="!compact" :location="location" />
+    <p v-if="!compact" class="navigation-rescan-hint">
       <ZhuyinText :text="t('scan.relocateHint')" />
     </p>
-    <p v-if="!view.available">{{ t("scan.needApp") }}</p>
-    <p v-if="view.noticeKey" role="status">
+    <p v-if="!compact && !view.available">{{ t("scan.needApp") }}</p>
+    <p v-if="!compact && view.noticeKey" role="status">
       <ZhuyinText :text="t(view.noticeKey)" />
     </p>
     <button
@@ -14,28 +14,35 @@
       data-tour-target="scan"
       :disabled="!view.available || view.active"
       :aria-busy="view.active"
-      @click="scan"
+      @click="rescanOpen = true"
     >
       <StationMapIcon name="qrcode" />
       <ZhuyinText :text="view.active ? t('scan.waiting') : t('scan.rescan')" />
     </button>
+    <StationRescanDialog
+      v-if="rescanOpen"
+      :location="location"
+      @close="rescanOpen = false"
+      @scanned="emit('scanned', $event)"
+    />
   </section>
 </template>
 <script setup>
 /* global defineProps, defineEmits */
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import StationRescanDialog from "./StationRescanDialog.vue";
 import StationMapIcon from "./StationMapIcon.vue";
 import StationTransferStep from "./StationTransferStep.vue";
 import ZhuyinText from "./ZhuyinText.vue";
 import { useI18n } from "../i18n/index.mjs";
-const props = defineProps({ location: { type: Object, required: true } });
+const props = defineProps({
+  location: { type: Object, required: true },
+  compact: { type: Boolean, default: false },
+});
 const emit = defineEmits(["scanned"]);
 const { t } = useI18n();
 const view = computed(() => props.location.view.value);
-async function scan() {
-  const result = await props.location.scan();
-  if (result.type === "success") emit("scanned");
-}
+const rescanOpen = ref(false);
 </script>
 <style scoped>
 .navigation-rescan-bar {
