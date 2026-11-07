@@ -191,7 +191,7 @@ export default {
   "chat.voiceLanguage": "音声の言語",
   "chat.voiceDraft": "音声は下書きになります。確認してから送信",
   "chat.typeInstead": "この言語は文字で入力してください",
-  "chat.starter1": "現在地はどうやって更新する？",
+  "chat.starter1": "トイレはどこですか？",
   "chat.starter2": "段差のないルートは何を避ける？",
   "chat.starter3": "位置コードが読み取れないときは？",
   "chat.status.checking": "端末を確認しています…",

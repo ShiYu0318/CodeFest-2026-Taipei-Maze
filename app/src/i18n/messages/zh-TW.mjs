@@ -166,7 +166,7 @@ export default {
   "chat.voiceLanguage": "語音語言",
   "chat.voiceDraft": "語音轉成草稿，確認後送出",
   "chat.typeInstead": "此語言請改用打字",
-  "chat.starter1": "怎麼更新目前位置？",
+  "chat.starter1": "廁所在哪裡？",
   "chat.starter2": "無障礙路線會避開什麼？",
   "chat.starter3": "掃不到定位碼怎麼辦？",
   "chat.status.checking": "正在確認裝置狀態…",

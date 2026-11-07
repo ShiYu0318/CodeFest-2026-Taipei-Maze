@@ -190,7 +190,7 @@ export default {
   "chat.voiceLanguage": "Voice language",
   "chat.voiceDraft": "Speech becomes a draft; check it before sending",
   "chat.typeInstead": "Please type in this language",
-  "chat.starter1": "How do I update my location?",
+  "chat.starter1": "Where is the toilet?",
   "chat.starter2": "What does the step-free route avoid?",
   "chat.starter3": "The location code won't scan. What now?",
   "chat.status.checking": "Checking the device…",

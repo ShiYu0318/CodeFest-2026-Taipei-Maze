@@ -181,7 +181,7 @@ export default {
   "chat.voiceLanguage": "ภาษาของเสียง",
   "chat.voiceDraft": "เสียงจะกลายเป็นร่าง ตรวจสอบก่อนส่ง",
   "chat.typeInstead": "โปรดพิมพ์สำหรับภาษานี้",
-  "chat.starter1": "อัปเดตตำแหน่งของฉันอย่างไร",
+  "chat.starter1": "ห้องน้ำอยู่ที่ไหน",
   "chat.starter2": "เส้นทางไม่มีขั้นบันไดหลีกเลี่ยงอะไรบ้าง",
   "chat.starter3": "สแกนรหัสตำแหน่งไม่ได้ ทำอย่างไรดี",
   "chat.status.checking": "กำลังตรวจสอบอุปกรณ์…",

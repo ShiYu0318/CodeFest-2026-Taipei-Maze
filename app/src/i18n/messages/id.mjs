@@ -191,7 +191,7 @@ export default {
   "chat.voiceLanguage": "Bahasa suara",
   "chat.voiceDraft": "Suara menjadi draf; periksa sebelum dikirim",
   "chat.typeInstead": "Silakan mengetik untuk bahasa ini",
-  "chat.starter1": "Bagaimana cara memperbarui lokasi saya?",
+  "chat.starter1": "Di mana toilet?",
   "chat.starter2": "Rute tanpa anak tangga menghindari apa?",
   "chat.starter3": "Kode lokasi tidak bisa dipindai, lalu bagaimana?",
   "chat.status.checking": "Memeriksa perangkat…",

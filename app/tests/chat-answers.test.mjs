@@ -107,3 +107,18 @@ test("places on the visitor's current floor come first", () => {
   assert.ok(floors.includes("B3"));
   assert.ok(floors.slice(firstOther).every((floor) => floor !== "B3"));
 });
+
+test("every suggested question is answered offline in every language", () => {
+  for (const code of ["zh-TW", "en", "vi", "id", "th", "ko", "ja"]) {
+    const value = i18n(code);
+    for (const key of ["chat.starter1", "chat.starter2", "chat.starter3"]) {
+      const answer = answerLocally(value.t(key), points, value);
+      assert.ok(answer, `${code} ${key}: ${value.t(key)}`);
+    }
+    assert.equal(
+      answerLocally(value.t("chat.starter1"), points, value).kind,
+      "places",
+      code
+    );
+  }
+});

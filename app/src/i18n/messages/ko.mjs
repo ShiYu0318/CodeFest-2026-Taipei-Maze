@@ -188,7 +188,7 @@ export default {
   "chat.voiceLanguage": "음성 언어",
   "chat.voiceDraft": "음성은 초안이 돼요. 보내기 전에 확인하세요",
   "chat.typeInstead": "이 언어는 입력해 주세요",
-  "chat.starter1": "현재 위치는 어떻게 바꾸나요?",
+  "chat.starter1": "화장실 어디예요?",
   "chat.starter2": "계단 없는 경로는 무엇을 피하나요?",
   "chat.starter3": "위치 코드가 스캔되지 않으면요?",
   "chat.status.checking": "기기를 확인하는 중…",

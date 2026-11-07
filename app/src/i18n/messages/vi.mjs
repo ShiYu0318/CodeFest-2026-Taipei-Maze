@@ -190,7 +190,7 @@ export default {
   "chat.voiceLanguage": "Ngôn ngữ giọng nói",
   "chat.voiceDraft": "Giọng nói thành bản nháp; kiểm tra trước khi gửi",
   "chat.typeInstead": "Hãy nhập chữ với ngôn ngữ này",
-  "chat.starter1": "Làm sao cập nhật vị trí của tôi?",
+  "chat.starter1": "Nhà vệ sinh ở đâu?",
   "chat.starter2": "Lối không bậc thang tránh những gì?",
   "chat.starter3": "Không quét được mã định vị thì sao?",
   "chat.status.checking": "Đang kiểm tra thiết bị…",
