@@ -7,6 +7,7 @@ export default {
   "display.dark": "深色模式",
   "display.toLight": "切換為淺色模式",
   "display.toDark": "切換為深色模式",
+  "display.contrast": "高對比",
   "display.mode": "介面模式",
   "display.standard": "標準",
   "display.child": "兒童",

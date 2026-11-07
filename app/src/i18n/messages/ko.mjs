@@ -6,6 +6,7 @@ export default {
   "display.dark": "다크 모드",
   "display.toLight": "라이트 모드로 전환",
   "display.toDark": "다크 모드로 전환",
+  "display.contrast": "고대비",
   "display.mode": "화면 모드",
   "display.standard": "표준",
   "display.child": "어린이",

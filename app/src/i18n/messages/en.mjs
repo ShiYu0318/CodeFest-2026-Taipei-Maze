@@ -6,6 +6,7 @@ export default {
   "display.dark": "Dark mode",
   "display.toLight": "Switch to light mode",
   "display.toDark": "Switch to dark mode",
+  "display.contrast": "High contrast",
   "display.mode": "Interface mode",
   "display.standard": "Standard",
   "display.child": "Kids",

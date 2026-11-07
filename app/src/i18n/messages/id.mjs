@@ -6,6 +6,7 @@ export default {
   "display.dark": "Mode gelap",
   "display.toLight": "Beralih ke mode terang",
   "display.toDark": "Beralih ke mode gelap",
+  "display.contrast": "Kontras tinggi",
   "display.mode": "Mode tampilan",
   "display.standard": "Standar",
   "display.child": "Anak",

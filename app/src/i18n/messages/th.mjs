@@ -6,6 +6,7 @@ export default {
   "display.dark": "โหมดมืด",
   "display.toLight": "เปลี่ยนเป็นโหมดสว่าง",
   "display.toDark": "เปลี่ยนเป็นโหมดมืด",
+  "display.contrast": "คอนทราสต์สูง",
   "display.mode": "โหมดหน้าจอ",
   "display.standard": "มาตรฐาน",
   "display.child": "เด็ก",

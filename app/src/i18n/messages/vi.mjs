@@ -6,6 +6,7 @@ export default {
   "display.dark": "Chế độ tối",
   "display.toLight": "Chuyển sang chế độ sáng",
   "display.toDark": "Chuyển sang chế độ tối",
+  "display.contrast": "Tương phản cao",
   "display.mode": "Chế độ giao diện",
   "display.standard": "Tiêu chuẩn",
   "display.child": "Trẻ em",

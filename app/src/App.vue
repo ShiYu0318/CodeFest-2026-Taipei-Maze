@@ -20,7 +20,7 @@ import { htmlLang, useI18n } from "./i18n/index.mjs";
 import { pageTitle } from "./router";
 import "./display/display-preferences.css";
 
-const { theme } = useDisplayPreferences();
+const { theme, contrast } = useDisplayPreferences();
 const { locale } = useI18n();
 const route = useRoute();
 onMounted(() => {
@@ -28,6 +28,13 @@ onMounted(() => {
     theme,
     (value) => {
       document.documentElement.dataset.mazeTheme = value;
+    },
+    { immediate: true }
+  );
+  watch(
+    contrast,
+    (value) => {
+      document.documentElement.dataset.mazeContrast = value;
     },
     { immediate: true }
   );

@@ -6,6 +6,7 @@ export default {
   "display.dark": "ダークモード",
   "display.toLight": "ライトモードに切り替え",
   "display.toDark": "ダークモードに切り替え",
+  "display.contrast": "ハイコントラスト",
   "display.mode": "表示モード",
   "display.standard": "標準",
   "display.child": "こども",
