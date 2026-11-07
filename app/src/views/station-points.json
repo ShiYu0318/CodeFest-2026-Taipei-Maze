@@ -2,7 +2,8 @@
   "categories": {
     "elevator": {
       "name": "電梯",
-      "colorToken": "primary-700"
+      "colorToken": "primary-700",
+      "iconColor": "#496b75"
     },
     "restroom": {
       "name": "廁所",
@@ -12,7 +13,6 @@
     "nursing": {
       "name": "哺集乳室",
       "colorToken": "secondary-700",
-      "iconColorToken": "gray-950",
       "iconColor": "#BF0060"
     },
     "info": {
@@ -22,7 +22,8 @@
     },
     "ticket": {
       "name": "售票處",
-      "colorToken": "secondary-800"
+      "colorToken": "secondary-800",
+      "iconColor": "#6c5326"
     },
     "aed": {
       "name": "AED",
@@ -37,24 +38,27 @@
     "escalator": {
       "name": "電扶梯",
       "colorToken": "secondary-600",
-      "iconColorToken": "gray-950"
+      "iconColor": "#d7a652"
     },
     "stairs": {
       "name": "樓梯",
-      "colorToken": "gray-800"
+      "colorToken": "gray-800",
+      "iconColor": "#32383c"
     },
     "water": {
       "name": "飲水設施",
       "colorToken": "primary-600",
-      "iconColorToken": "gray-950"
+      "iconColor": "#608c99"
     },
     "locker": {
       "name": "置物櫃",
-      "colorToken": "secondary-950"
+      "colorToken": "secondary-950",
+      "iconColor": "#1a1306"
     },
     "accessible": {
       "name": "輪椅候車區",
-      "colorToken": "gray-900"
+      "colorToken": "gray-900",
+      "iconColor": "#181b1d"
     }
   },
   "points": {

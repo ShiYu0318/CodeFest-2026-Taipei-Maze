@@ -416,11 +416,11 @@
   flex: 0 0 auto;
   width: 27px;
   height: 27px;
-  border: 2px solid var(--surface);
+  border: 2px solid var(--marker-color);
   border-radius: 50%;
-  background: var(--pin-color);
-  color: var(--pin-icon);
-  box-shadow: 0 0 0 1px var(--pin-color);
+  background: var(--marker-color);
+  color: #fff;
+  box-shadow: 0 0 0 1px var(--marker-color);
 }
 .pin-icon svg {
   width: 15px;
@@ -439,7 +439,7 @@
   height: 34px;
 }
 .map-pin[aria-pressed="true"] .pin-icon {
-  box-shadow: 0 0 0 3px var(--pin-color), 0 0 0 6px var(--surface);
+  box-shadow: 0 0 0 3px var(--marker-color), 0 0 0 6px var(--surface);
 }
 .point-pin {
   display: grid;
@@ -448,8 +448,8 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  outline: 1px solid var(--point-outline-color);
-  background: var(--pin-color);
+  outline: 1px solid var(--marker-color);
+  background: var(--marker-color);
   pointer-events: none;
 }
 .point-icon {
@@ -459,7 +459,7 @@
   color: #fff;
 }
 .pin-arrival .point-pin {
-  outline: 2px solid var(--tp-secondary-700);
+  outline: 2px solid var(--marker-color);
   outline-offset: 2px;
   border-radius: 50%;
 }
@@ -564,7 +564,7 @@
 }
 .theme-group svg {
   width: 16px;
-  color: var(--point-icon-color, var(--pin-color));
+  color: var(--point-icon-color);
 }
 .theme-group button[aria-pressed="true"] {
   background: var(--tp-secondary-200);

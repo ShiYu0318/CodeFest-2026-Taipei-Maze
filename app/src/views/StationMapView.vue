@@ -571,16 +571,10 @@ function pinStyle(point) {
 function pointThemeStyle(type) {
   const category = categories[type];
   const colorToken = category?.colorToken || "gray-700";
-  const iconColorToken = category?.iconColorToken || "gray-50";
   const iconColor = category?.iconColor;
   return {
-    "--pin-color": paletteColor(colorToken),
-    "--pin-icon":
-      theme.value === "dark"
-        ? "#0c1315"
-        : iconColor || paletteColor(iconColorToken),
     "--point-icon-color": iconColor || paletteColor(colorToken),
-    "--point-outline-color": iconColor || paletteColor(colorToken),
+    "--marker-color": iconColor || "#4a5258",
   };
 }
 
