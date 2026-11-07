@@ -19,20 +19,8 @@
         }}（來自分享端，未經伺服器驗證）
       </p>
       <p role="status">{{ timeText }}</p>
-      <NavigationDemoMap
-        :graph="graph"
-        :floor-id="resolved.node.floor_id"
-        :destination-node-id="resolved.node.id"
-      />
       <p>
-        這是目的地，不是你的位置。請先與朋友確認仍在等候；開始時需掃你自己附近的定位碼。
-      </p>
-      <router-link class="primary" :to="navigationTarget"
-        >帶我到這個集合點（合成導航）</router-link
-      >
-      <p>
-        一般瀏覽器可查看此卡，沒有城市通橋接時只能使用明確標示的合成測試定位。未驗證自動開啟城市通，不會自行跳轉外部
-        App。
+        這是分享者設定的集合點，不代表你目前的位置，也不提供導航或即時追蹤。
       </p>
     </section>
     <section v-else role="alert">
@@ -49,7 +37,6 @@ import { useRoute } from "vue-router";
 import graph from "../navigation/demo-graph.json";
 import points from "../meeting/meeting-points.json";
 import { parseMeetingLink, timeNotice } from "../meeting/meeting.mjs";
-import NavigationDemoMap from "../components/NavigationDemoMap.vue";
 const route = useRoute();
 const fullLink = computed(
   () => new URL(route.fullPath, window.location.origin).href
@@ -57,10 +44,6 @@ const fullLink = computed(
 const resolved = computed(() =>
   parseMeetingLink(fullLink.value, graph, points)
 );
-const navigationTarget = computed(() => ({
-  path: "/navigation-demo",
-  query: { meeting: fullLink.value },
-}));
 const timeText = computed(
   () =>
     ({
@@ -87,14 +70,5 @@ const timeText = computed(
 }
 a {
   color: #326875;
-}
-.primary {
-  display: inline-block;
-  padding: 12px 18px;
-  border-radius: 6px;
-  background: #326875;
-  color: white;
-  margin: 16px 0;
-  text-decoration: none;
 }
 </style>

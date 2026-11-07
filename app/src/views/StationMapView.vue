@@ -18,10 +18,6 @@
         <!-- <p>地下樓層站內地圖</p> -->
       </section>
 
-      <p>
-        <router-link to="/navigation-demo">測試導航流程（合成圖）</router-link>
-      </p>
-
       <DestinationSearch
         id="station-facility-search"
         :catalog="searchCatalogEntries"
@@ -134,8 +130,10 @@
                   >
                     <span
                       v-if="
-                        matchesTheme(point, activeTheme) ||
-                        point.id === routeOrigin?.pointId
+                        (matchesTheme(point, activeTheme) &&
+                          categories[activeTheme]) ||
+                        (point.id === routeOrigin?.pointId &&
+                          categories[point.type])
                       "
                       class="pin-icon"
                       ><StationMapIcon
@@ -313,6 +311,7 @@
             role="group"
             aria-label="設施主題，可左右滑動查看更多"
             tabindex="0"
+            @wheel="scrollThemesWithWheel"
           >
             <button
               v-for="type in availableThemes"
@@ -584,6 +583,27 @@ function zoneName(id) {
 
 function connectionCategoryName(type) {
   return categories[type]?.name || "跨樓層連接";
+}
+
+function scrollThemesWithWheel(event) {
+  const element = event.currentTarget;
+  const delta =
+    Math.abs(event.deltaX) > Math.abs(event.deltaY)
+      ? event.deltaX
+      : event.deltaY;
+  const normalizedDelta =
+    event.deltaMode === WheelEvent.DOM_DELTA_LINE
+      ? delta * 16
+      : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+      ? delta * element.clientWidth
+      : delta;
+  const canScroll =
+    (normalizedDelta < 0 && element.scrollLeft > 0) ||
+    (normalizedDelta > 0 &&
+      element.scrollLeft + element.clientWidth < element.scrollWidth);
+  if (!canScroll) return;
+  event.preventDefault();
+  element.scrollLeft += normalizedDelta;
 }
 
 function matchesTheme(point, type) {
