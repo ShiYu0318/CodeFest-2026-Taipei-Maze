@@ -101,7 +101,7 @@ export default {
   "map.pointCount": "{count}곳",
   "map.themesAria": "편의시설, 옆으로 밀어서 더 보기",
   "map.mapAria": "역 지도",
-  "map.compass": "북쪽이 위, 약간 왼쪽으로 기울어짐",
+  "map.compass": "지도의 북쪽을 위로 되돌리기",
   "map.backToStart": "출발점으로",
   "map.interactiveAria":
     "{floor} 인터랙티브 지도. 더하기·빼기 키로 확대·축소, 0 키로 초기화",

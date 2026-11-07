@@ -14,7 +14,7 @@
         aria-hidden="true"
         :style="
           step.kind === 'walk'
-            ? { transform: `rotate(${step.angle}deg)` }
+            ? { transform: `rotate(${step.angle + mapAngle}deg)` }
             : null
         "
       >
@@ -40,7 +40,7 @@
           </p>
         </details>
         <p v-if="step.kind === 'walk'" class="route-step-note">
-          <span aria-hidden="true">↑ N · </span>{{ t("walk.mapBearing") }}
+          {{ t("walk.mapBearing") }}
         </p>
       </div>
     </div>
@@ -86,6 +86,7 @@ import { describeStep } from "../station/step-text.mjs";
 const props = defineProps({
   steps: { type: Array, required: true },
   index: { type: Number, required: true },
+  mapAngle: { type: Number, default: 0 },
   pointsById: { type: Map, required: true },
 });
 const emit = defineEmits(["update:index"]);

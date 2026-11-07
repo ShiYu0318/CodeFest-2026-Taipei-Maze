@@ -104,7 +104,7 @@ export default {
   "map.pointCount": "{count} tempat",
   "map.themesAria": "Fasilitas, geser ke samping untuk melihat lainnya",
   "map.mapAria": "Peta stasiun",
-  "map.compass": "Utara di atas, sedikit miring ke kiri",
+  "map.compass": "Kembalikan utara ke atas peta",
   "map.backToStart": "Kembali ke awal",
   "map.interactiveAria":
     "Peta interaktif {floor}. Tekan plus atau minus untuk memperbesar, 0 untuk mengatur ulang",

@@ -105,7 +105,7 @@ export default {
   "map.pointCount": "{count} places",
   "map.themesAria": "Facilities, swipe sideways for more",
   "map.mapAria": "Station map",
-  "map.compass": "North is up, tilted slightly left",
+  "map.compass": "Reset map to north-up",
   "map.backToStart": "Back to start",
   "map.interactiveAria":
     "{floor} interactive map. Press plus or minus to zoom, 0 to reset",

@@ -104,7 +104,7 @@ export default {
   "map.pointCount": "{count} địa điểm",
   "map.themesAria": "Tiện ích, vuốt ngang để xem thêm",
   "map.mapAria": "Bản đồ nhà ga",
-  "map.compass": "Hướng bắc ở phía trên, hơi lệch trái",
+  "map.compass": "Đưa hướng bắc về phía trên bản đồ",
   "map.backToStart": "Về điểm xuất phát",
   "map.interactiveAria":
     "Bản đồ tương tác {floor}. Nhấn cộng hoặc trừ để phóng to, nhấn 0 để đặt lại",

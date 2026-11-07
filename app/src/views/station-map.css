@@ -371,6 +371,7 @@
 .map-compass svg {
   width: 30px;
   height: 30px;
+  transform: rotate(var(--map-angle));
 }
 .map-compass .needle-north {
   fill: #d45251;
@@ -378,15 +379,14 @@
 .map-compass .needle-south {
   fill: var(--tp-gray-400, #91a0a8);
 }
-.map-compass span {
-  position: absolute;
-  top: 1px;
-  left: 50%;
-  transform: translateX(-62%);
-  color: #d45251;
-  font-size: 9px;
+.map-compass .needle-label {
+  fill: #d45251;
+  text-anchor: middle;
+  font-size: 8px;
   font-weight: 800;
-  line-height: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(calc(-1 * var(--map-angle)));
 }
 .map-zoom {
   display: grid;
@@ -458,13 +458,37 @@
 .map-dragging .map-pin {
   cursor: grabbing;
 }
-.map-board {
+.map-canvas {
   position: relative;
   flex: none;
   width: calc(100% * var(--map-zoom));
   margin-block: auto;
+  aspect-ratio: var(--map-rotated-aspect);
+}
+.map-board {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(100% / var(--map-rotated-width));
   aspect-ratio: var(--map-aspect);
+  transform: translate(-50%, -50%) rotate(var(--map-angle));
   user-select: none;
+}
+.map-board .point-icon,
+.map-board .pin-icon svg,
+.map-endpoint {
+  transform: rotate(calc(-1 * var(--map-angle)));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .map-board,
+  .map-compass svg,
+  .map-compass .needle-label,
+  .map-board .point-icon,
+  .map-board .pin-icon svg,
+  .map-endpoint,
+  .location-badge {
+    transition: transform 260ms ease-out;
+  }
 }
 .floor-plan {
   position: absolute;
@@ -900,9 +924,9 @@
       --map-height: clamp(26rem, 78svh, 46rem);
     }
   }
-  .map-board {
+  .map-canvas {
     max-width: calc(
-      (var(--map-height) - 2px) * (var(--map-aspect)) * var(--map-zoom)
+      (var(--map-height) - 2px) * var(--map-rotated-aspect) * var(--map-zoom)
     );
     margin-inline: auto;
   }
@@ -951,7 +975,7 @@
   position: absolute;
   bottom: calc(100% + 10px);
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) rotate(calc(-1 * var(--map-angle)));
   display: grid;
   gap: 2px;
   width: max-content;
@@ -1302,9 +1326,9 @@
   height: var(--map-height);
   aspect-ratio: auto;
 }
-.station-page[data-guiding="true"] .map-board {
+.station-page[data-guiding="true"] .map-canvas {
   max-width: calc(
-    (var(--map-height) - 2px) * (var(--map-aspect)) * var(--map-zoom)
+    (var(--map-height) - 2px) * var(--map-rotated-aspect) * var(--map-zoom)
   );
   margin-inline: auto;
 }

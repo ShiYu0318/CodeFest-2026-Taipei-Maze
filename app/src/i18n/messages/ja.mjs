@@ -101,7 +101,7 @@ export default {
   "map.pointCount": "{count}か所",
   "map.themesAria": "設備。横にスワイプするとほかの設備が見られます",
   "map.mapAria": "駅の地図",
-  "map.compass": "北が上、やや左に傾いています",
+  "map.compass": "地図を北が上の向きに戻す",
   "map.backToStart": "出発地点に戻る",
   "map.interactiveAria":
     "{floor}のインタラクティブ地図。プラス・マイナスで拡大縮小、0でリセット",

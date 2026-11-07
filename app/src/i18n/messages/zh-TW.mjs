@@ -90,7 +90,7 @@ export default {
   "map.pointCount": "{count} 個標點",
   "map.themesAria": "設施主題，可左右滑動查看更多",
   "map.mapAria": "車站地圖",
-  "map.compass": "北方朝上略偏左",
+  "map.compass": "將地圖轉回北方朝上",
   "map.backToStart": "回到起點",
   "map.interactiveAria": "{floor} 互動地圖，可用加減鍵縮放，0 鍵重設",
   "map.planAria": "{floor} 平面示意圖",

@@ -163,7 +163,10 @@
             <div
               ref="mapStage"
               class="map-stage"
-              :style="{ '--map-top': mapTop * 1.5 + 'px' }"
+              :style="{
+                '--map-top': mapTop * 1.5 + 'px',
+                '--map-angle': mapAngle + 'deg',
+              }"
             >
               <div class="map-corner">
                 <button
@@ -189,15 +192,13 @@
                   :aria-label="t('map.compass') + '。' + t('map.zoomReset')"
                   :title="t('map.compass')"
                   :disabled="floorChanging"
-                  @click="resetZoom(constrainZoom(1))"
+                  @click="resetMapNorth"
                 >
                   <svg viewBox="0 0 32 32" aria-hidden="true">
-                    <g transform="rotate(-12 16 16)">
-                      <path class="needle-north" d="M16 3l5 13H11z" />
-                      <path class="needle-south" d="M16 29l-5-13h10z" />
-                    </g>
+                    <text class="needle-label" x="16" y="8">N</text>
+                    <path class="needle-north" d="M16 10l5 9H11z" />
+                    <path class="needle-south" d="M16 29l-5-10h10z" />
                   </svg>
-                  <span aria-hidden="true">N</span>
                 </button>
                 <div class="map-zoom">
                   <button
@@ -232,6 +233,8 @@
                   :class="{ 'map-zoomed': zoom > 1, 'map-dragging': dragging }"
                   :style="{
                     '--map-aspect': bounds[2] + ' / ' + bounds[3],
+                    '--map-rotated-aspect': mapShape.aspect,
+                    '--map-rotated-width': mapShape.width,
                     '--map-viewport-aspect':
                       bounds[2] + ' / ' + bounds[3] * 1.5,
                   }"
@@ -248,189 +251,188 @@
                   @lostpointercapture="endMapDrag"
                   @click.capture="ignoreDragClick"
                 >
-                  <div
-                    ref="mapBoard"
-                    class="map-board"
-                    :style="{ '--map-zoom': zoom }"
-                  >
-                    <svg
-                      class="floor-plan"
-                      :viewBox="bounds.join(' ')"
-                      role="img"
-                      :aria-label="t('map.planAria', { floor: level })"
-                    >
-                      <g
-                        v-for="layer in backgroundLayers"
-                        :key="layer.floor"
-                        class="ghost-layer"
-                        :style="{ '--ghost-ink': layer.color }"
-                        :transform="layer.transform"
-                        aria-hidden="true"
-                      >
-                        <StationFloorPlan :floor="layer.floor" outline-only />
-                      </g>
-                      <g
-                        :class="{
-                          'active-with-layers': backgroundLayers.length,
-                        }"
-                      >
-                        <StationFloorPlan
-                          :floor="level"
-                          :visible-point-ids="
-                            activeTheme
-                              ? floorPoints.map((point) => point.id)
-                              : null
-                          "
-                        />
-                      </g>
-                      <g class="walk-route" aria-hidden="true">
-                        <polyline
-                          v-for="(line, index) in walkLines"
-                          :key="index"
-                          :points="line.map((p) => p.join(',')).join(' ')"
-                        />
-                        <polyline
-                          v-if="
-                            currentWalkStep?.line &&
-                            currentWalkStep.floor === level
-                          "
-                          class="walk-route-current"
-                          :points="
-                            currentWalkStep.line
-                              .map((p) => p.join(','))
-                              .join(' ')
-                          "
-                        />
-                        <circle
-                          v-for="point in walkCheckpoints"
-                          :key="point.id"
-                          class="walk-checkpoint"
-                          :cx="point.x"
-                          :cy="point.y"
-                          r="9"
-                        />
-                      </g>
-                    </svg>
-                    <button
-                      v-for="point in floorPoints"
-                      :key="point.id"
-                      class="map-pin"
-                      :class="{
-                        'pin-filtered-out': !isPointVisible(point),
-                        'pin-themed': matchesTheme(point, activeTheme),
-                        'pin-scan-position': point.id === scanPositionId,
-                        'pin-scan-target': point.id === scanTargetId,
-                        'pin-arrival': point.id === arrivalPointId,
-                        'pin-location':
-                          point.id === selected?.id ||
-                          point.id === mapCurrentPoint?.id,
-                        'pin-endpoint':
-                          point.id === mapCurrentPoint?.id ||
-                          point.id === mapTargetPoint?.id,
-                      }"
-                      type="button"
-                      :style="pinStyle(point)"
-                      :aria-label="mapPointLabel(point)"
-                      :aria-pressed="point.id === selected?.id"
-                      :aria-hidden="!isPointVisible(point)"
-                      :tabindex="isPointVisible(point) ? undefined : -1"
-                      :aria-expanded="
-                        !mapPickStep
-                          ? point.id === selected?.id && !floorChanging
-                          : undefined
-                      "
-                      :aria-controls="
-                        !mapPickStep &&
-                        point.id === selected?.id &&
-                        !floorChanging
-                          ? 'station-facility-detail'
-                          : undefined
-                      "
-                      @click="selectMapPoint(point, $event)"
-                      @focus="focusVisiblePin(point, $event)"
-                    >
-                      <span
-                        v-if="
-                          point.id === selected?.id ||
-                          point.id === mapCurrentPoint?.id
-                        "
-                        class="pin-icon"
-                      >
-                        <StationMapIcon :name="pointIconType(point)" />
-                      </span>
-                      <span v-else class="point-pin">
-                        <StationMapIcon
-                          class="point-icon"
-                          :name="pointIconType(point)"
-                        />
-                      </span>
-                      <span
-                        v-if="platformIcons[point.id]"
-                        class="point-pin pin-platform-icon"
-                        :style="platformIcons[point.id]"
-                      >
-                        <StationMapIcon class="point-icon" name="platform" />
-                      </span>
-                      <span
-                        v-if="point.id === scanPositionId"
-                        class="location-badge"
-                      >
-                        <ZhuyinText
-                          :text="
-                            t(
-                              location.view.value.manualPosition
-                                ? 'transfer.manualPositionBadge'
-                                : 'map.youAreHere'
-                            )
-                          "
-                        />
-                        <span class="location-name"
-                          ><ZhuyinText :text="pointName(point)"
-                        /></span>
-                      </span>
+                  <div class="map-canvas" :style="{ '--map-zoom': zoom }">
+                    <div ref="mapBoard" class="map-board">
                       <svg
-                        v-if="
-                          point.id === selected?.id ||
-                          point.id === mapCurrentPoint?.id
-                        "
-                        class="map-location-arrow"
-                        viewBox="0 0 80 80"
-                        aria-hidden="true"
+                        class="floor-plan"
+                        :viewBox="bounds.join(' ')"
+                        role="img"
+                        :aria-label="t('map.planAria', { floor: level })"
                       >
-                        <defs>
-                          <linearGradient
-                            :id="'location-arrow-' + point.id"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop stop-color="#fff" stop-opacity="0" />
-                            <stop
-                              offset="1"
-                              stop-color="#fff"
-                              stop-opacity=".55"
-                            />
-                          </linearGradient>
-                        </defs>
-                        <path :d="facingMarkerPath" fill="currentColor" />
-                        <path
-                          :d="facingMarkerPath"
-                          :fill="'url(#location-arrow-' + point.id + ')'"
-                        />
+                        <g
+                          v-for="layer in backgroundLayers"
+                          :key="layer.floor"
+                          class="ghost-layer"
+                          :style="{ '--ghost-ink': layer.color }"
+                          :transform="layer.transform"
+                          aria-hidden="true"
+                        >
+                          <StationFloorPlan :floor="layer.floor" outline-only />
+                        </g>
+                        <g
+                          :class="{
+                            'active-with-layers': backgroundLayers.length,
+                          }"
+                        >
+                          <StationFloorPlan
+                            :floor="level"
+                            :visible-point-ids="
+                              activeTheme
+                                ? floorPoints.map((point) => point.id)
+                                : null
+                            "
+                          />
+                        </g>
+                        <g class="walk-route" aria-hidden="true">
+                          <polyline
+                            v-for="(line, index) in walkLines"
+                            :key="index"
+                            :points="line.map((p) => p.join(',')).join(' ')"
+                          />
+                          <polyline
+                            v-if="
+                              currentWalkStep?.line &&
+                              currentWalkStep.floor === level
+                            "
+                            class="walk-route-current"
+                            :points="
+                              currentWalkStep.line
+                                .map((p) => p.join(','))
+                                .join(' ')
+                            "
+                          />
+                          <circle
+                            v-for="point in walkCheckpoints"
+                            :key="point.id"
+                            class="walk-checkpoint"
+                            :cx="point.x"
+                            :cy="point.y"
+                            r="9"
+                          />
+                        </g>
                       </svg>
-                      <span
-                        v-if="
-                          point.id === mapCurrentPoint?.id ||
-                          point.id === mapTargetPoint?.id
-                        "
-                        class="map-endpoint"
+                      <button
+                        v-for="point in floorPoints"
+                        :key="point.id"
+                        class="map-pin"
                         :class="{
-                          'map-endpoint-target':
+                          'pin-filtered-out': !isPointVisible(point),
+                          'pin-themed': matchesTheme(point, activeTheme),
+                          'pin-scan-position': point.id === scanPositionId,
+                          'pin-scan-target': point.id === scanTargetId,
+                          'pin-arrival': point.id === arrivalPointId,
+                          'pin-location':
+                            point.id === selected?.id ||
+                            point.id === mapCurrentPoint?.id,
+                          'pin-endpoint':
+                            point.id === mapCurrentPoint?.id ||
                             point.id === mapTargetPoint?.id,
                         }"
-                        aria-hidden="true"
-                        ><ZhuyinText :text="endpointBadge(point)"
-                      /></span>
-                    </button>
+                        type="button"
+                        :style="pinStyle(point)"
+                        :aria-label="mapPointLabel(point)"
+                        :aria-pressed="point.id === selected?.id"
+                        :aria-hidden="!isPointVisible(point)"
+                        :tabindex="isPointVisible(point) ? undefined : -1"
+                        :aria-expanded="
+                          !mapPickStep
+                            ? point.id === selected?.id && !floorChanging
+                            : undefined
+                        "
+                        :aria-controls="
+                          !mapPickStep &&
+                          point.id === selected?.id &&
+                          !floorChanging
+                            ? 'station-facility-detail'
+                            : undefined
+                        "
+                        @click="selectMapPoint(point, $event)"
+                        @focus="focusVisiblePin(point, $event)"
+                      >
+                        <span
+                          v-if="
+                            point.id === selected?.id ||
+                            point.id === mapCurrentPoint?.id
+                          "
+                          class="pin-icon"
+                        >
+                          <StationMapIcon :name="pointIconType(point)" />
+                        </span>
+                        <span v-else class="point-pin">
+                          <StationMapIcon
+                            class="point-icon"
+                            :name="pointIconType(point)"
+                          />
+                        </span>
+                        <span
+                          v-if="platformIcons[point.id]"
+                          class="point-pin pin-platform-icon"
+                          :style="platformIcons[point.id]"
+                        >
+                          <StationMapIcon class="point-icon" name="platform" />
+                        </span>
+                        <span
+                          v-if="point.id === scanPositionId"
+                          class="location-badge"
+                        >
+                          <ZhuyinText
+                            :text="
+                              t(
+                                location.view.value.manualPosition
+                                  ? 'transfer.manualPositionBadge'
+                                  : 'map.youAreHere'
+                              )
+                            "
+                          />
+                          <span class="location-name"
+                            ><ZhuyinText :text="pointName(point)"
+                          /></span>
+                        </span>
+                        <svg
+                          v-if="
+                            !walkStepOnMap &&
+                            (point.id === selected?.id ||
+                              point.id === mapCurrentPoint?.id)
+                          "
+                          class="map-location-arrow"
+                          viewBox="0 0 80 80"
+                          aria-hidden="true"
+                        >
+                          <defs>
+                            <linearGradient
+                              :id="'location-arrow-' + point.id"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop stop-color="#fff" stop-opacity="0" />
+                              <stop
+                                offset="1"
+                                stop-color="#fff"
+                                stop-opacity=".55"
+                              />
+                            </linearGradient>
+                          </defs>
+                          <path :d="facingMarkerPath" fill="currentColor" />
+                          <path
+                            :d="facingMarkerPath"
+                            :fill="'url(#location-arrow-' + point.id + ')'"
+                          />
+                        </svg>
+                        <span
+                          v-if="
+                            point.id === mapCurrentPoint?.id ||
+                            point.id === mapTargetPoint?.id
+                          "
+                          class="map-endpoint"
+                          :class="{
+                            'map-endpoint-target':
+                              point.id === mapTargetPoint?.id,
+                          }"
+                          aria-hidden="true"
+                          ><ZhuyinText :text="endpointBadge(point)"
+                        /></span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -521,6 +523,7 @@
           v-if="walkDestination"
           :steps="walkSteps"
           :index="walkStepIndex"
+          :map-angle="mapAngle"
           :points-by-id="stationById"
           :status="guideStatus"
           :available="location.view.value.available"
@@ -584,7 +587,7 @@
       :key="tripDialog"
       :direction="tripDirection"
       :cancel-only="tripDialog === 'cancel'"
-      @continue="closeTripDialog"
+      @continue="continueTrip"
       @cancel="cancelTrip"
     />
     <StationMapTour
@@ -799,7 +802,7 @@ function setScanPosition(point) {
 }
 function setScanTarget(point) {
   scanTargetId.value = point?.id ?? null;
-  focusScanPoint(point);
+  if (!walkSteps.value.length) focusScanPoint(point);
 }
 const originView = ref(null);
 const facilityHeading = ref(null);
@@ -876,7 +879,14 @@ watch(tripKey, () => {
   manualArrival.value = null;
 });
 const walkStepIndex = ref(0);
-watch(walkSteps, () => (walkStepIndex.value = 0));
+const mapHeading = ref({ floor: null, angle: 0 });
+const mapAngle = computed(() =>
+  mapHeading.value.floor === level.value ? mapHeading.value.angle : 0
+);
+watch(walkSteps, () => {
+  walkStepIndex.value = 0;
+  setMapAngle(0);
+});
 const currentWalkStep = computed(
   () => walkSteps.value[walkStepIndex.value] ?? null
 );
@@ -913,6 +923,22 @@ async function finishTrip(expectedIdentity) {
   await nextTick();
   mapSection.value?.scrollIntoView({ block: "start" });
 }
+const walkStepOnMap = computed(
+  () => currentWalkStep.value?.floor === level.value
+);
+
+function setMapAngle(target) {
+  // CSS interpolates numbers, so choose the equivalent angle closest to the
+  // current view before animating across north.
+  const delta = ((((target - mapAngle.value) % 360) + 540) % 360) - 180;
+  mapHeading.value = { floor: level.value, angle: mapAngle.value + delta };
+}
+
+function resetMapNorth() {
+  setMapAngle(0);
+  resetZoom(constrainZoom(1));
+}
+
 const walkCheckpoints = computed(() => {
   const step = currentWalkStep.value;
   if (!step || step.floor !== level.value) return [];
@@ -923,9 +949,13 @@ const walkCheckpoints = computed(() => {
   return ids.map((id) => stationById.get(id)).filter(Boolean);
 });
 async function goWalkStep(index) {
+  await nextTick();
   const step = walkSteps.value[index];
   if (!Number.isInteger(index) || !step) return;
   walkStepIndex.value = index;
+  // A pending zoom to a scanned point must not move the current step offscreen.
+  scanFocusRevision++;
+  zoomRevision++;
   if (step.floor !== level.value) await showFloor(step.floor);
   await nextTick();
   if (
@@ -934,6 +964,8 @@ async function goWalkStep(index) {
     level.value !== step.floor
   )
     return;
+  setMapAngle(step.kind === "walk" ? -step.angle : 0);
+  await nextTick();
   // Bring this step's stretch of the route (or its lift/stairs) into view.
   const anchor = stationById.get(step.fromId) ?? stationById.get(step.toId);
   const line = step.line ?? (anchor ? [[anchor.x, anchor.y]] : []);
@@ -1147,6 +1179,15 @@ const bounds = computed(() => {
   const halfHeight = Math.max(y - top, top + height - y);
   return [x - halfWidth, y - halfHeight, 2 * halfWidth, 2 * halfHeight];
 });
+const mapShape = computed(() => {
+  const radians = (mapAngle.value * Math.PI) / 180;
+  const cos = Math.cos(radians);
+  const sin = Math.sin(radians);
+  const ratio = bounds.value[3] / bounds.value[2];
+  const width = Math.abs(cos) + Math.abs(sin) * ratio;
+  const height = Math.abs(sin) + Math.abs(cos) * ratio;
+  return { cos, sin, width, aspect: width / height };
+});
 const platformIcons = computed(() => {
   const scale = mapBoardWidth.value / bounds.value[2];
   const platforms = floorPoints.value.filter(
@@ -1352,15 +1393,29 @@ function pointThemeStyle(type) {
   };
 }
 
+function mapCanvasCenter() {
+  const canvas = viewport.value.firstElementChild;
+  return [
+    canvas.offsetLeft + canvas.clientWidth / 2,
+    canvas.offsetTop + canvas.clientHeight / 2,
+  ];
+}
+
+function mapScrollPoint([x, y]) {
+  const board = mapBoard.value;
+  const [centerX, centerY] = mapCanvasCenter();
+  const { cos, sin } = mapShape.value;
+  const dx = (x - 0.5) * board.clientWidth;
+  const dy = (y - 0.5) * board.clientHeight;
+  return [centerX + dx * cos - dy * sin, centerY + dx * sin + dy * cos];
+}
+
 function centerOn(x, y) {
   const frame = viewport.value;
-  if (!frame?.isConnected) return;
-  const board = frame.firstElementChild;
-  if (!board) return;
-  frame.scrollLeft =
-    board.offsetLeft + x * board.clientWidth - frame.clientWidth / 2;
-  frame.scrollTop =
-    board.offsetTop + y * board.clientHeight - frame.clientHeight / 2;
+  if (!frame?.isConnected || !mapBoard.value) return;
+  const [left, top] = mapScrollPoint([x, y]);
+  frame.scrollLeft = left - frame.clientWidth / 2;
+  frame.scrollTop = top - frame.clientHeight / 2;
 }
 
 function focusVisiblePin(point, event) {
@@ -1390,10 +1445,14 @@ function viewportPoint(clientX, clientY) {
 
 function zoomAnchor([x, y]) {
   const frame = viewport.value;
-  const board = frame.firstElementChild;
+  const board = mapBoard.value;
+  const [centerX, centerY] = mapCanvasCenter();
+  const { cos, sin } = mapShape.value;
+  const dx = frame.scrollLeft + x - centerX;
+  const dy = frame.scrollTop + y - centerY;
   return [
-    (frame.scrollLeft + x - board.offsetLeft) / board.clientWidth,
-    (frame.scrollTop + y - board.offsetTop) / board.clientHeight,
+    0.5 + (dx * cos + dy * sin) / board.clientWidth,
+    0.5 + (-dx * sin + dy * cos) / board.clientHeight,
   ];
 }
 
@@ -1401,17 +1460,15 @@ async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
   scale = constrainZoom(scale);
   clearMapDrag();
   const frame = viewport.value;
-  const board = frame.firstElementChild;
   const revision = ++zoomRevision;
   zoom.value = scale;
   await nextTick();
   if (revision !== zoomRevision || !frame.isConnected) return;
   if (scale === 1) frame.scrollTo(0, 0);
-  else
-    frame.scrollTo(
-      board.offsetLeft + anchor[0] * board.clientWidth - x,
-      board.offsetTop + anchor[1] * board.clientHeight - y
-    );
+  else {
+    const [left, top] = mapScrollPoint(anchor);
+    frame.scrollTo(left - x, top - y);
+  }
 }
 
 function startMapDrag(event) {
@@ -1919,6 +1976,12 @@ async function closeTripDialog() {
   (trigger?.isConnected ? trigger : viewport.value)?.focus({
     preventScroll: true,
   });
+}
+
+async function continueTrip() {
+  const shouldGuide = tripDialog.value === "orientation";
+  await closeTripDialog();
+  if (shouldGuide) await openGuide();
 }
 
 async function cancelTrip() {

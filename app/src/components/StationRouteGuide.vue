@@ -16,6 +16,7 @@
       v-else-if="steps.length"
       :steps="steps"
       :index="index"
+      :map-angle="mapAngle"
       :points-by-id="pointsById"
       @update:index="emit('update:index', $event)"
     />
@@ -120,6 +121,7 @@ import { htmlLang, useI18n } from "../i18n/index.mjs";
 const props = defineProps({
   steps: { type: Array, required: true },
   index: { type: Number, required: true },
+  mapAngle: { type: Number, default: 0 },
   pointsById: { type: Map, required: true },
   status: { type: String, default: "" },
   available: { type: Boolean, default: false },
