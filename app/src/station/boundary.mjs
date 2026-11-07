@@ -76,67 +76,6 @@ export function boundarySegments(plan) {
   });
 }
 
-function circleFitsOutline(x, y, clearance, edges) {
-  let inside = false;
-  for (const {
-    from: [left, top],
-    to: [right, bottom],
-    length,
-  } of edges) {
-    const dx = right - left;
-    const dy = bottom - top;
-    if (top > y !== bottom > y && x < left + ((y - top) * dx) / dy)
-      inside = !inside;
-
-    const projection = ((x - left) * dx + (y - top) * dy) / (length * length);
-    const along = Math.min(1, Math.max(0, projection));
-    if (Math.hypot(x - left - along * dx, y - top - along * dy) < clearance)
-      return false;
-  }
-  return inside;
-}
-
-/** Find a nearby offset that keeps a circular badge inside the anchor's outline. */
-export function insetBoundaryMarker(point, segments, separation, clearance) {
-  const edges = segments.filter(
-    ({ outline }) => outline === point.boundary.outline
-  );
-  const anchor = edges.find(({ edge }) => edge === point.boundary.edge);
-  if (!anchor) return null;
-  const normal = Math.atan2(
-    anchor.to[0] - anchor.from[0],
-    anchor.from[1] - anchor.to[1]
-  );
-  const direction = point.boundary.fraction < 0.5 ? -1 : 1;
-  function offsetAt(angle, distance) {
-    const x = Math.cos(angle) * distance;
-    const y = Math.sin(angle) * distance;
-    return circleFitsOutline(point.x + x, point.y + y, clearance, edges)
-      ? [x, y]
-      : null;
-  }
-  for (const distance of [
-    separation,
-    separation + clearance,
-    separation + 2 * clearance,
-  ]) {
-    // Try a tangent offset with just enough inward clearance for the badge.
-    const tangent = Math.acos(Math.min(1, (clearance * 1.05) / distance));
-    const along =
-      offsetAt(normal + tangent * direction, distance) ??
-      offsetAt(normal - tangent * direction, distance);
-    if (along) return along;
-    // Try the inward normal and nearby angles when the edge runs into a corner.
-    for (let step = 0; step < 24; step++) {
-      const turn = Math.ceil(step / 2) * (step % 2 ? 1 : -1);
-      const angle = normal + (turn * Math.PI) / 12;
-      const offset = offsetAt(angle, distance);
-      if (offset) return offset;
-    }
-  }
-  return null;
-}
-
 /** Stratified random samples are generated once and saved with stable IDs. */
 export function scatterBoundary(
   plan,
