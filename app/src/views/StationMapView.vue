@@ -8,14 +8,14 @@
     <div class="station-shell">
       <section class="station-heading" aria-labelledby="station-title">
         <div class="station-title-row">
-          <h1 id="station-title">台北車站</h1>
+          <h1 id="station-title"><ZhuyinText text="台北車站" /></h1>
           <DisplayControls />
         </div>
         <p v-if="displayMode !== 'standard'" class="display-floor-label">
-          {{ level }}・{{ floorNames[level] }}
+          {{ level }}・<ZhuyinText :text="floorNames[level]" />
         </p>
         <p v-if="displayMode === 'child'" class="display-hint">
-          先選要找的設施，再點地圖上的圓點。
+          <ZhuyinText text="先選要找的設施，再點地圖上的圖示。" />
         </p>
       </section>
 
@@ -48,16 +48,16 @@
           @click="toggleLayers"
         >
           <StationMapIcon name="layers" />
-          <span>透視樓層</span>
+          <span><ZhuyinText text="透視樓層" /></span>
           <span class="switch-track" aria-hidden="true"></span>
         </button>
       </div>
 
       <div class="facility-header">
         <div class="facility-title-group">
-          <h2 id="facility-title">設施主題</h2>
+          <h2 id="facility-title"><ZhuyinText text="設施主題" /></h2>
         </div>
-        <span>{{ floorPoints.length }} 個標點</span>
+        <span>{{ floorPoints.length }} <ZhuyinText text="個標點" /></span>
       </div>
 
       <div
@@ -75,7 +75,9 @@
           :style="pointThemeStyle(type)"
           @click="toggleTheme(type)"
         >
-          <StationMapIcon :name="type" />{{ categories[type].name }}
+          <StationMapIcon :name="type" /><ZhuyinText
+            :text="categories[type].name"
+          />
         </button>
       </div>
 
@@ -102,7 +104,7 @@
                   :disabled="floorChanging"
                   @click="returnToOrigin"
                 >
-                  回到起點・{{ originView.floor }}
+                  <ZhuyinText text="回到起點" />・{{ originView.floor }}
                 </button>
               </div>
               <div class="map-window" :inert="floorChanging ? '' : null">
@@ -200,10 +202,10 @@
                 aria-labelledby="connector-title"
               >
                 <h3 id="connector-title" ref="connectorHeading" tabindex="-1">
-                  {{ selected.name }}
+                  <ZhuyinText :text="selected.name" />
                 </h3>
                 <p v-if="displayMode === 'child'" class="display-hint">
-                  {{ facilityHelp[selected.type] }}
+                  <ZhuyinText :text="facilityHelp[selected.type]" />
                 </p>
                 <template v-if="destinations.length">
                   <div v-for="transfer in destinations" :key="transfer.id">
@@ -213,18 +215,17 @@
                       @click="visitDestination(transfer)"
                     >
                       <span
-                        >{{ transfer.to.floor }}・{{
-                          zoneName(transfer.to.zone)
-                        }}</span
-                      >
+                        >{{ transfer.to.floor }}・<ZhuyinText
+                          :text="zoneName(transfer.to.zone)"
+                      /></span>
                       <StationMapIcon name="arrow" />
                     </button>
                     <p v-if="transferNote(transfer)">
-                      {{ transferNote(transfer) }}
+                      <ZhuyinText :text="transferNote(transfer)" />
                     </p>
                   </div>
                 </template>
-                <p v-else>{{ selected.description }}</p>
+                <p v-else><ZhuyinText :text="selected.description" /></p>
               </section>
             </div>
             <div
@@ -234,11 +235,11 @@
               class="display-facility-detail"
               role="status"
             >
-              <h3>{{ selected.name }}</h3>
+              <h3><ZhuyinText :text="selected.name" /></h3>
               <p v-if="displayMode === 'child'" class="display-hint">
-                {{ facilityHelp[selected.type] }}
+                <ZhuyinText :text="facilityHelp[selected.type]" />
               </p>
-              <p>{{ selected.description }}</p>
+              <p><ZhuyinText :text="selected.description" /></p>
             </div>
           </section>
         </div>
@@ -276,6 +277,7 @@ import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationScanPanel from "../components/StationScanPanel.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import DisplayControls from "../components/DisplayControls.vue";
+import ZhuyinText from "../components/ZhuyinText.vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { floors, stackBounds } from "./station-floor-plans";
 import stationData from "./station-points.json";

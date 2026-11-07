@@ -182,3 +182,19 @@ html[data-maze-theme="dark"] {
 .display-page:not([data-display-mode="standard"]) .display-controls {
   gap: var(--display-gap);
 }
+
+/* Navigation and its shared search/map keep their original light palette. */
+.display-page[data-theme="dark"] {
+  --demo-ink: var(--ink);
+  --demo-muted: var(--muted);
+  --demo-accent: var(--accent);
+  --demo-on-accent: #0c1315;
+  --demo-surface: var(--surface);
+  --demo-wash: var(--wash);
+  --demo-border: var(--tp-primary-400);
+  --demo-edge: var(--tp-primary-300);
+  --demo-current: #e7c78d;
+  --demo-destination: #85c8ac;
+  --demo-warning: var(--warning-bg);
+  --demo-warning-ink: #f5e7cb;
+}

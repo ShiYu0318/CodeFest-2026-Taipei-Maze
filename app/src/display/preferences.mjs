@@ -1,43 +1,36 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { reactive, readonly, toRefs } from "vue";
 
-export const displayStorageKey = "taipei-maze.display-preferences.v1";
-const themes = ["light", "dark"];
 const modes = ["standard", "child", "senior"];
+export const themeStorageKey = "taipei-maze.theme.v1";
 const browserStorage = () =>
   typeof window === "undefined" ? undefined : window.localStorage;
 
-/** Display preferences only: never persist a location, destination or route. */
+/** Remember only a manually chosen theme; age presets still start standard. */
 export function createDisplayPreferences(storage = browserStorage) {
-  let saved;
+  let savedTheme;
   try {
-    saved = JSON.parse(storage()?.getItem(displayStorageKey) ?? "null");
+    savedTheme = storage()?.getItem(themeStorageKey);
   } catch {
-    // Private browsing, denied storage and malformed saved data use defaults.
+    /* Storage is optional. */
   }
   const state = reactive({
-    theme: themes.includes(saved?.theme) ? saved.theme : "light",
-    displayMode: modes.includes(saved?.displayMode)
-      ? saved.displayMode
-      : "standard",
+    theme: savedTheme === "dark" ? "dark" : "light",
+    displayMode: "standard",
   });
-  function save() {
-    try {
-      storage()?.setItem(displayStorageKey, JSON.stringify(state));
-    } catch {
-      // Changes remain usable in memory when persistence is unavailable.
-    }
-  }
   return {
     ...toRefs(readonly(state)),
     toggleTheme() {
       state.theme = state.theme === "light" ? "dark" : "light";
-      save();
+      try {
+        storage()?.setItem(themeStorageKey, state.theme);
+      } catch {
+        /* Keep in-memory choice. */
+      }
     },
     setDisplayMode(value) {
       if (!modes.includes(value)) return;
       state.displayMode = value;
-      save();
     },
   };
 }

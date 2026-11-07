@@ -3,65 +3,82 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   createDisplayPreferences,
-  displayStorageKey,
+  useDisplayPreferences,
+  themeStorageKey,
 } from "../src/display/preferences.mjs";
 
-test("display settings survive a new page instance without persisting task data", () => {
-  const entries = new Map();
+test("fresh document state always starts light/standard after any prior mode", () => {
+  for (const mode of ["standard", "child", "senior"]) {
+    const previous = createDisplayPreferences();
+    previous.toggleTheme();
+    previous.setDisplayMode(mode);
+    const next = createDisplayPreferences();
+    assert.equal(next.theme.value, "light");
+    assert.equal(next.displayMode.value, "standard");
+    assert.equal(previous.theme.value, "dark");
+    assert.equal(previous.displayMode.value, mode);
+  }
+});
+
+test("components on the same document share manual choices across SPA pages", () => {
+  const map = useDisplayPreferences();
+  const meeting = useDisplayPreferences();
+  try {
+    map.toggleTheme();
+    map.setDisplayMode("child");
+    assert.equal(meeting.theme.value, "dark");
+    assert.equal(meeting.displayMode.value, "child");
+    meeting.setDisplayMode("senior");
+    assert.equal(map.displayMode.value, "senior");
+    assert.equal(map.theme.value, "dark");
+  } finally {
+    map.toggleTheme();
+    map.setDisplayMode("standard");
+  }
+});
+
+test("invalid modes are ignored and mode changes do not change theme", () => {
+  const prefs = createDisplayPreferences();
+  prefs.setDisplayMode("child");
+  prefs.setDisplayMode("invalid");
+  assert.equal(prefs.displayMode.value, "child");
+  assert.equal(prefs.theme.value, "light");
+  prefs.toggleTheme();
+  assert.equal(prefs.displayMode.value, "child");
+});
+
+test("only an explicit theme choice persists across document reloads", () => {
+  const values = new Map();
   const storage = () => ({
-    getItem: (key) => entries.get(key) ?? null,
-    setItem: (key, value) => entries.set(key, value),
+    getItem: (key) => values.get(key),
+    setItem: (key, value) => values.set(key, value),
   });
   const first = createDisplayPreferences(storage);
+  assert.equal(first.theme.value, "light");
+  assert.equal(values.size, 0);
   first.toggleTheme();
-  first.setDisplayMode("senior");
+  first.setDisplayMode("child");
   const next = createDisplayPreferences(storage);
   assert.equal(next.theme.value, "dark");
-  assert.equal(next.displayMode.value, "senior");
-  next.setDisplayMode("child");
-  assert.equal(next.theme.value, "dark");
-  assert.deepEqual(JSON.parse(entries.get(displayStorageKey)), {
-    theme: "dark",
-    displayMode: "child",
-  });
+  assert.equal(next.displayMode.value, "standard");
+  next.toggleTheme();
+  assert.equal(createDisplayPreferences(storage).theme.value, "light");
+  assert.deepEqual([...values], [[themeStorageKey, "light"]]);
 });
 
-test("blocked localStorage retains settings in memory", () => {
-  const prefs = createDisplayPreferences(() => {
-    throw new Error("Storage denied");
+test("denied or malformed storage never prevents manual theme changes", () => {
+  const blocked = createDisplayPreferences(() => {
+    throw new Error("Denied");
   });
-  assert.equal(prefs.theme.value, "light");
-  assert.equal(prefs.displayMode.value, "standard");
-  prefs.toggleTheme();
-  prefs.setDisplayMode("senior");
-  assert.equal(prefs.theme.value, "dark");
-  assert.equal(prefs.displayMode.value, "senior");
-});
-
-test("write failures do not undo display changes", () => {
-  const prefs = createDisplayPreferences(() => ({
-    getItem: () => '{"theme":"dark","displayMode":"child"}',
+  blocked.toggleTheme();
+  assert.equal(blocked.theme.value, "dark");
+  const invalid = createDisplayPreferences(() => ({
+    getItem: () => "unexpected",
     setItem: () => {
-      throw new Error("Quota exceeded");
+      throw new Error("Quota");
     },
   }));
-  prefs.toggleTheme();
-  prefs.setDisplayMode("senior");
-  assert.equal(prefs.theme.value, "light");
-  assert.equal(prefs.displayMode.value, "senior");
-});
-
-test("malformed or unsupported stored settings fall back independently", () => {
-  for (const value of ["broken JSON", "null", "[]"]) {
-    const prefs = createDisplayPreferences(() => ({ getItem: () => value }));
-    assert.equal(prefs.theme.value, "light");
-    assert.equal(prefs.displayMode.value, "standard");
-  }
-  const prefs = createDisplayPreferences(() => ({
-    getItem: () => '{"theme":"dark","displayMode":"unknown"}',
-  }));
-  assert.equal(prefs.theme.value, "dark");
-  assert.equal(prefs.displayMode.value, "standard");
-  prefs.setDisplayMode("invalid");
-  assert.equal(prefs.displayMode.value, "standard");
+  assert.equal(invalid.theme.value, "light");
+  invalid.toggleTheme();
+  assert.equal(invalid.theme.value, "dark");
 });
