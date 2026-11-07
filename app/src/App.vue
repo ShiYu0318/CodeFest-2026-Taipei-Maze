@@ -8,7 +8,12 @@
     <router-link to="/station-map">台北車站 B1–B4 地圖</router-link>
   </nav>
   <router-view />
+  <FloatingChat />
 </template>
+
+<script setup>
+import FloatingChat from "./components/FloatingChat.vue";
+</script>
 
 <style lang="scss">
 #app {
