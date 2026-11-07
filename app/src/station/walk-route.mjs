@@ -93,3 +93,71 @@ export function nextArrow(route) {
   }
   return { kind: "none" };
 }
+
+const bearing = (from, to) =>
+  Math.round(
+    ((Math.atan2(to.x - from.x, -(to.y - from.y)) * 180) / Math.PI + 360) % 360
+  );
+
+/**
+ * Split a route into steps a visitor can page through:
+ *   walk   — one floor, from a place to the next floor change or the end,
+ *            with the named checkpoints passed on the way
+ *   floor  — change floors by elevator, stairs or escalator
+ *   arrive — the destination
+ * Directions remain map bearings; nothing here claims left or right.
+ */
+export function routeSteps(route) {
+  if (!route?.edges?.length) return [];
+  const nodes = new Map(route.nodes.map((node) => [node.id, node]));
+  const steps = [];
+  let walk = null;
+  const named = (id) => !helper(id);
+  const closeWalk = () => {
+    if (!walk) return;
+    const last = walk.ids.at(-1);
+    const first = nodes.get(walk.ids[0]);
+    // The first move long enough to show a direction.
+    let angle = null;
+    for (let i = 1; i < walk.ids.length && angle === null; i++) {
+      const to = nodes.get(walk.ids[i]);
+      if (Math.hypot(to.x - first.x, to.y - first.y) >= 2)
+        angle = bearing(first, to);
+    }
+    if (walk.ids.length >= 2 && angle !== null)
+      steps.push({
+        kind: "walk",
+        floor: walk.floor,
+        fromId: walk.ids.find(named) ?? walk.ids[0],
+        toId: [...walk.ids].reverse().find(named) ?? last,
+        viaIds: walk.ids.slice(1, -1).filter(named),
+        line: walk.ids.map((id) => [nodes.get(id).x, nodes.get(id).y]),
+        angle,
+      });
+    walk = null;
+  };
+  for (const edge of route.edges) {
+    const from = nodes.get(edge.from),
+      to = nodes.get(edge.to);
+    if (from.floor !== to.floor) {
+      closeWalk();
+      steps.push({
+        kind: "floor",
+        floor: from.floor,
+        toFloor: to.floor,
+        fromId: edge.from,
+        toId: edge.to,
+        via: edge.type,
+        direction:
+          FLOORS.indexOf(to.floor) > FLOORS.indexOf(from.floor) ? "down" : "up",
+      });
+      continue;
+    }
+    if (!walk) walk = { floor: from.floor, ids: [edge.from] };
+    walk.ids.push(edge.to);
+  }
+  closeWalk();
+  const end = nodes.get(route.nodeIds.at(-1));
+  steps.push({ kind: "arrive", floor: end.floor, toId: end.id });
+  return steps.map((step, index) => ({ ...step, index }));
+}

@@ -511,4 +511,12 @@ export default {
   "share.received":
     "Tempat dari teman: {name} ({floor}). Ini tempat tetap, bukan lokasi langsung. Pindai kode QR lokasi terdekat untuk merencanakan rute.",
   "share.linkLabel": "Tautan berbagi",
+  "route.title": "Langkah rute",
+  "route.step": "Langkah {current}/{total}",
+  "route.walk": "Di {floor}, berjalan menuju “{name}”",
+  "route.via": "Di jalan Anda melewati: {list}",
+  "route.arrive": "Tiba di “{name}”",
+  "route.prev": "Sebelumnya",
+  "route.next": "Berikutnya",
+  "route.all": "Semua langkah",
 };

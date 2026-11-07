@@ -438,4 +438,12 @@ export default {
   "share.received":
     "朋友分享的地點：{name}（{floor}）。這是固定地點，不是即時位置；掃描附近的定位 QR，就能規劃路線。",
   "share.linkLabel": "分享連結",
+  "route.title": "路線步驟",
+  "route.step": "第 {current}／{total} 步",
+  "route.walk": "在 {floor} 往「{name}」走",
+  "route.via": "途中經過：{list}",
+  "route.arrive": "抵達「{name}」",
+  "route.prev": "上一步",
+  "route.next": "下一步",
+  "route.all": "全部步驟",
 };

@@ -501,4 +501,12 @@ export default {
   "share.received":
     "Địa điểm bạn bè chia sẻ: {name} ({floor}). Đây là địa điểm cố định, không phải vị trí trực tiếp. Quét mã QR định vị gần bạn để lập đường đi.",
   "share.linkLabel": "Liên kết chia sẻ",
+  "route.title": "Các bước đi",
+  "route.step": "Bước {current}/{total}",
+  "route.walk": "Ở {floor}, đi về phía “{name}”",
+  "route.via": "Trên đường sẽ đi qua: {list}",
+  "route.arrive": "Đến “{name}”",
+  "route.prev": "Bước trước",
+  "route.next": "Bước tiếp",
+  "route.all": "Tất cả các bước",
 };

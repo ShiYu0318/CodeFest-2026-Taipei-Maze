@@ -502,4 +502,12 @@ export default {
   "share.received":
     "Place shared by a friend: {name} ({floor}). It is a fixed place, not a live location. Scan a nearby location QR code to plan your route.",
   "share.linkLabel": "Share link",
+  "route.title": "Route steps",
+  "route.step": "Step {current} of {total}",
+  "route.walk": "On {floor}, walk toward “{name}”",
+  "route.via": "On the way you pass: {list}",
+  "route.arrive": "Arrive at “{name}”",
+  "route.prev": "Previous",
+  "route.next": "Next",
+  "route.all": "All steps",
 };

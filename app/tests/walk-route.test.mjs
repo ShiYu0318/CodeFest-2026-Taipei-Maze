@@ -8,6 +8,7 @@ import {
   routeLines,
   nearestPlace,
   nextArrow,
+  routeSteps,
 } from "../src/station/walk-route.mjs";
 
 const compact = JSON.parse(
@@ -86,4 +87,37 @@ test("a route that starts with a floor change shows up or down", () => {
   if (lift.type !== "success") return;
   const arrow = nextArrow(lift.route, { startFloorFirst: true });
   assert.ok(["map", "up", "down"].includes(arrow.kind));
+});
+
+test("a cross-floor route becomes walk / floor / arrive steps with checkpoints", () => {
+  const { route } = planWalk(router, {
+    startId: "b1-qr-02",
+    destinationId: "b4-qr-03",
+  });
+  const steps = routeSteps(route);
+  assert.equal(steps.at(-1).kind, "arrive");
+  assert.equal(steps.at(-1).toId, "b4-qr-03");
+  assert.ok(steps.some((step) => step.kind === "floor"));
+  for (const [i, step] of steps.entries()) {
+    assert.equal(step.index, i);
+    if (step.kind === "walk") {
+      assert.ok(step.line.length >= 2, `step ${i} line`);
+      assert.ok(Number.isFinite(step.angle));
+      // Checkpoints are named places, never helper corner or entrance nodes.
+      for (const id of [step.fromId, step.toId, ...step.viaIds])
+        assert.ok(!/-corner-\d+$|-entrance$/.test(id), id);
+    }
+    if (step.kind === "floor") {
+      assert.ok(["up", "down"].includes(step.direction));
+      assert.notEqual(step.floor, step.toFloor);
+      assert.ok(["elevator", "stairs", "escalator"].includes(step.via));
+    }
+  }
+  // Floors line up: each step starts where the previous one ended.
+  for (let i = 1; i < steps.length; i++)
+    assert.equal(steps[i].floor, steps[i - 1].toFloor ?? steps[i - 1].floor);
+});
+
+test("no route means no steps", () => {
+  assert.deepEqual(routeSteps(null), []);
 });

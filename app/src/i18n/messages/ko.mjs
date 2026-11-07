@@ -491,4 +491,12 @@ export default {
   "share.received":
     "친구가 공유한 장소: {name}({floor}). 고정된 장소이며 실시간 위치가 아니에요. 가까운 위치 QR 코드를 스캔하면 경로를 만들 수 있어요.",
   "share.linkLabel": "공유 링크",
+  "route.title": "경로 단계",
+  "route.step": "{current}/{total}단계",
+  "route.walk": "{floor}에서 “{name}” 쪽으로 걸어가세요",
+  "route.via": "가는 길에 지나는 곳: {list}",
+  "route.arrive": "“{name}”에 도착",
+  "route.prev": "이전",
+  "route.next": "다음",
+  "route.all": "전체 단계",
 };

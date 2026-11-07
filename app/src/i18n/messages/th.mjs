@@ -478,4 +478,12 @@ export default {
   "share.received":
     "สถานที่ที่เพื่อนแชร์: {name} ({floor}) นี่คือสถานที่คงที่ ไม่ใช่ตำแหน่งปัจจุบัน สแกน QR ระบุตำแหน่งใกล้ ๆ เพื่อวางเส้นทาง",
   "share.linkLabel": "ลิงก์สำหรับแชร์",
+  "route.title": "ขั้นตอนเส้นทาง",
+  "route.step": "ขั้นที่ {current}/{total}",
+  "route.walk": "ที่ {floor} เดินไปทาง “{name}”",
+  "route.via": "ระหว่างทางจะผ่าน: {list}",
+  "route.arrive": "ถึง “{name}”",
+  "route.prev": "ก่อนหน้า",
+  "route.next": "ถัดไป",
+  "route.all": "ทุกขั้นตอน",
 };

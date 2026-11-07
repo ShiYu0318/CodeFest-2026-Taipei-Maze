@@ -1123,6 +1123,17 @@
   width: 18px;
   height: 18px;
 }
+.walk-route polyline.walk-route-current {
+  stroke: var(--tp-primary-600);
+  stroke-width: 10;
+  stroke-dasharray: none;
+  opacity: 0.9;
+}
+.walk-route .walk-checkpoint {
+  fill: var(--surface, #fff);
+  stroke: var(--tp-primary-600);
+  stroke-width: 5;
+}
 .walk-route polyline {
   fill: none;
   stroke: var(--tp-secondary-600, #e7a43c);

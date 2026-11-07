@@ -71,6 +71,13 @@
         >
           <ZhuyinText :text="walkStatus" />
         </p>
+        <StationRouteSteps
+          v-if="walkSteps.length"
+          :steps="walkSteps"
+          :index="walkStepIndex"
+          :points-by-id="stationById"
+          @update:index="goWalkStep"
+        />
         <button
           v-if="walkDestinationPoint"
           type="button"
@@ -280,6 +287,26 @@
                           v-for="(line, index) in walkLines"
                           :key="index"
                           :points="line.map((p) => p.join(',')).join(' ')"
+                        />
+                        <polyline
+                          v-if="
+                            currentWalkStep?.line &&
+                            currentWalkStep.floor === level
+                          "
+                          class="walk-route-current"
+                          :points="
+                            currentWalkStep.line
+                              .map((p) => p.join(','))
+                              .join(' ')
+                          "
+                        />
+                        <circle
+                          v-for="point in walkCheckpoints"
+                          :key="point.id"
+                          class="walk-checkpoint"
+                          :cx="point.x"
+                          :cy="point.y"
+                          r="9"
                         />
                       </g>
                     </svg>
@@ -547,6 +574,7 @@ import { readSharedPlace } from "../station/place-share.mjs";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
 import StationInformationDialog from "../components/StationInformationDialog.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
+import StationRouteSteps from "../components/StationRouteSteps.vue";
 import StationMapTour from "../components/StationMapTour.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import DisplayControls from "../components/DisplayControls.vue";
@@ -561,6 +589,7 @@ import walkingNetwork from "../station/walking-network.json";
 import {
   nearestPlace,
   nextArrow,
+  routeSteps,
   planWalk,
   routeLines,
   walkingRouter,
@@ -750,6 +779,44 @@ const walk = computed(() =>
 const walkLines = computed(() =>
   walk.value.type === "success" ? routeLines(walk.value.route, level.value) : []
 );
+// Step-by-step view of the whole route: one walk per floor with the named
+// checkpoints passed, each floor change, then arrival.
+const walkSteps = computed(() =>
+  walk.value.type === "success" ? routeSteps(walk.value.route) : []
+);
+const walkStepIndex = ref(0);
+watch(walkSteps, () => (walkStepIndex.value = 0));
+const currentWalkStep = computed(
+  () => walkSteps.value[walkStepIndex.value] ?? null
+);
+const walkCheckpoints = computed(() => {
+  const step = currentWalkStep.value;
+  if (!step || step.floor !== level.value) return [];
+  const ids =
+    step.kind === "walk"
+      ? [step.fromId, ...step.viaIds, step.toId]
+      : [step.kind === "floor" ? step.fromId : step.toId];
+  return ids.map((id) => stationById.get(id)).filter(Boolean);
+});
+async function goWalkStep(index) {
+  walkStepIndex.value = index;
+  const step = walkSteps.value[index];
+  if (!step) return;
+  if (step.floor !== level.value) await showFloor(step.floor);
+  await nextTick();
+  if (walkStepIndex.value !== index || level.value !== step.floor) return;
+  // Bring this step's stretch of the route (or its lift/stairs) into view.
+  const anchor = stationById.get(step.fromId) ?? stationById.get(step.toId);
+  const line = step.line ?? (anchor ? [[anchor.x, anchor.y]] : []);
+  if (!line.length) return;
+  const xs = line.map((p) => p[0]),
+    ys = line.map((p) => p[1]);
+  const [x, y] = normalizedPoint({
+    x: (Math.min(...xs) + Math.max(...xs)) / 2,
+    y: (Math.min(...ys) + Math.max(...ys)) / 2,
+  });
+  centerOn(x, y);
+}
 const walkStatus = computed(() => {
   const type = walk.value.type;
   if (type === "success") return t("walk.routeTitle");
