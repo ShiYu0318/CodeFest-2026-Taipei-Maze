@@ -7,7 +7,7 @@
     "restroom": {
       "name": "廁所",
       "colorToken": "primary-800",
-      "iconColor": "#5ab4c5"
+      "iconColor": "#0066CC"
     },
     "nursing": {
       "name": "哺集乳室",
@@ -17,7 +17,7 @@
     "info": {
       "name": "詢問處",
       "colorToken": "gray-700",
-      "iconColor": "#79FF79"
+      "iconColor": "#01814A"
     },
     "ticket": {
       "name": "售票處",
@@ -26,7 +26,7 @@
     "aed": {
       "name": "AED",
       "colorToken": "secondary-900",
-      "iconColor": "#FF5151"
+      "iconColor": "#CE0000"
     },
     "phone": {
       "name": "公用電話",
