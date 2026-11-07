@@ -124,13 +124,17 @@
         }}
       </p>
     </div>
-    <button v-if="view.mode === 'navigation'" :disabled="active" @click="reset">
-      {{ t("scan.exit") }}
+    <button
+      v-if="view.mode === 'navigation' || view.destinationId"
+      :disabled="active"
+      @click="emit('cancel-trip')"
+    >
+      {{ view.mode === "navigation" ? t("scan.exit") : t("scan.cancelTrip") }}
     </button>
   </section>
 </template>
 <script setup>
-/* global defineProps */
+/* global defineProps, defineEmits */
 import { computed, ref } from "vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import DestinationSearch from "./DestinationSearch.vue";
@@ -143,6 +147,7 @@ const props = defineProps({
   selectedPoint: { type: Object, default: null },
   location: { type: Object, required: true },
 });
+const emit = defineEmits(["destination", "scanned", "cancel-trip"]);
 const view = computed(() => props.location.view.value);
 const catalog = stationPoints(data),
   searchEntries = stationCatalog(data);
@@ -197,11 +202,12 @@ const instruction = computed(() => {
   return t("scan.instr.none");
 });
 function choose(id) {
-  props.location.choose(id);
+  if (props.location.choose(id)) emit("destination", id);
 }
 function searchSelect(selection) {
-  if (props.location.searchSelect(selection) && searchDetails.value)
-    searchDetails.value.open = false;
+  if (!props.location.searchSelect(selection)) return;
+  if (searchDetails.value) searchDetails.value.open = false;
+  emit("destination", selection.poiId);
 }
 function changeStepFree(value) {
   props.location.setStepFree(value);
@@ -212,11 +218,9 @@ function unavailable(id) {
 function confirm(token) {
   props.location.confirmArrival(token);
 }
-function start() {
-  props.location.scan();
-}
-function reset() {
-  props.location.reset();
+async function start() {
+  const result = await props.location.scan();
+  if (result.type === "success") emit("scanned");
 }
 </script>
 <style scoped>

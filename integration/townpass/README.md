@@ -20,3 +20,9 @@ bash scripts/townpass-env.sh serve
 ### 裝置端聊天與內建網頁包
 
 目前 patch 另含 Google LiteRT-LM 0.19.1、原生本地語音、模型下載原生畫面與 loopback-only 網頁包。套用後先從作品 repo 執行 `bash scripts/townpass-env.sh bundle-web`，再 pub get／codegen／build；不要忘記產生 `assets/codefest_web.bundle`。此產物不提交宿主或 patch，由本 repo 的 Vue 原始碼重新生成。完整流程與未測限制見 [手機聊天與語音開發指南](../../docs/手機聊天與語音開發指南.md)。
+
+## 行程方向確認
+
+正式站內地圖沿用原版 TownPass 的 `qr_code_scan` 單次掃碼橋接。選好目的地或成功掃到本站定位碼後，網頁顯示兩步方向確認。先請使用者面向 QRcode 面板，再依已核對的跨樓層連結或現場導引指標確認方向。每步都需等待兩秒才能按「繼續」。
+
+關閉按鈕與「退出導航」都會先詢問是否取消行程。確認取消後清除這次定位、起點和目的地。定位仍以掃碼當下確認的點位為準，步行路線由後端接手。

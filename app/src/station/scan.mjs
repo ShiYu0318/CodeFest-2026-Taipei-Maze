@@ -107,7 +107,10 @@ export function createStationScanSession(data, graph) {
       );
     },
     setDestination(pointId) {
-      if (!byId.has(pointId) || byId.get(pointId).enabled === false)
+      if (
+        pointId !== null &&
+        (!byId.has(pointId) || byId.get(pointId).enabled === false)
+      )
         return false;
       state.destinationId = pointId;
       state.arrived = false;

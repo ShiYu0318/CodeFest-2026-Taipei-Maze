@@ -319,26 +319,6 @@
   font-weight: 750;
   pointer-events: auto;
 }
-.compass {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--tp-primary-50);
-  padding: 3px;
-  color: var(--tp-primary-800);
-}
-.compass span {
-  font-size: 0.625rem;
-  font-weight: 800;
-}
-.compass svg {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
-  transform: rotate(-12deg);
-}
 .map-window {
   overflow: hidden;
   overflow: clip;
@@ -454,6 +434,7 @@
 }
 .map-pin[aria-pressed="true"],
 .map-pin:focus-visible,
+.pin-endpoint,
 .pin-arrival {
   z-index: 2;
 }
@@ -491,6 +472,46 @@
 }
 .map-pin:active .pin-icon {
   opacity: 0.78;
+}
+.map-pin.pin-location {
+  width: 38px;
+  height: 38px;
+}
+.map-pin.pin-location .pin-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--point-icon-color);
+  color: var(--location-icon-ink);
+  box-shadow: 0 0 0 1px var(--point-icon-color);
+}
+.map-location-arrow {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 80px;
+  height: 80px;
+  transform: translate(-50%, -50%);
+  color: var(--point-icon-color);
+  filter: drop-shadow(0 1px 1px var(--surface));
+  pointer-events: none;
+}
+.map-endpoint {
+  position: absolute;
+  left: calc(100% - 2px);
+  bottom: 0;
+  padding: 1px 4px;
+  border: 1px solid var(--tp-primary-300);
+  border-radius: 5px;
+  background: var(--tp-primary-100);
+  color: var(--tp-primary-800);
+  font-size: 0.625rem;
+  font-weight: 800;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.map-endpoint-target {
+  border-color: var(--tp-secondary-500);
+  background: var(--tp-secondary-100);
+  color: var(--tp-secondary-900);
 }
 .map-tools {
   padding-block: 8px;
@@ -555,10 +576,44 @@
 }
 .facility-header {
   padding-inline: 0;
+  flex-wrap: wrap;
 }
-.facility-header > span {
-  color: var(--muted);
-  font-size: 0.75rem;
+.location-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-inline-start: auto;
+}
+.location-link,
+.map-pick-instructions button {
+  min-height: var(--display-control-height);
+  padding-inline: 12px;
+  border: 1px solid var(--tp-primary-300);
+  border-radius: 8px;
+  background: var(--wash);
+  color: var(--tp-primary-800);
+  font-size: var(--display-control-size);
+  font-weight: 750;
+}
+.location-link svg {
+  width: 18px;
+  height: 18px;
+}
+.map-pick-instructions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--wash);
+  color: var(--ink);
+  font-size: var(--display-secondary-size, 0.875rem);
+}
+.map-pick-instructions button {
+  flex-shrink: 0;
 }
 .theme-group {
   display: flex;

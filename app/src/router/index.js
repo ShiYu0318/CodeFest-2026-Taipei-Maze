@@ -36,6 +36,10 @@ const routes = [
     meta: { titleKey: "title.station" },
     component: () => import("../views/StationMapView.vue"),
   },
+  {
+    path: "/station-orientation",
+    redirect: "/station-map",
+  },
 ];
 
 const router = createRouter({

@@ -5,7 +5,10 @@
     :data-theme="theme"
     :data-display-mode="displayMode"
   >
-    <div class="station-shell">
+    <div
+      class="station-shell"
+      :inert="endpointPickerOpen || tripDialog ? '' : null"
+    >
       <section class="station-heading" :aria-label="t('display.group')">
         <div class="station-title-row">
           <!-- <h1 id="station-title"><ZhuyinText text="台北車站" /></h1> -->
@@ -19,8 +22,14 @@
         </p>
       </section>
 
-      <StationScanPanel :location="location" :selected-point="selected" />
-      <div class="floor-controls">
+      <StationScanPanel
+        :location="location"
+        :selected-point="selected"
+        @destination="planDestination"
+        @scanned="onQrScanned"
+        @cancel-trip="openTripDialog('cancel')"
+      />
+      <div ref="floorControls" class="floor-controls">
         <div
           class="floor-switch"
           role="group"
@@ -59,11 +68,16 @@
             <ZhuyinText :text="t('map.facilities')" />
           </h2>
         </div>
-        <span>
-          <ZhuyinText
-            :text="t('map.pointCount', { count: visibleFloorPoints.length })"
-          />
-        </span>
+        <button
+          class="location-link"
+          type="button"
+          aria-haspopup="dialog"
+          :disabled="floorChanging"
+          @click="openEndpointPicker"
+        >
+          <StationMapIcon name="locate" />
+          <ZhuyinText :text="t('map.locate')" />
+        </button>
       </div>
 
       <div
@@ -86,6 +100,15 @@
         </button>
       </div>
 
+      <div v-if="mapPickStep" class="map-pick-instructions">
+        <p role="status">
+          {{ mapPickStep === "start" ? t("map.pickStart") : t("map.pickEnd") }}
+        </p>
+        <button type="button" @click="openEndpointPicker()">
+          {{ t("map.cancel") }}
+        </button>
+      </div>
+
       <div class="station-layout">
         <div class="station-map-column">
           <section
@@ -97,15 +120,11 @@
               ref="mapStage"
               class="map-stage"
               :style="{ '--map-top': mapTop * 1.5 + 'px' }"
-              @keydown.esc="closeConnectorDetails"
+              @keydown.esc="
+                mapPickStep ? openEndpointPicker() : closeConnectorDetails()
+              "
             >
               <div class="map-corner">
-                <div class="compass" :aria-label="t('map.compass')" role="img">
-                  <span>N</span>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M12 3 20 21l-8-4-8 4Z" />
-                  </svg>
-                </div>
                 <button
                   v-if="originView"
                   type="button"
@@ -177,23 +196,21 @@
                         'pin-scan-position': point.id === scanPositionId,
                         'pin-scan-target': point.id === scanTargetId,
                         'pin-arrival': point.id === arrivalPointId,
+                        'pin-location':
+                          point.id === selected?.id ||
+                          point.id === mapCurrentPoint?.id,
+                        'pin-endpoint':
+                          point.id === mapCurrentPoint?.id ||
+                          point.id === mapTargetPoint?.id,
                       }"
                       type="button"
                       :style="pinStyle(point)"
-                      :aria-label="
-                        pointName(point) +
-                        (point.id === scanPositionId
-                          ? t('map.ariaYouAreHere')
-                          : '') +
-                        (point.id === scanTargetId
-                          ? t('map.ariaDestination')
-                          : '')
-                      "
+                      :aria-label="mapPointLabel(point)"
                       :aria-pressed="point.id === selected?.id"
                       :aria-hidden="!isPointVisible(point)"
                       :tabindex="isPointVisible(point) ? undefined : -1"
                       :aria-expanded="
-                        isConnector(point)
+                        isConnector(point) && !mapPickStep
                           ? point.id === selected?.id &&
                             !floorChanging &&
                             !!connectorPosition
@@ -202,7 +219,13 @@
                       @click="selectMapPoint(point, $event)"
                       @focus="focusVisiblePin(point, $event)"
                     >
-                      <span v-if="point.id === selected?.id" class="pin-icon">
+                      <span
+                        v-if="
+                          point.id === selected?.id ||
+                          point.id === mapCurrentPoint?.id
+                        "
+                        class="pin-icon"
+                      >
                         <StationMapIcon :name="pointIconType(point)" />
                       </span>
                       <span v-else class="point-pin">
@@ -220,6 +243,48 @@
                           ><ZhuyinText :text="pointName(point)"
                         /></span>
                       </span>
+                      <svg
+                        v-if="
+                          point.id === selected?.id ||
+                          point.id === mapCurrentPoint?.id
+                        "
+                        class="map-location-arrow"
+                        viewBox="0 0 80 80"
+                        aria-hidden="true"
+                      >
+                        <defs>
+                          <linearGradient
+                            :id="'location-arrow-' + point.id"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop stop-color="#fff" stop-opacity="0" />
+                            <stop
+                              offset="1"
+                              stop-color="#fff"
+                              stop-opacity=".55"
+                            />
+                          </linearGradient>
+                        </defs>
+                        <path :d="facingMarkerPath" fill="currentColor" />
+                        <path
+                          :d="facingMarkerPath"
+                          :fill="'url(#location-arrow-' + point.id + ')'"
+                        />
+                      </svg>
+                      <span
+                        v-if="
+                          point.id === mapCurrentPoint?.id ||
+                          point.id === mapTargetPoint?.id
+                        "
+                        class="map-endpoint"
+                        :class="{
+                          'map-endpoint-target':
+                            point.id === mapTargetPoint?.id,
+                        }"
+                        aria-hidden="true"
+                        >{{ endpointBadge(point) }}</span
+                      >
                     </button>
                   </div>
                 </div>
@@ -303,6 +368,22 @@
         </footer>
       </div>
     </div>
+    <StationEndpointPicker
+      v-if="endpointPickerOpen"
+      :start-point="currentPoint"
+      :target-point="targetPoint"
+      @close="closeEndpointPicker"
+      @select="chooseEndpoint"
+      @map-pick="startMapPicking"
+    />
+    <StationTripDialog
+      v-if="tripDialog"
+      :key="tripDialog"
+      :direction="tripDirection"
+      :cancel-only="tripDialog === 'cancel'"
+      @continue="closeTripDialog"
+      @cancel="cancelTrip"
+    />
   </main>
 </template>
 
@@ -315,10 +396,13 @@ import {
   ref,
   watch,
 } from "vue";
+import { useRoute, useRouter } from "vue-router";
 // import DestinationSearch from "../components/DestinationSearch.vue";
 // import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationScanPanel from "../components/StationScanPanel.vue";
+import StationEndpointPicker from "../components/StationEndpointPicker.vue";
+import StationTripDialog from "../components/StationTripDialog.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import DisplayControls from "../components/DisplayControls.vue";
 import ZhuyinText from "../components/ZhuyinText.vue";
@@ -346,6 +430,13 @@ const pointDescription = (point) =>
   locale.value === "zh-TW"
     ? point.description
     : t("map.originalName", { name: point.name });
+const route = useRoute();
+const router = useRouter();
+const stationById = new Map(
+  stationPoints(stationData).map((point) => [point.id, point])
+);
+const currentPoint = computed(() => stationById.get(route.query.start));
+const targetPoint = computed(() => stationById.get(route.query.destination));
 // const searchCatalogEntries = stationCatalog(stationData);
 // let searchPointRevision = 0;
 const mobileZoomQuery = window.matchMedia(
@@ -386,16 +477,40 @@ const floorPalette = {
     onTone: "gray-50",
   },
 };
-const level = ref("B2");
+const level = ref(
+  currentPoint.value?.floor ?? targetPoint.value?.floor ?? "B2"
+);
 const showLayers = ref(false);
 const activeTheme = ref(null);
 const selected = ref(null);
+const endpointPickerOpen = ref(false);
+const tripDialog = ref(null);
+let tripTrigger = null;
+const mapPickStep = ref(null);
+const draftStart = ref(null);
+const floorControls = ref(null);
+let endpointTrigger = null;
+let pickerFocusPoint = null;
+const mapCurrentPoint = computed(() =>
+  mapPickStep.value ? draftStart.value : currentPoint.value
+);
+const mapTargetPoint = computed(() =>
+  mapPickStep.value ? null : targetPoint.value
+);
+const facingMarkerPath =
+  "M40 1 47.5 14C53 15.8 58 18.7 61 22H57C47.3 12.8 32.7 12.8 23 22H19C22 18.7 27 15.8 32.5 14Z";
 const scanPositionId = ref(null);
 const scanTargetId = ref(null);
 let scanFocusRevision = 0;
 async function focusScanPoint(point) {
   const revision = ++scanFocusRevision;
-  if (!point) return;
+  if (
+    !point ||
+    mapPickStep.value ||
+    endpointPickerOpen.value ||
+    tripDialog.value
+  )
+    return;
   floorAnimation?.cancel();
   clearMapDrag();
   clearPinch();
@@ -438,9 +553,14 @@ const mapSection = ref(null);
 const mapStage = ref(null);
 const mapTop = ref(0);
 const location = useStationLocation(stationData, stationConnections);
-const stationById = new Map(
-  stationPoints(stationData).map((point) => [point.id, point])
-);
+const tripDirection = computed(() => {
+  const { destinationId, relation } = location.view.value;
+  const connector = stationById.get(relation.steps[0]?.from.pointId);
+  if (connector)
+    return t("map.faceConnector", { name: placeName(connector, i18n) });
+  if (relation.status === "at_destination") return t("map.faceDestination");
+  return destinationId ? t("map.faceToDestination") : t("map.faceChoose");
+});
 watch(
   () => {
     const position = location.view.value.position;
@@ -456,7 +576,7 @@ watch(
   (id) => setScanTarget(stationById.get(id)),
   { flush: "post" }
 );
-watch(level, updateMapLayout, { flush: "post" });
+watch([level, mapPickStep], updateMapLayout, { flush: "post" });
 watch(displayMode, async () => {
   const frame = viewport.value;
   if (!frame) return;
@@ -484,7 +604,10 @@ onMounted(() => {
   for (const type of webkitGestures) {
     document.addEventListener(type, handleWebkitGesture, captureGesture);
   }
-  nextTick(() => centerOn(0.5, 0.5));
+  nextTick(() => {
+    const point = currentPoint.value ?? targetPoint.value;
+    centerOn(...(point ? normalizedPoint(point) : [0.5, 0.5]));
+  });
 });
 
 onBeforeUnmount(() => {
@@ -512,9 +635,6 @@ const floorPoints = computed(() => {
     ...current.filter((point) => isConnector(point)),
   ];
 });
-const visibleFloorPoints = computed(() =>
-  floorPoints.value.filter(isPointVisible)
-);
 const availableThemes = computed(() =>
   Object.keys(categories).filter((type) =>
     floorPoints.value.some((point) => matchesTheme(point, type))
@@ -655,6 +775,24 @@ function pinStyle(point) {
   };
 }
 
+function endpointBadge(point) {
+  const start =
+    point.id === mapCurrentPoint.value?.id ? t("map.badgeStart") : "";
+  const destination =
+    point.id === mapTargetPoint.value?.id ? t("map.badgeEnd") : "";
+  return start + destination;
+}
+
+function mapPointLabel(point) {
+  const badge = endpointBadge(point);
+  return (
+    pointName(point) +
+    (badge ? "・" + badge : "") +
+    (point.id === scanPositionId.value ? t("map.ariaYouAreHere") : "") +
+    (point.id === scanTargetId.value ? t("map.ariaDestination") : "")
+  );
+}
+
 function pointThemeStyle(type) {
   const primaryType = Array.isArray(type) ? type[0] : type;
   const category = categories[primaryType];
@@ -663,6 +801,7 @@ function pointThemeStyle(type) {
   return {
     "--point-icon-color": iconColor || paletteColor(colorToken),
     "--marker-base-color": iconColor || "#4a5258",
+    "--location-icon-ink": iconColor ? "#fdfefe" : "var(--surface)",
   };
 }
 
@@ -1080,9 +1219,123 @@ function placeConnectorPanel() {
   };
 }
 
+function openEndpointPicker(event) {
+  if (event) endpointTrigger = event.currentTarget;
+  selected.value = null;
+  mapPickStep.value = null;
+  draftStart.value = null;
+  endpointPickerOpen.value = true;
+}
+
+async function closeEndpointPicker() {
+  const trigger = endpointTrigger;
+  const point = pickerFocusPoint;
+  endpointTrigger = null;
+  pickerFocusPoint = null;
+  endpointPickerOpen.value = false;
+  await nextTick();
+  if (point && viewport.value) {
+    await showFloor(point.floor);
+    if (viewport.value && level.value === point.floor)
+      centerOn(...normalizedPoint(point));
+  }
+  trigger?.focus({ preventScroll: true });
+}
+
+function saveEndpoints(start, destination) {
+  return router.replace({
+    name: "station-map",
+    query: {
+      ...route.query,
+      start: start || undefined,
+      destination: destination || undefined,
+    },
+  });
+}
+
+function chooseEndpoint(start, destination, point, role) {
+  if (role === "destination" && !location.choose(destination ?? null)) return;
+  pickerFocusPoint = point;
+  const saved = saveEndpoints(start, destination);
+  if (role === "destination" && destination) openTripDialog();
+  return saved;
+}
+
+function planDestination(destination) {
+  const saved = saveEndpoints(currentPoint.value?.id, destination);
+  openTripDialog();
+  return saved;
+}
+
+function onQrScanned() {
+  const destination = targetPoint.value?.id;
+  if (destination && !location.view.value.destinationId)
+    location.choose(destination);
+  openTripDialog();
+}
+
+function openTripDialog(mode = "orientation") {
+  if (tripDialog.value || !viewport.value?.isConnected) return;
+  tripTrigger = endpointTrigger ?? document.activeElement;
+  endpointTrigger = null;
+  pickerFocusPoint = null;
+  endpointPickerOpen.value = false;
+  selected.value = null;
+  mapPickStep.value = null;
+  draftStart.value = null;
+  tripDialog.value = mode;
+}
+
+async function closeTripDialog() {
+  const trigger = tripTrigger;
+  tripTrigger = null;
+  tripDialog.value = null;
+  await nextTick();
+  (trigger?.isConnected ? trigger : viewport.value)?.focus({
+    preventScroll: true,
+  });
+}
+
+async function cancelTrip() {
+  originView.value = null;
+  arrivalPointId.value = null;
+  try {
+    await location.reset();
+    if (viewport.value?.isConnected) await saveEndpoints();
+  } finally {
+    await closeTripDialog();
+  }
+}
+
+async function startMapPicking() {
+  endpointPickerOpen.value = false;
+  pickerFocusPoint = null;
+  selected.value = null;
+  draftStart.value = null;
+  mapPickStep.value = "start";
+  await nextTick();
+  const controls = floorControls.value;
+  controls?.scrollIntoView({ block: "start" });
+  controls
+    ?.querySelector('.floor-switch button[aria-pressed="true"]')
+    ?.focus({ preventScroll: true });
+}
+
 async function selectMapPoint(point, event) {
   if (floorChanging.value) return;
   arrivalPointId.value = null;
+  if (mapPickStep.value === "start") {
+    draftStart.value = point;
+    mapPickStep.value = "destination";
+    return;
+  }
+  if (mapPickStep.value === "destination") {
+    const start = draftStart.value.id;
+    if (!location.choose(point.id)) return;
+    const saved = saveEndpoints(start, point.id);
+    openTripDialog();
+    return saved;
+  }
   selected.value = selected.value?.id === point.id ? null : point;
   if (!selected.value) return;
   if (zoom.value > 1) centerOn(...normalizedPoint(point));
