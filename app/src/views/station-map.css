@@ -259,8 +259,7 @@
   min-width: 0;
 }
 .map-card,
-.facility-card,
-.transfer-card {
+.facility-card {
   min-width: 0;
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -328,6 +327,16 @@
   fill: currentColor;
   transform: rotate(-12deg);
 }
+.map-window {
+  overflow: hidden;
+  overflow: clip;
+}
+.map-window[inert] {
+  pointer-events: none;
+}
+.map-viewport:focus-visible {
+  outline-offset: -3px;
+}
 .map-viewport {
   position: relative;
   min-height: 0;
@@ -336,7 +345,6 @@
   overflow: clip;
   touch-action: pan-x pan-y;
   border-block: 1px solid var(--border);
-  background: var(--station-map-background);
 }
 .map-zoomed {
   overflow: auto;
@@ -416,14 +424,9 @@
   width: 15px;
   height: 15px;
 }
-.pin-connector:not([aria-pressed="true"]):not(.pin-themed):not(.pin-route)
-  .pin-icon {
-  width: 22px;
-  height: 22px;
-}
 .map-pin[aria-pressed="true"],
 .map-pin:focus-visible,
-.pin-route {
+.pin-arrival {
   z-index: 2;
 }
 .pin-themed {
@@ -436,11 +439,13 @@
 .map-pin[aria-pressed="true"] .pin-icon {
   box-shadow: 0 0 0 3px var(--pin-color), 0 0 0 6px var(--surface);
 }
-.pin-route .pin-icon {
-  box-shadow: 0 0 0 3px var(--tp-secondary-500), 0 0 0 5px var(--surface);
+.pin-themed .point-dot {
+  outline: 1px solid var(--pin-color);
+  border-radius: 50%;
 }
-.map-pin[aria-pressed="true"] .point-dot {
-  outline: 2px solid var(--pin-color);
+.pin-arrival .point-dot {
+  outline: 2px solid var(--tp-secondary-700);
+  outline-offset: 2px;
   border-radius: 50%;
 }
 .map-pin:active .pin-icon {
@@ -566,29 +571,46 @@
 .theme-map-link {
   flex-shrink: 0;
 }
-.facility-detail {
+.connector-panel {
+  position: absolute;
+  z-index: 4;
   display: grid;
   gap: 4px;
-  padding: 12px;
-  min-height: 105px;
-  align-content: center;
-  border: 1px solid var(--border);
+  width: min(210px, calc(100% - 16px));
+  max-height: min(230px, 45vh);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 4px 8px 8px;
+  border: 1px solid var(--tp-primary-300);
   border-radius: 10px;
-  background: var(--wash);
+  background: var(--surface);
+  box-shadow: 0 4px 16px rgb(24 38 41 / 16%);
 }
-.facility-detail h3 {
-  font-size: 0.9375rem;
+.connector-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.facility-detail p:not(.eyebrow) {
-  color: var(--muted);
+.connector-heading h3 {
   font-size: 0.8125rem;
-  line-height: 1.55;
+  line-height: 1.4;
 }
-.connector-detail {
-  min-height: 0;
-  margin: 8px 12px;
+.connector-close {
+  flex: 0 0 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 1.2rem;
 }
-.connector-detail .floor-destination {
+.connector-panel p {
+  padding-block: 4px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+.floor-destination {
   margin-top: 0;
 }
 .detail-heading {
@@ -613,7 +635,7 @@
   gap: 8px;
   min-height: 44px;
   padding: 6px 9px;
-  margin-top: 5px;
+  width: 100%;
   border: 1px solid var(--tp-primary-300);
   border-radius: 7px;
   background: var(--surface);
@@ -674,125 +696,6 @@
   font-size: 0.6875rem;
   font-weight: 550;
 }
-.transfer-card {
-  padding: 12px;
-}
-.transfer-heading,
-.transfer-step > header {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.transfer-heading {
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.transfer-heading h2,
-.transfer-step h3 {
-  font-size: 1rem;
-  line-height: 1.4;
-}
-.transfer-heading .floor-tag {
-  font-size: 0.75rem;
-}
-.transfer-form {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  gap: 8px;
-}
-.transfer-form label {
-  display: grid;
-  gap: 4px;
-  flex: 1 1 180px;
-  min-width: 0;
-  color: var(--muted);
-  font-size: 0.75rem;
-}
-.transfer-form select {
-  width: 100%;
-  min-height: 44px;
-  border: 1px solid var(--tp-primary-400);
-  border-radius: 8px;
-  padding: 6px 8px;
-  background: var(--surface);
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.875rem;
-}
-.transfer-form select:focus-visible {
-  outline: 3px solid var(--accent);
-  outline-offset: 2px;
-}
-.transfer-form button {
-  min-height: 44px;
-  border: 1px solid var(--accent);
-  border-radius: 8px;
-  padding: 6px 10px;
-  background: var(--accent);
-  color: var(--surface);
-  font-size: 0.875rem;
-  font-weight: 750;
-}
-.transfer-card p.transfer-hint {
-  margin-top: 8px;
-  color: var(--muted);
-  font-size: 0.75rem;
-  line-height: 1.55;
-}
-.transfer-card p.transfer-message {
-  margin-top: 8px;
-  color: var(--tp-secondary-800);
-  font-size: 0.8125rem;
-}
-.transfer-results-list {
-  display: grid;
-  gap: 12px;
-  padding: 0;
-  margin: 10px 0 0;
-  list-style: none;
-}
-.transfer-step {
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--tp-gray-50);
-}
-.transfer-step > header {
-  margin-bottom: 8px;
-}
-.transfer-step > header p {
-  color: var(--muted);
-  font-size: 0.75rem;
-}
-.transfer-reveal {
-  display: grid;
-  grid-template-rows: 1fr;
-}
-.transfer-reveal-content {
-  min-height: 0;
-}
-.floor-reveal-enter-active,
-.floor-reveal-leave-active {
-  transition: grid-template-rows 260ms ease, opacity 220ms ease,
-    transform 260ms ease;
-}
-.floor-reveal-enter-active .transfer-reveal-content,
-.floor-reveal-leave-active .transfer-reveal-content {
-  overflow: hidden;
-}
-.floor-reveal-enter-from,
-.floor-reveal-leave-to {
-  grid-template-rows: 0fr;
-  opacity: 0;
-  transform: translateY(-14px);
-}
-@media (prefers-reduced-motion: reduce) {
-  .floor-reveal-enter-active,
-  .floor-reveal-leave-active {
-    transition: none;
-  }
-}
 .list-arrow {
   width: 14px;
   color: var(--tp-gray-700);
@@ -828,7 +731,7 @@
   .theme-map-link:hover,
   .layer-toggle:hover,
   .map-return:hover,
-  .clear-selection:hover,
+  .connector-close:hover,
   .floor-destination:hover,
   .facility-list button:hover {
     background: var(--wash);

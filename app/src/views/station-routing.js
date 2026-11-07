@@ -22,8 +22,8 @@ const transfers = graph.connections.flatMap((edge) => {
   ];
 });
 
-export function transferFromPoint(pointId) {
-  return transfers.find((transfer) => transfer.from.pointId === pointId);
+export function transfersFromPoint(pointId) {
+  return transfers.filter((transfer) => transfer.from.pointId === pointId);
 }
 
 export function planFloorTransfer(startZone, targetZone) {
