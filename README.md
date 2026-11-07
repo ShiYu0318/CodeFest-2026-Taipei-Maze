@@ -7,12 +7,13 @@ Taipei Maze 北車不迷路：QR 定位、局部跨樓層路網、圖像指引�
 - [本地測試環境](./docs/測試環境.md)：已安裝工具、實測結果、宿主位置及啟動指令。
 - [城市通開發指南](./docs/城市通開發指南.md)：環境、宿主／網頁整合、橋接、Mock、部署及授權檢查。
 - [2026 城市通入門指引 PDF](<./docs/2026 城市通入門指引.pdf>)：使用者提供的原始參考文件，保留原有權利。
+- [作品五大面向評估與發展建議](./docs/作品五大面向評估與發展建議.md)：可行性、功能性、可靠性、易用性、亮點，以及風險、驗證與延伸構想。
 - [產品與技術 SPEC](./docs/SPEC.md)：功能、資料契約、七語、離線及驗收。
 - [提案企劃書](./docs/提案企劃書.md)：構想與決策歷程，架構以最新版 SPEC 為準。
 - [競賽完整指南](./docs/2026-fall-competition-guide.md)：時程、規則與賽後義務；工作坊補充見開發指南。
 - [研究資料包](./data/README.md)：48 項來源索引、10 份官方 CSV、UTF-8／北車子集、地圖入口與處理方法；尚非已驗證的產品路網。
 
-目前已整理研究資料、處理工具及本地 TownPass 測試環境；宿主另放在相鄰 checkout，診斷入口以 patch 保存。本產品導航功能、前端 package／lockfile 與遠端 TownPass fork 尚未建立；實際環境驗證範圍以測試環境文件為準。既有 `compose.yml` 為 hello-world 設定，不是本產品服務。
+目前已有研究資料、處理工具、本地 TownPass 測試環境，以及 `app/` 的 Vue／TypeScript 城市服務範例基底與 package／lockfile。`compose.yml` 提供 nginx 正式容器設定，`compose.dev.yml` 提供 Vite 開發設定；這些基底不代表 Taipei Maze 導航功能已完成或部署驗證通過。宿主另放在相鄰 checkout，診斷入口以 patch 保存；遠端 TownPass fork 尚未建立，平台與整合實測範圍見測試環境文件。
 
 ## 授權與原始碼
 
