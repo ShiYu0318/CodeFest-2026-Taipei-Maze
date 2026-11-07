@@ -1,12 +1,12 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
   <section class="destination-search" :aria-labelledby="id + '-title'">
-    <h2 :id="id + '-title'">用名稱找設施</h2>
+    <h2 :id="id + '-title'">{{ t("search.title") }}</h2>
     <p class="search-hint">
-      七語詞典原型，詞彙尚待校對。只搜尋本頁已載入的設施，不使用遠端 AI。
+      {{ t("search.note") }}
     </p>
     <form @submit.prevent="submit">
-      <label :for="id + '-query'">設施名稱或簡單需求（最多 80 字）</label>
+      <label :for="id + '-query'">{{ t("search.label") }}</label>
       <div class="search-input-row">
         <input
           :id="id + '-query'"
@@ -15,10 +15,10 @@
           type="search"
           autocomplete="off"
           :spellcheck="false"
-          placeholder="廁所、restrom、nhà vệ sinh…"
+          :placeholder="t('search.placeholder')"
         />
         <button type="submit" :disabled="disabled || !query.trim()">
-          搜尋
+          {{ t("search.submit") }}
         </button>
       </div>
       <button
@@ -27,49 +27,49 @@
         :disabled="disabled"
         @click="query = ''"
       >
-        清除查詢
+        {{ t("search.clear") }}
       </button>
     </form>
     <p v-if="!navigation" class="search-hint">
-      本頁只查設施位置，不會規劃避樓梯或無障礙路線，也不判斷最近。
+      {{ t("search.scope") }}
     </p>
     <div v-if="result" role="status" aria-live="polite">
       <p>{{ statusText }}</p>
       <p v-if="result.unparsedTerms?.length" class="search-hint">
-        尚未理解：{{
-          result.unparsedTerms.join("、")
-        }}。請改用設施名稱或已支援的條件。
+        {{
+          t("search.unknown", {
+            terms: result.unparsedTerms.join(t("search.listSeparator")),
+          })
+        }}
       </p>
       <p v-if="selectable && restrictionText" class="search-conditions">
         {{ restrictionText }}
       </p>
       <p v-if="result.status === 'suggestionsOnly'" class="search-hint">
-        可能是「{{
-          result.matches[0]?.matchedAlias
-        }}」；請確認下方實際設施，不會自動導航。
+        {{ t("search.maybe", { term: result.matches[0]?.matchedAlias }) }}
       </p>
       <ul
         v-if="selectable && result.matches.length"
         class="search-results"
-        aria-label="搜尋到的設施"
+        :aria-label="t('search.results')"
       >
         <li v-for="match in result.matches" :key="match.poiId">
           <span
-            ><strong>{{ match.name }}</strong
+            ><strong>{{ matchName(match) }}</strong
             ><small
               >{{ match.floorId.toUpperCase() }} ·
               {{
                 match.matchType === "fuzzy"
-                  ? "錯字建議"
+                  ? t("search.typo")
                   : match.matchType === "exact"
-                  ? "名稱相符"
-                  : "詞典對應"
+                  ? t("search.exact")
+                  : t("search.dictionary")
               }}
-              · 可達性尚待確認</small
+              · {{ t("search.accessUnknown") }}</small
             ></span
           >
           <button :disabled="disabled" @click="choose(match)">
-            {{ navigation ? "確認設施與條件" : "在地圖上查看" }}
+            {{ navigation ? t("search.confirm") : t("search.showOnMap") }}
           </button>
         </li>
       </ul>
@@ -83,6 +83,8 @@
 import { computed, ref, shallowRef, watch } from "vue";
 import dictionary from "../search/dictionary.json";
 import { searchCatalog } from "../search/search.mjs";
+import { useI18n } from "../i18n/index.mjs";
+import { placeLabel } from "../i18n/places.mjs";
 const props = defineProps({
   id: { type: String, required: true },
   catalog: { type: Array, required: true },
@@ -99,6 +101,14 @@ const props = defineProps({
   clearToken: { type: Number, default: 0 },
 });
 const emit = defineEmits(["select"]);
+const i18n = useI18n();
+const { locale, t } = i18n;
+const matchName = (match) => {
+  const entry = props.catalog.find((item) => item.id === match.poiId);
+  return entry
+    ? placeLabel({ name: entry.name, type: entry.category }, i18n)
+    : match.name;
+};
 const query = ref(""),
   result = shallowRef(null),
   selectionNotice = ref("");
@@ -108,35 +118,40 @@ let submittedQuery = null,
 const selectable = computed(() =>
   ["matched", "suggestionsOnly"].includes(result.value?.status)
 );
+const statuses = new Set([
+  "matched",
+  "suggestionsOnly",
+  "noMatch",
+  "needsClarification",
+  "invalidInput",
+  "invalidDictionary",
+  "invalidCatalog",
+  "incomplete",
+]);
 const statusText = computed(() => {
   if (result.value?.reason === "nearestUnavailable")
-    return "最近排序尚未啟用，需新確認的起點與可用走道路網。請先改查設施名稱。";
-  return (
-    {
-      matched: `找到 ${result.value?.matches.length} 個設施，請自行確認選擇。`,
-      suggestionsOnly: "這是錯字建議，請確認你要找的設施。",
-      noMatch: "目前資料沒有符合條件的設施；不代表全站都沒有。",
-      needsClarification: "這段需求還不夠明確，請分開查詢一個目的地。",
-      invalidInput: "請輸入 1–80 字；全形字正規化後也不能超過 80 字。",
-      invalidDictionary: "詞典資料無法使用，請改用原有設施清單。",
-      invalidCatalog: "設施資料無法使用，請改用原有清單。",
-      incomplete: "查詢未完成，不能據此判定設施不存在。請改用較短名稱。",
-    }[result.value?.status] ?? ""
-  );
+    return t("search.nearestUnavailable");
+  const status = result.value?.status;
+  return statuses.has(status)
+    ? t(`search.status.${status}`, { count: result.value.matches.length })
+    : "";
 });
 const restrictionText = computed(() => {
   const options = result.value?.proposedOptions;
   if (!options) return "";
   const labels = [];
   if (options.mobilityProfile === "stepFree")
-    labels.push("保留／使用無階梯限制");
-  if (options.excludedEdgeTypes.includes("stairs")) labels.push("避開樓梯");
-  if (options.excludedEdgeTypes.includes("elevator")) labels.push("避開電梯");
-  if (options.unavailableConnectorIds.length) labels.push("保留本次不可用設備");
+    labels.push(t("search.cond.stepFree"));
+  if (options.excludedEdgeTypes.includes("stairs"))
+    labels.push(t("search.cond.avoidStairs"));
+  if (options.excludedEdgeTypes.includes("elevator"))
+    labels.push(t("search.cond.avoidElevator"));
+  if (options.unavailableConnectorIds.length)
+    labels.push(t("search.cond.keepUnavailable"));
   return labels.length
-    ? `${
-        props.navigation ? "選擇後套用：" : "解析到的條件（本頁不規劃路線）："
-      }${labels.join("、")}`
+    ? t(props.navigation ? "search.cond.apply" : "search.cond.parsed", {
+        list: labels.join(t("search.listSeparator")),
+      })
     : "";
 });
 watch(
@@ -157,7 +172,7 @@ watch(
 function submit() {
   result.value = searchCatalog(query.value, props.catalog, dictionary, {
     prototype: true,
-    uiLocale: "zh-TW",
+    uiLocale: locale.value,
     currentOptions: props.currentOptions,
   });
   submittedQuery = query.value;
@@ -173,7 +188,7 @@ function choose(match) {
     props.catalog !== submittedCatalog
   ) {
     result.value = null;
-    selectionNotice.value = "條件已變更，請重新搜尋。";
+    selectionNotice.value = t("search.changed");
     return;
   }
   emit("select", {
@@ -181,8 +196,8 @@ function choose(match) {
     proposedOptions: result.value.proposedOptions,
   });
   selectionNotice.value = props.navigation
-    ? "已選擇目的地；請依導航區提示確認位置與朝向。"
-    : "已切換至設施所在樓層並選取標點。";
+    ? t("search.selectedNav")
+    : t("search.selectedMap");
 }
 </script>
 
