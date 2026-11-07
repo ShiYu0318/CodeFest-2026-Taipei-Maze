@@ -37,6 +37,17 @@
         </option>
       </select>
     </label>
+    <label class="display-mode-label" data-tour-target="mode">
+      <span class="display-visually-hidden">{{ t("display.mode") }}</span>
+      <select
+        :value="displayMode"
+        @change="setDisplayMode($event.target.value)"
+      >
+        <option value="standard">{{ t("display.standard") }}</option>
+        <option value="child">{{ t("display.child") }}</option>
+        <option value="senior">{{ t("display.senior") }}</option>
+      </select>
+    </label>
     <button
       class="display-icon-button"
       data-tour-target="theme"
@@ -97,17 +108,6 @@
       </svg>
       <span class="display-visually-hidden">{{ t("display.contrast") }}</span>
     </button>
-    <label class="display-mode-label" data-tour-target="mode">
-      <span class="display-visually-hidden">{{ t("display.mode") }}</span>
-      <select
-        :value="displayMode"
-        @change="setDisplayMode($event.target.value)"
-      >
-        <option value="standard">{{ t("display.standard") }}</option>
-        <option value="child">{{ t("display.child") }}</option>
-        <option value="senior">{{ t("display.senior") }}</option>
-      </select>
-    </label>
   </div>
 </template>
 

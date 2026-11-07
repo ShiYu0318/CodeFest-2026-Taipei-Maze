@@ -10,20 +10,33 @@
       class="station-shell"
       :inert="endpointPickerOpen || tripDialog || informationOpen ? '' : null"
     >
-      <section class="station-heading" :aria-label="t('display.group')">
+      <section class="station-heading" :aria-label="t('map.toolbar')">
         <div class="station-title-row">
-          <button
-            class="display-icon-button"
-            data-tour-target="reopen"
-            type="button"
-            aria-haspopup="dialog"
-            :aria-label="t('tour.replay')"
-            :title="t('tour.replay')"
-            @click="tourOpen = true"
-          >
-            <StationMapIcon name="help" />
-          </button>
           <DisplayControls />
+          <div class="station-utility-actions">
+            <button
+              class="display-icon-button"
+              data-tour-target="reopen"
+              type="button"
+              aria-haspopup="dialog"
+              :aria-label="t('tour.replay')"
+              :title="t('tour.replay')"
+              @click="tourOpen = true"
+            >
+              <StationMapIcon name="help" />
+            </button>
+            <button
+              ref="informationButton"
+              type="button"
+              class="display-icon-button map-information-button"
+              aria-haspopup="dialog"
+              :aria-label="t('map.information')"
+              :title="t('map.information')"
+              @click="informationOpen = true"
+            >
+              <StationMapIcon name="info" />
+            </button>
+          </div>
         </div>
         <p v-if="displayMode !== 'standard'" class="display-floor-label">
           {{ level }}・<ZhuyinText :text="t('floor.' + level)" />
@@ -139,17 +152,6 @@
               class="map-stage"
               :style="{ '--map-top': mapTop * 1.5 + 'px' }"
             >
-              <button
-                ref="informationButton"
-                type="button"
-                class="map-information-button"
-                aria-haspopup="dialog"
-                :aria-label="t('map.information')"
-                :title="t('map.information')"
-                @click="informationOpen = true"
-              >
-                <StationMapIcon name="info" />
-              </button>
               <div class="map-corner">
                 <button
                   v-if="originView"

@@ -106,6 +106,7 @@ export default {
   "map.ariaYouAreHere": " คุณอยู่ที่นี่",
   "map.ariaDestination": " จุดหมาย",
   "map.youAreHere": "คุณอยู่ที่นี่",
+  "map.toolbar": "แถบเครื่องมือแผนที่",
   "map.information": "ข้อมูลแผนที่ แหล่งข้อมูล และใบอนุญาต",
   "about.mapNotes": "คำอธิบายและเอกสารอ้างอิงแผนที่",
   "map.footerNote":

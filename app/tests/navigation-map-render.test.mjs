@@ -11,6 +11,7 @@ import { transformSync } from "@babel/core";
 import * as i18n from "../src/i18n/index.mjs";
 import * as places from "../src/i18n/places.mjs";
 import * as preferences from "../src/display/preferences.mjs";
+import * as zhuyin from "../src/display/zhuyin.mjs";
 import * as floorPlans from "../src/views/station-floor-plans.mjs";
 import * as navigation from "../src/station/navigation-view.mjs";
 import * as scan from "../src/station/scan.mjs";
@@ -46,6 +47,9 @@ const realComponents = new Set([
   "StationTransferStep",
   "DestinationSearch",
   "StationScanPanel",
+  "DisplayControls",
+  "StationTripDialog",
+  "ZhuyinText",
 ]);
 function component(name) {
   if (components.has(name)) return components.get(name);
@@ -88,6 +92,7 @@ function component(name) {
     "index.mjs": i18n,
     "places.mjs": places,
     "preferences.mjs": preferences,
+    "zhuyin.mjs": zhuyin,
     "navigation-view.mjs": navigation,
     "scan.mjs": scan,
     "map-focus.mjs": mapFocus,
@@ -106,6 +111,7 @@ function component(name) {
   };
   const load = (path) => {
     const file = path.split("/").at(-1);
+    if (file.endsWith(".css")) return {};
     if (file.endsWith(".vue")) {
       const child = file.slice(0, -4);
       if (realComponents.has(child)) return component(child);
@@ -134,6 +140,50 @@ function component(name) {
   components.set(name, compiled.exports.default);
   return compiled.exports.default;
 }
+
+test("navigation prompts annotate only Traditional Chinese child mode", async () => {
+  const settings = preferences.useDisplayPreferences();
+  const language = i18n.useI18n();
+  const originalMode = settings.displayMode.value;
+  const originalLocale = language.locale.value;
+  const view = Vue.shallowRef(null);
+  const controller = createStationLocation({
+    data,
+    connections,
+    onChange: (state) => {
+      view.value = state;
+    },
+  });
+  controller.applyQuery({ point: "b1-e4" });
+  controller.choose("b4-e1");
+  const location = { view, scan() {} };
+  try {
+    for (const locale of ["zh-TW", "en"]) {
+      language.setLocale(locale);
+      for (const mode of ["standard", "senior", "child"]) {
+        settings.setDisplayMode(mode);
+        for (const [name, props] of [
+          ["StationNavigationRescan", { location }],
+          ["StationTripDialog", { direction: language.t("map.faceChoose") }],
+          ["StationTripDialog", { direction: "", cancelOnly: true }],
+        ]) {
+          const html = await renderToString(
+            Vue.createSSRApp(component(name), props)
+          );
+          assert.equal(
+            html.includes("<ruby"),
+            mode === "child" && locale === "zh-TW",
+            `${name}: ${locale}/${mode}/${!!props.cancelOnly}`
+          );
+        }
+      }
+    }
+  } finally {
+    controller.dispose();
+    language.setLocale(originalLocale);
+    settings.setDisplayMode(originalMode);
+  }
+});
 
 test("the map renders only needed icons during a trip, keeps QR markers and inline scanning, then restores browsing", async () => {
   const previousWindow = globalThis.window;
@@ -327,7 +377,10 @@ test("the rendered floor action names its target, rejects a repeated old click a
   });
   const action = () =>
     nodes.findLast((node) => node.class === "confirm-floor-transfer");
-  const heading = () => nodes.findLast((node) => node.tag === "h3").text;
+  const textContent = (node) =>
+    (node.text || "") + (node.children || []).map(textContent).join("");
+  const heading = () =>
+    textContent(nodes.findLast((node) => node.tag === "h3"));
   const reply = (payload) => {
     for (const receiver of receivers)
       receiver({
@@ -341,7 +394,7 @@ test("the rendered floor action names its target, rejects a repeated old click a
     app.mount({ children: [] });
     const qr = nodes.find((node) => node["data-tour-target"] === "scan");
     assert.match(heading(), /電梯.*B2/);
-    assert.equal(action().text, "我已下樓");
+    assert.equal(textContent(action()), "我已下樓");
     const firstClick = action().onClick;
     firstClick();
     firstClick(); // Same rendered handler, before Vue updates its DOM.
@@ -361,7 +414,7 @@ test("the rendered floor action names its target, rejects a repeated old click a
     await Vue.nextTick();
     assert.equal(view.value.manualPosition, null);
     assert.match(heading(), /B2/);
-    assert.equal(action().text, "我已上樓");
+    assert.equal(textContent(action()), "我已上樓");
     action().onClick();
     await Vue.nextTick();
     assert.equal(view.value.navigationPosition.floor, "B2");
@@ -443,7 +496,17 @@ test("map sources stay behind an information entry rather than consuming map foo
       false
     );
     assert.ok(html.includes('aria-haspopup="dialog"'));
-    assert.ok(html.includes('class="map-information-button"'));
+    const info = html.indexOf("map-information-button");
+    assert.ok(info >= 0 && info < html.indexOf('class="map-stage"'));
+    const ordered = ["language", "mode", "theme", "contrast", "reopen"].map(
+      (target) => html.indexOf('data-tour-target="' + target + '"')
+    );
+    assert.ok(ordered.every((index) => index >= 0));
+    assert.deepEqual(
+      [...ordered].sort((a, b) => a - b),
+      ordered
+    );
+    assert.ok(ordered.at(-1) < info);
   } finally {
     globalThis.window = previousWindow;
   }

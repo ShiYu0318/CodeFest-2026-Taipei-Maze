@@ -112,6 +112,7 @@ export default {
   "map.ariaYouAreHere": ", Anda di sini",
   "map.ariaDestination": ", tujuan",
   "map.youAreHere": "Anda di sini",
+  "map.toolbar": "Bilah alat peta",
   "map.information": "Informasi peta, sumber, dan lisensi",
   "about.mapNotes": "Catatan dan referensi peta",
   "map.footerNote":

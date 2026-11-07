@@ -105,10 +105,16 @@
 }
 .station-title-row {
   display: flex;
-  flex-wrap: nowrap;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   min-height: 44px;
+}
+.station-utility-actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  margin-left: auto;
 }
 .station-heading h1 {
   flex: 1 1 auto;
@@ -128,8 +134,10 @@
   white-space: normal;
 }
 .station-title-row .display-controls {
-  margin-left: auto;
+  flex: 1 1 240px;
+  justify-content: flex-start;
   flex-wrap: wrap;
+  margin: 0;
 }
 .station-page .station-heading .display-floor-label {
   margin-top: 10px;
@@ -738,25 +746,6 @@
   width: 14px;
   color: var(--tp-gray-700);
 }
-.map-information-button {
-  position: absolute;
-  z-index: 3;
-  right: 10px;
-  top: 10px;
-  display: grid;
-  place-items: center;
-  width: var(--display-control-height, 44px);
-  min-height: var(--display-control-height, 44px);
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  background: var(--surface);
-  color: var(--ink);
-  box-shadow: 0 2px 8px rgb(8 19 21 / 12%);
-  cursor: pointer;
-}
-.map-information-button svg { width: 24px; height: 24px; }
-
 @media (hover: hover) {
   .floor-switch button:not([aria-pressed="true"]):hover {
     border-color: var(--floor-ink);

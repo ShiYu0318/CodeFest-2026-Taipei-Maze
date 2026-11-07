@@ -108,6 +108,7 @@ export default {
   "map.ariaYouAreHere": ", 현재 위치",
   "map.ariaDestination": ", 목적지",
   "map.youAreHere": "현재 위치",
+  "map.toolbar": "지도 도구 모음",
   "map.information": "지도 안내, 출처 및 라이선스",
   "about.mapNotes": "지도 설명 및 참고 자료",
   "map.footerNote":

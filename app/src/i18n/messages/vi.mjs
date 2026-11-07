@@ -112,6 +112,7 @@ export default {
   "map.ariaYouAreHere": ", bạn đang ở đây",
   "map.ariaDestination": ", điểm đến",
   "map.youAreHere": "Bạn đang ở đây",
+  "map.toolbar": "Thanh công cụ bản đồ",
   "map.information": "Thông tin bản đồ, nguồn và giấy phép",
   "about.mapNotes": "Ghi chú và tài liệu bản đồ",
   "map.footerNote":
