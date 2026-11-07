@@ -447,11 +447,19 @@
 .map-pin[aria-pressed="true"] .pin-icon {
   box-shadow: 0 0 0 3px var(--pin-color), 0 0 0 6px var(--surface);
 }
-.pin-themed .point-dot {
+.point-icon {
+  display: block;
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  color: var(--pin-color);
+  pointer-events: none;
+}
+.pin-themed .point-icon {
   outline: 1px solid var(--pin-color);
   border-radius: 50%;
 }
-.pin-arrival .point-dot {
+.pin-arrival .point-icon {
   outline: 2px solid var(--tp-secondary-700);
   outline-offset: 2px;
   border-radius: 50%;

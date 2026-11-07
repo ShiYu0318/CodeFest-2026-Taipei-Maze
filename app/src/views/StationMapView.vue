@@ -156,14 +156,11 @@
                       <span v-if="point.id === selected?.id" class="pin-icon">
                         <StationMapIcon :name="point.type" />
                       </span>
-                      <svg
+                      <StationMapIcon
                         v-else
-                        class="point-dot"
-                        viewBox="0 0 12 12"
-                        aria-hidden="true"
-                      >
-                        <circle cx="6" cy="6" r="5" />
-                      </svg>
+                        class="point-icon"
+                        :name="point.type"
+                      />
                     </button>
                   </div>
                 </div>
