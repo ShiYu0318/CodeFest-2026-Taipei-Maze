@@ -4,12 +4,17 @@ export function navigationMapState(
   session,
   { startId = null, targetId = null, picking = false } = {}
 ) {
-  const origin =
-    (session.navigationPosition ?? session.position)?.pointId ?? startId;
+  const sessionOrigin = (session.navigationPosition ?? session.position)
+    ?.pointId;
+  const origin = startId ?? sessionOrigin;
   const destination = session.destinationId ?? targetId;
   const active = !!origin && !!destination && !picking;
   const ids = new Set([origin, destination].filter(Boolean));
-  if (active && session.relation?.status === "connections")
+  if (
+    active &&
+    origin === sessionOrigin &&
+    session.relation?.status === "connections"
+  )
     for (const edge of session.relation.steps) {
       if (edge.from?.pointId) ids.add(edge.from.pointId);
       if (edge.to?.pointId) ids.add(edge.to.pointId);
@@ -17,9 +22,15 @@ export function navigationMapState(
   return { active, pointIds: [...ids] };
 }
 
-export function navigationPointVisible(point, navigation, matchesTheme = true) {
+export function navigationPointVisible(
+  point,
+  navigation,
+  matchesTheme = true,
+  hasSelectedTheme = false
+) {
   if (!navigation.active) return matchesTheme;
   return (
+    (hasSelectedTheme && matchesTheme) ||
     [point.type].flat().includes("qrcode") ||
     navigation.pointIds.includes(point.id)
   );

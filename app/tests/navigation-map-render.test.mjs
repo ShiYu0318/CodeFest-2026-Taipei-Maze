@@ -16,6 +16,7 @@ import * as floorPlans from "../src/views/station-floor-plans.mjs";
 import * as navigation from "../src/station/navigation-view.mjs";
 import * as scan from "../src/station/scan.mjs";
 import * as mapFocus from "../src/station/map-focus.mjs";
+import * as demoScenarios from "../src/station/demo-scenarios.mjs";
 import * as nearestAction from "../src/station/nearest-action.mjs";
 import * as stepText from "../src/station/step-text.mjs";
 import * as walkRoute from "../src/station/walk-route.mjs";
@@ -48,10 +49,13 @@ const realComponents = new Set([
   "StationB2Plan",
   "StationMapIcon",
   "StationNavigationRescan",
+  "StationRescanDialog",
   "StationTransferStep",
   "DestinationSearch",
   "StationScanPanel",
   "StationEndpointBar",
+  "StationFacilityPicker",
+  "StationDemoPanel",
   "DisplayControls",
   "StationTripDialog",
   "StationRouteSteps",
@@ -107,6 +111,7 @@ function component(name) {
     "walk-route.mjs": walkRoute,
     "step-text.mjs": stepText,
     "nearest-action.mjs": nearestAction,
+    "demo-scenarios.mjs": demoScenarios,
     "place-share.mjs": placeShare,
     "walking-network.json": JSON.parse(
       readFileSync(
@@ -234,20 +239,24 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
   }
   try {
     const browsing = await render({});
+    assert.equal(browsing.includes('class="demo-panel"'), false);
+    const rehearsal = await render({ demo: "1" });
+    assert.ok(rehearsal.includes('class="demo-panel"'));
     assert.equal(
       (browsing.match(/class="map-pin\b/g) ?? []).length,
       data.points.B2.length
     );
     assert.ok(browsing.includes('class="theme-group'));
     assert.ok(
-      browsing.includes('class="walk-nearest-button"'),
+      browsing.includes('class="theme-group'),
       "nearest facilities remain visible before locating"
     );
     assert.equal(browsing.includes('class="navigation-rescan-bar"'), false);
     const trip = await render({ start: "b1-e4", destination: "m-e4" });
     assert.equal((trip.match(/class="map-pin\b/g) ?? []).length, 9);
     assert.ok(trip.includes('class="navigation-rescan-bar"'));
-    assert.equal(trip.includes('class="theme-group'), false);
+    assert.equal(trip.includes('class="theme-group'), true);
+    assert.ok(trip.includes('class="facility-nearest-option"'));
     assert.equal(trip.includes('class="plan-stairs"'), false);
     assert.ok(trip.includes('class="station-scan-panel'));
     assert.ok(
@@ -255,6 +264,11 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
       "manual endpoints expose a direct go button without a scan prerequisite"
     );
     assert.ok(trip.includes("重新掃描定位"));
+    assert.equal(
+      trip.includes('class="scan-caveat"'),
+      false,
+      "compact start field does not duplicate long notes"
+    );
     const restored = await render({});
     assert.equal(
       (restored.match(/class="map-pin\b/g) ?? []).length,
@@ -267,6 +281,8 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
 });
 
 test("the real inline scan button calls TownPass once, handles cancel and can relocate without changing the target", async () => {
+  const previousDocument = globalThis.document;
+  globalThis.document = { activeElement: null };
   const replies = new Set(),
     messages = [];
   const native = {
@@ -289,11 +305,22 @@ test("the real inline scan button calls TownPass once, handles cancel and can re
   view.value = controller.snapshot();
   const location = { view, scan: () => controller.scan() };
   let button,
+    confirmButton,
     scanned = 0;
   const renderer = Vue.createRenderer({
     createElement(tag) {
       const node = { children: [] };
       node.tag = tag;
+      node.setAttribute = (key, value) => {
+        node[key] = value;
+      };
+      node.querySelector = () =>
+        node.children.find((child) => child.tag === "button") ?? null;
+      node.focus = () => {
+        globalThis.document.activeElement = node;
+      };
+      node.close = () => {};
+
       return node;
     },
     createText: (text) => ({ text }),
@@ -314,6 +341,7 @@ test("the real inline scan button calls TownPass once, handles cancel and can re
     patchProp(node, key, _, value) {
       node[key] = value;
       if (key === "data-tour-target" && value === "scan") button = node;
+      if (key === "data-rescan-confirm") confirmButton = node;
     },
   });
   const reply = (payload) => {
@@ -331,9 +359,17 @@ test("the real inline scan button calls TownPass once, handles cancel and can re
   try {
     app.mount({ children: [] });
     assert.equal(button.disabled, false);
-    const cancelled = button.onClick();
+    button.onClick();
     await Vue.nextTick();
-    assert.equal(button.disabled, true);
+    assert.equal(
+      messages.length,
+      0,
+      "opening the overlay does not start the camera"
+    );
+    assert.ok(confirmButton, "the current page has a confirmation overlay");
+    const cancelled = confirmButton.onClick();
+    await Vue.nextTick();
+    assert.equal(confirmButton.disabled, true);
     assert.deepEqual(messages, [{ name: "qr_code_scan", data: null }]);
     assert.equal((await controller.scan()).type, "Busy");
     reply(null);
@@ -341,7 +377,7 @@ test("the real inline scan button calls TownPass once, handles cancel and can re
     await Vue.nextTick();
     assert.equal(button.disabled, false);
     assert.equal(scanned, 0);
-    const pending = button.onClick();
+    const pending = confirmButton.onClick();
     reply(scan.stationQrPayload("b2-qr-01", data));
     await pending;
     await Vue.nextTick();
@@ -353,6 +389,7 @@ test("the real inline scan button calls TownPass once, handles cancel and can re
   } finally {
     app.unmount();
     controller.dispose();
+    globalThis.document = previousDocument;
   }
 });
 
@@ -383,9 +420,20 @@ test("the rendered floor action names its target, rejects a repeated old click a
     scan: () => controller.scan(),
     confirmTransfer: (token) => controller.confirmTransfer(token),
   };
+  const previousDocument = globalThis.document;
+  globalThis.document = { activeElement: null };
   const renderer = Vue.createRenderer({
     createElement(tag) {
       const node = { tag, children: [] };
+      node.setAttribute = (key, value) => {
+        node[key] = value;
+      };
+      node.querySelector = () =>
+        node.children.find((child) => child.tag === "button") ?? null;
+      node.focus = () => {
+        globalThis.document.activeElement = node;
+      };
+      node.close = () => {};
       nodes.push(node);
       return node;
     },
@@ -439,7 +487,11 @@ test("the rendered floor action names its target, rejects a repeated old click a
     firstClick(); // Removed button cannot advance the new step either.
     assert.equal(view.value.navigationPosition.floor, "B2");
     assert.equal(qr.disabled, false);
-    const pending = qr.onClick();
+    qr.onClick();
+    await Vue.nextTick();
+    const pending = nodes
+      .findLast((node) => Object.hasOwn(node, "data-rescan-confirm"))
+      .onClick();
     await Vue.nextTick();
     assert.equal(action().disabled, true);
     assert.equal(qr.disabled, true);
@@ -459,6 +511,7 @@ test("the rendered floor action names its target, rejects a repeated old click a
     app.unmount();
     controller.dispose();
     language.setLocale(previousLocale);
+    globalThis.document = previousDocument;
   }
 });
 
@@ -501,6 +554,12 @@ test("endpoint picker exposes search with the active start or destination role",
       const html = await renderToString(
         Vue.createSSRApp(component("StationEndpointPicker"), { startPoint })
       );
+      for (const floor of ["1F", "B1", "B2", "B3", "B4"]) {
+        assert.ok(
+          html.includes(`data-endpoint-floor="${floor}"`),
+          `${floor} has its own collapsible group`
+        );
+      }
       assert.ok(html.includes('id="endpoint-' + role + '-search-query"'));
       assert.ok(html.includes(title));
       const form = html.indexOf('type="search"');

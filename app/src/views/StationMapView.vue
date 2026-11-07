@@ -9,11 +9,31 @@
     <div
       class="station-shell"
       :inert="
-        endpointPickerOpen || tripDialog || informationOpen || guideOpen
+        endpointPickerOpen ||
+        tripDialog ||
+        informationOpen ||
+        guideOpen ||
+        rescanOpen
           ? ''
           : null
       "
     >
+      <StationDemoPanel
+        v-if="demoEnabled"
+        :busy="demoBusy || location.view.value.active"
+        :can-advance="
+          walk.type === 'success' && !!demoNextPoint(walkSteps, walkStepIndex)
+        "
+        :can-arrive="walk.type === 'success'"
+        :has-destination="!!walkDestination"
+        :notice="demoNotice"
+        @scenario="loadDemoScenario"
+        @advance="advanceDemo"
+        @arrive="arriveDemo"
+        @outage="demoElevatorOutage"
+        @reset="loadDemoScenario(demoScenarioId)"
+        @exit="exitDemo"
+      />
       <section class="station-heading" :aria-label="t('map.toolbar')">
         <div class="station-title-row">
           <DisplayControls />
@@ -77,22 +97,14 @@
       >
         <ZhuyinText :text="t('map.goHere')" />
       </button>
-      <div class="walk-nearest" role="group" :aria-label="t('walk.nearest')">
-        <span class="walk-nearest-label"
-          ><ZhuyinText :text="t('walk.nearest')"
-        /></span>
-        <button
-          v-for="category in nearestCategories"
-          :key="category"
-          type="button"
-          class="walk-nearest-button"
-          :disabled="location.view.value.active || nearestBusy"
-          @click="goNearest(category)"
-        >
-          <StationMapIcon :name="category" />
-          <ZhuyinText :text="t('type.' + category)" />
-        </button>
-      </div>
+      <StationFacilityPicker
+        :categories="availableThemes"
+        :category="activeTheme"
+        :points="stationCatalogPoints"
+        :busy="location.view.value.active || nearestBusy"
+        @category="toggleTheme"
+        @go="goFacilityCategory"
+      />
       <p
         v-if="nearestNotice"
         class="walk-status"
@@ -180,28 +192,6 @@
             <StationMapIcon name="layers" />
           </button>
         </div>
-      </div>
-
-      <div
-        v-if="!navigationMap.active || tourOpen"
-        class="theme-group horizontal-scroll"
-        data-tour-target="facilities"
-        role="group"
-        :aria-label="t('map.themesAria')"
-        tabindex="0"
-        @wheel="scrollHorizontallyWithWheel"
-      >
-        <button
-          v-for="type in availableThemes"
-          :key="type"
-          type="button"
-          :aria-pressed="activeTheme === type"
-          @click="toggleTheme(type)"
-        >
-          <StationMapIcon :name="type" /><ZhuyinText
-            :text="t('type.' + type)"
-          />
-        </button>
       </div>
 
       <div v-if="mapPickStep" class="map-pick-instructions">
@@ -615,10 +605,20 @@
       :available="location.view.value.available"
       :active="location.view.value.active"
       :has-destination="!!walkDestination"
+      :demo="demoEnabled"
+      :demo-busy="demoBusy"
+      @demo-advance="advanceDemo"
+      @demo-arrive="arriveDemo"
       @close="closeGuide"
       @scan="scanGuide"
       @destination="chooseGuideDestination"
       @update:index="goWalkStep"
+    />
+    <StationRescanDialog
+      v-if="rescanOpen"
+      :location="location"
+      @close="rescanOpen = false"
+      @scanned="onQrScanned"
     />
     <StationTripDialog
       v-if="tripDialog"
@@ -655,8 +655,18 @@ import StaffCard from "../components/StaffCard.vue";
 import PlaceShareSheet from "../components/PlaceShareSheet.vue";
 import { readSharedPlace } from "../station/place-share.mjs";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
+import StationFacilityPicker from "../components/StationFacilityPicker.vue";
 import StationEndpointBar from "../components/StationEndpointBar.vue";
 import StationInformationDialog from "../components/StationInformationDialog.vue";
+import StationDemoPanel from "../components/StationDemoPanel.vue";
+import {
+  DEMO_SCENARIOS,
+  demoScenarioQuery,
+  demoPositionQuery,
+  leaveDemoQuery,
+  demoNextPoint,
+} from "../station/demo-scenarios.mjs";
+import StationRescanDialog from "../components/StationRescanDialog.vue";
 import StationNavigationGuide from "../components/StationNavigationGuide.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
 import StationRouteSteps from "../components/StationRouteSteps.vue";
@@ -712,9 +722,14 @@ const pointDescription = (point) =>
     : t("map.originalName", { name: point.name });
 const route = useRoute();
 const router = useRouter();
+const demoEnabled = computed(() => route.query.demo === "1");
+const demoBusy = ref(false),
+  demoNotice = ref(""),
+  demoScenarioId = ref("restroom");
 const stationById = new Map(
   stationPoints(stationData).map((point) => [point.id, point])
 );
+const stationCatalogPoints = [...stationById.values()];
 const location = useStationLocation(stationData, stationConnections);
 const currentPoint = computed(() =>
   stationById.get(route.query.start ?? location.view.value.position?.pointId)
@@ -775,6 +790,7 @@ const selected = ref(null);
 const endpointPickerOpen = ref(false);
 const tripDialog = ref(null);
 const guideOpen = ref(false);
+const rescanOpen = ref(false);
 const nearestBusy = ref(false);
 let tripTrigger = null;
 const mapPickStep = ref(null);
@@ -848,7 +864,6 @@ let mapBoardObserver;
 
 // Walking network: routes, nearest facilities and the first-step arrow.
 const walkRouter = walkingRouter(walkingNetwork);
-const nearestCategories = ["restroom", "elevator", "info", "water", "nursing"];
 const walkStart = computed(
   () => currentPoint.value?.id ?? location.view.value.position?.pointId ?? null
 );
@@ -937,7 +952,7 @@ async function goNearest(category) {
   if (
     location.view.value.active ||
     nearestBusy.value ||
-    !nearestCategories.includes(category)
+    !Object.hasOwn(categories, category)
   )
     return;
   nearestBusy.value = true;
@@ -971,6 +986,15 @@ async function goNearest(category) {
   } finally {
     nearestBusy.value = false;
   }
+}
+async function goFacilityCategory({ category, nearest, pointId }) {
+  if (!Object.hasOwn(categories, category) || location.view.value.active)
+    return;
+  if (nearest) return goNearest(category);
+  const point = stationById.get(pointId);
+  if (!point || point.enabled === false || !matchesTheme(point, category))
+    return;
+  return chooseEndpoint(walkStart.value, point.id, point, "destination");
 }
 const nearestNotice = ref("");
 // Place sharing: a fixed place for a friend, never a live position.
@@ -1096,14 +1120,16 @@ const allFloorPoints = computed(() => {
 });
 const floorPoints = computed(() =>
   allFloorPoints.value.filter((point) =>
-    navigationPointVisible(point, navigationMap.value)
+    navigationPointVisible(
+      point,
+      navigationMap.value,
+      !activeTheme.value || matchesTheme(point, activeTheme.value),
+      !!activeTheme.value
+    )
   )
 );
-const availableThemes = computed(() =>
-  Object.keys(categories).filter((type) =>
-    allFloorPoints.value.some((point) => matchesTheme(point, type))
-  )
-);
+const availableThemes = computed(() => Object.keys(categories));
+
 const bounds = computed(() => {
   const floor = floors[level.value];
   const [left, top, width, height] =
@@ -1210,7 +1236,8 @@ function isPointVisible(point) {
   return navigationPointVisible(
     point,
     navigationMap.value,
-    !activeTheme.value || matchesTheme(point, activeTheme.value)
+    !activeTheme.value || matchesTheme(point, activeTheme.value),
+    !!activeTheme.value
   );
 }
 
@@ -1760,11 +1787,99 @@ function planDestination(destination) {
   );
 }
 
-function onQrScanned() {
+function onQrScanned({ rescan = false } = {}) {
   const destination = targetPoint.value?.id;
   if (destination && !location.view.value.destinationId)
     location.choose(destination);
-  openGuide();
+  if (!rescan) openGuide();
+  else if (guideOpen.value && walkSteps.value.length) goWalkStep(0);
+}
+
+async function loadDemoScenario(id) {
+  if (!demoEnabled.value || demoBusy.value || location.view.value.active)
+    return;
+  const scenario = DEMO_SCENARIOS.find((item) => item.id === id);
+  const query = demoScenarioQuery(route.query, id);
+  if (!scenario || !query) return;
+  demoBusy.value = true;
+  demoNotice.value = "";
+  try {
+    guideOpen.value = false;
+    await location.reset();
+    location.setStepFree(scenario.stepFree);
+    await router.replace({ name: "station-map", query });
+    await nextTick();
+    location.choose(scenario.destination);
+    demoScenarioId.value = id;
+    nearestNotice.value = "";
+    if (walkSteps.value.length) await goWalkStep(0);
+  } catch {
+    demoNotice.value = t("demo.error");
+  } finally {
+    demoBusy.value = false;
+  }
+}
+async function simulateDemoPosition(pointId) {
+  if (
+    !demoEnabled.value ||
+    demoBusy.value ||
+    location.view.value.active ||
+    walk.value.type !== "success"
+  )
+    return;
+  const query = demoPositionQuery(route.query, pointId, stationData);
+  if (!query) return;
+  demoBusy.value = true;
+  demoNotice.value = "";
+  try {
+    await router.replace({ name: "station-map", query });
+    await nextTick();
+    if (walkSteps.value.length) await goWalkStep(0);
+  } catch {
+    demoNotice.value = t("demo.error");
+  } finally {
+    demoBusy.value = false;
+  }
+}
+function advanceDemo() {
+  return simulateDemoPosition(
+    demoNextPoint(walkSteps.value, walkStepIndex.value)
+  );
+}
+function arriveDemo() {
+  return simulateDemoPosition(walkDestination.value);
+}
+function demoElevatorOutage() {
+  if (
+    !demoEnabled.value ||
+    demoBusy.value ||
+    location.view.value.active ||
+    !walkDestination.value
+  )
+    return;
+  location.searchSelect({
+    poiId: walkDestination.value,
+    proposedOptions: { excludedEdgeTypes: ["elevator"] },
+  });
+}
+async function exitDemo() {
+  if (!demoEnabled.value || demoBusy.value || location.view.value.active)
+    return;
+  demoBusy.value = true;
+  demoNotice.value = "";
+  try {
+    guideOpen.value = false;
+    await location.reset();
+    location.setStepFree(false);
+    await router.replace({
+      name: "station-map",
+      query: leaveDemoQuery(route.query),
+    });
+  } catch {
+    demoNotice.value = t("demo.error");
+  } finally {
+    demoBusy.value = false;
+  }
 }
 
 function openGuide() {
@@ -1783,10 +1898,8 @@ async function closeGuide() {
   await nextTick();
   viewport.value?.focus({ preventScroll: true });
 }
-async function scanGuide() {
-  if (location.view.value.active) return;
-  const result = await location.scan();
-  if (result.type === "success" && guideOpen.value) onQrScanned();
+function scanGuide() {
+  if (!location.view.value.active) rescanOpen.value = true;
 }
 async function chooseGuideDestination() {
   await closeGuide();

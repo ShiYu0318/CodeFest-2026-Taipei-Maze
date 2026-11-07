@@ -17,6 +17,7 @@
         <ZhuyinText :text="t('guide.map')" />
       </button>
     </header>
+    <p v-if="demo" class="guide-demo-note">{{ t("demo.notice") }}</p>
     <div class="guide-body">
       <p v-if="active" role="status">{{ t("notice.waiting") }}</p>
       <StationRouteSteps
@@ -32,7 +33,33 @@
       <p v-if="notice" role="status">{{ notice }}</p>
       <p v-if="!available">{{ t("scan.needApp") }}</p>
     </div>
+    <details class="guide-help">
+      <summary>{{ t("guide.help") }}</summary>
+      <p>{{ t("walk.arrowNote") }}</p>
+      <p>{{ t("scan.caveat") }}</p>
+    </details>
     <footer class="guide-actions">
+      <template v-if="demo">
+        <button
+          type="button"
+          :disabled="
+            active ||
+            demoBusy ||
+            !steps.length ||
+            steps[index]?.kind === 'arrive'
+          "
+          @click="emit('demo-advance')"
+        >
+          {{ t("demo.advance") }}
+        </button>
+        <button
+          type="button"
+          :disabled="active || demoBusy || !steps.length"
+          @click="emit('demo-arrive')"
+        >
+          {{ t("demo.arrive") }}
+        </button>
+      </template>
       <button
         type="button"
         :disabled="active || !available"
@@ -66,8 +93,17 @@ defineProps({
   available: { type: Boolean, default: false },
   active: { type: Boolean, default: false },
   hasDestination: { type: Boolean, default: true },
+  demo: { type: Boolean, default: false },
+  demoBusy: { type: Boolean, default: false },
 });
-const emit = defineEmits(["close", "scan", "destination", "update:index"]);
+const emit = defineEmits([
+  "close",
+  "scan",
+  "destination",
+  "update:index",
+  "demo-advance",
+  "demo-arrive",
+]);
 const { t } = useI18n();
 const panel = ref(null);
 let trigger;
@@ -198,5 +234,18 @@ function keepFocus(event) {
   .guide-body :deep(.route-step-text) {
     animation: none;
   }
+}
+.guide-demo-note {
+  margin: 0;
+  padding: 8px;
+  border: 2px dashed var(--tp-primary-500);
+  border-radius: 10px;
+  font-weight: 700;
+}
+.guide-help summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 }
 </style>

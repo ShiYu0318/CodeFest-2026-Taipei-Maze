@@ -3,231 +3,296 @@
   <section
     class="station-scan-panel"
     :class="{ 'is-embedded': embedded }"
-    aria-labelledby="station-scan-heading"
+    :aria-labelledby="embedded ? undefined : 'station-scan-heading'"
+    :aria-label="embedded ? t('scan.scan') : undefined"
   >
-    <div class="scan-heading" :class="{ 'visually-hidden': embedded }">
-      <h2 id="station-scan-heading">
-        <ZhuyinText
-          :text="
-            view.mode === 'navigation' || persistentScan
-              ? t('scan.navigation')
-              : t('scan.browsing')
-          "
+    <template v-if="embedded">
+      <div class="compact-scan-actions">
+        <StationNavigationRescan
+          v-if="persistentScan || position"
+          compact
+          :location="location"
+          @scanned="emit('scanned', $event)"
         />
-      </h2>
-    </div>
-    <p class="scan-caveat">
-      {{ t("scan.caveat") }}
-    </p>
-    <p v-if="view.mode === 'browsing' && !embedded">
-      <ZhuyinText :text="t('scan.browseHint')" />
-    </p>
-    <template v-if="view.mode === 'navigation'">
-      <DestinationSearch
-        id="station-navigation-search"
-        :catalog="searchEntries"
-        navigation
-        :disabled="active"
-        :current-options="options"
-        @select="searchSelect"
-      />
-      <details class="scan-destination-list">
-        <summary><ZhuyinText :text="t('scan.chooseDestination')" /></summary>
-        <label for="station-destination"
-          ><ZhuyinText :text="t('scan.chooseDestination')"
-        /></label>
-        <select
-          id="station-destination"
-          :value="view.destinationId ?? ''"
-          :disabled="active"
-          @change="choose($event.target.value)"
-        >
-          <option disabled value="">
-            <ZhuyinText :text="t('scan.choosePlaceholder')" plain />
-          </option>
-          <option v-for="point in catalog" :key="point.id" :value="point.id">
-            <ZhuyinText :text="point.floor" plain /> ·
-            <ZhuyinText :text="label(point)" plain />
-          </option>
-        </select>
-      </details>
-      <button
-        v-if="props.selectedPoint"
-        :disabled="active"
-        @click="choose(props.selectedPoint.id)"
-      >
-        <ZhuyinText
-          :text="t('scan.useSelected', { name: name(props.selectedPoint) })"
-        />
-      </button>
-      <label
-        ><input
-          :checked="view.stepFree"
-          type="checkbox"
-          :disabled="active"
-          @change="changeStepFree($event.target.checked)" /><ZhuyinText
-          :text="t('scan.stepFree')"
-      /></label>
-    </template>
-    <p v-if="destination" class="scan-target">
-      <strong
-        ><ZhuyinText
-          :text="t('scan.destination', { place: place(destination) })"
-      /></strong>
-    </p>
-    <StaffCard
-      v-if="staffOpen && destination"
-      :point="destination"
-      :step-free="view.stepFree"
-      @close="closeStaffCard"
-    />
-    <p v-if="view.manualPosition && position" role="status">
-      <ZhuyinText
-        :text="t('transfer.previousLocation', { place: place(position) })"
-      />
-    </p>
-    <p v-else-if="position || view.mode !== 'browsing'" role="status">
-      <ZhuyinText
-        :text="
-          position
-            ? t('scan.youAreHere', { place: place(position) })
-            : t('scan.notLocated')
-        "
-      />
-    </p>
-    <p v-if="view.position?.source === 'qr'" class="scan-time">
-      <ZhuyinText :text="t('scan.scannedAt', { time: confirmedTime })" />
-    </p>
-    <p v-else-if="view.position" class="scan-time">
-      <ZhuyinText :text="t('scan.fromLink')" />
-    </p>
-
-    <p v-if="!persistentScan && !available" class="scan-note">
-      {{ t("scan.needApp") }}
-    </p>
-    <p v-if="!persistentScan && notice" role="status">
-      <ZhuyinText :text="notice" />
-    </p>
-    <div
-      v-if="position && destination"
-      class="scan-overview"
-      aria-live="polite"
-    >
-      <h3>
-        <ZhuyinText
-          :text="view.arrived ? t('scan.arrivedTitle') : t('scan.currentHint')"
-        />
-      </h3>
-      <p><ZhuyinText :text="instruction" /></p>
-      <StationTransferStep v-if="!persistentScan" :location="location" />
-      <ol v-if="view.relation.steps.length">
-        <li v-for="step in view.relation.steps" :key="step.id">
-          <ZhuyinText :text="stopLabel(step.from)" /> →
-          <ZhuyinText :text="stopLabel(step.to)" /><button
-            :disabled="active"
-            @click="unavailable(step.id)"
-          >
-            <ZhuyinText :text="t('scan.unavailable')" />
-          </button>
-        </li>
-      </ol>
-      <button
-        v-if="view.relation.status === 'at_destination' && !view.arrived"
-        :disabled="active"
-        @click="confirm(view.token)"
-      >
-        <ZhuyinText :text="t('scan.confirmArrival')" />
-      </button>
-      <p v-if="view.excludedEdgeTypes.length">
-        <ZhuyinText
-          :text="
-            t('scan.excluded', {
-              list: view.excludedEdgeTypes.join(t('scan.listSeparator')),
-            })
-          "
-        />
-      </p>
-    </div>
-
-    <div class="scan-actions" role="group" :aria-label="t('scan.actions')">
-      <StationNavigationRescan
-        v-if="persistentScan"
-        :location="location"
-        @scanned="emit('scanned')"
-      />
-      <button
-        v-else
-        class="scan-start"
-        data-tour-target="scan"
-        :disabled="!available || active"
-        @click="start"
-      >
-        <StationMapIcon name="qrcode" />
-        <ZhuyinText
-          :text="
-            active
-              ? t('scan.waiting')
-              : position
-              ? t('scan.rescan')
-              : t('scan.scan')
-          "
-        />
-      </button>
-      <div
-        v-if="destination || view.mode === 'navigation'"
-        class="scan-secondary-actions"
-      >
         <button
-          v-if="destination"
+          v-else
+          type="button"
+          class="scan-start"
+          data-tour-target="scan"
+          :disabled="!available || active"
+          @click="start"
+        >
+          <StationMapIcon name="qrcode" /><ZhuyinText
+            :text="active ? t('scan.waiting') : t('scan.scan')"
+          />
+        </button>
+        <button
+          v-if="view.destinationId"
           type="button"
           class="scan-staff"
+          :aria-label="t('staff.open')"
           :disabled="active"
           @click="staffOpen = true"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect
-              x="4"
-              y="3"
-              width="16"
-              height="18"
-              rx="2.5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-            />
-            <path
-              d="M8 8h8M8 12h8M8 16h5"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-            />
-          </svg>
-          <ZhuyinText :text="t('staff.open')" />
+          <StationMapIcon name="help" /><ZhuyinText :text="t('staff.short')" />
         </button>
         <button
-          v-if="view.mode === 'navigation' || view.destinationId"
+          v-if="view.destinationId"
           type="button"
-          class="scan-cancel"
+          :aria-label="t('scan.cancelTrip')"
           :disabled="active"
           @click="emit('cancel-trip')"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="m7 7 10 10M17 7 7 17"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-            />
-          </svg>
+          <ZhuyinText :text="t('map.cancel')" />
+        </button>
+      </div>
+      <p v-if="!available" class="scan-note">{{ t("scan.needAppShort") }}</p>
+      <details
+        v-if="
+          notice &&
+          !['notice.located', 'notice.linkLoaded', 'notice.Cancelled'].includes(
+            view.noticeKey
+          )
+        "
+        class="scan-status-details"
+      >
+        <summary>{{ t("scan.status") }}</summary>
+        <p role="status">{{ notice }}</p>
+      </details>
+      <StaffCard
+        v-if="staffOpen && destination"
+        :point="destination"
+        :step-free="view.stepFree"
+        @close="closeStaffCard"
+      />
+    </template>
+    <template v-else>
+      <div class="scan-heading" :class="{ 'visually-hidden': embedded }">
+        <h2 id="station-scan-heading">
           <ZhuyinText
             :text="
-              view.mode === 'browsing' ? t('scan.cancelTrip') : t('scan.exit')
+              view.mode === 'navigation' || persistentScan
+                ? t('scan.navigation')
+                : t('scan.browsing')
+            "
+          />
+        </h2>
+      </div>
+      <p class="scan-caveat">
+        {{ t("scan.caveat") }}
+      </p>
+      <p v-if="view.mode === 'browsing' && !embedded">
+        <ZhuyinText :text="t('scan.browseHint')" />
+      </p>
+      <template v-if="view.mode === 'navigation'">
+        <DestinationSearch
+          id="station-navigation-search"
+          :catalog="searchEntries"
+          navigation
+          :disabled="active"
+          :current-options="options"
+          @select="searchSelect"
+        />
+        <details class="scan-destination-list">
+          <summary><ZhuyinText :text="t('scan.chooseDestination')" /></summary>
+          <label for="station-destination"
+            ><ZhuyinText :text="t('scan.chooseDestination')"
+          /></label>
+          <select
+            id="station-destination"
+            :value="view.destinationId ?? ''"
+            :disabled="active"
+            @change="choose($event.target.value)"
+          >
+            <option disabled value="">
+              <ZhuyinText :text="t('scan.choosePlaceholder')" plain />
+            </option>
+            <option v-for="point in catalog" :key="point.id" :value="point.id">
+              <ZhuyinText :text="point.floor" plain /> ·
+              <ZhuyinText :text="label(point)" plain />
+            </option>
+          </select>
+        </details>
+        <button
+          v-if="props.selectedPoint"
+          :disabled="active"
+          @click="choose(props.selectedPoint.id)"
+        >
+          <ZhuyinText
+            :text="t('scan.useSelected', { name: name(props.selectedPoint) })"
+          />
+        </button>
+        <label
+          ><input
+            :checked="view.stepFree"
+            type="checkbox"
+            :disabled="active"
+            @change="changeStepFree($event.target.checked)" /><ZhuyinText
+            :text="t('scan.stepFree')"
+        /></label>
+      </template>
+      <p v-if="destination" class="scan-target">
+        <strong
+          ><ZhuyinText
+            :text="t('scan.destination', { place: place(destination) })"
+        /></strong>
+      </p>
+      <StaffCard
+        v-if="staffOpen && destination"
+        :point="destination"
+        :step-free="view.stepFree"
+        @close="closeStaffCard"
+      />
+      <p v-if="view.manualPosition && position" role="status">
+        <ZhuyinText
+          :text="t('transfer.previousLocation', { place: place(position) })"
+        />
+      </p>
+      <p v-else-if="position || view.mode !== 'browsing'" role="status">
+        <ZhuyinText
+          :text="
+            position
+              ? t('scan.youAreHere', { place: place(position) })
+              : t('scan.notLocated')
+          "
+        />
+      </p>
+      <p v-if="view.position?.source === 'qr'" class="scan-time">
+        <ZhuyinText :text="t('scan.scannedAt', { time: confirmedTime })" />
+      </p>
+      <p v-else-if="view.position" class="scan-time">
+        <ZhuyinText :text="t('scan.fromLink')" />
+      </p>
+
+      <p v-if="!persistentScan && !available" class="scan-note">
+        {{ t("scan.needApp") }}
+      </p>
+      <p v-if="!persistentScan && notice" role="status">
+        <ZhuyinText :text="notice" />
+      </p>
+      <div
+        v-if="position && destination"
+        class="scan-overview"
+        aria-live="polite"
+      >
+        <h3>
+          <ZhuyinText
+            :text="
+              view.arrived ? t('scan.arrivedTitle') : t('scan.currentHint')
+            "
+          />
+        </h3>
+        <p><ZhuyinText :text="instruction" /></p>
+        <StationTransferStep v-if="!persistentScan" :location="location" />
+        <ol v-if="view.relation.steps.length">
+          <li v-for="step in view.relation.steps" :key="step.id">
+            <ZhuyinText :text="stopLabel(step.from)" /> →
+            <ZhuyinText :text="stopLabel(step.to)" /><button
+              :disabled="active"
+              @click="unavailable(step.id)"
+            >
+              <ZhuyinText :text="t('scan.unavailable')" />
+            </button>
+          </li>
+        </ol>
+        <button
+          v-if="view.relation.status === 'at_destination' && !view.arrived"
+          :disabled="active"
+          @click="confirm(view.token)"
+        >
+          <ZhuyinText :text="t('scan.confirmArrival')" />
+        </button>
+        <p v-if="view.excludedEdgeTypes.length">
+          <ZhuyinText
+            :text="
+              t('scan.excluded', {
+                list: view.excludedEdgeTypes.join(t('scan.listSeparator')),
+              })
+            "
+          />
+        </p>
+      </div>
+
+      <div class="scan-actions" role="group" :aria-label="t('scan.actions')">
+        <StationNavigationRescan
+          v-if="persistentScan || position"
+          :location="location"
+          @scanned="emit('scanned', $event)"
+        />
+        <button
+          v-else
+          class="scan-start"
+          data-tour-target="scan"
+          :disabled="!available || active"
+          @click="start"
+        >
+          <StationMapIcon name="qrcode" />
+          <ZhuyinText
+            :text="
+              active
+                ? t('scan.waiting')
+                : position
+                ? t('scan.rescan')
+                : t('scan.scan')
             "
           />
         </button>
+        <div
+          v-if="destination || view.mode === 'navigation'"
+          class="scan-secondary-actions"
+        >
+          <button
+            v-if="destination"
+            type="button"
+            class="scan-staff"
+            :disabled="active"
+            @click="staffOpen = true"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect
+                x="4"
+                y="3"
+                width="16"
+                height="18"
+                rx="2.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+              />
+              <path
+                d="M8 8h8M8 12h8M8 16h5"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            <ZhuyinText :text="t('staff.open')" />
+          </button>
+          <button
+            v-if="view.mode === 'navigation' || view.destinationId"
+            type="button"
+            class="scan-cancel"
+            :disabled="active"
+            @click="emit('cancel-trip')"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="m7 7 10 10M17 7 7 17"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            <ZhuyinText
+              :text="
+                view.mode === 'browsing' ? t('scan.cancelTrip') : t('scan.exit')
+              "
+            />
+          </button>
+        </div>
       </div>
-    </div>
+    </template>
   </section>
 </template>
 <script setup>
@@ -560,5 +625,42 @@ async function start() {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+.compact-scan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.compact-scan-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 12px;
+}
+.compact-scan-actions svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+.compact-scan-actions :deep(.navigation-rescan-bar) {
+  flex: 1 1 10rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.compact-scan-actions :deep(.navigation-rescan-bar button) {
+  margin: 0;
+}
+.scan-status-details summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 </style>
