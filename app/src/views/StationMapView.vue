@@ -504,7 +504,8 @@ function centerOn(x, y) {
   const frame = viewport.value;
   const board = frame.firstElementChild;
   frame.scrollLeft = x * board.clientWidth - frame.clientWidth / 2;
-  frame.scrollTop = y * board.clientHeight - frame.clientHeight / 2;
+  frame.scrollTop =
+    board.offsetTop + y * board.clientHeight - frame.clientHeight / 2;
 }
 
 function focusVisiblePin(point, event) {
@@ -531,7 +532,7 @@ function zoomAnchor([x, y]) {
   const board = frame.firstElementChild;
   return [
     (frame.scrollLeft + x) / board.clientWidth,
-    (frame.scrollTop + y) / board.clientHeight,
+    (frame.scrollTop + y - board.offsetTop) / board.clientHeight,
   ];
 }
 
@@ -547,7 +548,7 @@ async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
   else
     frame.scrollTo(
       anchor[0] * board.clientWidth - x,
-      anchor[1] * board.clientHeight - y
+      board.offsetTop + anchor[1] * board.clientHeight - y
     );
 }
 
@@ -843,7 +844,7 @@ function placeConnectorPanel() {
   const board = frame.firstElementChild;
   const [pointX, pointY] = normalizedPoint(selected.value);
   const x = pointX * board.clientWidth - frame.scrollLeft;
-  const y = pointY * board.clientHeight - frame.scrollTop;
+  const y = board.offsetTop + pointY * board.clientHeight - frame.scrollTop;
   const width = frame.clientWidth;
   const height = frame.clientHeight;
   if (x < 0 || x > width || y < 0 || y > height) {
