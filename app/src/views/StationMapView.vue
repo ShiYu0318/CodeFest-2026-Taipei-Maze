@@ -606,7 +606,7 @@ function pointThemeStyle(type) {
   const iconColor = category?.iconColor;
   return {
     "--point-icon-color": iconColor || paletteColor(colorToken),
-    "--marker-color": iconColor || "#4a5258",
+    "--marker-base-color": iconColor || "#4a5258",
   };
 }
 

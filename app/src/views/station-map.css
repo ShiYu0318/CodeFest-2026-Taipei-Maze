@@ -397,6 +397,7 @@
   opacity: 0.87;
 }
 .map-pin {
+  --marker-color: var(--marker-base-color);
   position: absolute;
   touch-action: pan-x pan-y;
   display: flex;
@@ -409,6 +410,9 @@
   border-radius: 50%;
   transform: translate(-50%, -50%);
   background: transparent;
+}
+.station-page[data-theme="dark"] .map-pin {
+  --marker-color: color-mix(in srgb, var(--marker-base-color) 75%, white);
 }
 .map-pin.pin-filtered-out {
   opacity: 0;
@@ -584,6 +588,9 @@
 .theme-group svg {
   width: 16px;
   color: var(--point-icon-color);
+}
+.station-page[data-theme="dark"] .theme-group svg {
+  color: color-mix(in srgb, var(--point-icon-color) 75%, white);
 }
 .theme-group button[aria-pressed="true"] {
   background: var(--tp-secondary-200);
