@@ -48,6 +48,7 @@ const realComponents = new Set([
   "DestinationSearch",
   "StationTripDialog",
   "ZhuyinText",
+  "ZhuyinSvgText",
 ]);
 function component(name) {
   if (components.has(name)) return components.get(name);
@@ -155,7 +156,7 @@ test("navigation prompts annotate only Traditional Chinese child mode", async ()
   controller.choose("b4-e1");
   const location = { view, scan() {} };
   try {
-    for (const locale of ["zh-TW", "en"]) {
+    for (const { code: locale } of i18n.LOCALES) {
       language.setLocale(locale);
       for (const mode of ["standard", "senior", "child"]) {
         settings.setDisplayMode(mode);

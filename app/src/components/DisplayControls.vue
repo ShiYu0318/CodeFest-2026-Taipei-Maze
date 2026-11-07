@@ -4,7 +4,7 @@
     <label
       class="display-language"
       data-tour-target="language"
-      :title="t('lang.label')"
+      :title="displayPlainZhuyin(t('lang.label'), displayMode, locale)"
     >
       <span class="display-visually-hidden">{{ t("lang.label") }}</span>
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -23,9 +23,9 @@
           stroke-width="1.7"
         />
       </svg>
-      <span class="display-language-code" aria-hidden="true">{{
-        shortCode
-      }}</span>
+      <span class="display-language-code" aria-hidden="true"
+        ><ZhuyinText :text="shortCode"
+      /></span>
       <select :value="locale" @change="setLocale($event.target.value)">
         <option
           v-for="item in LOCALES"
@@ -33,7 +33,11 @@
           :value="item.code"
           :lang="item.htmlLang"
         >
-          {{ item.nativeName }}
+          <ZhuyinText
+            :text="item.nativeName"
+            :enabled="item.code === 'zh-TW'"
+            plain
+          />
         </option>
       </select>
     </label>
@@ -43,7 +47,13 @@
       type="button"
       role="switch"
       :aria-checked="theme === 'dark'"
-      :title="theme === 'dark' ? t('display.toLight') : t('display.toDark')"
+      :title="
+        displayPlainZhuyin(
+          theme === 'dark' ? t('display.toLight') : t('display.toDark'),
+          displayMode,
+          locale
+        )
+      "
       @click="toggleTheme"
     >
       <svg v-if="theme === 'dark'" viewBox="0 0 24 24" aria-hidden="true">
@@ -81,7 +91,7 @@
       type="button"
       role="switch"
       :aria-checked="contrast === 'high'"
-      :title="t('display.contrast')"
+      :title="displayPlainZhuyin(t('display.contrast'), displayMode, locale)"
       @click="toggleContrast"
     >
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -103,15 +113,22 @@
         :value="displayMode"
         @change="setDisplayMode($event.target.value)"
       >
-        <option value="standard">{{ t("display.standard") }}</option>
-        <option value="child">{{ t("display.child") }}</option>
-        <option value="senior">{{ t("display.senior") }}</option>
+        <option value="standard">
+          <ZhuyinText :text="t('display.standard')" plain />
+        </option>
+        <option value="child">
+          <ZhuyinText :text="t('display.child')" plain />
+        </option>
+        <option value="senior">
+          <ZhuyinText :text="t('display.senior')" plain />
+        </option>
       </select>
     </label>
   </div>
 </template>
 
 <script setup>
+import { displayPlainZhuyin } from "../display/zhuyin.mjs";
 import { computed } from "vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { LOCALES, useI18n } from "../i18n/index.mjs";

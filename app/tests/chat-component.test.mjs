@@ -12,6 +12,7 @@ import * as bridge from "../src/chat/bridge.mjs";
 import * as answers from "../src/chat/answers.mjs";
 import * as stream from "../src/chat/stream.mjs";
 import * as i18n from "../src/i18n/index.mjs";
+import * as zhuyin from "../src/display/zhuyin.mjs";
 import * as scan from "../src/station/scan.mjs";
 // Node 18 file execution lacks the browser Web Crypto global.
 // Supply the real standard implementation for the simulated WebView.
@@ -67,6 +68,7 @@ function mountChat({ reducedMotion = false } = {}) {
     "../chat/answers.mjs": answers,
     "../chat/stream.mjs": stream,
     "../i18n/index.mjs": i18n,
+    "../display/zhuyin.mjs": zhuyin,
     "../station/scan.mjs": scan,
     "../station/map-focus.mjs": { useMapFocus: () => ({}) },
     "../views/station-points.json": JSON.parse(

@@ -1,21 +1,75 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import * as Vue from "vue";
 import { renderToString } from "@vue/server-renderer";
 import { compileScript, parse } from "@vue/compiler-sfc";
 import { transformSync } from "@babel/core";
+import { parse as parseJavaScript } from "@babel/parser";
 import * as preferences from "../src/display/preferences.mjs";
 import * as zhuyin from "../src/display/zhuyin.mjs";
 import * as i18n from "../src/i18n/index.mjs";
 import zhTW from "../src/i18n/messages/zh-TW.mjs";
+import { characterReadings } from "../src/display/zhuyin-characters.mjs";
+import { plans } from "../src/views/station-floor-plans.mjs";
 import {
   annotateZhuyin,
   splitZhuyin,
   zhuyinLexicon,
+  plainZhuyin,
 } from "../src/display/zhuyin.mjs";
+
+test("all shipped Chinese UI messages, station names, descriptions and SVG labels have readings", () => {
+  const station = JSON.parse(
+    readFileSync(new URL("../src/views/station-points.json", import.meta.url))
+  );
+  const texts = [
+    i18n.LOCALES.find((locale) => locale.code === "zh-TW").nativeName,
+    ...Object.values(zhTW),
+    ...Object.values(station.points).flatMap((points) =>
+      points.flatMap((point) => [point.name, point.description || ""])
+    ),
+    ...Object.values(plans).flatMap(
+      (plan) => plan.labels?.map((label) => label[2]) || []
+    ),
+  ];
+  for (const text of texts) {
+    assert.deepEqual(
+      annotateZhuyin(text.replace(/\{\w+\}/g, "")).filter(
+        (part) => /\p{Script=Han}/u.test(part.text) && !part.reading
+      ),
+      [],
+      text
+    );
+  }
+  for (const [character, reading] of characterReadings) {
+    assert.match(character, /^\p{Script=Han}$/u);
+    assert.match(reading, /^(?:˙[ㄅ-ㄩ]{1,3}|[ㄅ-ㄩ]{1,3}[ˊˇˋ]?)$/u);
+  }
+});
+
+test("contextual readings override characters and native option text keeps identifiers", () => {
+  const readings = (text) => annotateZhuyin(text).map((part) => part.reading);
+  assert.deepEqual(readings("長者重新處理"), [
+    "ㄓㄤˇ",
+    "ㄓㄜˇ",
+    "ㄔㄨㄥˊ",
+    "ㄒㄧㄣ",
+    "ㄔㄨˇ",
+    "ㄌㄧˇ",
+  ]);
+  assert.deepEqual(readings("自行確認"), [
+    "ㄗˋ",
+    "ㄒㄧㄥˊ",
+    "ㄑㄩㄝˋ",
+    "ㄖㄣˋ",
+  ]);
+  assert.equal(plainZhuyin("兒童"), "兒童（ㄦˊ ㄊㄨㄥˊ）");
+  assert.equal(plainZhuyin("B2・電梯"), "B2・電梯（ㄉㄧㄢˋ ㄊㄧ）");
+  assert.equal(plainZhuyin("<script>𠮷🙂"), "<script>𠮷🙂");
+});
 
 test("reviewed phrases have one well-formed syllable per Han character", () => {
   const seen = new Set();
@@ -153,16 +207,44 @@ test("navigation actions, transfers and orientation prompts have full Han covera
 
 test("opted-in fixed labels and meeting messages have full Han coverage", () => {
   const texts = [];
-  for (const path of [
-    "components/DisplayControls.vue",
-    "components/StationScanPanel.vue",
-    "views/StationMapView.vue",
-    "views/MeetingView.vue",
-  ]) {
+  const paths = ["components", "views"].flatMap((directory) =>
+    readdirSync(new URL(`../src/${directory}/`, import.meta.url))
+      .filter((file) => file.endsWith(".vue"))
+      .map((file) => `${directory}/${file}`)
+  );
+  function collectStrings(node) {
+    if (!node || typeof node !== "object") return;
+    if (node.type === "StringLiteral" && /\p{Script=Han}/u.test(node.value))
+      texts.push(node.value);
+    for (const [key, value] of Object.entries(node)) {
+      if (
+        [
+          "loc",
+          "extra",
+          "comments",
+          "leadingComments",
+          "trailingComments",
+        ].includes(key)
+      )
+        continue;
+      if (Array.isArray(value)) value.forEach(collectStrings);
+      else if (value && typeof value === "object") collectStrings(value);
+    }
+  }
+  for (const path of paths) {
     const source = readFileSync(
       new URL(`../src/${path}`, import.meta.url),
       "utf8"
     );
+    const descriptor = parse(source).descriptor;
+    for (const block of [descriptor.script, descriptor.scriptSetup].filter(
+      Boolean
+    ))
+      collectStrings(parseJavaScript(block.content, { sourceType: "module" }));
+    for (const match of source.matchAll(
+      /<Zhuyin(?:Svg)?Text\s+(?:[^>]*?\s)?:text="'([^']+)'"/g
+    ))
+      texts.push(match[1]);
     for (const match of source.matchAll(/<ZhuyinText\s+text="([^"]+)"/g))
       texts.push(match[1]);
     // Translated labels: check the Traditional Chinese text behind the key.
@@ -187,10 +269,10 @@ test("opted-in fixed labels and meeting messages have full Han coverage", () => 
   }
 });
 
-test("the Vue component annotates child mode only and escapes unknown text", async () => {
+function compileZhuyinComponent(name) {
   // Compile the actual SFC in memory using the existing build dependencies.
   const source = readFileSync(
-    new URL("../src/components/ZhuyinText.vue", import.meta.url),
+    new URL(`../src/components/${name}.vue`, import.meta.url),
     "utf8"
   );
   const script = compileScript(parse(source).descriptor, {
@@ -217,6 +299,12 @@ test("the Vue component annotates child mode only and escapes unknown text", asy
     compiled,
     compiled.exports
   );
+  return compiled.exports.default;
+}
+
+test("HTML, native and SVG readings appear only in child mode with Traditional Chinese", async () => {
+  const htmlComponent = compileZhuyinComponent("ZhuyinText");
+  const svgComponent = compileZhuyinComponent("ZhuyinSvgText");
   const settings = preferences.useDisplayPreferences();
   const original = settings.displayMode.value;
   // Newer Node versions expose navigator.languages (e.g. en-US); pin the
@@ -225,25 +313,56 @@ test("the Vue component annotates child mode only and escapes unknown text", asy
   const originalLocale = language.locale.value;
   language.setLocale("zh-TW");
   try {
-    for (const mode of ["standard", "senior", "child"]) {
-      settings.setDisplayMode(mode);
-      const html = await renderToString(
-        Vue.createSSRApp(compiled.exports.default, { text: "電梯<script>" })
-      );
-      assert.equal(html.includes("<ruby"), mode === "child", mode);
-      assert.equal(html.includes("<script>"), false);
-      assert.equal(html.includes("&lt;script&gt;"), true);
-      if (mode === "child") {
-        assert.match(html, /aria-hidden="true"/);
-        assert.match(html, /zhuyin-readable[^>]*>電梯&lt;script&gt;/);
+    for (const { code: locale } of i18n.LOCALES) {
+      language.setLocale(locale);
+      for (const mode of ["standard", "senior", "child"]) {
+        settings.setDisplayMode(mode);
+        const enabled = mode === "child" && locale === "zh-TW";
+        const html = await renderToString(
+          Vue.createSSRApp(htmlComponent, { text: "電梯<script>" })
+        );
+        assert.equal(html.includes("<ruby"), enabled, `${locale}/${mode}`);
+        assert.equal(html.includes("<script>"), false);
+        assert.equal(html.includes("&lt;script&gt;"), true);
+        if (enabled) {
+          assert.match(html, /aria-hidden="true"/);
+          assert.match(html, /zhuyin-readable[^>]*>電梯&lt;script&gt;/);
+        }
+        const plain = await renderToString(
+          Vue.createSSRApp(htmlComponent, { text: "兒童", plain: true })
+        );
+        assert.equal(
+          /[ㄅ-ㄩ]/u.test(plain),
+          enabled,
+          `${locale}/${mode}/native`
+        );
+        assert.equal(plain.includes("<ruby"), false);
+        assert.equal(
+          zhuyin.displayPlainZhuyin("輸入", mode, locale).includes("ㄕㄨ"),
+          enabled
+        );
+        const svg = await renderToString(
+          Vue.createSSRApp(svgComponent, { text: "車站大廳", x: 120, y: 30 })
+        );
+        assert.equal(
+          svg.includes("svg-zhuyin-reading"),
+          enabled,
+          `${locale}/${mode}/svg`
+        );
+        assert.match(svg, /x="120"/);
+        assert.match(svg, /y="30"/);
       }
     }
-    // Zhuyin is for Traditional Chinese readers only.
-    language.setLocale("en");
-    const html = await renderToString(
-      Vue.createSSRApp(compiled.exports.default, { text: "電梯" })
+    language.setLocale("zh-TW");
+    settings.setDisplayMode("child");
+    const disabled = await renderToString(
+      Vue.createSSRApp(htmlComponent, {
+        text: "日本語",
+        plain: true,
+        enabled: false,
+      })
     );
-    assert.equal(html.includes("<ruby"), false);
+    assert.equal(/[ㄅ-ㄩ]/u.test(disabled), false);
   } finally {
     language.setLocale(originalLocale);
     settings.setDisplayMode(original);

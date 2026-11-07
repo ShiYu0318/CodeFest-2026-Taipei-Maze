@@ -27,9 +27,11 @@
       :data-side="side"
     >
       <header class="map-tour-header">
-        <span>{{ t("tour.step", { step: index + 1, total }) }}</span>
+        <span
+          ><ZhuyinText :text="t('tour.step', { step: index + 1, total })"
+        /></span>
         <button type="button" class="map-tour-skip" @click="finish">
-          {{ t("tour.skip") }}
+          <ZhuyinText :text="t('tour.skip')" />
         </button>
       </header>
       <div class="map-tour-copy" @touchmove.stop @wheel.stop>
@@ -41,9 +43,11 @@
         </p>
       </div>
       <footer class="map-tour-actions">
-        <span>{{ t("tour.tapOutside") }}</span>
+        <span><ZhuyinText :text="t('tour.tapOutside')" /></span>
         <button type="button" class="map-tour-next" @click="advance">
-          {{ t(index === total - 1 ? "tour.finish" : "tour.next") }}
+          <ZhuyinText
+            :text="t(index === total - 1 ? 'tour.finish' : 'tour.next')"
+          />
         </button>
       </footer>
     </section>

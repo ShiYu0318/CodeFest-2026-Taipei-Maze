@@ -17,7 +17,7 @@
       >
         <header class="staff-head">
           <h2 id="staff-card-title" lang="zh-Hant-TW">
-            {{ zh["staff.title"] }}
+            <ZhuyinText :text="zh['staff.title']" />
           </h2>
           <button
             ref="closeButton"
@@ -40,18 +40,24 @@
           <span class="staff-icon" aria-hidden="true"
             ><StationMapIcon :name="card.icon"
           /></span>
-          <span class="staff-floor">{{ card.floor }}</span>
+          <span class="staff-floor"><ZhuyinText :text="card.floor" /></span>
         </div>
         <div class="staff-chinese" lang="zh-Hant-TW">
-          <p v-for="line in card.chinese" :key="line">{{ line }}</p>
+          <p v-for="line in card.chinese" :key="line">
+            <ZhuyinText :text="line" />
+          </p>
         </div>
         <div
           v-if="card.visitor.length"
           class="staff-visitor"
           :lang="htmlLang(card.visitorLang)"
         >
-          <p class="staff-instruction">{{ t("staff.showThis") }}</p>
-          <p v-for="line in card.visitor" :key="line">{{ line }}</p>
+          <p class="staff-instruction">
+            <ZhuyinText :text="t('staff.showThis')" />
+          </p>
+          <p v-for="line in card.visitor" :key="line">
+            <ZhuyinText :text="line" />
+          </p>
         </div>
       </section>
     </div>
@@ -59,6 +65,7 @@
 </template>
 
 <script setup>
+import ZhuyinText from "./ZhuyinText.vue";
 /* global defineProps, defineEmits */
 import { computed, nextTick, onMounted, ref } from "vue";
 import StationMapIcon from "./StationMapIcon.vue";

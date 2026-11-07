@@ -10,6 +10,8 @@ import * as places from "../src/i18n/places.mjs";
 import * as engine from "../src/search/search.mjs";
 import * as fallback from "../src/search/fallback.mjs";
 import { stationCatalog } from "../src/search/catalog.mjs";
+import * as preferences from "../src/display/preferences.mjs";
+import * as zhuyin from "../src/display/zhuyin.mjs";
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 const catalog = stationCatalog(
   JSON.parse(read("../src/views/station-points.json"))
@@ -29,6 +31,10 @@ const modules = {
   "../i18n/places.mjs": places,
   "../search/search.mjs": engine,
   "../search/fallback.mjs": fallback,
+  "../display/preferences.mjs": preferences,
+  "../display/zhuyin.mjs": zhuyin,
+  // Render-free test: the annotation component is not needed.
+  "./ZhuyinText.vue": { default: {} },
   "../search/dictionary.json": JSON.parse(
     read("../src/search/dictionary.json")
   ),

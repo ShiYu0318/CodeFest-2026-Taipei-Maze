@@ -197,7 +197,12 @@ test("QR navigation points scan normally without inventing a surveyed walking ro
 test("the actual QR icon and every floor component render with the shared outline data", async () => {
   const Vue = await import("vue");
   const { renderToString } = await import("@vue/server-renderer");
-  const { parse, compileTemplate } = await import("@vue/compiler-sfc");
+  const { parse, compileTemplate, compileScript } = await import(
+    "@vue/compiler-sfc"
+  );
+  const preferences = await import("../src/display/preferences.mjs");
+  const i18n = await import("../src/i18n/index.mjs");
+  const zhuyin = await import("../src/display/zhuyin.mjs");
   const { transformSync } = await import("@babel/core");
   const components = new Map();
   function component(name) {
@@ -213,11 +218,15 @@ test("the actual QR icon and every floor component render with the shared outlin
       id: name,
     });
     assert.deepEqual(template.errors, []);
-    const code =
-      descriptor.script.content.replace("export default", "const component =") +
-      "\n" +
-      template.code.replace("export function render", "function render") +
-      "\ncomponent.render = render; export default component;";
+    const code = descriptor.scriptSetup
+      ? compileScript(descriptor, { id: name, inlineTemplate: true }).content
+      : descriptor.script.content.replace(
+          "export default",
+          "const component ="
+        ) +
+        "\n" +
+        template.code.replace("export function render", "function render") +
+        "\ncomponent.render = render; export default component;";
     const output = transformSync(code, {
       babelrc: false,
       configFile: false,
@@ -226,6 +235,10 @@ test("the actual QR icon and every floor component render with the shared outlin
     const compiled = { exports: {} };
     const load = (path) => {
       if (path === "vue") return Vue;
+      if (path.endsWith("preferences.mjs")) return preferences;
+      if (path.endsWith("i18n/index.mjs")) return i18n;
+      if (path.endsWith("zhuyin.mjs")) return zhuyin;
+      if (path.endsWith("ZhuyinSvgText.vue")) return component("ZhuyinSvgText");
       if (path.endsWith("station-floor-plans.mjs"))
         return { plans, b2Outline, b2RailPlatforms };
       if (path.endsWith("station-points.json")) return data;
