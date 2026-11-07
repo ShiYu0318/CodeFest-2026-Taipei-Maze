@@ -186,11 +186,9 @@
                       <span v-if="point.id === selected?.id" class="pin-icon">
                         <StationMapIcon :name="point.type" />
                       </span>
-                      <StationMapIcon
-                        v-else
-                        class="point-icon"
-                        :name="point.type"
-                      />
+                      <span v-else class="point-pin">
+                        <StationMapIcon class="point-icon" :name="point.type" />
+                      </span>
                     </button>
                   </div>
                 </div>
