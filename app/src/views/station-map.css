@@ -88,6 +88,11 @@
   font-size: 0.75rem;
   font-weight: 700;
 }
+/* In child/senior modes the heading also carries the floor name and a hint;
+   keeping all of that pinned would cover half the screen, so it scrolls. */
+.station-page:not([data-display-mode="standard"]) .station-heading {
+  position: static;
+}
 .station-heading {
   position: sticky;
   top: 0;
@@ -103,18 +108,47 @@
   font-weight: 800;
   letter-spacing: 0.13em;
 }
+/* Toolbar: on phones always two even rows — language and mode first, then
+   the four icon actions — so large child/senior controls never leave a
+   lonely button on a third line. Wide screens keep one row. */
 .station-title-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
+  align-items: center;
   min-height: 44px;
 }
+.station-title-row .display-controls,
 .station-utility-actions {
-  display: flex;
-  flex: none;
-  gap: 8px;
-  margin-left: auto;
+  display: contents;
+}
+.station-title-row :deep(.display-language) {
+  grid-column: span 1;
+  width: 100%;
+  min-width: 0;
+}
+.station-title-row :deep(.display-mode-label) {
+  grid-column: span 3;
+  min-width: 0;
+}
+.station-title-row :deep(.display-mode-label select) {
+  width: 100%;
+  max-width: none;
+}
+.station-title-row :deep(.display-icon-button) {
+  width: 100%;
+}
+@media (min-width: 560px) {
+  .station-title-row {
+    grid-template-columns: auto minmax(8em, 14em) repeat(4, auto);
+    justify-content: start;
+  }
+  .station-title-row :deep(.display-mode-label) {
+    grid-column: auto;
+  }
+  .station-title-row :deep(.display-icon-button) {
+    width: var(--display-control-height);
+  }
 }
 .station-heading h1 {
   flex: 1 1 auto;
@@ -132,12 +166,6 @@
 }
 .station-page[data-display-mode="child"] .station-heading h1 {
   white-space: normal;
-}
-.station-title-row .display-controls {
-  flex: 1 1 240px;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  margin: 0;
 }
 .station-page .station-heading .display-floor-label {
   margin-top: 10px;
@@ -996,4 +1024,11 @@
   background: var(--surface);
   color: var(--tp-primary-700);
   font-weight: 600;
+}
+
+/* Large controls overflow the floor row: fade the edge to show it scrolls. */
+.station-page:not([data-display-mode="standard"]) .floor-controls.horizontal-scroll {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
+  padding-right: 28px;
 }
