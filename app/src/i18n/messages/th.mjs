@@ -247,6 +247,11 @@ export default {
   "chat.listeningNotice": "กำลังฟัง สูงสุด 30 วินาที",
   "chat.drafted": "เปลี่ยนเป็นร่างแล้ว ตรวจสอบแล้วส่ง",
   "chat.cleared": "ล้างแชตแล้ว",
+  "search.startTitle": "ค้นหาจุดเริ่มต้น",
+  "search.destinationTitle": "ค้นหาจุดหมาย",
+  "search.useStart": "ตั้งเป็นจุดเริ่มต้น",
+  "search.useDestination": "ตั้งเป็นจุดหมาย",
+  "search.selectedStart": "เลือกจุดเริ่มต้นแล้ว",
   "search.title": "ค้นหาสิ่งอำนวยความสะดวกด้วยชื่อ",
   "search.note":
     "ต้นแบบพจนานุกรมเจ็ดภาษา คำศัพท์ยังไม่ผ่านการตรวจ ค้นหาเฉพาะสิ่งอำนวยความสะดวกในหน้านี้ ไม่ใช้ AI ออนไลน์",

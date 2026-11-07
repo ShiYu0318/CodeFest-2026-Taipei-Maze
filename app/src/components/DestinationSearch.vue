@@ -1,7 +1,11 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
   <section class="destination-search" :aria-labelledby="id + '-title'">
-    <h2 :id="id + '-title'">{{ t("search.title") }}</h2>
+    <h2 :id="id + '-title'">
+      {{
+        t(selectionRole ? "search." + selectionRole + "Title" : "search.title")
+      }}
+    </h2>
     <p class="search-hint">
       {{ t("search.note") }}
     </p>
@@ -69,7 +73,15 @@
             ></span
           >
           <button :disabled="disabled" @click="choose(match)">
-            {{ navigation ? t("search.confirm") : t("search.showOnMap") }}
+            {{
+              selectionRole === "start"
+                ? t("search.useStart")
+                : selectionRole === "destination"
+                ? t("search.useDestination")
+                : navigation
+                ? t("search.confirm")
+                : t("search.showOnMap")
+            }}
           </button>
         </li>
       </ul>
@@ -90,6 +102,7 @@ const props = defineProps({
   id: { type: String, required: true },
   catalog: { type: Array, required: true },
   navigation: { type: Boolean, default: false },
+  selectionRole: { type: String, default: null },
   disabled: { type: Boolean, default: false },
   currentOptions: {
     type: Object,
@@ -115,7 +128,8 @@ const query = ref(""),
   selectionNotice = ref("");
 let submittedQuery = null,
   submittedOptions = null,
-  submittedCatalog = null;
+  submittedCatalog = null,
+  submittedRole = null;
 const selectable = computed(() =>
   ["matched", "suggestionsOnly"].includes(result.value?.status)
 );
@@ -150,13 +164,23 @@ const restrictionText = computed(() => {
   if (options.unavailableConnectorIds.length)
     labels.push(t("search.cond.keepUnavailable"));
   return labels.length
-    ? t(props.navigation ? "search.cond.apply" : "search.cond.parsed", {
-        list: labels.join(t("search.listSeparator")),
-      })
+    ? t(
+        props.navigation && props.selectionRole !== "start"
+          ? "search.cond.apply"
+          : "search.cond.parsed",
+        {
+          list: labels.join(t("search.listSeparator")),
+        }
+      )
     : "";
 });
 watch(
-  [query, () => props.catalog, () => JSON.stringify(props.currentOptions)],
+  [
+    query,
+    () => props.catalog,
+    () => props.selectionRole,
+    () => JSON.stringify(props.currentOptions),
+  ],
   () => {
     result.value = null;
     selectionNotice.value = "";
@@ -183,6 +207,7 @@ function submit() {
   submittedQuery = query.value;
   submittedOptions = JSON.stringify(props.currentOptions);
   submittedCatalog = props.catalog;
+  submittedRole = props.selectionRole;
   selectionNotice.value = "";
 }
 function choose(match) {
@@ -190,19 +215,24 @@ function choose(match) {
   if (
     query.value !== submittedQuery ||
     JSON.stringify(props.currentOptions) !== submittedOptions ||
-    props.catalog !== submittedCatalog
+    props.catalog !== submittedCatalog ||
+    props.selectionRole !== submittedRole
   ) {
     result.value = null;
     selectionNotice.value = t("search.changed");
     return;
   }
   emit("select", {
+    ...(props.selectionRole ? { role: submittedRole } : {}),
     poiId: match.poiId,
     proposedOptions: result.value.proposedOptions,
   });
-  selectionNotice.value = props.navigation
-    ? t("search.selectedNav")
-    : t("search.selectedMap");
+  selectionNotice.value =
+    props.selectionRole === "start"
+      ? t("search.selectedStart")
+      : props.navigation
+      ? t("search.selectedNav")
+      : t("search.selectedMap");
 }
 </script>
 

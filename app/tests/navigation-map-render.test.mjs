@@ -394,3 +394,31 @@ test("navigation exposes destination search before the secondary destination lis
     location.dispose();
   }
 });
+
+test("endpoint picker exposes search with the active start or destination role", async () => {
+  const language = i18n.useI18n(),
+    previous = language.locale.value;
+  language.setLocale("zh-TW");
+  try {
+    for (const [startPoint, role, title, action] of [
+      [null, "start", "搜尋起點", "設為起點"],
+      [
+        { ...data.points.B1[0], floor: "B1" },
+        "destination",
+        "搜尋終點",
+        "設為終點",
+      ],
+    ]) {
+      const html = await renderToString(
+        Vue.createSSRApp(component("StationEndpointPicker"), { startPoint })
+      );
+      assert.ok(html.includes('id="endpoint-' + role + '-search-query"'));
+      assert.ok(html.includes(title));
+      const form = html.indexOf('type="search"');
+      const list = html.indexOf('class="endpoint-list"');
+      assert.ok(form >= 0 && list > form, action);
+    }
+  } finally {
+    language.setLocale(previous);
+  }
+});

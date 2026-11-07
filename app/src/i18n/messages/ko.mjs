@@ -257,6 +257,11 @@ export default {
   "chat.listeningNotice": "최대 30초 동안 듣는 중이에요.",
   "chat.drafted": "초안으로 바꿨어요. 확인한 뒤 보내세요.",
   "chat.cleared": "대화를 지웠어요.",
+  "search.startTitle": "출발지 검색",
+  "search.destinationTitle": "목적지 검색",
+  "search.useStart": "출발지로 설정",
+  "search.useDestination": "목적지로 설정",
+  "search.selectedStart": "출발지를 선택했습니다.",
   "search.title": "이름으로 편의시설 찾기",
   "search.note":
     "7개 언어 사전 시제품이며 단어는 아직 검토 전입니다. 이 페이지에 있는 편의시설만 찾으며 온라인 AI를 쓰지 않습니다.",

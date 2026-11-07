@@ -266,6 +266,11 @@ export default {
   "chat.listeningNotice": "Mendengarkan hingga 30 detik.",
   "chat.drafted": "Sudah menjadi draf. Periksa lalu kirim.",
   "chat.cleared": "Obrolan dihapus.",
+  "search.startTitle": "Cari titik awal",
+  "search.destinationTitle": "Cari tujuan",
+  "search.useStart": "Jadikan titik awal",
+  "search.useDestination": "Jadikan tujuan",
+  "search.selectedStart": "Titik awal dipilih.",
   "search.title": "Cari fasilitas dengan nama",
   "search.note":
     "Prototipe kamus tujuh bahasa; kata-kata belum ditinjau. Hanya mencari fasilitas di halaman ini, tanpa AI daring.",

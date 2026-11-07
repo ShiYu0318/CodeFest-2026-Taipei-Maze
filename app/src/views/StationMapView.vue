@@ -436,6 +436,11 @@
       </div>
     </div>
     <StationEndpointPicker
+      :current-options="{
+        mobilityProfile: location.view.value.stepFree ? 'stepFree' : 'standard',
+        excludedEdgeTypes: location.view.value.excludedEdgeTypes,
+        unavailableConnectorIds: location.view.value.unavailableConnectorIds,
+      }"
       v-if="endpointPickerOpen"
       :start-point="currentPoint"
       :target-point="targetPoint"
@@ -1372,8 +1377,14 @@ function saveEndpoints(start, destination) {
   });
 }
 
-function chooseEndpoint(start, destination, point, role) {
-  if (role === "destination" && !location.choose(destination ?? null)) return;
+function chooseEndpoint(start, destination, point, role, proposedOptions) {
+  if (role === "destination") {
+    const selected =
+      proposedOptions && destination
+        ? location.searchSelect({ poiId: destination, proposedOptions })
+        : location.choose(destination ?? null);
+    if (!selected) return;
+  }
   pickerFocusPoint = point;
   const saved = saveEndpoints(start, destination);
   if (role === "destination" && destination) openTripDialog();

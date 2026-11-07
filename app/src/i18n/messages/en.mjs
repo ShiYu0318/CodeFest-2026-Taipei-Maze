@@ -265,6 +265,11 @@ export default {
   "chat.listeningNotice": "Listening for up to 30 seconds.",
   "chat.drafted": "Turned into a draft. Check it, then send.",
   "chat.cleared": "Chat cleared.",
+  "search.startTitle": "Search for a starting point",
+  "search.destinationTitle": "Search for a destination",
+  "search.useStart": "Set as start",
+  "search.useDestination": "Set as destination",
+  "search.selectedStart": "Starting point selected.",
   "search.title": "Find a facility by name",
   "search.note":
     "Seven-language dictionary prototype; words are not yet reviewed. Searches only the facilities on this page, without any online AI.",

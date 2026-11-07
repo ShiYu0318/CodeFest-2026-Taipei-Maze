@@ -265,6 +265,11 @@ export default {
   "chat.listeningNotice": "最大30秒聞き取ります。",
   "chat.drafted": "下書きにしました。確認してから送信してください。",
   "chat.cleared": "会話を消去しました。",
+  "search.startTitle": "出発地を検索",
+  "search.destinationTitle": "目的地を検索",
+  "search.useStart": "出発地に設定",
+  "search.useDestination": "目的地に設定",
+  "search.selectedStart": "出発地を選択しました。",
   "search.title": "名前で設備を探す",
   "search.note":
     "7言語の辞書の試作で、語句はまだ確認中です。このページの設備だけを検索し、オンラインのAIは使いません。",

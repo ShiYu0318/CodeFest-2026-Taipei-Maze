@@ -262,6 +262,11 @@ export default {
   "chat.listeningNotice": "Đang nghe, tối đa 30 giây.",
   "chat.drafted": "Đã thành bản nháp. Hãy kiểm tra rồi gửi.",
   "chat.cleared": "Đã xóa cuộc trò chuyện.",
+  "search.startTitle": "Tìm điểm xuất phát",
+  "search.destinationTitle": "Tìm điểm đến",
+  "search.useStart": "Đặt làm điểm xuất phát",
+  "search.useDestination": "Đặt làm điểm đến",
+  "search.selectedStart": "Đã chọn điểm xuất phát.",
   "search.title": "Tìm tiện ích theo tên",
   "search.note":
     "Bản thử từ điển bảy ngôn ngữ, từ ngữ chưa được duyệt. Chỉ tìm các tiện ích trên trang này, không dùng AI trực tuyến.",

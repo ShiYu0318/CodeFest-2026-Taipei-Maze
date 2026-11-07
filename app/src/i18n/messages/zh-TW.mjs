@@ -224,6 +224,11 @@ export default {
   "chat.listeningNotice": "正在聆聽，最長 30 秒。",
   "chat.drafted": "已轉成草稿，請確認後送出。",
   "chat.cleared": "對話已清除。",
+  "search.startTitle": "搜尋起點",
+  "search.destinationTitle": "搜尋終點",
+  "search.useStart": "設為起點",
+  "search.useDestination": "設為終點",
+  "search.selectedStart": "已選擇起點。",
   "search.title": "用名稱找設施",
   "search.note":
     "七語詞典原型，詞彙尚待校對。只搜尋本頁已載入的設施，不使用遠端 AI。",
