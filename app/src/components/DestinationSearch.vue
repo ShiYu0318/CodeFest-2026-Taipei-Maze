@@ -83,6 +83,7 @@
 import { computed, ref, shallowRef, watch } from "vue";
 import dictionary from "../search/dictionary.json";
 import { searchCatalog } from "../search/search.mjs";
+import { withLocalizedFallback } from "../search/fallback.mjs";
 import { useI18n } from "../i18n/index.mjs";
 import { placeLabel } from "../i18n/places.mjs";
 const props = defineProps({
@@ -170,11 +171,15 @@ watch(
   }
 );
 function submit() {
-  result.value = searchCatalog(query.value, props.catalog, dictionary, {
-    prototype: true,
-    uiLocale: locale.value,
-    currentOptions: props.currentOptions,
-  });
+  result.value = withLocalizedFallback(
+    searchCatalog(query.value, props.catalog, dictionary, {
+      prototype: true,
+      uiLocale: locale.value,
+      currentOptions: props.currentOptions,
+    }),
+    query.value,
+    props.catalog
+  );
   submittedQuery = query.value;
   submittedOptions = JSON.stringify(props.currentOptions);
   submittedCatalog = props.catalog;
