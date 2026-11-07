@@ -146,6 +146,7 @@
             :aria-label="
               message.role === 'user' ? t('chat.you') : t('chat.bot')
             "
+            :aria-busy="message.streaming ? 'true' : undefined"
           >
             <span
               v-if="message.role === 'assistant'"
@@ -162,7 +163,46 @@
                 <circle cx="12" cy="10" r="2.4" fill="currentColor" /></svg
             ></span>
             <div class="maze-chat-content">
-              <p class="maze-chat-bubble">{{ message.text }}</p>
+              <details
+                v-if="message.thinking"
+                class="maze-chat-thought"
+                :data-state="message.thinking.state"
+                :open="message.thinking.open"
+                @toggle="message.thinking.open = $event.target.open"
+              >
+                <summary>
+                  <span class="maze-chat-orb" aria-hidden="true"></span>
+                  <span class="maze-chat-thought-title">{{
+                    message.thinking.state === "done"
+                      ? t("chat.think.done", {
+                          seconds: message.thinking.seconds,
+                        })
+                      : t("chat.think.title")
+                  }}</span>
+                  <span class="maze-chat-chev" aria-hidden="true"></span>
+                </summary>
+                <ol class="maze-chat-steps">
+                  <li
+                    v-for="step in message.thinking.steps"
+                    :key="step.id"
+                    :data-state="step.state"
+                  >
+                    <span class="maze-chat-tick" aria-hidden="true"></span
+                    >{{ step.label }}
+                  </li>
+                </ol>
+              </details>
+              <p
+                v-if="message.text || !message.thinking"
+                class="maze-chat-bubble"
+              >
+                {{ message.text
+                }}<span
+                  v-if="message.streaming"
+                  class="maze-chat-caret"
+                  aria-hidden="true"
+                ></span>
+              </p>
               <ul v-if="message.places?.length" class="maze-chat-places">
                 <li v-for="place in message.places" :key="place.id">
                   <button type="button" @click="showPlace(place.id)">
@@ -184,25 +224,6 @@
               </p>
             </div>
           </article>
-          <div v-if="busy" class="maze-chat-message assistant" role="status">
-            <span class="maze-chat-avatar" aria-hidden="true"
-              ><svg viewBox="0 0 24 24">
-                <path
-                  d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linejoin="round"
-                />
-                <circle cx="12" cy="10" r="2.4" fill="currentColor" /></svg
-            ></span>
-            <p class="maze-chat-typing">
-              <i></i><i></i><i></i>
-              <span class="display-visually-hidden">{{
-                t("chat.thinking")
-              }}</span>
-            </p>
-          </div>
         </div>
         <p v-if="notice" class="maze-chat-notice" role="status">{{ notice }}</p>
         <div
@@ -382,6 +403,7 @@ import {
 import StationMapIcon from "./StationMapIcon.vue";
 import { LOCALES, useI18n } from "../i18n/index.mjs";
 import { answerLocally } from "../chat/answers.mjs";
+import { chunkText, streamLocalAnswer } from "../chat/stream.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
 import { stationPoints } from "../station/scan.mjs";
 import stationData from "../views/station-points.json";
@@ -504,6 +526,7 @@ async function open() {
 }
 function close() {
   epoch++;
+  streamControl?.abort();
   bridge.cancelAll();
   bridge.request("unload");
   busy.value = false;
@@ -540,8 +563,111 @@ function composerKey(event) {
   event.preventDefault();
   send();
 }
-function addReply(reply) {
-  messages.value.push({ id: ++serial, role: "assistant", ...reply });
+const reducedMotion = () =>
+  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+let streamControl = null;
+function startReply() {
+  messages.value.push({
+    id: ++serial,
+    role: "assistant",
+    text: "",
+    places: [],
+    more: "",
+    streaming: true,
+    thinking: {
+      steps: [],
+      state: "active",
+      open: true,
+      startedAt: performance.now(),
+      seconds: "0",
+    },
+  });
+  return messages.value.at(-1);
+}
+function applyStep(reply, step) {
+  const index = reply.thinking.steps.findIndex((item) => item.id === step.id);
+  if (index < 0) reply.thinking.steps.push(step);
+  else reply.thinking.steps[index] = step;
+}
+function finishThinking(reply) {
+  if (reply.thinking.state === "done") return;
+  for (const step of reply.thinking.steps) step.state = "done";
+  reply.thinking.state = "done";
+  reply.thinking.open = false;
+  reply.thinking.seconds = Math.max(
+    0.1,
+    (performance.now() - reply.thinking.startedAt) / 1000
+  ).toFixed(1);
+}
+async function playLocal(reply, answer, signal) {
+  const fast = reducedMotion();
+  for await (const event of streamLocalAnswer(answer, i18n, {
+    signal,
+    stepDelay: fast ? 0 : 280,
+    chunkDelay: fast ? 0 : 22,
+  })) {
+    if (event.type === "thinking") applyStep(reply, event.step);
+    else if (event.type === "delta") {
+      finishThinking(reply);
+      reply.text += event.text;
+      scroll();
+    } else if (event.type === "done") {
+      reply.places = event.places ?? [];
+      reply.more =
+        answer.total > (answer.places?.length ?? 0)
+          ? t("chat.answer.more", {
+              count: answer.total - answer.places.length,
+            })
+          : "";
+    }
+  }
+}
+async function playModel(reply, prompt, current) {
+  applyStep(reply, {
+    id: "understand",
+    label: t("chat.think.understand"),
+    state: "done",
+  });
+  applyStep(reply, {
+    id: "model",
+    label: t("chat.think.model"),
+    state: "active",
+  });
+  let streamed = false;
+  const result = await bridge.request(
+    "generate",
+    { prompt },
+    {
+      // SSE-style partial chunks from the on-device model, when available.
+      onPartial(part) {
+        if (current !== epoch) return;
+        streamed = true;
+        finishThinking(reply);
+        reply.text += part;
+        scroll();
+      },
+    }
+  );
+  if (current !== epoch || !opened.value) return null;
+  if (
+    result.status !== "success" ||
+    typeof result.text !== "string" ||
+    !isUsableChatReply(result.text)
+  )
+    return result;
+  finishThinking(reply);
+  if (!streamed && !reducedMotion()) {
+    // Older hosts send one final reply: reveal it progressively anyway.
+    reply.text = "";
+    for (const part of chunkText(result.text, 2)) {
+      if (current !== epoch || streamControl?.signal.aborted) break;
+      reply.text += part;
+      scroll();
+      await new Promise((resolve) => setTimeout(resolve, 18));
+    }
+  }
+  reply.text = result.text;
+  return result;
 }
 async function send() {
   if (busy.value || listening.value) return;
@@ -556,7 +682,6 @@ async function send() {
   draft.value = "";
   notice.value = "";
   nextTick(grow);
-  scroll();
   // Grounded, offline answers first: facilities come from station data.
   const here = chatPoints.find(
     (point) => point.id === route.query.point || point.id === route.query.start
@@ -564,38 +689,42 @@ async function send() {
   const local = answerLocally(text, chatPoints, i18n, {
     nearFloor: here?.floor,
   });
-  if (local) {
-    addReply({
-      text: local.text,
-      places: local.places,
-      more:
-        local.total > (local.places?.length ?? 0)
-          ? t("chat.answer.more", {
-              count: local.total - local.places.length,
-            })
-          : "",
-    });
-  } else if (!modelReady.value) {
-    addReply({ text: t("chat.answer.fallback") });
-  } else {
-    const prompt = buildChatPrompt(history, text, {
-      languageName: LOCALES.find((item) => item.code === uiLocale.value)
-        ?.nativeName,
-    });
-    busy.value = true;
-    const result = await bridge.request("generate", { prompt });
-    if (current !== epoch || !opened.value) return;
-    busy.value = false;
-    if (
-      result.status === "success" &&
-      typeof result.text === "string" &&
-      isUsableChatReply(result.text)
-    )
-      addReply({ text: result.text });
-    else {
-      notice.value =
-        result.status === "success" ? t("chat.badReply") : explain(result);
-      if (!draft.value) draft.value = text;
+  busy.value = true;
+  streamControl = new AbortController();
+  const reply = startReply();
+  scroll();
+  try {
+    if (local || !modelReady.value) {
+      await playLocal(
+        reply,
+        local ?? { kind: "fallback", text: t("chat.answer.fallback") },
+        streamControl.signal
+      );
+    } else {
+      const prompt = buildChatPrompt(history, text, {
+        languageName: LOCALES.find((item) => item.code === uiLocale.value)
+          ?.nativeName,
+      });
+      const result = await playModel(reply, prompt, current);
+      if (result && result.status !== "success") {
+        messages.value = messages.value.filter((item) => item !== reply);
+        notice.value = explain(result);
+        if (!draft.value) draft.value = text;
+      } else if (result && !isUsableChatReply(result.text)) {
+        messages.value = messages.value.filter((item) => item !== reply);
+        notice.value = t("chat.badReply");
+      }
+    }
+  } finally {
+    if (current === epoch) {
+      if (streamControl?.signal.aborted && !reply.text) {
+        messages.value = messages.value.filter((item) => item !== reply);
+        notice.value = t("chat.error.cancelled");
+      }
+      finishThinking(reply);
+      reply.streaming = false;
+      busy.value = false;
+      streamControl = null;
     }
   }
   scroll();
@@ -609,6 +738,7 @@ async function showPlace(pointId) {
   mapFocus.focus(pointId);
 }
 function cancelGeneration() {
+  streamControl?.abort();
   bridge.cancelAll();
 }
 async function record() {
@@ -882,6 +1012,156 @@ onBeforeUnmount(() => {
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+}
+/* Thinking panel (SSE-style steps), adapted in spirit from EmbAId-Agent. */
+.maze-chat-thought {
+  flex-shrink: 0;
+  max-width: 100%;
+  border: 1px solid var(--chat-line);
+  border-radius: 14px;
+  background: var(--tp-surface);
+  color: var(--chat-muted);
+  font-size: 13px;
+  animation: maze-in 280ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.maze-chat-thought summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 6px 12px;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+.maze-chat-thought summary::-webkit-details-marker {
+  display: none;
+}
+.maze-chat-orb {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--tp-primary-500),
+    var(--tp-primary-200),
+    transparent 70%,
+    var(--tp-primary-500)
+  );
+  -webkit-mask: radial-gradient(circle, transparent 3.5px, #000 4px);
+  mask: radial-gradient(circle, transparent 3.5px, #000 4px);
+  animation: maze-spin 0.9s linear infinite;
+}
+.maze-chat-thought[data-state="done"] .maze-chat-orb {
+  animation: none;
+  background: #2e9a6c;
+  -webkit-mask: none;
+  mask: none;
+  transform: scale(0.55);
+}
+.maze-chat-thought[data-state="active"] .maze-chat-thought-title {
+  background: linear-gradient(
+    90deg,
+    var(--tp-gray-400) 0%,
+    var(--chat-ink) 45%,
+    var(--tp-gray-400) 90%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: maze-shimmer 1.6s linear infinite;
+}
+.maze-chat-chev {
+  width: 7px;
+  height: 7px;
+  margin-left: auto;
+  border: solid var(--tp-gray-400);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 200ms ease;
+}
+.maze-chat-thought[open] .maze-chat-chev {
+  transform: rotate(-135deg) translateY(-1px);
+}
+.maze-chat-steps {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0 12px 10px;
+  list-style: none;
+}
+.maze-chat-steps li {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  padding: 3px 0;
+  line-height: 1.45;
+  animation: maze-step 260ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.maze-chat-tick {
+  position: relative;
+  width: 13px;
+  height: 13px;
+  margin-top: 2px;
+  border-radius: 50%;
+  border: 1.5px solid var(--tp-gray-200);
+}
+.maze-chat-steps li[data-state="active"] .maze-chat-tick {
+  border-color: var(--tp-primary-500);
+  border-right-color: transparent;
+  animation: maze-spin 0.8s linear infinite;
+}
+.maze-chat-steps li[data-state="done"] .maze-chat-tick {
+  border-color: #2e9a6c;
+  background: #2e9a6c;
+}
+.maze-chat-steps li[data-state="done"] .maze-chat-tick::after {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0.5px;
+  width: 3px;
+  height: 6px;
+  border: solid #fff;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+}
+.maze-chat-caret {
+  display: inline-block;
+  width: 6px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -2px;
+  border-radius: 2px;
+  background: var(--tp-primary-500);
+  animation: maze-caret 1s steps(2) infinite;
+}
+@keyframes maze-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes maze-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+@keyframes maze-step {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+@keyframes maze-caret {
+  50% {
+    opacity: 0;
+  }
 }
 .maze-chat-places {
   display: flex;
@@ -1298,7 +1578,12 @@ onBeforeUnmount(() => {
   .maze-chat-tray button {
     animation: none;
   }
-  .maze-chat-typing i,
+  .maze-chat-orb,
+  .maze-chat-tick,
+  .maze-chat-caret,
+  .maze-chat-thought,
+  .maze-chat-steps li,
+  .maze-chat-thought-title,
   .maze-chat-round.listening {
     animation-duration: 0.001ms;
     animation-iteration-count: 1;
