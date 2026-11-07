@@ -1,10 +1,22 @@
 <template>
-  <main class="station-page" lang="zh-Hant">
+  <main
+    class="station-page display-page"
+    lang="zh-Hant"
+    :data-theme="theme"
+    :data-display-mode="displayMode"
+  >
     <div class="station-shell">
       <section class="station-heading" aria-labelledby="station-title">
         <div class="station-title-row">
           <h1 id="station-title">台北車站</h1>
+          <DisplayControls />
         </div>
+        <p v-if="displayMode !== 'standard'" class="display-floor-label">
+          {{ level }}・{{ floorNames[level] }}
+        </p>
+        <p v-if="displayMode === 'child'" class="display-hint">
+          先選要找的設施，再點地圖上的圓點。
+        </p>
       </section>
 
       <StationScanPanel
@@ -188,6 +200,9 @@
                 <h3 id="connector-title" ref="connectorHeading" tabindex="-1">
                   {{ selected.name }}
                 </h3>
+                <p v-if="displayMode === 'child'" class="display-hint">
+                  {{ facilityHelp[selected.type] }}
+                </p>
                 <template v-if="destinations.length">
                   <div v-for="transfer in destinations" :key="transfer.id">
                     <button
@@ -209,6 +224,19 @@
                 </template>
                 <p v-else>{{ selected.description }}</p>
               </section>
+            </div>
+            <div
+              v-if="
+                selected && !isConnector(selected) && displayMode !== 'standard'
+              "
+              class="display-facility-detail"
+              role="status"
+            >
+              <h3>{{ selected.name }}</h3>
+              <p v-if="displayMode === 'child'" class="display-hint">
+                {{ facilityHelp[selected.type] }}
+              </p>
+              <p>{{ selected.description }}</p>
             </div>
           </section>
         </div>
@@ -245,11 +273,36 @@ import {
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationScanPanel from "../components/StationScanPanel.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
+import DisplayControls from "../components/DisplayControls.vue";
+import { useDisplayPreferences } from "../display/preferences.mjs";
 import { floors, stackBounds } from "./station-floor-plans";
 import stationData from "./station-points.json";
 import { zones, transfersFromPoint } from "./station-routing";
 
 const { categories, points } = stationData;
+const { theme, displayMode } = useDisplayPreferences();
+const floorNames = {
+  B1: "地下一樓",
+  B2: "地下二樓",
+  B3: "地下三樓",
+  B4: "地下四樓",
+};
+const facilityHelp = {
+  elevator: "電梯：可以換樓層，不用走樓梯。",
+  stairs: "樓梯：一步一步走，可以到別的樓層。",
+  escalator: "電扶梯：會移動的樓梯，搭乘前請確認方向。",
+  "stairs-escalator": "這裡有換樓層的通道，請依現場標示確認樓梯或電扶梯。",
+  stairway: "這裡有換樓層的通道，種類和方向請看現場標示。",
+  restroom: "廁所：上廁所、洗手的地方。",
+  nursing: "哺集乳室：照顧寶寶、哺乳或集乳的地方。",
+  info: "詢問處：有問題時，可以向工作人員詢問。",
+  ticket: "售票處：詢問或購買車票的地方。",
+  aed: "AED：急救設備，有人需要急救時請找工作人員協助。",
+  phone: "公用電話：可以打電話的地方。",
+  water: "飲水設施：依設備標示取用飲水。",
+  locker: "置物櫃：暫時寄放行李的地方。",
+  accessible: "輪椅候車區：提供輪椅使用者候車的空間。",
+};
 // const searchCatalogEntries = stationCatalog(stationData);
 // let searchPointRevision = 0;
 const mobileZoomQuery = window.matchMedia(
@@ -342,6 +395,18 @@ const mapSection = ref(null);
 const mapStage = ref(null);
 const mapTop = ref(0);
 watch(level, updateMapLayout, { flush: "post" });
+watch(displayMode, async () => {
+  const frame = viewport.value;
+  if (!frame) return;
+  const center = zoomAnchor(viewportCenter());
+  await nextTick();
+  if (!frame.isConnected) return;
+  updateMapLayout();
+  await nextTick();
+  if (!frame.isConnected) return;
+  centerOn(...center);
+  placeConnectorPanel();
+});
 watch([selected, zoom, showLayers, floorChanging], placeConnectorPanel, {
   flush: "post",
 });
@@ -479,7 +544,8 @@ function floorStyle(floor) {
     "--floor-tone": paletteColor(tone),
     "--floor-tint": paletteColor(tint),
     "--floor-ink": paletteColor(ink),
-    "--floor-on-tone": paletteColor(onTone),
+    "--floor-on-tone":
+      theme.value === "dark" ? "#0c1315" : paletteColor(onTone),
   };
 }
 
@@ -504,7 +570,10 @@ function pointThemeStyle(type) {
   const iconColor = category?.iconColor;
   return {
     "--pin-color": paletteColor(colorToken),
-    "--pin-icon": iconColor || paletteColor(iconColorToken),
+    "--pin-icon":
+      theme.value === "dark"
+        ? "#0c1315"
+        : iconColor || paletteColor(iconColorToken),
     "--point-icon-color": iconColor || paletteColor(colorToken),
   };
 }
@@ -880,6 +949,15 @@ function placeConnectorPanel() {
 
   const margin = 8;
   const gap = 23;
+  panel.style.maxHeight =
+    Math.max(
+      48,
+      Math.min(
+        displayMode.value === "standard" ? 230 : 480,
+        height - margin * 2,
+        window.innerHeight * (displayMode.value === "standard" ? 0.45 : 0.7)
+      )
+    ) + "px";
   const panelWidth = panel.offsetWidth;
   const panelHeight = panel.offsetHeight;
   const leftLimit = width - panelWidth - margin;
@@ -901,6 +979,11 @@ function placeConnectorPanel() {
         top = below;
       else top = aboveClearance >= belowClearance ? above : below;
     }
+  }
+
+  if (displayMode.value !== "standard") {
+    left = Math.max(margin, Math.min(leftLimit, left));
+    top = Math.max(margin, Math.min(topLimit, top));
   }
 
   connectorPosition.value = {
@@ -931,6 +1014,7 @@ function closeConnectorDetails() {
 function dismissConnectorOutside(event) {
   const panel = connectorPanel.value;
   if (!panel || panel.contains(event.target)) return;
+  if (event.target.closest?.(".display-controls")) return;
   if (viewport.value.contains(event.target)) {
     // Marker clicks handle selection, and a click following a drag is ignored.
     const dragClick = ignoreMouseClick && event.detail !== 0;

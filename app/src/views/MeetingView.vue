@@ -1,8 +1,17 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
-  <main class="meeting-page" lang="zh-Hant">
+  <main
+    class="meeting-page display-page"
+    lang="zh-Hant"
+    :data-theme="theme"
+    :data-display-mode="displayMode"
+  >
+    <DisplayControls />
     <router-link to="/station-map">← 回車站地圖</router-link>
     <h1>朋友分享的集合點</h1>
+    <p v-if="displayMode === 'child'" class="display-hint">
+      這是朋友約好的地方，不是你現在的位置。
+    </p>
     <p class="banner">
       合成場景示範，不是北車實際等候地點。分享者位置非即時資訊。
     </p>
@@ -34,10 +43,13 @@
 <script setup>
 import { computed } from "vue";
 import { useRoute } from "vue-router";
+import DisplayControls from "../components/DisplayControls.vue";
+import { useDisplayPreferences } from "../display/preferences.mjs";
 import graph from "../navigation/demo-graph.json";
 import points from "../meeting/meeting-points.json";
 import { parseMeetingLink, timeNotice } from "../meeting/meeting.mjs";
 const route = useRoute();
+const { theme, displayMode } = useDisplayPreferences();
 const fullLink = computed(
   () => new URL(route.fullPath, window.location.origin).href
 );
@@ -59,16 +71,41 @@ const timeText = computed(
   margin: 0 auto;
   padding: 24px 18px 48px;
   text-align: left;
-  color: #213b43;
+  color: var(--meeting-ink);
+  background: var(--surface);
   line-height: 1.75;
   font-family: system-ui, sans-serif;
 }
 .banner {
-  background: #fff4dc;
-  border-left: 4px solid #91601e;
+  background: var(--warning-bg);
+  border-left: 4px solid var(--warning-border);
   padding: 14px;
 }
 a {
-  color: #326875;
+  color: var(--meeting-link);
+}
+.display-controls {
+  margin-bottom: 16px;
+}
+.meeting-page:not([data-display-mode="standard"]) {
+  font-size: var(--display-main-size);
+  overflow-wrap: anywhere;
+}
+.meeting-page:not([data-display-mode="standard"]) a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--display-control-height);
+}
+.meeting-page:not([data-display-mode="standard"]) h1 {
+  font-size: 1.75em;
+  line-height: 1.35;
+}
+.meeting-page:not([data-display-mode="standard"]) h2 {
+  font-size: 1.3em;
+  line-height: 1.45;
+}
+.meeting-page a:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
 }
 </style>
