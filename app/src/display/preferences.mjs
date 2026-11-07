@@ -7,7 +7,7 @@ export const contrastStorageKey = "taipei-maze.contrast.v1";
 const browserStorage = () =>
   typeof window === "undefined" ? undefined : window.localStorage;
 
-/** Remember only a manually chosen theme; age presets still start standard. */
+/** Persist manual appearance choices. Display modes always start at standard. */
 export function createDisplayPreferences(storage = browserStorage) {
   let savedTheme, savedContrast;
   try {
@@ -45,6 +45,8 @@ export function createDisplayPreferences(storage = browserStorage) {
     setDisplayMode(value) {
       if (!modes.includes(value)) return;
       state.displayMode = value;
+      state.theme = "light";
+      state.contrast = value === "senior" ? "high" : "standard";
     },
   };
 }

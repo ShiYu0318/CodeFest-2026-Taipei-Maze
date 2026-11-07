@@ -12,7 +12,7 @@ export function useStationLocation(data, connections) {
   const controller = createStationLocation({
     data,
     connections,
-    native: window.flutterObject,
+    native: () => window.flutterObject,
     onChange: (state) => {
       view.value = state;
     },
@@ -30,12 +30,21 @@ export function useStationLocation(data, connections) {
     { flush: "post" }
   );
   const suspend = () => controller.suspend();
+  const refreshNative = () => controller.refreshNative();
   onMounted(() => {
     controller.applyQuery(route.query);
+    refreshNative();
+    window.addEventListener("flutterInAppWebViewPlatformReady", refreshNative);
+    window.addEventListener("pageshow", refreshNative);
     window.addEventListener("pagehide", suspend);
   });
   onBeforeRouteLeave(suspend);
   onBeforeUnmount(() => {
+    window.removeEventListener(
+      "flutterInAppWebViewPlatformReady",
+      refreshNative
+    );
+    window.removeEventListener("pageshow", refreshNative);
     window.removeEventListener("pagehide", suspend);
     controller.dispose();
   });

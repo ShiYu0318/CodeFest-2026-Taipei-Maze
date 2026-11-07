@@ -150,6 +150,7 @@ export default {
     "The scanner could not start. Close and reopen the service, then try again.",
   "notice.InvalidReply":
     "The app sent an unexpected reply. Your location has not changed.",
+  "notice.ScanFailed": "Could not process the scan result. Please scan again.",
   "notice.unsupportedCode":
     "This code is not a location on this map. Your location and destination have not changed.",
   "notice.resetUrlFailed":
