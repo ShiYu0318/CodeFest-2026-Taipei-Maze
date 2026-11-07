@@ -60,7 +60,9 @@
             <ZhuyinText text="測試導航流程" />
           </router-link>
         </div>
-        <span>{{ floorPoints.length }} <ZhuyinText text="個標點" /></span>
+        <span>
+          {{ visibleFloorPoints.length }} <ZhuyinText text="個標點" />
+        </span>
       </div>
 
       <div
@@ -156,7 +158,7 @@
                       </g>
                     </svg>
                     <button
-                      v-for="point in floorPoints"
+                      v-for="point in visibleFloorPoints"
                       :key="point.id"
                       class="map-pin"
                       :class="{
@@ -458,6 +460,13 @@ const floorPoints = computed(() => {
     ...current.filter((point) => isConnector(point)),
   ];
 });
+const visibleFloorPoints = computed(() =>
+  activeTheme.value
+    ? floorPoints.value.filter((point) =>
+        matchesTheme(point, activeTheme.value)
+      )
+    : floorPoints.value
+);
 const availableThemes = computed(() =>
   Object.keys(categories).filter((type) =>
     floorPoints.value.some((point) => matchesTheme(point, type))
