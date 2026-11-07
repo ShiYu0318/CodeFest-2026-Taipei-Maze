@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0
 
       - name: Pull latest main
-        run: git pull origin main
+        run: git pull origin main --rebase
 
       - name: Start services
         working-directory: ./
