@@ -1,3 +1,4 @@
+# for production: docker compose -f compose.yml up --build
 services:
   codefest:
     build:
