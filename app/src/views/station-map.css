@@ -1,36 +1,4 @@
 .station-page {
-  /* Use the labeled 500 values and sample the remaining shades from the reference. */
-  --tp-primary-50: #f0f8fa;
-  --tp-primary-100: #e1f0f4;
-  --tp-primary-200: #c2e1e9;
-  --tp-primary-300: #a8d2dd;
-  --tp-primary-400: #8ec3d3;
-  --tp-primary-500: #5ab4c5;
-  --tp-primary-600: #608c99;
-  --tp-primary-700: #496b75;
-  --tp-primary-800: #2f464d;
-  --tp-primary-900: #182629;
-  --tp-primary-950: #0c1315;
-  --tp-secondary-50: #fbf8ee;
-  --tp-secondary-100: #f9f2e1;
-  --tp-secondary-200: #f2e3c1;
-  --tp-secondary-500: #f5ba4b;
-  --tp-secondary-600: #d7a652;
-  --tp-secondary-700: #a17d3c;
-  --tp-secondary-800: #6c5326;
-  --tp-secondary-900: #382b11;
-  --tp-secondary-950: #1a1306;
-  --tp-gray-50: #f1f3f4;
-  --tp-gray-100: #e4e7e9;
-  --tp-gray-500: #738995;
-  --tp-gray-600: #626d75;
-  --tp-gray-700: #4a5258;
-  --tp-gray-800: #32383c;
-  --tp-gray-900: #181b1d;
-  --tp-gray-950: #0c0d0e;
-  --tp-page: #f8fafa;
-  --tp-surface: #fdfefe;
-
   --ink: var(--tp-primary-900);
   --muted: var(--tp-gray-700);
   --accent: var(--tp-primary-700);
@@ -137,6 +105,22 @@
   font-size: clamp(2rem, 6vw, 3rem);
   line-height: 1.2;
   letter-spacing: -0.035em;
+}
+.station-title-row .display-controls {
+  margin-left: auto;
+}
+.station-page .station-heading .display-floor-label {
+  margin-top: 10px;
+  color: var(--ink);
+  font-size: var(--display-main-size);
+  font-weight: 750;
+  line-height: 1.5;
+}
+.station-page .station-heading .display-hint {
+  margin-top: 6px;
+  color: var(--accent);
+  font-size: var(--display-main-size);
+  line-height: 1.65;
 }
 .floor-tag {
   border-radius: 8px;
@@ -793,4 +777,109 @@
   .facility-card {
     padding-inline: 16px;
   }
+}
+
+.station-page[data-theme="dark"] .floor-switch button {
+  color: #0c1315;
+}
+.station-page[data-theme="dark"] .floor-switch button[aria-pressed="true"] {
+  color: #1a1306;
+}
+.station-page[data-theme="dark"] .switch-track::after {
+  background: #fff;
+}
+
+/* Reading presets change controls and details, not map geometry or idle pins. */
+.station-page:not([data-display-mode="standard"]) .floor-controls,
+.station-page:not([data-display-mode="standard"]) .theme-group {
+  gap: var(--display-gap);
+}
+.station-page:not([data-display-mode="standard"]) .floor-switch {
+  flex-basis: 220px;
+  max-width: 300px;
+  gap: 6px;
+}
+.station-page:not([data-display-mode="standard"])
+  :is(
+    .floor-switch button,
+    .layer-toggle,
+    .theme-group button,
+    .floor-destination,
+    .map-return
+  ) {
+  min-height: var(--display-control-height);
+  min-width: 48px;
+  padding: 6px 10px;
+  font-size: var(--display-main-size);
+  line-height: 1.5;
+}
+.station-page:not([data-display-mode="standard"])
+  :is(.theme-group svg, .layer-toggle svg, .floor-destination svg) {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.station-page:not([data-display-mode="standard"]) .facility-header {
+  flex-wrap: wrap;
+  padding-block: 14px;
+}
+.station-page:not([data-display-mode="standard"]) .facility-header h2 {
+  font-size: var(--display-main-size);
+}
+.station-page:not([data-display-mode="standard"])
+  :is(.facility-header > span, .station-footer) {
+  font-size: var(--display-secondary-size);
+  line-height: 1.65;
+}
+.station-page:not([data-display-mode="standard"]) .station-footer a {
+  min-height: var(--display-control-height);
+}
+.station-page:not([data-display-mode="standard"]) .connector-panel {
+  width: min(20rem, calc(100% - 16px));
+  padding: 12px;
+  gap: var(--display-gap);
+  overflow-wrap: anywhere;
+}
+.station-page:not([data-display-mode="standard"]) .connector-panel h3,
+.station-page:not([data-display-mode="standard"]) .display-facility-detail h3 {
+  font-size: var(--display-main-size);
+  line-height: 1.5;
+}
+.station-page:not([data-display-mode="standard"]) .connector-panel p {
+  font-size: var(--display-secondary-size);
+  line-height: 1.65;
+}
+.station-page:not([data-display-mode="standard"])
+  .connector-panel
+  .display-hint {
+  color: var(--accent);
+  font-size: var(--display-main-size);
+}
+.station-page:not([data-display-mode="standard"])
+  .map-pin[aria-pressed="true"] {
+  width: 48px;
+  height: 48px;
+}
+.station-page:not([data-display-mode="standard"])
+  .map-pin[aria-pressed="true"]
+  .pin-icon {
+  width: 40px;
+  height: 40px;
+}
+.station-page:not([data-display-mode="standard"])
+  .map-pin[aria-pressed="true"]
+  .pin-icon
+  svg {
+  width: 24px;
+  height: 24px;
+}
+.display-facility-detail {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  overflow-wrap: anywhere;
+  font-size: var(--display-main-size);
+  line-height: 1.65;
+}
+.display-facility-detail p {
+  margin-top: 8px;
 }
