@@ -67,7 +67,7 @@ export default {
 <style scoped>
 .landing-plan {
   position: relative;
-  background: var(--tp-primary-50);
+  background: var(--station-map-background, var(--tp-primary-50));
   border: 1px solid var(--tp-primary-100);
   border-radius: 8px;
 }

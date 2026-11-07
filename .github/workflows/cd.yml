@@ -11,23 +11,22 @@ concurrency:
 
 permissions:
   contents: read
+env:
+  DEPLOY_DIR: /home/user/Taipei-Codefest-2026-Big-Dumb
 
 jobs:
   deploy:
     runs-on: [self-hosted, Linux, X64]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Pull latest changes
-        working-directory: ./
-        run: git pull origin main
+        run: |
+          cd "$DEPLOY_DIR"
+          git pull --ff-only
 
       - name: Start services
-        working-directory: ./
-        run: docker compose up -d --build --remove-orphans
+        run: |
+          cd "$DEPLOY_DIR"
+          docker compose up -d --build --remove-orphans
 
       - name: Health check
         run: |
@@ -40,7 +39,3 @@ jobs:
           done
           docker compose logs --tail=50
           exit 1
-
-      - name: Prune dangling images
-        if: always()
-        run: docker image prune -f

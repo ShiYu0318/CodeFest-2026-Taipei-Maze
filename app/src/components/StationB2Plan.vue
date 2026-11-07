@@ -57,7 +57,7 @@ export default { props: { outlineOnly: Boolean } };
 
 <style scoped>
 .floor {
-  fill: var(--tp-surface);
+  fill: none;
   stroke: var(--tp-primary-700);
   stroke-width: 6;
   stroke-linejoin: round;

@@ -69,13 +69,20 @@
               <div
                 ref="viewport"
                 class="map-viewport"
-                :class="{ 'map-zoomed': zoom > 1 }"
+                :class="{ 'map-zoomed': zoom > 1, 'map-dragging': dragging }"
                 :style="{ '--map-aspect': bounds[2] + ' / ' + bounds[3] }"
                 role="region"
                 :aria-label="level + ' 互動地圖，可用加減鍵縮放，0 鍵重設'"
                 tabindex="0"
                 @wheel="zoomWithWheel"
                 @keydown.self="zoomWithKeyboard"
+                @pointerdown="startMapDrag"
+                @pointermove="moveMapDrag"
+                @pointerup="endMapDrag"
+                @pointercancel="endMapDrag"
+                @pointerleave="leaveMapDrag"
+                @lostpointercapture="endMapDrag"
+                @click.capture="ignoreDragClick"
               >
                 <div class="map-board" :style="{ width: zoom * 100 + '%' }">
                   <svg
@@ -441,6 +448,9 @@ const activeTheme = ref(null);
 const selected = ref(null);
 const zoom = ref(1);
 const viewport = ref(null);
+const dragging = ref(false);
+let mapDrag = null;
+let ignoreMouseClick = false;
 let pinch = null;
 let webkitPinch = null;
 let zoomRevision = 0;
@@ -463,6 +473,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  clearMapDrag();
   clearPinch();
   document.removeEventListener("touchstart", startPinch, true);
   document.removeEventListener("touchend", endPinch, true);
@@ -640,6 +651,7 @@ function zoomAnchor([x, y]) {
 }
 
 async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
+  clearMapDrag();
   const frame = viewport.value;
   const board = frame.firstElementChild;
   const revision = ++zoomRevision;
@@ -652,6 +664,65 @@ async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
       anchor[0] * board.clientWidth - x,
       anchor[1] * board.clientHeight - y
     );
+}
+
+function startMapDrag(event) {
+  ignoreMouseClick = false;
+  if (event.pointerType !== "mouse" || event.button !== 0 || zoom.value <= 1)
+    return;
+  const frame = viewport.value;
+  mapDrag = {
+    pointerId: event.pointerId,
+    x: event.clientX,
+    y: event.clientY,
+    left: frame.scrollLeft,
+    top: frame.scrollTop,
+  };
+}
+
+function moveMapDrag(event) {
+  if (event.pointerId !== mapDrag?.pointerId) return;
+  if (!(event.buttons & 1)) {
+    clearMapDrag();
+    return;
+  }
+  const dx = event.clientX - mapDrag.x;
+  const dy = event.clientY - mapDrag.y;
+  const frame = viewport.value;
+  if (!dragging.value) {
+    // A small movement should still count as a tap on a facility marker.
+    if (Math.hypot(dx, dy) < 5) return;
+    frame.setPointerCapture(event.pointerId);
+    dragging.value = true;
+    ignoreMouseClick = true;
+  }
+  event.preventDefault();
+  frame.scrollTo(mapDrag.left - dx, mapDrag.top - dy);
+}
+
+function clearMapDrag() {
+  if (!mapDrag) return;
+  const { pointerId } = mapDrag;
+  const frame = viewport.value;
+  mapDrag = null;
+  dragging.value = false;
+  if (frame?.hasPointerCapture(pointerId))
+    frame.releasePointerCapture(pointerId);
+}
+
+function endMapDrag(event) {
+  if (event.pointerId === mapDrag?.pointerId) clearMapDrag();
+}
+
+function leaveMapDrag(event) {
+  if (!dragging.value) endMapDrag(event);
+}
+
+function ignoreDragClick(event) {
+  if (!ignoreMouseClick || event.detail === 0) return;
+  ignoreMouseClick = false;
+  event.preventDefault();
+  event.stopPropagation();
 }
 
 function resetZoom() {
