@@ -3,6 +3,8 @@ name: Android host integration
 on:
   pull_request:
     paths:
+      - app/**
+      - tools/package-townpass-web.py
       - integration/townpass/test-env.patch
       - .github/workflows/native-android.yml
   workflow_dispatch:
@@ -54,3 +56,11 @@ jobs:
       - name: Build Android debug APK (no model weights or signing secrets)
         working-directory: ${{ runner.temp }}/TownPass
         run: flutter build apk --debug --no-pub
+
+      - name: Upload debug APK for phone testing
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: townpass-debug-apk
+          path: ${{ runner.temp }}/TownPass/build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
+          if-no-files-found: error

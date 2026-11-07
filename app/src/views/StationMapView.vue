@@ -18,6 +18,12 @@
           先選要找的設施，再點地圖上的圓點。
         </p>
       </section>
+
+      <StationScanPanel
+        :selected-point="selected"
+        @position="setScanPosition"
+        @destination="setScanTarget"
+      />
       <div class="floor-controls">
         <div class="floor-switch" role="group" aria-label="選擇樓層">
           <button
@@ -153,11 +159,17 @@
                       class="map-pin"
                       :class="{
                         'pin-themed': matchesTheme(point, activeTheme),
+                        'pin-scan-position': point.id === scanPositionId,
+                        'pin-scan-target': point.id === scanTargetId,
                         'pin-arrival': point.id === arrivalPointId,
                       }"
                       type="button"
                       :style="pinStyle(point)"
-                      :aria-label="point.name"
+                      :aria-label="
+                        point.name +
+                        (point.id === scanPositionId ? '，上次掃碼位置' : '') +
+                        (point.id === scanTargetId ? '，目的地' : '')
+                      "
                       :aria-pressed="point.id === selected?.id"
                       :aria-expanded="
                         isConnector(point)
@@ -264,6 +276,7 @@ import {
 // import DestinationSearch from "../components/DestinationSearch.vue";
 // import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
+import StationScanPanel from "../components/StationScanPanel.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import DisplayControls from "../components/DisplayControls.vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
@@ -339,6 +352,33 @@ const level = ref("B2");
 const showLayers = ref(false);
 const activeTheme = ref(null);
 const selected = ref(null);
+const scanPositionId = ref(null);
+const scanTargetId = ref(null);
+let scanFocusRevision = 0;
+async function focusScanPoint(point) {
+  const revision = ++scanFocusRevision;
+  if (!point) return;
+  floorAnimation?.cancel();
+  clearMapDrag();
+  clearPinch();
+  originView.value = null;
+  level.value = point.floor;
+  selected.value = point;
+  await nextTick();
+  if (revision !== scanFocusRevision || !viewport.value?.isConnected) return;
+  await resetZoom();
+  if (revision !== scanFocusRevision || !viewport.value?.isConnected) return;
+  const [x, y] = normalizedPoint(point);
+  centerOn(x, y);
+}
+function setScanPosition(point) {
+  scanPositionId.value = point?.id ?? null;
+  focusScanPoint(point);
+}
+function setScanTarget(point) {
+  scanTargetId.value = point?.id ?? null;
+  focusScanPoint(point);
+}
 const originView = ref(null);
 const connectorHeading = ref(null);
 const connectorPanel = ref(null);
@@ -391,6 +431,8 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  scanFocusRevision++;
+  zoomRevision++;
   window.removeEventListener("resize", updateMapLayout);
   mobileZoomQuery.removeEventListener("change", enforceZoomLimit);
   document.removeEventListener("click", dismissConnectorOutside, true);
@@ -543,7 +585,9 @@ function pointThemeStyle(type) {
 
 function centerOn(x, y) {
   const frame = viewport.value;
+  if (!frame?.isConnected) return;
   const board = frame.firstElementChild;
+  if (!board) return;
   frame.scrollLeft =
     board.offsetLeft + x * board.clientWidth - frame.clientWidth / 2;
   frame.scrollTop =

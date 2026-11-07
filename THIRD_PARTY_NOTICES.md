@@ -69,3 +69,7 @@ MIT、常見 BSD-2-Clause／BSD-3-Clause、Apache-2.0 可作優先候選，但�
 - Gemma 3 1B INT4：Google 開放權重、Gemma 專屬條款；官方 Gallery 所列 HF commit 與檔案固定，取得使用者授權與 SHA-256 核對後才安裝，不包含權重或 Token。不是 AGPL 權重再授權。
 - Apple Speech、Android SpeechRecognizer 是平台 API；只允許 Apple／可識別 Google 的裝置端 provider。未採用中國模型、廠牌服務、代理或來源不明權重。
 - GitHub Android CI 使用 GitHub 官方 `actions/checkout` 固定 SHA、官方 Flutter 固定 commit 與 runner 預裝的 Google SDK／NDK；不自動接受 preview license。
+
+## 正式地圖測試碼產生工具
+
+`python-qrcode` 8.2（Lincoln Loop，BSD-3-Clause）僅用於開發產生 SVG 測試碼；來源 https://github.com/lincolnloop/python-qrcode ，PyPI wheel SHA-256 固定於 `tools/requirements/station-qr.txt`，完整授權位於 `integration/townpass/licenses/python-qrcode-BSD-3-Clause.txt`。未新增網頁或手機 runtime 相依套件，未使用線上 QR 服務。

@@ -26,7 +26,19 @@
       </svg>
       <span>小幫手</span>
     </button>
-    <div v-if="opened" class="maze-chat-backdrop" @click.self="close">
+    <div
+      v-if="opened"
+      class="maze-chat-backdrop display-page"
+      :data-theme="theme"
+      :data-display-mode="displayMode"
+      :style="{
+        height: viewportHeight + 'px',
+        top: viewportTop + 'px',
+        bottom: 'auto',
+        '--chat-viewport-height': viewportHeight + 'px',
+      }"
+      @click.self="close"
+    >
       <section
         ref="panel"
         class="maze-chat-panel"
@@ -168,6 +180,8 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { useDisplayPreferences } from "../display/preferences.mjs";
+import "../display/display-preferences.css";
 import {
   buildChatPrompt,
   createChatBridge,
@@ -188,6 +202,15 @@ const launcher = ref(null),
   closeButton = ref(null),
   input = ref(null),
   thread = ref(null);
+const viewportHeight = ref(window.visualViewport?.height ?? window.innerHeight);
+const viewportTop = ref(window.visualViewport?.offsetTop ?? 0);
+function updateViewport() {
+  viewportHeight.value = window.visualViewport?.height ?? window.innerHeight;
+  viewportTop.value = window.visualViewport?.offsetTop ?? 0;
+}
+window.visualViewport?.addEventListener("resize", updateViewport);
+window.visualViewport?.addEventListener("scroll", updateViewport);
+window.addEventListener("resize", updateViewport);
 const locale = ref("zh-TW");
 const languages = [
   ["zh-TW", "繁體中文"],
@@ -200,6 +223,7 @@ const languages = [
 ];
 const bridge = createChatBridge(window.flutterObject);
 const route = useRoute();
+const { theme, displayMode } = useDisplayPreferences();
 let epoch = 0,
   serial = 0,
   priorFocus = null,
@@ -245,6 +269,7 @@ async function refreshStatus() {
     result.status === "success" && result.voiceAvailable === true;
 }
 async function open() {
+  updateViewport();
   priorFocus = document.activeElement;
   opened.value = true;
   const app = document.getElementById("app");
@@ -368,6 +393,9 @@ document.addEventListener("visibilitychange", visibility);
 onBeforeUnmount(() => {
   if (opened.value) close();
   bridge.dispose();
+  window.visualViewport?.removeEventListener("resize", updateViewport);
+  window.visualViewport?.removeEventListener("scroll", updateViewport);
+  window.removeEventListener("resize", updateViewport);
   document.removeEventListener("visibilitychange", visibility);
 });
 </script>
@@ -402,14 +430,14 @@ onBeforeUnmount(() => {
 }
 .maze-chat-panel {
   width: min(410px, 100%);
-  height: min(680px, calc(100dvh - 32px));
+  height: min(680px, calc(var(--chat-viewport-height, 100dvh) - 32px));
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #fff;
+  background: var(--surface, #fff);
   border-radius: 20px;
   box-shadow: 0 12px 50px #102c4340;
-  color: #173649;
+  color: var(--ink, #173649);
   text-align: left;
   font: 16px/1.5 system-ui, -apple-system, "PingFang TC", sans-serif;
 }
@@ -436,14 +464,14 @@ onBeforeUnmount(() => {
   color: white;
   font-size: 30px;
   min-width: 44px;
-  min-height: 44px;
+  min-height: var(--display-control-height, 44px);
 }
 .maze-chat-status {
   display: flex;
   align-items: center;
   gap: 7px;
   padding: 10px 16px;
-  background: #eef4f7;
+  background: var(--wash, #eef4f7);
   font-size: 12px;
 }
 .maze-chat-status > span {
@@ -461,7 +489,7 @@ onBeforeUnmount(() => {
   background: transparent;
   text-decoration: underline;
   min-height: 36px;
-  color: #153d53;
+  color: var(--ink, #153d53);
 }
 .maze-chat-thread {
   flex: 1;
@@ -480,7 +508,7 @@ onBeforeUnmount(() => {
   font-size: 15px;
 }
 .maze-chat-setup {
-  color: #596b77;
+  color: var(--muted, #596b77);
   font-size: 13px;
   border-left: 3px solid #d3dfe7;
   padding-left: 10px;
@@ -499,11 +527,11 @@ onBeforeUnmount(() => {
   align-self: flex-end;
 }
 .maze-chat-bubble.assistant {
-  background: #eef4f7;
+  background: var(--wash, #eef4f7);
   align-self: flex-start;
 }
 .maze-chat-working {
-  color: #596b77;
+  color: var(--muted, #596b77);
   font-size: 13px;
 }
 .maze-chat-notice {
@@ -541,12 +569,12 @@ onBeforeUnmount(() => {
   margin-top: 8px;
 }
 .maze-chat-actions button {
-  min-height: 44px;
+  min-height: var(--display-control-height, 44px);
   border: 1px solid #b7c9d4;
   border-radius: 9px;
   padding: 8px 10px;
-  background: #fff;
-  color: #153d53;
+  background: var(--surface, #fff);
+  color: var(--ink, #153d53);
   font-weight: 600;
 }
 .maze-chat-actions .maze-chat-send {
@@ -565,20 +593,20 @@ onBeforeUnmount(() => {
   min-height: 40px;
   max-width: 126px;
   font-size: 13px;
-  background: #fff;
+  background: var(--surface, #fff);
   border: 1px solid #b7c9d4;
   border-radius: 7px;
-  color: #153d53;
+  color: var(--ink, #153d53);
 }
 .maze-chat-caption {
   font-size: 11px;
-  color: #596b77;
+  color: var(--muted, #596b77);
   margin: 8px 0 0;
 }
 .maze-chat-clear {
   border: 0;
   background: transparent;
-  color: #596b77;
+  color: var(--muted, #596b77);
   text-decoration: underline;
   padding: 8px 0;
   min-height: 36px;
@@ -601,7 +629,7 @@ onBeforeUnmount(() => {
   }
   .maze-chat-panel {
     width: 100%;
-    height: min(730px, 100dvh);
+    height: min(730px, var(--chat-viewport-height, 100dvh));
     border-radius: 20px 20px 0 0;
     padding-bottom: env(safe-area-inset-bottom);
   }
