@@ -516,4 +516,8 @@ export default {
   "endpoint.destinationPlaceholder": "どこへ行きますか？",
   "endpoint.browse": "または種類から選ぶ",
   "endpoint.allTypes": "すべて",
+  "map.zoomIn": "拡大",
+  "map.zoomOut": "縮小",
+  "map.zoomReset": "タップでフロア全体を表示",
+  "map.zoomControls": "地図の拡大・縮小",
 };

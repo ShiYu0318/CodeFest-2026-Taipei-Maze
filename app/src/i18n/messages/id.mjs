@@ -524,4 +524,8 @@ export default {
   "endpoint.destinationPlaceholder": "Mau ke mana?",
   "endpoint.browse": "Atau pilih menurut jenis",
   "endpoint.allTypes": "Semua",
+  "map.zoomIn": "Perbesar",
+  "map.zoomOut": "Perkecil",
+  "map.zoomReset": "Ketuk untuk melihat seluruh lantai",
+  "map.zoomControls": "Zoom peta",
 };

@@ -51,16 +51,19 @@
         :target-point="targetPoint"
         @open="(role, event) => openEndpointPicker(event, role)"
         @swap="swapEndpoints"
-      />
-
-      <StationScanPanel
-        :location="location"
-        :selected-point="selected"
-        :persistent-scan="navigationMap.active"
-        @destination="planDestination"
-        @scanned="onQrScanned"
-        @cancel-trip="openTripDialog('cancel')"
-      />
+      >
+        <template #start>
+          <StationScanPanel
+            embedded
+            :location="location"
+            :selected-point="selected"
+            :persistent-scan="navigationMap.active"
+            @destination="planDestination"
+            @scanned="onQrScanned"
+            @cancel-trip="openTripDialog('cancel')"
+          />
+        </template>
+      </StationEndpointBar>
       <section class="walk-panel" :aria-label="t('walk.routeTitle')">
         <p v-if="sharedPlace" class="walk-status" data-state="ok" role="status">
           {{
@@ -219,6 +222,52 @@
                     originView.floor
                   }}
                 </button>
+              </div>
+              <div
+                class="map-controls"
+                role="group"
+                :aria-label="t('map.zoomControls')"
+              >
+                <button
+                  type="button"
+                  class="map-compass"
+                  :aria-label="t('map.compass') + '。' + t('map.zoomReset')"
+                  :title="t('map.compass')"
+                  :disabled="floorChanging"
+                  @click="resetZoom(constrainZoom(1))"
+                >
+                  <svg viewBox="0 0 32 32" aria-hidden="true">
+                    <g transform="rotate(-12 16 16)">
+                      <path class="needle-north" d="M16 3l5 13H11z" />
+                      <path class="needle-south" d="M16 29l-5-13h10z" />
+                    </g>
+                  </svg>
+                  <span aria-hidden="true">N</span>
+                </button>
+                <div class="map-zoom">
+                  <button
+                    type="button"
+                    :aria-label="t('map.zoomIn')"
+                    :title="t('map.zoomIn')"
+                    :disabled="floorChanging || zoom >= 3"
+                    @click="zoomAt(constrainZoom(zoom + 0.5), viewportCenter())"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    :aria-label="t('map.zoomOut')"
+                    :title="t('map.zoomOut')"
+                    :disabled="floorChanging || zoom <= constrainZoom(0)"
+                    @click="zoomAt(constrainZoom(zoom - 0.5), viewportCenter())"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M5 12h14" />
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div class="map-window" :inert="floorChanging ? '' : null">
                 <div

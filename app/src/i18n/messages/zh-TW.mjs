@@ -451,4 +451,8 @@ export default {
   "endpoint.destinationPlaceholder": "要去哪裡？",
   "endpoint.browse": "或從分類選擇",
   "endpoint.allTypes": "全部",
+  "map.zoomIn": "放大地圖",
+  "map.zoomOut": "縮小地圖",
+  "map.zoomReset": "點一下回到整層地圖",
+  "map.zoomControls": "地圖縮放",
 };

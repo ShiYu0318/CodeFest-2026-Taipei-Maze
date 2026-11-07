@@ -514,4 +514,8 @@ export default {
   "endpoint.destinationPlaceholder": "Bạn muốn đi đâu?",
   "endpoint.browse": "Hoặc chọn theo loại",
   "endpoint.allTypes": "Tất cả",
+  "map.zoomIn": "Phóng to",
+  "map.zoomOut": "Thu nhỏ",
+  "map.zoomReset": "Chạm để xem cả tầng",
+  "map.zoomControls": "Thu phóng bản đồ",
 };

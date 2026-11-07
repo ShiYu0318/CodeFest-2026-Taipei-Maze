@@ -342,6 +342,89 @@
   font-weight: 750;
   pointer-events: auto;
 }
+.map-controls {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+.map-compass,
+.map-zoom button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--tp-gray-200, #cad1d5);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+  cursor: pointer;
+}
+.map-compass {
+  position: relative;
+  border-radius: 50%;
+}
+.map-compass svg {
+  width: 30px;
+  height: 30px;
+}
+.map-compass .needle-north {
+  fill: #d45251;
+}
+.map-compass .needle-south {
+  fill: var(--tp-gray-400, #91a0a8);
+}
+.map-compass span {
+  position: absolute;
+  top: 1px;
+  left: 50%;
+  transform: translateX(-62%);
+  color: #d45251;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+}
+.map-zoom {
+  display: grid;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+}
+.map-zoom button {
+  border-radius: 0;
+  box-shadow: none;
+}
+.map-zoom button + button {
+  border-top: 0;
+}
+.map-zoom button:first-child {
+  border-radius: 10px 10px 0 0;
+}
+.map-zoom button:last-child {
+  border-radius: 0 0 10px 10px;
+}
+.map-zoom svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.map-compass:disabled,
+.map-zoom button:disabled {
+  color: var(--tp-gray-300, #adb8be);
+  cursor: default;
+}
+.map-compass:focus-visible,
+.map-zoom button:focus-visible {
+  outline: 3px solid var(--tp-primary-500);
+  outline-offset: 2px;
+}
 .map-window {
   overflow: hidden;
   overflow: clip;
@@ -806,16 +889,15 @@
 @media (max-width: 719px) {
   .map-viewport {
     --map-screen-height: 150vh;
-    --map-height: max(
-      15rem,
-      calc(var(--map-screen-height) - var(--map-top) - 30px)
-    );
+    /* A tall map that fills most of the phone screen once scrolled to. */
+    --map-height: clamp(26rem, 78vh, 46rem);
     min-height: 0;
     height: var(--map-height);
   }
   @supports (height: 100svh) {
     .map-viewport {
       --map-screen-height: 150svh;
+      --map-height: clamp(26rem, 78svh, 46rem);
     }
   }
   .map-board {

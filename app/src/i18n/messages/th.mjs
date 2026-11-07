@@ -492,4 +492,8 @@ export default {
   "endpoint.destinationPlaceholder": "จะไปที่ไหน",
   "endpoint.browse": "หรือเลือกตามประเภท",
   "endpoint.allTypes": "ทั้งหมด",
+  "map.zoomIn": "ขยาย",
+  "map.zoomOut": "ย่อ",
+  "map.zoomReset": "แตะเพื่อดูทั้งชั้น",
+  "map.zoomControls": "ซูมแผนที่",
 };

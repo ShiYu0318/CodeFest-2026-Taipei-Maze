@@ -21,6 +21,8 @@
       >
         <ZhuyinText :text="describe(startPoint, 'start')" />
       </button>
+      <!-- Locating by QR belongs to the start: the scan sets where you are. -->
+      <slot name="start" />
     </div>
     <button
       type="button"

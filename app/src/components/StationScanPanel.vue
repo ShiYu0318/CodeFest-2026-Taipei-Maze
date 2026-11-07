@@ -1,7 +1,11 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
-  <section class="station-scan-panel" aria-labelledby="station-scan-heading">
-    <div class="scan-heading">
+  <section
+    class="station-scan-panel"
+    :class="{ 'is-embedded': embedded }"
+    aria-labelledby="station-scan-heading"
+  >
+    <div class="scan-heading" :class="{ 'visually-hidden': embedded }">
       <h2 id="station-scan-heading">
         <ZhuyinText
           :text="
@@ -15,7 +19,7 @@
     <p class="scan-caveat">
       {{ t("scan.caveat") }}
     </p>
-    <p v-if="view.mode === 'browsing'">
+    <p v-if="view.mode === 'browsing' && !embedded">
       <ZhuyinText :text="t('scan.browseHint')" />
     </p>
     <template v-if="view.mode === 'navigation'">
@@ -244,6 +248,8 @@ const props = defineProps({
   selectedPoint: { type: Object, default: null },
   location: { type: Object, required: true },
   persistentScan: { type: Boolean, default: false },
+  // Rendered inside the start field instead of as its own card.
+  embedded: { type: Boolean, default: false },
 });
 const emit = defineEmits(["destination", "scanned", "cancel-trip"]);
 const view = computed(() => props.location.view.value);
@@ -501,5 +507,58 @@ async function start() {
 }
 .scan-actions :deep(.navigation-rescan-bar button) {
   margin: 8px 0 0;
+}
+/* Inside the start field: no card, compact copy, secondary scan button. */
+.station-scan-panel.is-embedded {
+  margin: 4px 0 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: var(--display-secondary-size, 0.875rem);
+}
+.station-scan-panel.is-embedded p {
+  margin: 4px 0;
+}
+.station-scan-panel.is-embedded .scan-actions {
+  margin-top: 8px;
+  padding-top: 0;
+  border-top: 0;
+}
+.station-scan-panel.is-embedded .scan-start {
+  min-height: 44px;
+  background: var(--surface, #fff);
+  color: var(--tp-primary-700, #356c77);
+  border: 1px solid var(--tp-primary-500, #5ab4c5);
+}
+.station-scan-panel.is-embedded .scan-start:active:not(:disabled) {
+  background: var(--tp-primary-50, #e6f4f7);
+}
+.station-scan-panel.is-embedded :deep(.navigation-rescan-bar) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.station-scan-panel.is-embedded :deep(.navigation-rescan-bar p) {
+  margin: 2px 0;
+}
+.station-scan-panel.is-embedded :deep(.navigation-rescan-bar button) {
+  margin-top: 6px;
+  background: var(--surface, #fff);
+  color: var(--tp-primary-700, #356c77);
+  border: 1px solid var(--tp-primary-500, #5ab4c5);
+}
+.station-scan-panel.is-embedded .scan-caveat {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 </style>

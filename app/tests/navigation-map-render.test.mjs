@@ -49,6 +49,7 @@ const realComponents = new Set([
   "StationTransferStep",
   "DestinationSearch",
   "StationScanPanel",
+  "StationEndpointBar",
   "DisplayControls",
   "StationTripDialog",
   "ZhuyinText",
@@ -229,7 +230,7 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
     assert.ok(trip.includes('class="navigation-rescan-bar"'));
     assert.equal(trip.includes('class="theme-group'), false);
     assert.equal(trip.includes('class="plan-stairs"'), false);
-    assert.ok(trip.includes('class="station-scan-panel"'));
+    assert.ok(trip.includes('class="station-scan-panel'));
     assert.ok(trip.includes("重新掃描定位"));
     const restored = await render({});
     assert.equal(

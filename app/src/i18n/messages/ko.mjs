@@ -505,4 +505,8 @@ export default {
   "endpoint.destinationPlaceholder": "어디로 가나요?",
   "endpoint.browse": "또는 종류별로 고르기",
   "endpoint.allTypes": "전체",
+  "map.zoomIn": "확대",
+  "map.zoomOut": "축소",
+  "map.zoomReset": "눌러서 층 전체 보기",
+  "map.zoomControls": "지도 확대·축소",
 };

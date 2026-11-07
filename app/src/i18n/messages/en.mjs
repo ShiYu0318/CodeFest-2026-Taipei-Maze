@@ -515,4 +515,8 @@ export default {
   "endpoint.destinationPlaceholder": "Where are you going?",
   "endpoint.browse": "Or browse by type",
   "endpoint.allTypes": "All",
+  "map.zoomIn": "Zoom in",
+  "map.zoomOut": "Zoom out",
+  "map.zoomReset": "Tap to see the whole floor",
+  "map.zoomControls": "Map zoom",
 };
