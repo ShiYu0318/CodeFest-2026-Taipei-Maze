@@ -15,7 +15,7 @@ index 10b0ecf..1518ece 100644
 -COCOAPODS: 1.16.2
 +COCOAPODS: 1.17.0
 diff --git a/lib/page/city_service/model/my_service_model.dart b/lib/page/city_service/model/my_service_model.dart
-index 4f33a56..9dc29e4 100644
+index 4f33a56..e4aaa52 100644
 --- a/lib/page/city_service/model/my_service_model.dart
 +++ b/lib/page/city_service/model/my_service_model.dart
 @@ -29,12 +29,21 @@ enum MyServiceItemId {
@@ -31,10 +31,10 @@ index 4f33a56..9dc29e4 100644
      return switch (this) {
 +      MyServiceItemId.codefestDiagnostics => MyServiceItem(
 +          title: 'CodeFest 測試環境',
-+          description: '本地 WebView 與原生掃碼橋接檢查',
++          description: '本地台北車站地圖與即時開發預覽',
 +          icon: Assets.svg.iconDistrictOffice.svg(),
 +          category: MyServiceCategory.cityLife,
-+          destinationUrl: 'http://127.0.0.1:8765/',
++          destinationUrl: 'http://127.0.0.1:8082/station-map',
 +          forceWebViewTitle: 'CodeFest 測試環境',
 +        ),
        MyServiceItemId.dedicatedLine => MyServiceItem(

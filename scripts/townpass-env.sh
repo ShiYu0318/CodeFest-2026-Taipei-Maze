@@ -48,7 +48,7 @@ export FLUTTER_STORAGE_BASE_URL=https://storage.googleapis.com
 cd -- "$townpass_dir"
 case "$command_name" in
   paths)
-    printf 'TownPass: %s\nWeb smoke: http://127.0.0.1:8765/\n' "$townpass_dir"
+    printf 'TownPass: %s\nApp preview: http://127.0.0.1:8082/station-map\nWeb smoke: http://127.0.0.1:8765/\n' "$townpass_dir"
     git rev-parse HEAD
     ;;
   doctor) exec fvm flutter doctor -v ;;
