@@ -5,7 +5,6 @@ import { readFileSync } from "node:fs";
 import {
   outlineRings,
   boundarySegments,
-  insetBoundaryMarker,
   scatterBoundary,
 } from "../src/station/boundary.mjs";
 import { plans, floors, b2Outline } from "../src/views/station-floor-plans.mjs";
@@ -14,6 +13,7 @@ import {
   stationQrPayload,
   createStationScanSession,
 } from "../src/station/scan.mjs";
+import { parseStationLocationQuery } from "../src/station/location-link.mjs";
 import { validateStationData } from "../src/station/validate.mjs";
 
 const data = JSON.parse(
@@ -55,35 +55,13 @@ test("linear SVG outlines preserve relative moves and separate holes from the pe
   assert.throws(() => outlineRings("M0 0L10 10"), /Unclosed/);
 });
 
-test("a platform badge clears both edges near a corner of a narrow outline", () => {
-  const edges = boundarySegments({ outlines: ["M0 0H50V10H0Z"] });
-  const point = {
-    x: 1,
-    y: 0,
-    boundary: { outline: 0, edge: 0, fraction: 0.02 },
-  };
-  const [dx, dy] = insetBoundaryMarker(point, edges, 12, 4);
-  assert.ok(point.x + dx >= 4 && point.x + dx <= 46);
-  assert.ok(point.y + dy >= 4 && point.y + dy <= 6);
-  assert.ok(Math.hypot(dx, dy) >= 12 - 0.001);
-  assert.equal(insetBoundaryMarker(point, edges, 12, 6), null);
-  const [along, inward] = insetBoundaryMarker(
-    { x: 25, y: 0, boundary: { outline: 0, edge: 0, fraction: 0.5 } },
-    edges,
-    12,
-    4
-  );
-  assert.ok(Math.abs(along) > inward);
-  assert.ok(inward >= 4 && inward <= 4.5);
-});
-
-test("each floor has eight fixed QR points on its actual transformed outer boundary", () => {
-  assert.equal(qrPoints.length, 32);
-  assert.equal(new Set(qrPoints.map((point) => point.id)).size, 32);
+test("remaining QR points keep their fixed IDs and boundary positions outside platforms", () => {
+  assert.equal(qrPoints.length, 20);
+  assert.equal(new Set(qrPoints.map((point) => point.id)).size, 20);
   for (const floor of Object.keys(floors)) {
     const points = qrPoints.filter((point) => point.floor === floor);
     const obstacles = data.points[floor].filter((point) => !isQrPoint(point));
-    assert.equal(points.length, 8);
+    assert.equal(points.length, { B1: 8, B2: 8, B3: 4, B4: 0 }[floor]);
     const generated = scatterBoundary(plans[floor], {
       seed: 20261108 + Number(floor.slice(1)),
       obstacles,
@@ -120,23 +98,30 @@ test("each floor has eight fixed QR points on its actual transformed outer bound
   }
 });
 
-test("the platform filter tags only the QR points on the B3 and B4 platforms", () => {
-  const platformPoints = stationPoints(data).filter((point) =>
-    [point.type].flat().includes("platform")
-  );
-  assert.deepEqual(
-    platformPoints.map((point) => point.id),
-    [
-      "b3-qr-05",
-      "b3-qr-06",
-      "b3-qr-07",
-      "b3-qr-08",
-      ...qrPoints
-        .filter((point) => point.floor === "B4")
-        .map((point) => point.id),
-    ]
-  );
-  assert.ok(platformPoints.every((point) => point.type[0] === "qrcode"));
+test("removed platform QR payloads and point links are rejected without changing navigation", () => {
+  const session = createStationScanSession(data, connections);
+  session.scan(stationQrPayload("b1-e4", data));
+  session.setDestination("b4-e1");
+  const before = session.snapshot();
+  const payload = JSON.parse(stationQrPayload("b1-qr-01", data));
+  const removed = [
+    ...[5, 6, 7, 8].map((n) => `b3-qr-0${n}`),
+    ...[1, 2, 3, 4, 5, 6, 7, 8].map((n) => `b4-qr-0${n}`),
+  ];
+  for (const id of removed) {
+    assert.throws(() => stationQrPayload(id, data), RangeError);
+    assert.notEqual(
+      session.scan(JSON.stringify({ ...payload, anchor_id: `station_${id}` }))
+        .type,
+      "success"
+    );
+    assert.notEqual(
+      parseStationLocationQuery({ point: id, v: "1" }, data).type,
+      "success"
+    );
+    assert.deepEqual(session.snapshot(), before);
+  }
+  assert.equal(Object.hasOwn(data.categories, "platform"), false);
 });
 
 test("QR navigation points scan normally without inventing a surveyed walking route", () => {

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
-  "type.platform": "Sân ga",
   "tour.helper":
     "Chạm vào trợ lý ở góc dưới bên phải để hỏi về tiện ích trong ga hoặc cách dùng bản đồ.",
   "tour.reopen":

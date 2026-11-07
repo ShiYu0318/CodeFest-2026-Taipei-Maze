@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
-  "type.platform": "Peron",
   "tour.helper":
     "Ketuk asisten di pojok kanan bawah untuk bertanya tentang fasilitas stasiun atau cara memakai peta.",
   "tour.reopen":

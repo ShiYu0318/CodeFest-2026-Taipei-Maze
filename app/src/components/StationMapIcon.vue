@@ -19,8 +19,6 @@ const paths = {
     "M12 2v3m0 14v3M2 12h3m14 0h3M12 5a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm0 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z",
   qrcode:
     "M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM6 6h.01M18 6h.01M6 18h.01M12 3v3m0 3v3H9m3 3v6m3-9h3v3h3m-6 3v3h6v-3m0-6v-1",
-  platform:
-    "M6 15h12V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2Zm0-5h12M9 13h.01M15 13h.01M9 18l-2 3m8-3 2 3",
   elevator: "M5 10h14v11H5zm7 0v11M8 7V3L6 5m2-2 2 2m6-2v4l-2-2m2 2 2-2",
   restroom: "M7 5h.01M5 10h4m-2 0v10m-2 0 2-5 2 5M17 5h.01m0 5-3 6h6l-3-6v10",
   nursing:

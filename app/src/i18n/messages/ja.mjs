@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
-  "type.platform": "ホーム",
   "tour.helper":
     "右下のヘルパーをタップすると、駅の施設や地図の使い方について質問できます。",
   "tour.reopen":

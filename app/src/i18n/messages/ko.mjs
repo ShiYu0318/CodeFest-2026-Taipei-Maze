@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
-  "type.platform": "승강장",
   "tour.helper":
     "오른쪽 아래의 도우미를 눌러 역 시설이나 지도 사용 방법을 물어보세요.",
   "tour.reopen":

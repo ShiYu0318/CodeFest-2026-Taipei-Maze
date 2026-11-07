@@ -354,8 +354,7 @@
 .active-with-layers {
   opacity: 0.87;
 }
-.map-pin,
-.pin-platform-icon {
+.map-pin {
   --marker-color: var(--marker-base-color);
 }
 .map-pin {
@@ -372,7 +371,7 @@
   transform: translate(-50%, -50%);
   background: transparent;
 }
-.station-page[data-theme="dark"] :is(.map-pin, .pin-platform-icon) {
+.station-page[data-theme="dark"] .map-pin {
   --marker-color: color-mix(in srgb, var(--marker-base-color) 75%, white);
 }
 .map-pin.pin-filtered-out {
@@ -438,10 +437,6 @@
   width: 9px;
   height: 9px;
   color: #fff;
-}
-.pin-platform-icon {
-  position: absolute;
-  transform: translate(-50%, -50%) scale(var(--platform-icon-scale));
 }
 .pin-arrival .point-pin {
   outline: 2px solid var(--marker-color);
@@ -951,9 +946,7 @@
   width: 96px;
   height: 96px;
 }
-.station-page[data-display-mode="senior"]
-  .map-pin
-  :is(.point-pin:not(.pin-platform-icon), .pin-icon) {
+.station-page[data-display-mode="senior"] .map-pin :is(.point-pin, .pin-icon) {
   transform: scale(2);
 }
 .display-facility-detail h3 {

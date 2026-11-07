@@ -7,6 +7,7 @@ import { scatterBoundary } from "../app/src/station/boundary.mjs";
 const file = new URL("../app/src/views/station-points.json", import.meta.url);
 const original = readFileSync(file, "utf8");
 const data = JSON.parse(original);
+// Platform demo QRs were removed. Keep the other samples' existing IDs/positions.
 // B3 also has a concourse outline. B4 consists of its platform outline.
 const platformOutline = { B3: 1, B4: 0 };
 data.categories.qrcode = {
@@ -33,10 +34,7 @@ for (const [floor, points] of Object.entries(data.points)) {
       throw new Error(`Point ID already exists: ${id}`);
     return {
       id,
-      type:
-        platformOutline[floor] === position.boundary.outline
-          ? ["qrcode", "platform"]
-          : "qrcode",
+      type: "qrcode",
       name: `QR ${number} 號示意定位點`,
       x: position.x,
       y: position.y,
@@ -46,7 +44,12 @@ for (const [floor, points] of Object.entries(data.points)) {
       boundary: position.boundary,
     };
   });
-  data.points[floor] = [...existing, ...generated];
+  data.points[floor] = [
+    ...existing,
+    ...generated.filter(
+      (point) => point.boundary.outline !== platformOutline[floor]
+    ),
+  ];
 }
 const output = JSON.stringify(data, null, 2) + "\n";
 if (process.argv.includes("--check")) {
@@ -55,4 +58,6 @@ if (process.argv.includes("--check")) {
       "Regenerate boundary QR points with node tools/scatter-station-qrcode.mjs"
     );
 } else writeFileSync(file, output);
-console.log("32 stable QR navigation points along the B1–B4 outer boundaries.");
+console.log(
+  "20 stable QR navigation points outside platform boundaries (B1–B3)."
+);
