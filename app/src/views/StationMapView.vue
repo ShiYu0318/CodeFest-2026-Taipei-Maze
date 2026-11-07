@@ -246,7 +246,6 @@
   </main>
 </template>
 
-const initialMapZoom = 1.15;
 <script setup>
 import {
   computed,
@@ -275,6 +274,7 @@ const connectorTypes = new Set([
   "stairway",
 ]);
 const floorIds = Object.keys(floors);
+const initialMapZoom = 1.15;
 const floorPalette = {
   B1: {
     tone: "primary-500",
@@ -308,7 +308,6 @@ const selected = ref(null);
 const originView = ref(null);
 const connectorHeading = ref(null);
 const connectorPanel = ref(null);
-  nextTick(() => centerOn(0.5, 0.5));
 const connectorPosition = ref(null);
 const floorChanging = ref(false);
 const arrivalPointId = ref(null);
@@ -337,6 +336,7 @@ onMounted(() => {
   for (const type of webkitGestures) {
     document.addEventListener(type, handleWebkitGesture, captureGesture);
   }
+  nextTick(() => centerOn(0.5, 0.5));
 });
 
 onBeforeUnmount(() => {
@@ -741,7 +741,6 @@ function zoomWithKeyboard(event) {
     resetZoom();
     return;
   }
-    if (!origin) await zoomAt(initialMapZoom, viewportCenter());
   if (event.key !== "+" && event.key !== "=" && event.key !== "-") return;
   event.preventDefault();
   const scale = constrainZoom(zoom.value + (event.key === "-" ? -0.5 : 0.5));
@@ -789,6 +788,7 @@ async function showFloor(floor, { arrival, origin } = {}) {
     }
     await resetZoom();
     if (!frame.isConnected) return;
+    if (!origin) await zoomAt(initialMapZoom, viewportCenter());
     if (origin) await zoomAt(origin.scale, viewportCenter(), origin.center);
     else if (arrival)
       await zoomAt(scale, viewportCenter(), normalizedPoint(arrival.point));
