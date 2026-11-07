@@ -6,25 +6,31 @@
     aria-live="polite"
   >
     <p v-if="view.manualPosition" class="manual-floor-note">
-      {{
-        t("transfer.manualFloor", {
-          floor: floorLabel(view.manualPosition.floor),
-        })
-      }}
+      <ZhuyinText
+        :text="
+          t('transfer.manualFloor', {
+            floor: floorLabel(view.manualPosition.floor),
+          })
+        "
+      />
     </p>
     <article v-for="step in steps" :key="step.token">
       <h3>
-        {{
-          t("transfer.goTo", {
-            kind: t("type." + step.type),
-            floor: floorLabel(step.to.floor),
-          })
-        }}
+        <ZhuyinText
+          :text="
+            t('transfer.goTo', {
+              kind: t('type.' + step.type),
+              floor: floorLabel(step.to.floor),
+            })
+          "
+        />
       </h3>
-      <p class="transfer-connector">{{ connectorLabel(step) }}</p>
-      <p>{{ t("transfer.checkFloor") }}</p>
+      <p class="transfer-connector">
+        <ZhuyinText :text="connectorLabel(step)" />
+      </p>
+      <p><ZhuyinText :text="t('transfer.checkFloor')" /></p>
       <p v-if="step.escalatorDirection === 'unverified'">
-        {{ t("transfer.checkDirection") }}
+        <ZhuyinText :text="t('transfer.checkDirection')" />
       </p>
       <button
         type="button"
@@ -32,13 +38,15 @@
         :disabled="view.active"
         @click="location.confirmTransfer(step.token)"
       >
-        {{
-          t(
-            step.movement === "up"
-              ? "transfer.confirmUp"
-              : "transfer.confirmDown"
-          )
-        }}
+        <ZhuyinText
+          :text="
+            t(
+              step.movement === 'up'
+                ? 'transfer.confirmUp'
+                : 'transfer.confirmDown'
+            )
+          "
+        />
       </button>
     </article>
   </section>
@@ -46,6 +54,7 @@
 <script setup>
 /* global defineProps */
 import { computed } from "vue";
+import ZhuyinText from "./ZhuyinText.vue";
 import { useI18n } from "../i18n/index.mjs";
 import { placeLabel } from "../i18n/places.mjs";
 import { stationPoints } from "../station/scan.mjs";

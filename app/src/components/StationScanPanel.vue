@@ -174,10 +174,8 @@
       @click="emit('cancel-trip')"
     >
       <ZhuyinText
-        v-if="view.mode === 'browsing'"
-        :text="t('scan.cancelTrip')"
+        :text="view.mode === 'browsing' ? t('scan.cancelTrip') : t('scan.exit')"
       />
-      <template v-else>{{ t("scan.exit") }}</template>
     </button>
   </section>
 </template>
