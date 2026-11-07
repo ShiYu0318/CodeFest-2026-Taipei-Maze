@@ -100,6 +100,8 @@ export default {
   "map.ariaYouAreHere": " คุณอยู่ที่นี่",
   "map.ariaDestination": " จุดหมาย",
   "map.youAreHere": "คุณอยู่ที่นี่",
+  "map.information": "ข้อมูลแผนที่ แหล่งข้อมูล และใบอนุญาต",
+  "about.mapNotes": "คำอธิบายและเอกสารอ้างอิงแผนที่",
   "map.footerNote":
     "วาดใหม่จากแผนผังสถานีที่เปิดเผยต่อสาธารณะ ตำแหน่งเป็นเพียงการประมาณ โปรดดูป้ายในสถานที่จริง",
   "map.dataStatus":

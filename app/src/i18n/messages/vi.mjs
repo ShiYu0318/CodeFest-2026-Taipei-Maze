@@ -106,6 +106,8 @@ export default {
   "map.ariaYouAreHere": ", bạn đang ở đây",
   "map.ariaDestination": ", điểm đến",
   "map.youAreHere": "Bạn đang ở đây",
+  "map.information": "Thông tin bản đồ, nguồn và giấy phép",
+  "about.mapNotes": "Ghi chú và tài liệu bản đồ",
   "map.footerNote":
     "Vẽ lại từ bản đồ nhà ga công khai. Vị trí chỉ mang tính minh họa; hãy theo biển chỉ dẫn tại chỗ.",
   "map.dataStatus":

@@ -107,6 +107,8 @@ export default {
   "map.ariaYouAreHere": ", you are here",
   "map.ariaDestination": ", destination",
   "map.youAreHere": "You are here",
+  "map.information": "Map information, sources and licensing",
+  "about.mapNotes": "Map notes and references",
   "map.footerNote":
     "Redrawn from public station maps. Positions are approximate; follow the signs on site.",
   "map.dataStatus":

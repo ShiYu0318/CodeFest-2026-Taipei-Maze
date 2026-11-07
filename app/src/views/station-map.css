@@ -738,33 +738,24 @@
   width: 14px;
   color: var(--tp-gray-700);
 }
-.station-footer {
+.map-information-button {
+  position: absolute;
+  z-index: 3;
+  right: 10px;
+  top: 10px;
   display: grid;
-  justify-items: center;
-  gap: 4px;
-  margin: 30px 30px 20px;
-  padding-top: 14px;
-  color: #9d9d9d;
-  font-size: 12px;
-  line-height: 1.6;
-  text-align: center;
+  place-items: center;
+  width: var(--display-control-height, 44px);
+  min-height: var(--display-control-height, 44px);
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgb(8 19 21 / 12%);
+  cursor: pointer;
 }
-.station-footer > div {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0 12px;
-}
-.station-footer a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: inherit;
-}
-.station-footer .station-about-link {
-  font-weight: 600;
-  text-decoration: none;
-}
+.map-information-button svg { width: 24px; height: 24px; }
 
 @media (hover: hover) {
   .floor-switch button:not([aria-pressed="true"]):hover {
@@ -903,9 +894,6 @@
   width: 24px;
   height: 24px;
   flex-shrink: 0;
-}
-.station-page:not([data-display-mode="standard"]) .station-footer a {
-  min-height: var(--display-control-height);
 }
 .station-page:not([data-display-mode="standard"]) .display-facility-detail h3 {
   font-size: var(--display-main-size);

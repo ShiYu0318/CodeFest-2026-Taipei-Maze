@@ -102,6 +102,8 @@ export default {
   "map.ariaYouAreHere": "、現在地",
   "map.ariaDestination": "、目的地",
   "map.youAreHere": "現在地",
+  "map.information": "地図の説明・出典・ライセンス",
+  "about.mapNotes": "地図の説明と参考資料",
   "map.footerNote":
     "公開されている駅構内図をもとに描き直しました。位置はおおよそです。現地の案内表示に従ってください。",
   "map.dataStatus":

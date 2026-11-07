@@ -106,6 +106,8 @@ export default {
   "map.ariaYouAreHere": ", Anda di sini",
   "map.ariaDestination": ", tujuan",
   "map.youAreHere": "Anda di sini",
+  "map.information": "Informasi peta, sumber, dan lisensi",
+  "about.mapNotes": "Catatan dan referensi peta",
   "map.footerNote":
     "Digambar ulang dari peta stasiun publik. Posisi hanya perkiraan; ikuti papan petunjuk di lokasi.",
   "map.dataStatus":

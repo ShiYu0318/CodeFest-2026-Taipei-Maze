@@ -102,6 +102,8 @@ export default {
   "map.ariaYouAreHere": ", 현재 위치",
   "map.ariaDestination": ", 목적지",
   "map.youAreHere": "현재 위치",
+  "map.information": "지도 안내, 출처 및 라이선스",
+  "about.mapNotes": "지도 설명 및 참고 자료",
   "map.footerNote":
     "공개된 역 지도를 바탕으로 다시 그렸습니다. 위치는 대략적이니 현장 안내판을 따르세요.",
   "map.dataStatus":
