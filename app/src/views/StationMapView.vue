@@ -1,0 +1,694 @@
+<template>
+  <main class="station-page" lang="zh-Hant">
+    <div class="station-shell">
+      <header class="station-header">
+        <router-link class="brand" to="/" aria-label="回 TownPass 首頁">
+          <span class="brand-icon"><StationMapIcon name="map" /></span>
+          <span>TownPass</span>
+        </router-link>
+        <span class="preview-tag">站內導覽・試用版</span>
+      </header>
+
+      <section class="station-heading" aria-labelledby="station-title">
+        <p class="eyebrow">TAIPEI MAIN STATION</p>
+        <div class="station-title-row">
+          <h1 id="station-title">台北車站</h1>
+          <span class="floor-tag" :style="floorStyle(level)">{{ level }}</span>
+        </div>
+        <p>地下樓層站內地圖</p>
+      </section>
+
+      <div class="floor-controls">
+        <div class="floor-switch" role="group" aria-label="選擇樓層">
+          <button
+            v-for="floor in floorIds"
+            :key="floor"
+            type="button"
+            :style="floorStyle(floor)"
+            :aria-pressed="level === floor"
+            @click="showFloor(floor)"
+          >
+            {{ floor }}
+          </button>
+        </div>
+        <button
+          class="layer-toggle"
+          type="button"
+          role="switch"
+          :aria-checked="showLayers"
+          aria-label="透視其他樓層"
+          @click="toggleLayers"
+        >
+          <StationMapIcon name="layers" />
+          <span>透視樓層</span>
+          <span class="switch-track" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <section
+        v-if="level === 'B2'"
+        class="b2-guide"
+        aria-labelledby="b2-guide-title"
+      >
+        <h2 id="b2-guide-title">B2 是北捷穿堂</h2>
+        <p class="b2-hint">
+          板南線月台在 B3，淡水信義線月台在 B4。可在地圖下方展開轉乘樓層。
+        </p>
+      </section>
+
+      <div class="station-layout">
+        <div class="station-map-column">
+          <section
+            ref="mapSection"
+            class="map-card"
+            aria-labelledby="map-title"
+          >
+            <header class="map-header">
+              <div>
+                <p class="eyebrow">{{ level }} FLOOR PLAN</p>
+                <h2 id="map-title">
+                  {{ floors[level].name }}
+                </h2>
+              </div>
+              <div class="compass" aria-label="北方朝上略偏左" role="img">
+                <span>N</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 3 20 21l-8-4-8 4Z" />
+                </svg>
+              </div>
+            </header>
+
+            <div
+              ref="viewport"
+              class="map-viewport"
+              :class="{ 'map-zoomed': zoom > 1 }"
+              :style="{ '--map-aspect': bounds[2] + ' / ' + bounds[3] }"
+              role="region"
+              :aria-label="level + ' 互動地圖，放大後可滑動查看'"
+              :tabindex="zoom > 1 ? 0 : -1"
+            >
+              <div class="map-board" :style="{ width: zoom * 100 + '%' }">
+                <svg
+                  class="floor-plan"
+                  :viewBox="bounds.join(' ')"
+                  role="img"
+                  :aria-label="level + ' 平面示意圖'"
+                >
+                  <g
+                    v-for="layer in backgroundLayers"
+                    :key="layer.floor"
+                    class="ghost-layer"
+                    :style="{ '--ghost-ink': layer.color }"
+                    :transform="layer.transform"
+                    aria-hidden="true"
+                  >
+                    <StationFloorPlan :floor="layer.floor" outline-only />
+                  </g>
+                  <g :class="{ 'active-with-layers': backgroundLayers.length }">
+                    <StationFloorPlan :floor="level" />
+                  </g>
+                </svg>
+                <button
+                  v-for="point in floorPoints"
+                  :key="point.id"
+                  class="map-pin"
+                  :class="{
+                    'pin-themed': matchesTheme(point, activeTheme),
+                    'pin-route': point.id === routeOrigin?.pointId,
+                  }"
+                  type="button"
+                  :style="pinStyle(point)"
+                  :aria-label="point.name"
+                  :aria-pressed="point.id === selected?.id"
+                  @click="togglePoint(point)"
+                  @focus="focusVisiblePin(point, $event)"
+                >
+                  <span
+                    v-if="
+                      matchesTheme(point, activeTheme) ||
+                      point.id === routeOrigin?.pointId
+                    "
+                    class="pin-icon"
+                    ><StationMapIcon :name="point.type"
+                  /></span>
+                  <svg
+                    v-else
+                    class="point-dot"
+                    viewBox="0 0 12 12"
+                    aria-hidden="true"
+                  >
+                    <circle cx="6" cy="6" r="5" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="map-tools">
+              <span v-if="selected" class="map-selection">{{
+                selected.name
+              }}</span>
+              <span v-else-if="activeTheme" class="map-selection"
+                >{{ categories[activeTheme].name }}・{{
+                  listedPoints.length
+                }}
+                處</span
+              >
+              <span v-else>{{
+                zoom === 1 ? "選擇設施主題來顯示圖標" : "滑動地圖查看其他位置"
+              }}</span>
+              <div class="zoom-controls" role="group" aria-label="地圖縮放">
+                <button
+                  type="button"
+                  aria-label="縮小地圖"
+                  :disabled="zoom === 1"
+                  @click="setZoom(zoom - 0.5)"
+                >
+                  <StationMapIcon name="minus" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="重設地圖縮放"
+                  :disabled="zoom === 1"
+                  @click="setZoom(1)"
+                >
+                  <StationMapIcon name="reset" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="放大地圖"
+                  :disabled="zoom === 3"
+                  @click="setZoom(zoom + 0.5)"
+                >
+                  <StationMapIcon name="plus" />
+                </button>
+              </div>
+            </div>
+            <div
+              v-if="backgroundLayers.length"
+              class="layer-key"
+              aria-label="背景樓層圖例"
+            >
+              <span
+                v-for="layer in backgroundLayers"
+                :key="layer.floor"
+                :style="{ '--ghost-ink': layer.ink }"
+                >{{ layer.floor }}</span
+              >
+            </div>
+            <p class="map-note">
+              <span aria-hidden="true"></span>{{ mapNote }}
+            </p>
+          </section>
+
+          <section class="transfer-card" aria-labelledby="transfer-title">
+            <div class="transfer-heading">
+              <h2 id="transfer-title">跨樓層預覽</h2>
+              <span class="floor-tag" :style="floorStyle(level)"
+                >目前 {{ level }}</span
+              >
+            </div>
+            <form class="transfer-form" @submit.prevent="previewRoute">
+              <label v-if="startOptions.length > 1">
+                出發區域
+                <select v-model="startZone" required>
+                  <option disabled value="">選擇目前區域</option>
+                  <option
+                    v-for="zone in startOptions"
+                    :key="zone.id"
+                    :value="zone.id"
+                  >
+                    {{ zone.name }}
+                  </option>
+                </select>
+              </label>
+              <label>
+                前往樓層
+                <select v-model="targetZone" required>
+                  <option disabled value="">選擇目的樓層</option>
+                  <option
+                    v-for="zone in targetOptions"
+                    :key="zone.id"
+                    :value="zone.id"
+                  >
+                    {{ zone.floor }}・{{ zone.name }}
+                  </option>
+                </select>
+              </label>
+              <button type="submit">展開轉乘圖</button>
+            </form>
+            <p class="transfer-hint">
+              預覽會列出已確認可通行的跨樓層接點。樓層內步行與驗票請依站內指標。
+            </p>
+            <p v-if="routeMessage" class="transfer-message" role="status">
+              {{ routeMessage }}
+            </p>
+          </section>
+
+          <Transition name="floor-reveal">
+            <div v-if="previewSteps.length" class="transfer-reveal">
+              <div class="transfer-reveal-content">
+                <section
+                  class="transfer-card transfer-results"
+                  aria-labelledby="transfer-results-title"
+                >
+                  <div class="transfer-heading">
+                    <h2
+                      id="transfer-results-title"
+                      ref="previewHeading"
+                      tabindex="-1"
+                    >
+                      {{ level }} 往
+                      {{ previewSteps[previewSteps.length - 1].to.floor }}
+                    </h2>
+                    <button
+                      type="button"
+                      class="clear-selection"
+                      @click="previewSteps = []"
+                    >
+                      收起轉乘圖
+                    </button>
+                  </div>
+                  <p class="transfer-hint">
+                    從 {{ routeOrigin.floor }} 的「{{
+                      routeOrigin.point.name
+                    }}」出發。
+                  </p>
+                  <ol class="transfer-results-list">
+                    <li
+                      v-for="(step, index) in previewSteps"
+                      :key="step.id"
+                      class="transfer-step"
+                    >
+                      <header>
+                        <span
+                          class="floor-tag"
+                          :style="floorStyle(step.to.floor)"
+                          >{{ step.to.floor }}</span
+                        >
+                        <div>
+                          <h3>{{ zoneName(step.to.zone) }}</h3>
+                          <p>
+                            {{ categories[step.type].name }}・{{
+                              step.from.point.name
+                            }}
+                          </p>
+                        </div>
+                      </header>
+                      <StationTransferMap
+                        :arrival="step.to"
+                        :departure="previewSteps[index + 1]?.from"
+                      />
+                      <p v-if="transferNote(step)" class="transfer-hint">
+                        {{ transferNote(step) }}
+                      </p>
+                    </li>
+                  </ol>
+                </section>
+              </div>
+            </div>
+          </Transition>
+        </div>
+
+        <section class="facility-card" aria-labelledby="facility-title">
+          <div class="facility-header">
+            <h2 id="facility-title">設施主題</h2>
+            <span>{{ floorPoints.length }} 個標點</span>
+          </div>
+
+          <div class="theme-group" role="group" aria-label="設施主題">
+            <button
+              v-for="type in availableThemes"
+              :key="type"
+              type="button"
+              :aria-pressed="activeTheme === type"
+              :style="pointThemeStyle(type)"
+              @click="toggleTheme(type)"
+            >
+              <StationMapIcon :name="type" />{{ categories[type].name }}
+            </button>
+          </div>
+          <div class="theme-feedback">
+            <p class="theme-hint" role="status">{{ themeHint }}</p>
+            <button
+              v-if="activeTheme"
+              type="button"
+              class="theme-map-link"
+              @click="revealMap"
+            >
+              查看地圖
+            </button>
+          </div>
+
+          <div
+            v-if="selected"
+            class="facility-detail"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <div class="detail-heading">
+              <p class="eyebrow">
+                {{ level }}・{{ categories[selected.type].name }}
+              </p>
+              <button
+                type="button"
+                class="clear-selection"
+                @click="selected = null"
+              >
+                關閉明細
+              </button>
+            </div>
+            <h3>{{ selected.name }}</h3>
+            <p>{{ selected.description }}</p>
+            <p v-if="destination">
+              對應端點 {{ destination.to.floor }}・{{
+                destination.to.point.name
+              }}
+            </p>
+            <button
+              v-if="destination"
+              type="button"
+              class="floor-destination"
+              @click="followConnection"
+            >
+              展開 {{ destination.to.floor }} 端點
+              <StationMapIcon name="arrow" />
+            </button>
+            <p
+              v-if="destination && transferNote(destination)"
+              class="direction-note"
+            >
+              {{ transferNote(destination) }}
+            </p>
+          </div>
+
+          <ul class="facility-list" aria-label="標點明細">
+            <li v-for="point in listedPoints" :key="point.id">
+              <button
+                type="button"
+                :aria-pressed="point.id === selected?.id"
+                :style="pointThemeStyle(point.type)"
+                @click="togglePoint(point)"
+              >
+                <svg class="point-dot" viewBox="0 0 12 12" aria-hidden="true">
+                  <circle cx="6" cy="6" r="5" />
+                </svg>
+                <span
+                  >{{ point.name
+                  }}<small
+                    v-if="getDestination(point)"
+                    class="connector-type"
+                    >{{ categories[point.type].name }}</small
+                  ></span
+                >
+                <span v-if="getDestination(point)" class="floor-link-label">{{
+                  getDestination(point).to.floor
+                }}</span>
+                <StationMapIcon v-else class="list-arrow" name="arrow" />
+              </button>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <footer class="station-footer">
+        <span>依公開站圖重繪。標點與樓層相對位置為示意，請依現場指標。</span>
+        <div>
+          <a
+            v-for="[label, url] in sources"
+            :key="url"
+            :href="url"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{{ label }}</a
+          >
+        </div>
+      </footer>
+    </div>
+  </main>
+</template>
+
+<script setup>
+import { computed, nextTick, ref } from "vue";
+import StationFloorPlan from "../components/StationFloorPlan.vue";
+import StationMapIcon from "../components/StationMapIcon.vue";
+import StationTransferMap from "../components/StationTransferMap.vue";
+import { floors, stackBounds } from "./station-floor-plans";
+import stationData from "./station-points.json";
+import { zones, planFloorTransfer, transferFromPoint } from "./station-routing";
+
+const { categories, points } = stationData;
+const floorIds = Object.keys(floors);
+const floorPalette = {
+  B1: {
+    tone: "primary-500",
+    tint: "primary-100",
+    ink: "primary-800",
+    onTone: "primary-950",
+  },
+  B2: {
+    tone: "primary-600",
+    tint: "primary-200",
+    ink: "primary-800",
+    onTone: "primary-950",
+  },
+  B3: {
+    tone: "primary-700",
+    tint: "primary-300",
+    ink: "primary-900",
+    onTone: "gray-50",
+  },
+  B4: {
+    tone: "primary-800",
+    tint: "primary-400",
+    ink: "primary-950",
+    onTone: "gray-50",
+  },
+};
+const level = ref("B2");
+const showLayers = ref(false);
+const activeTheme = ref(null);
+const selected = ref(null);
+const zoom = ref(1);
+const viewport = ref(null);
+const mapSection = ref(null);
+const startZone = ref("");
+const targetZone = ref("");
+const previewSteps = ref([]);
+const routeMessage = ref("");
+const previewHeading = ref(null);
+
+const startOptions = computed(() =>
+  zones.filter((zone) => zone.floor === level.value)
+);
+const targetOptions = computed(() =>
+  zones.filter((zone) => zone.floor !== level.value)
+);
+const routeOrigin = computed(() => previewSteps.value[0]?.from);
+const floorPoints = computed(() => {
+  const current = points[level.value];
+  return [
+    ...current.filter((point) => !getDestination(point)),
+    ...current.filter((point) => getDestination(point)),
+  ];
+});
+const availableThemes = computed(() =>
+  Object.keys(categories).filter((type) =>
+    floorPoints.value.some((point) => matchesTheme(point, type))
+  )
+);
+const listedPoints = computed(() =>
+  activeTheme.value
+    ? floorPoints.value.filter((point) =>
+        matchesTheme(point, activeTheme.value)
+      )
+    : floorPoints.value
+);
+const themeHint = computed(() =>
+  activeTheme.value
+    ? categories[activeTheme.value].name +
+      "・" +
+      listedPoints.value.length +
+      " 處，再點主題可恢復圓點。"
+    : "選一個主題，同類標點會一起顯示圖標。"
+);
+const bounds = computed(() => {
+  return showLayers.value ? stackBounds : floors[level.value].bounds;
+});
+const backgroundLayers = computed(() => {
+  if (!showLayers.value) return [];
+  const activeIndex = floorIds.indexOf(level.value);
+  return floorIds.flatMap((floor, index) => {
+    if (floor === level.value) return [];
+    const offset = index - activeIndex;
+    return [
+      {
+        floor,
+        color: paletteColor(floorPalette[floor].tone),
+        ink: paletteColor(floorPalette[floor].ink),
+        transform: "translate(" + offset * 18 + " " + offset * 24 + ")",
+      },
+    ];
+  });
+});
+const destination = computed(() => getDestination(selected.value));
+const mapNote = computed(() => {
+  if (showLayers.value) return "實線是目前樓層，淡色虛線是其他樓層的相對輪廓。";
+  return "實線為目前樓層。開啟透視樓層可查看其他樓層的相對位置。";
+});
+const sources = computed(() => [
+  [
+    "台北捷運 " + level.value + " 資訊圖",
+    "https://web.metro.taipei/img/ALL/INFOPDF/051.pdf#page=" +
+      (floorIds.indexOf(level.value) + 1),
+  ],
+  ["台北捷運車站設施", "https://web.metro.taipei/pages2026/WebStation/051/1"],
+  ["台北捷運剖面圖", "https://web.metro.taipei/pages2026/WebStation/051/4"],
+]);
+
+function getDestination(point) {
+  return transferFromPoint(point?.id);
+}
+
+function zoneName(id) {
+  return zones.find((zone) => zone.id === id)?.name;
+}
+
+function matchesTheme(point, type) {
+  return (
+    point.type === type ||
+    (point.type === "stairs-escalator" &&
+      (type === "stairs" || type === "escalator"))
+  );
+}
+
+function transferNote(transfer) {
+  if (transfer.typeStatus === "unverified")
+    return "平面圖顯示梯口，梯種及通行方向待確認。";
+  if (transfer.typeStatus === "inferred")
+    return "樓梯與電扶梯配置為推定，請依現場指標。";
+  if (
+    transfer.escalatorDirection === "unverified" ||
+    transfer.direction === "unverified"
+  )
+    return "電扶梯運轉方向請依現場指標。";
+  return "";
+}
+
+function paletteColor(token) {
+  return `var(--tp-${token})`;
+}
+
+function floorStyle(floor) {
+  const { tone, tint, ink, onTone } = floorPalette[floor];
+  return {
+    "--floor-tone": paletteColor(tone),
+    "--floor-tint": paletteColor(tint),
+    "--floor-ink": paletteColor(ink),
+    "--floor-on-tone": paletteColor(onTone),
+  };
+}
+
+function normalizedPoint(point) {
+  const [left, top, width, height] = bounds.value;
+  return [(point.x - left) / width, (point.y - top) / height];
+}
+
+function pinStyle(point) {
+  const [x, y] = normalizedPoint(point);
+  return {
+    left: x * 100 + "%",
+    top: y * 100 + "%",
+    ...pointThemeStyle(point.type),
+  };
+}
+
+function pointThemeStyle(type) {
+  const { colorToken, iconColorToken = "gray-50" } = categories[type];
+  return {
+    "--pin-color": paletteColor(colorToken),
+    "--pin-icon": paletteColor(iconColorToken),
+  };
+}
+
+function centerOn(x, y) {
+  const frame = viewport.value;
+  const board = frame.firstElementChild;
+  frame.scrollLeft = x * board.clientWidth - frame.clientWidth / 2;
+  frame.scrollTop = y * board.clientHeight - frame.clientHeight / 2;
+}
+
+function focusVisiblePin(point, event) {
+  if (zoom.value > 1 && event.currentTarget.matches(":focus-visible")) {
+    centerOn(...normalizedPoint(point));
+  }
+}
+
+async function setZoom(level) {
+  const frame = viewport.value;
+  const board = frame.firstElementChild;
+  const x = (frame.scrollLeft + frame.clientWidth / 2) / board.clientWidth;
+  const y = (frame.scrollTop + frame.clientHeight / 2) / board.clientHeight;
+  zoom.value = level;
+  await nextTick();
+  if (level === 1) frame.scrollTo(0, 0);
+  else centerOn(...(selected.value ? normalizedPoint(selected.value) : [x, y]));
+}
+
+async function showFloor(floor) {
+  if (floor === level.value) return;
+  level.value = floor;
+  selected.value = null;
+  startZone.value = "";
+  targetZone.value = "";
+  previewSteps.value = [];
+  routeMessage.value = "";
+  if (!availableThemes.value.includes(activeTheme.value))
+    activeTheme.value = null;
+  await setZoom(1);
+}
+
+function toggleLayers() {
+  showLayers.value = !showLayers.value;
+  setZoom(1);
+}
+
+function togglePoint(point) {
+  selected.value = selected.value?.id === point.id ? null : point;
+  if (selected.value && startOptions.value.length > 1)
+    startZone.value = point.zone;
+  if (selected.value && zoom.value > 1) centerOn(...normalizedPoint(point));
+}
+
+function toggleTheme(type) {
+  activeTheme.value = activeTheme.value === type ? null : type;
+  if (selected.value && !matchesTheme(selected.value, activeTheme.value))
+    selected.value = null;
+}
+
+async function followConnection() {
+  if (!destination.value) return;
+  routeMessage.value = "";
+  previewSteps.value = [destination.value];
+  await nextTick();
+  previewHeading.value?.scrollIntoView({ block: "nearest" });
+  previewHeading.value?.focus({ preventScroll: true });
+}
+
+function previewRoute() {
+  const origin =
+    startOptions.value.length === 1
+      ? startOptions.value[0].id
+      : startZone.value;
+  previewSteps.value = planFloorTransfer(origin, targetZone.value);
+  routeMessage.value = previewSteps.value.length
+    ? ""
+    : "目前沒有已確認的跨樓層連接。";
+}
+
+function revealMap() {
+  mapSection.value.scrollIntoView({ block: "nearest" });
+  viewport.value.focus({ preventScroll: true });
+}
+</script>
+
+<style scoped src="./station-map.css"></style>

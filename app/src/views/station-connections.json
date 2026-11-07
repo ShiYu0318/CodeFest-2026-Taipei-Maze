@@ -1,0 +1,352 @@
+{
+  "schemaVersion": 2,
+  "zones": [
+    {
+      "id": "b1-passage",
+      "floor": "B1",
+      "name": "站內通道"
+    },
+    {
+      "id": "b2-concourse",
+      "floor": "B2",
+      "name": "板南線大廳"
+    },
+    {
+      "id": "b3-blue",
+      "floor": "B3",
+      "name": "板南線月台"
+    },
+    {
+      "id": "b3-red",
+      "floor": "B3",
+      "name": "淡水信義線大廳"
+    },
+    {
+      "id": "b4-platform",
+      "floor": "B4",
+      "name": "淡水信義線月台"
+    }
+  ],
+  "connections": [
+    {
+      "id": "metro-e4",
+      "type": "elevator",
+      "from": {
+        "floor": "B1",
+        "pointId": "b1-e4",
+        "zone": "b1-passage"
+      },
+      "to": {
+        "floor": "B2",
+        "pointId": "m-e4",
+        "zone": "b2-concourse"
+      },
+      "direction": "bidirectional",
+      "wheelchairAccessible": true
+    },
+    {
+      "id": "metro-e7",
+      "type": "elevator",
+      "from": {
+        "floor": "B1",
+        "pointId": "b1-e7",
+        "zone": "b1-passage"
+      },
+      "to": {
+        "floor": "B2",
+        "pointId": "m-e7",
+        "zone": "b2-concourse"
+      },
+      "direction": "bidirectional",
+      "wheelchairAccessible": true
+    },
+    {
+      "id": "bannan-west",
+      "type": "stairs-escalator",
+      "from": {
+        "floor": "B2",
+        "pointId": "m-bl-west",
+        "zone": "b2-concourse"
+      },
+      "to": {
+        "floor": "B3",
+        "pointId": "b3-bl-west",
+        "zone": "b3-blue"
+      },
+      "direction": "bidirectional",
+      "wheelchairAccessible": false,
+      "escalatorDirection": "unverified"
+    },
+    {
+      "id": "bannan-east",
+      "type": "stairs-escalator",
+      "from": {
+        "floor": "B2",
+        "pointId": "m-bl-east",
+        "zone": "b2-concourse"
+      },
+      "to": {
+        "floor": "B3",
+        "pointId": "b3-bl-east",
+        "zone": "b3-blue"
+      },
+      "direction": "bidirectional",
+      "wheelchairAccessible": false,
+      "escalatorDirection": "unverified"
+    },
+    {
+      "id": "red-concourse",
+      "type": "escalator",
+      "from": {
+        "floor": "B2",
+        "pointId": "m-r-b3",
+        "zone": "b2-concourse"
+      },
+      "to": {
+        "floor": "B3",
+        "pointId": "b3-red-b2",
+        "zone": "b3-red"
+      },
+      "direction": "unverified",
+      "wheelchairAccessible": false
+    },
+    {
+      "id": "red-direct",
+      "type": "stairs-escalator",
+      "from": {
+        "floor": "B2",
+        "pointId": "m-r-b4",
+        "zone": "b2-concourse"
+      },
+      "to": {
+        "floor": "B4",
+        "pointId": "b4-red-direct",
+        "zone": "b4-platform"
+      },
+      "direction": "unverified",
+      "wheelchairAccessible": false,
+      "typeStatus": "inferred",
+      "escalatorDirection": "unverified"
+    },
+    {
+      "id": "metro-e1",
+      "type": "elevator",
+      "from": {
+        "floor": "B2",
+        "pointId": "m-e1",
+        "zone": "b2-concourse"
+      },
+      "to": {
+        "floor": "B4",
+        "pointId": "b4-e1",
+        "zone": "b4-platform"
+      },
+      "direction": "bidirectional",
+      "wheelchairAccessible": true
+    },
+    {
+      "id": "metro-e6",
+      "type": "elevator",
+      "from": {
+        "floor": "B2",
+        "pointId": "m-e6",
+        "zone": "b2-concourse"
+      },
+      "to": {
+        "floor": "B3",
+        "pointId": "b3-e6",
+        "zone": "b3-blue"
+      },
+      "direction": "bidirectional",
+      "wheelchairAccessible": true
+    },
+    {
+      "id": "metro-e2",
+      "type": "elevator",
+      "from": {
+        "floor": "B3",
+        "pointId": "b3-e2",
+        "zone": "b3-red"
+      },
+      "to": {
+        "floor": "B4",
+        "pointId": "b4-e2",
+        "zone": "b4-platform"
+      },
+      "direction": "bidirectional",
+      "wheelchairAccessible": true
+    },
+    {
+      "id": "bannan-west-inner",
+      "type": "stairs-escalator",
+      "from": {
+        "floor": "B2",
+        "pointId": "m-bl-west-inner",
+        "zone": "b2-concourse"
+      },
+      "to": {
+        "floor": "B3",
+        "pointId": "b3-bl-west-inner",
+        "zone": "b3-blue"
+      },
+      "direction": "bidirectional",
+      "wheelchairAccessible": false,
+      "escalatorDirection": "unverified"
+    },
+    {
+      "id": "bannan-east-inner",
+      "type": "stairs-escalator",
+      "from": {
+        "floor": "B2",
+        "pointId": "m-bl-east-inner",
+        "zone": "b2-concourse"
+      },
+      "to": {
+        "floor": "B3",
+        "pointId": "b3-bl-east-inner",
+        "zone": "b3-blue"
+      },
+      "direction": "bidirectional",
+      "wheelchairAccessible": false,
+      "escalatorDirection": "unverified"
+    },
+    {
+      "id": "b1-b2-m5",
+      "type": "stairway",
+      "from": {
+        "floor": "B1",
+        "pointId": "b1-m5-lower",
+        "zone": "b1-passage"
+      },
+      "to": {
+        "floor": "B2",
+        "pointId": "b2-m5-upper",
+        "zone": "b2-concourse"
+      },
+      "direction": "unverified",
+      "wheelchairAccessible": false,
+      "typeStatus": "unverified"
+    },
+    {
+      "id": "b1-b2-m4-m6",
+      "type": "stairway",
+      "from": {
+        "floor": "B1",
+        "pointId": "b1-m4-m6-lower",
+        "zone": "b1-passage"
+      },
+      "to": {
+        "floor": "B2",
+        "pointId": "b2-m4-m6-upper",
+        "zone": "b2-concourse"
+      },
+      "direction": "unverified",
+      "wheelchairAccessible": false,
+      "typeStatus": "unverified"
+    },
+    {
+      "id": "b1-b2-m3-m8",
+      "type": "stairway",
+      "from": {
+        "floor": "B1",
+        "pointId": "b1-m3-m8-lower",
+        "zone": "b1-passage"
+      },
+      "to": {
+        "floor": "B2",
+        "pointId": "b2-m3-m8-upper",
+        "zone": "b2-concourse"
+      },
+      "direction": "unverified",
+      "wheelchairAccessible": false,
+      "typeStatus": "unverified"
+    },
+    {
+      "id": "b1-b2-m7",
+      "type": "stairway",
+      "from": {
+        "floor": "B1",
+        "pointId": "b1-m7-lower",
+        "zone": "b1-passage"
+      },
+      "to": {
+        "floor": "B2",
+        "pointId": "b2-m7-upper",
+        "zone": "b2-concourse"
+      },
+      "direction": "unverified",
+      "wheelchairAccessible": false,
+      "typeStatus": "unverified"
+    },
+    {
+      "id": "civic-red",
+      "type": "escalator",
+      "from": {
+        "floor": "B1",
+        "pointId": "b1-civic-red",
+        "zone": "b1-passage"
+      },
+      "to": {
+        "floor": "B3",
+        "pointId": "b3-civic-red",
+        "zone": "b3-red"
+      },
+      "direction": "unverified",
+      "wheelchairAccessible": false
+    },
+    {
+      "id": "red-b3-b4-north",
+      "type": "stairs-escalator",
+      "from": {
+        "floor": "B3",
+        "pointId": "b3-red-north",
+        "zone": "b3-red"
+      },
+      "to": {
+        "floor": "B4",
+        "pointId": "b4-red-north",
+        "zone": "b4-platform"
+      },
+      "direction": "unverified",
+      "wheelchairAccessible": false,
+      "typeStatus": "inferred",
+      "escalatorDirection": "unverified"
+    },
+    {
+      "id": "red-b3-b4-middle",
+      "type": "stairs-escalator",
+      "from": {
+        "floor": "B3",
+        "pointId": "b3-red-middle",
+        "zone": "b3-red"
+      },
+      "to": {
+        "floor": "B4",
+        "pointId": "b4-red-middle",
+        "zone": "b4-platform"
+      },
+      "direction": "unverified",
+      "wheelchairAccessible": false,
+      "typeStatus": "inferred",
+      "escalatorDirection": "unverified"
+    },
+    {
+      "id": "red-b3-b4-south",
+      "type": "stairs-escalator",
+      "from": {
+        "floor": "B3",
+        "pointId": "b3-red-south",
+        "zone": "b3-red"
+      },
+      "to": {
+        "floor": "B4",
+        "pointId": "b4-red-south",
+        "zone": "b4-platform"
+      },
+      "direction": "unverified",
+      "wheelchairAccessible": false,
+      "typeStatus": "inferred",
+      "escalatorDirection": "unverified"
+    }
+  ]
+}

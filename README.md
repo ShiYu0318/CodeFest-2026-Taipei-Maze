@@ -13,7 +13,17 @@ Taipei Maze 北車不迷路：QR 定位、局部跨樓層路網、圖像指引�
 - [競賽完整指南](./docs/2026-fall-competition-guide.md)：時程、規則與賽後義務；工作坊補充見開發指南。
 - [研究資料包](./data/README.md)：48 項來源索引、10 份官方 CSV、UTF-8／北車子集、地圖入口與處理方法；尚非已驗證的產品路網。
 
-目前已有研究資料、處理工具、本地 TownPass 測試環境，以及 `app/` 的 Vue／TypeScript 城市服務範例基底與 package／lockfile。`compose.yml` 提供 nginx 正式容器設定，`compose.dev.yml` 提供 Vite 開發設定；這些基底不代表 Taipei Maze 導航功能已完成或部署驗證通過。宿主另放在相鄰 checkout，診斷入口以 patch 保存；遠端 TownPass fork 尚未建立，平台與整合實測範圍見測試環境文件。
+目前已有研究資料、處理工具、本地 TownPass 測試環境，以及 `app/` 的 Vue 台北車站地圖原型。`compose.yml` 提供 nginx 容器設定，`compose.dev.yml` 提供 Vue CLI 開發設定。宿主另放在相鄰 checkout，診斷入口以 patch 保存。平台與橋接實測範圍見測試環境文件。
+
+## 啟動站內地圖預覽
+
+```bash
+cd app
+npm ci
+npm run serve -- --port 8082
+```
+
+開啟 `http://localhost:8082/station-map`。原型提供 B1–B4 平面圖、設施主題、梯口端點與跨樓層預覽。站圖座標與轉乘資料存於 `app/src/views/`，目前為示意位置。`backend/` 保留原 Webview 的本機 Flask 測試 API，地圖以本地 JSON 載入。
 
 ## 授權與原始碼
 

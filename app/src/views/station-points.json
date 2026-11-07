@@ -1,0 +1,921 @@
+{
+  "categories": {
+    "elevator": {
+      "name": "無障礙電梯",
+      "colorToken": "primary-700"
+    },
+    "restroom": {
+      "name": "廁所",
+      "colorToken": "primary-800"
+    },
+    "nursing": {
+      "name": "哺集乳室",
+      "colorToken": "secondary-700",
+      "iconColorToken": "gray-950"
+    },
+    "info": {
+      "name": "詢問處",
+      "colorToken": "gray-700"
+    },
+    "ticket": {
+      "name": "售票處",
+      "colorToken": "secondary-800"
+    },
+    "aed": {
+      "name": "AED",
+      "colorToken": "secondary-900"
+    },
+    "phone": {
+      "name": "公用電話",
+      "colorToken": "gray-600"
+    },
+    "escalator": {
+      "name": "電扶梯",
+      "colorToken": "secondary-600",
+      "iconColorToken": "gray-950"
+    },
+    "stairs": {
+      "name": "樓梯",
+      "colorToken": "gray-800"
+    },
+    "water": {
+      "name": "飲水設施",
+      "colorToken": "primary-600",
+      "iconColorToken": "gray-950"
+    },
+    "locker": {
+      "name": "置物櫃",
+      "colorToken": "secondary-950"
+    },
+    "accessible": {
+      "name": "輪椅候車區",
+      "colorToken": "gray-900"
+    },
+    "stairs-escalator": {
+      "name": "樓梯＋電扶梯",
+      "colorToken": "secondary-800"
+    },
+    "stairway": {
+      "name": "梯種待確認",
+      "colorToken": "gray-700"
+    }
+  },
+  "points": {
+    "B1": [
+      {
+        "id": "b1-e4",
+        "type": "elevator",
+        "name": "4 號無障礙電梯",
+        "x": 612,
+        "y": 1224,
+        "description": "M4、M5 方向的通道，通往 B2 板南線大廳西側。",
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-e7",
+        "type": "elevator",
+        "name": "7 號無障礙電梯",
+        "x": 1005,
+        "y": 1222,
+        "description": "忠孝西路側通道東端，通往 B2 板南線大廳東側。",
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-e5",
+        "type": "elevator",
+        "name": "5 號無障礙電梯",
+        "x": 730,
+        "y": 1158,
+        "description": "靠近 M4 方向，連接 B1 與地面層。",
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-wc-nw",
+        "type": "restroom",
+        "name": "廁所（北側西段）",
+        "x": 499,
+        "y": 668,
+        "description": "站體北側通道，靠近中間的南北通道。",
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-wc-ne",
+        "type": "restroom",
+        "name": "廁所（北側東段）",
+        "x": 858,
+        "y": 639,
+        "description": "站體北側通道，靠近 M1 方向。",
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-wc-sw",
+        "type": "restroom",
+        "name": "廁所（南側西段）",
+        "x": 520,
+        "y": 910,
+        "description": "站體南側通道，靠近西區停車場。",
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-wc-se",
+        "type": "restroom",
+        "name": "廁所（南側東段）",
+        "x": 882,
+        "y": 875,
+        "description": "站體南側通道，靠近東區停車場。",
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-wc-m5",
+        "type": "restroom",
+        "name": "廁所（M5 方向）",
+        "x": 468,
+        "y": 1162,
+        "description": "靠近 M5 與站前地下街通道。",
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-water",
+        "type": "water",
+        "name": "飲水台",
+        "x": 609,
+        "y": 1160,
+        "description": "靠近 M4 出入口的通道。",
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-locker-west",
+        "type": "locker",
+        "name": "置物櫃（K 區方向）",
+        "x": 781,
+        "y": 994,
+        "description": "靠近 K 區地下街及捷運轉乘通道。",
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-locker-east",
+        "type": "locker",
+        "name": "置物櫃（東側）",
+        "x": 872,
+        "y": 950,
+        "description": "靠近捷運與臺鐵、高鐵連通處。",
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-m5-lower",
+        "type": "stairway",
+        "name": "M5 方向梯口",
+        "x": 576,
+        "y": 1235,
+        "description": "往 B2 捷運穿堂。平面圖有梯口，樓梯或電扶梯的配置待核對。",
+        "angle": 0,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-m4-m6-lower",
+        "type": "stairway",
+        "name": "M4／M6 方向梯口",
+        "x": 706,
+        "y": 1233,
+        "description": "往 B2 捷運穿堂。平面圖有梯口，樓梯或電扶梯的配置待核對。",
+        "angle": 0,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-m3-m8-lower",
+        "type": "stairway",
+        "name": "M3／M8 方向梯口",
+        "x": 922,
+        "y": 1236,
+        "description": "往 B2 捷運穿堂。平面圖有梯口，樓梯或電扶梯的配置待核對。",
+        "angle": 0,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-m7-lower",
+        "type": "stairway",
+        "name": "M7 方向梯口",
+        "x": 1040,
+        "y": 1190,
+        "description": "往 B2 捷運穿堂。平面圖有梯口，樓梯或電扶梯的配置待核對。",
+        "angle": 0,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-civic-red",
+        "type": "escalator",
+        "name": "市民大道側電扶梯",
+        "x": 981,
+        "y": 492,
+        "description": "剖面圖標示 B1 市民大道側連接 B3 淡水信義線大廳。",
+        "angle": 16,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-civic-west",
+        "type": "stairway",
+        "name": "市民大道側西邊短梯",
+        "x": 956,
+        "y": 478,
+        "description": "市民大道側主梯口西邊的小段梯，梯種待核對。",
+        "angle": 16,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-civic-east",
+        "type": "stairway",
+        "name": "市民大道側東邊短梯",
+        "x": 1009,
+        "y": 493,
+        "description": "市民大道側主梯口東邊的小段梯，梯種待核對。",
+        "angle": 16,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-north-gate-west",
+        "type": "stairway",
+        "name": "北一門西側短梯",
+        "x": 934,
+        "y": 571,
+        "description": "北一門附近西側短梯，梯種待核對。",
+        "angle": 15,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-north-gate-east",
+        "type": "stairway",
+        "name": "北一門東側短梯",
+        "x": 990,
+        "y": 564,
+        "description": "北一門附近東側短梯，梯種待核對。",
+        "angle": 0,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-k-upper-a",
+        "type": "stairway",
+        "name": "K 區方向北側梯口",
+        "x": 778,
+        "y": 950,
+        "description": "K 區連通道電梯旁北側梯口，梯種待核對。",
+        "angle": 0,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-k-upper-b",
+        "type": "stairway",
+        "name": "K 區方向第二梯口",
+        "x": 777,
+        "y": 970,
+        "description": "K 區連通道電梯旁南側梯口，梯種待核對。",
+        "angle": 0,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-east-passage-stair",
+        "type": "stairway",
+        "name": "東側連通處梯口",
+        "x": 892,
+        "y": 950,
+        "description": "臺鐵／高鐵連通處附近，梯種待核對。",
+        "angle": 12,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-k-lower-a",
+        "type": "stairway",
+        "name": "K 區入口梯口（北）",
+        "x": 755,
+        "y": 1027,
+        "description": "K 區入口的北段梯口，對側在目前圖外。",
+        "angle": 90,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-k-lower-b",
+        "type": "stairway",
+        "name": "K 區入口梯口（中）",
+        "x": 757,
+        "y": 1048,
+        "description": "K 區入口的中段梯口，對側在目前圖外。",
+        "angle": 90,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-k-lower-c",
+        "type": "stairway",
+        "name": "K 區入口梯口（南）",
+        "x": 759,
+        "y": 1067,
+        "description": "K 區入口的南段梯口，對側在目前圖外。",
+        "angle": 90,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-k-lower-d",
+        "type": "stairway",
+        "name": "K 區南側通道短梯",
+        "x": 762,
+        "y": 1113,
+        "description": "K 區南側通道短梯，梯種待核對。",
+        "angle": 90,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-south-gate",
+        "type": "stairway",
+        "name": "臺鐵／高鐵南一門梯口",
+        "x": 688,
+        "y": 1121,
+        "description": "南一門方向的梯口，對側在目前圖外。",
+        "angle": 90,
+        "zone": "b1-passage"
+      },
+      {
+        "id": "b1-m4-street",
+        "type": "escalator",
+        "name": "M4 出入口電扶梯",
+        "x": 750,
+        "y": 1144,
+        "description": "可往地面層 M4；地面層在目前圖外。",
+        "angle": 0,
+        "zone": "b1-passage"
+      }
+    ],
+    "B2": [
+      {
+        "id": "m-bl-west",
+        "type": "stairs-escalator",
+        "name": "板南線梯口・西端",
+        "x": 690.5,
+        "y": 1254,
+        "description": "同一梯口有樓梯與電扶梯，連接 B3 板南線月台。",
+        "angle": 0,
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-bl-east",
+        "type": "stairs-escalator",
+        "name": "板南線梯口・東端",
+        "x": 1039.5,
+        "y": 1254,
+        "description": "同一梯口有樓梯與電扶梯，連接 B3 板南線月台。",
+        "angle": 0,
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-r-b3",
+        "type": "escalator",
+        "name": "淡水信義線電扶梯（往 B3）",
+        "x": 907.5,
+        "y": 1045.5,
+        "description": "靠近 1 號電梯的電扶梯通往 B3 淡水信義線大廳，可再下至 B4 月台。",
+        "angle": 12,
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-r-b4",
+        "type": "stairs-escalator",
+        "name": "淡水信義線直達梯口",
+        "x": 932,
+        "y": 1125,
+        "description": "靠近穿堂交會處的電扶梯可直達 B4，梯口與運轉方向依現場標示。樓梯與電扶梯的配置依站圖和設備數量推定。",
+        "angle": 12,
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-e1",
+        "type": "elevator",
+        "name": "1 號無障礙電梯",
+        "x": 926,
+        "y": 1026.5,
+        "description": "中央偏北，通往 B4 淡水信義線 2 號月台。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-e4",
+        "type": "elevator",
+        "name": "4 號無障礙電梯",
+        "x": 568,
+        "y": 1272.5,
+        "description": "穿堂西側，通往 B1 的 M4、M5 出口之間。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-e6",
+        "type": "elevator",
+        "name": "6 號無障礙電梯",
+        "x": 866,
+        "y": 1262.5,
+        "description": "穿堂中央，通往 B3 板南線月台。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-e7",
+        "type": "elevator",
+        "name": "7 號無障礙電梯",
+        "x": 1139,
+        "y": 1258.5,
+        "description": "穿堂東側，通往 B1。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-wc",
+        "type": "restroom",
+        "name": "廁所與親子無障礙廁所",
+        "x": 857.5,
+        "y": 1104,
+        "description": "板南線付費區北側，男廁、女廁及親子無障礙廁所相鄰。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-nursing",
+        "type": "nursing",
+        "name": "哺集乳室",
+        "x": 847.5,
+        "y": 1165.5,
+        "description": "板南線付費區北側，位在親子無障礙廁所南側。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-i2",
+        "type": "info",
+        "name": "2 號詢問處",
+        "x": 634,
+        "y": 1223.5,
+        "description": "穿堂西側，近往 M4、M5、M6 的通道。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-i3",
+        "type": "info",
+        "name": "3 號詢問處",
+        "x": 1101,
+        "y": 1223,
+        "description": "穿堂東側，近往 M3、M7、M8 的通道。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-tw",
+        "type": "ticket",
+        "name": "捷運售票處（西）",
+        "x": 580,
+        "y": 1240,
+        "description": "穿堂西側，近往 M5 的通道。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-te",
+        "type": "ticket",
+        "name": "捷運售票處（東）",
+        "x": 1132.5,
+        "y": 1274.5,
+        "description": "穿堂東側，近往 M3、M8 的通道。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-aed",
+        "type": "aed",
+        "name": "自動體外心臟電擊去顫器",
+        "x": 1074,
+        "y": 1214,
+        "description": "穿堂東側，靠近 3 號詢問處及 M7 方向。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-pw",
+        "type": "phone",
+        "name": "公用電話（西）",
+        "x": 585.5,
+        "y": 1266,
+        "description": "穿堂西側，近 4 號無障礙電梯。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-pe",
+        "type": "phone",
+        "name": "公用電話（東）",
+        "x": 1137,
+        "y": 1242,
+        "description": "穿堂東側，近 7 號無障礙電梯。",
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-bl-west-inner",
+        "type": "stairs-escalator",
+        "name": "板南線梯口・中央偏西",
+        "x": 799,
+        "y": 1254,
+        "description": "同一梯口有樓梯與電扶梯，連接 B3 板南線月台。",
+        "angle": 0,
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "m-bl-east-inner",
+        "type": "stairs-escalator",
+        "name": "板南線梯口・中央偏東",
+        "x": 933,
+        "y": 1254,
+        "description": "同一梯口有樓梯與電扶梯，連接 B3 板南線月台。",
+        "angle": 0,
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "b2-m5-upper",
+        "type": "stairway",
+        "name": "M5 方向梯口",
+        "x": 552,
+        "y": 1290,
+        "description": "往 B1 出口通道。平面圖有梯口，樓梯或電扶梯的配置待核對。",
+        "angle": 0,
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "b2-m4-m6-upper",
+        "type": "stairway",
+        "name": "M4／M6 方向梯口",
+        "x": 698,
+        "y": 1289,
+        "description": "往 B1 出口通道。平面圖有梯口，樓梯或電扶梯的配置待核對。",
+        "angle": 0,
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "b2-m3-m8-upper",
+        "type": "stairway",
+        "name": "M3／M8 方向梯口",
+        "x": 1039,
+        "y": 1289,
+        "description": "往 B1 出口通道。平面圖有梯口，樓梯或電扶梯的配置待核對。",
+        "angle": 0,
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "b2-m7-upper",
+        "type": "stairway",
+        "name": "M7 方向梯口",
+        "x": 1170,
+        "y": 1220,
+        "description": "往 B1 出口通道。平面圖有梯口，樓梯或電扶梯的配置待核對。",
+        "angle": 0,
+        "zone": "b2-concourse"
+      },
+      {
+        "id": "b2-civic-branch",
+        "type": "stairway",
+        "name": "市民大道方向梯口",
+        "x": 946,
+        "y": 1054,
+        "description": "靠近 1 號電梯北側、往市民大道的另一組梯口，梯種及端點待核對。",
+        "angle": 12,
+        "zone": "b2-concourse"
+      }
+    ],
+    "B3": [
+      {
+        "id": "b3-e6",
+        "type": "elevator",
+        "name": "6 號無障礙電梯",
+        "x": 889,
+        "y": 1259,
+        "description": "板南線月台中央，通往 B2 板南線大廳。",
+        "zone": "b3-blue"
+      },
+      {
+        "id": "b3-e2",
+        "type": "elevator",
+        "name": "2 號無障礙電梯",
+        "x": 1020,
+        "y": 711,
+        "description": "淡水信義線大廳中央，通往 B4 淡水信義線月台。",
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-e3",
+        "type": "elevator",
+        "name": "3 號無障礙電梯",
+        "x": 1120,
+        "y": 389,
+        "description": "淡水信義線大廳北側，可往地面層 M1、M2 之間。",
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-bl-west",
+        "type": "stairs-escalator",
+        "name": "板南線梯口・西端",
+        "x": 683,
+        "y": 1258,
+        "description": "同一梯口有樓梯與電扶梯，連接 B2 板南線大廳。",
+        "angle": 0,
+        "zone": "b3-blue"
+      },
+      {
+        "id": "b3-bl-east",
+        "type": "stairs-escalator",
+        "name": "板南線梯口・東端",
+        "x": 1085,
+        "y": 1258,
+        "description": "同一梯口有樓梯與電扶梯，連接 B2 板南線大廳。",
+        "angle": 0,
+        "zone": "b3-blue"
+      },
+      {
+        "id": "b3-red-b2",
+        "type": "escalator",
+        "name": "淡水信義線電扶梯（往 B2）",
+        "x": 926,
+        "y": 1006,
+        "description": "淡水信義線大廳南端，連接 B2 板南線大廳。",
+        "angle": 12,
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-wc-n",
+        "type": "restroom",
+        "name": "廁所與親子無障礙廁所（北）",
+        "x": 1044,
+        "y": 448,
+        "description": "淡水信義線大廳北側、往市民大道方向。",
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-wc-s",
+        "type": "restroom",
+        "name": "廁所與親子無障礙廁所（南）",
+        "x": 923,
+        "y": 881,
+        "description": "淡水信義線大廳南側。",
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-info",
+        "type": "info",
+        "name": "1 號詢問處",
+        "x": 1031,
+        "y": 563,
+        "description": "淡水信義線大廳北半部。",
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-aed",
+        "type": "aed",
+        "name": "自動體外心臟電擊去顫器",
+        "x": 1023,
+        "y": 597,
+        "description": "淡水信義線大廳，靠近 1 號詢問處。",
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-water",
+        "type": "water",
+        "name": "飲水機",
+        "x": 1039,
+        "y": 479,
+        "description": "淡水信義線大廳北側、靠近廁所。",
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-phone-n",
+        "type": "phone",
+        "name": "公用電話（淡水信義線大廳）",
+        "x": 1104,
+        "y": 486,
+        "description": "淡水信義線大廳北側。",
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-phone-w",
+        "type": "phone",
+        "name": "公用電話（板南線西端）",
+        "x": 585,
+        "y": 1258,
+        "description": "板南線月台西端。",
+        "zone": "b3-blue"
+      },
+      {
+        "id": "b3-phone-e",
+        "type": "phone",
+        "name": "公用電話（板南線東端）",
+        "x": 1178,
+        "y": 1258,
+        "description": "板南線月台東端。",
+        "zone": "b3-blue"
+      },
+      {
+        "id": "b3-ticket-tr",
+        "type": "ticket",
+        "name": "臺鐵售票處",
+        "x": 989,
+        "y": 512,
+        "description": "臺鐵轉乘區北側，靠近淡水信義線大廳。",
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-ticket-hsr",
+        "type": "ticket",
+        "name": "高鐵售票處",
+        "x": 936,
+        "y": 778,
+        "description": "高鐵轉乘區南側。",
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-bl-west-inner",
+        "type": "stairs-escalator",
+        "name": "板南線梯口・中央偏西",
+        "x": 819,
+        "y": 1258,
+        "description": "同一梯口有樓梯與電扶梯，連接 B2 板南線大廳。",
+        "angle": 0,
+        "zone": "b3-blue"
+      },
+      {
+        "id": "b3-bl-east-inner",
+        "type": "stairs-escalator",
+        "name": "板南線梯口・中央偏東",
+        "x": 948,
+        "y": 1258,
+        "description": "同一梯口有樓梯與電扶梯，連接 B2 板南線大廳。",
+        "angle": 0,
+        "zone": "b3-blue"
+      },
+      {
+        "id": "b3-civic-red",
+        "type": "escalator",
+        "name": "淡水信義線大廳北端電扶梯",
+        "x": 1092,
+        "y": 358,
+        "description": "剖面圖標示 B3 大廳北端連接 B1 市民大道側通道。",
+        "angle": 12,
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-red-north",
+        "type": "stairs-escalator",
+        "name": "淡水信義線月台梯口・北段",
+        "x": 1040,
+        "y": 625,
+        "description": "往 B4 淡水信義線月台。梯種依平面圖、剖面圖與設備數量推定。",
+        "angle": 12,
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-red-middle",
+        "type": "stairs-escalator",
+        "name": "淡水信義線月台梯口・中段",
+        "x": 998,
+        "y": 796,
+        "description": "往 B4 淡水信義線月台。梯種依平面圖、剖面圖與設備數量推定。",
+        "angle": 12,
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-red-south",
+        "type": "stairs-escalator",
+        "name": "淡水信義線月台梯口・南段",
+        "x": 975,
+        "y": 925,
+        "description": "往 B4 淡水信義線月台。梯種依平面圖、剖面圖與設備數量推定。",
+        "angle": 12,
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-red-extra-south",
+        "type": "stairway",
+        "name": "淡水信義線大廳南端短梯",
+        "x": 959,
+        "y": 1012,
+        "description": "1 號電梯旁另一組短梯，梯種及另一端待核對。",
+        "angle": 12,
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-tra-stair-n",
+        "type": "stairs",
+        "name": "臺鐵轉乘區樓梯（北）",
+        "x": 887,
+        "y": 549,
+        "description": "連接 B2 臺鐵月台區，該站區在目前圖外。",
+        "angle": -6,
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-tra-stair-s",
+        "type": "stairs",
+        "name": "臺鐵轉乘區樓梯（南）",
+        "x": 892,
+        "y": 613,
+        "description": "連接 B2 臺鐵月台區，該站區在目前圖外。",
+        "angle": -6,
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-hsr-stair-n",
+        "type": "stairs",
+        "name": "高鐵轉乘區樓梯（北）",
+        "x": 899,
+        "y": 702,
+        "description": "連接 B2 高鐵月台區，該站區在目前圖外。",
+        "angle": -6,
+        "zone": "b3-red"
+      },
+      {
+        "id": "b3-hsr-stair-s",
+        "type": "stairs",
+        "name": "高鐵轉乘區樓梯（南）",
+        "x": 905,
+        "y": 764,
+        "description": "連接 B2 高鐵月台區，該站區在目前圖外。",
+        "angle": -6,
+        "zone": "b3-red"
+      }
+    ],
+    "B4": [
+      {
+        "id": "b4-e1",
+        "type": "elevator",
+        "name": "1 號無障礙電梯",
+        "x": 935,
+        "y": 1017,
+        "description": "2 號月台南側，直達 B2 板南線大廳。",
+        "zone": "b4-platform"
+      },
+      {
+        "id": "b4-e2",
+        "type": "elevator",
+        "name": "2 號無障礙電梯",
+        "x": 1019,
+        "y": 702,
+        "description": "淡水信義線月台中央，通往 B3 淡水信義線大廳。",
+        "zone": "b4-platform"
+      },
+      {
+        "id": "b4-red-direct",
+        "type": "stairs-escalator",
+        "name": "板南線大廳直達梯口",
+        "x": 954,
+        "y": 1051,
+        "description": "月台南側與 B2 相連的電扶梯，請依梯口標示確認。樓梯與電扶梯的配置依站圖和設備數量推定。",
+        "angle": 12,
+        "zone": "b4-platform"
+      },
+      {
+        "id": "b4-phone",
+        "type": "phone",
+        "name": "公用電話",
+        "x": 1063,
+        "y": 476,
+        "description": "淡水信義線月台北端。",
+        "zone": "b4-platform"
+      },
+      {
+        "id": "b4-wait-n",
+        "type": "accessible",
+        "name": "輪椅候車區（北）",
+        "x": 1083,
+        "y": 485,
+        "description": "淡水信義線月台北端。",
+        "zone": "b4-platform"
+      },
+      {
+        "id": "b4-wait-s",
+        "type": "accessible",
+        "name": "輪椅候車區（南）",
+        "x": 934,
+        "y": 990,
+        "description": "淡水信義線月台南端、1 號無障礙電梯附近。",
+        "zone": "b4-platform"
+      },
+      {
+        "id": "b4-red-north",
+        "type": "stairs-escalator",
+        "name": "淡水信義線大廳梯口・北段",
+        "x": 1039,
+        "y": 591,
+        "description": "往 B3 淡水信義線大廳。梯種依平面圖、剖面圖與設備數量推定。",
+        "angle": 12,
+        "zone": "b4-platform"
+      },
+      {
+        "id": "b4-red-middle",
+        "type": "stairs-escalator",
+        "name": "淡水信義線大廳梯口・中段",
+        "x": 1000,
+        "y": 790,
+        "description": "往 B3 淡水信義線大廳。梯種依平面圖、剖面圖與設備數量推定。",
+        "angle": 12,
+        "zone": "b4-platform"
+      },
+      {
+        "id": "b4-red-south",
+        "type": "stairs-escalator",
+        "name": "淡水信義線大廳梯口・南段",
+        "x": 981,
+        "y": 914,
+        "description": "往 B3 淡水信義線大廳。梯種依平面圖、剖面圖與設備數量推定。",
+        "angle": 12,
+        "zone": "b4-platform"
+      }
+    ]
+  }
+}
