@@ -12,7 +12,8 @@
     "nursing": {
       "name": "哺集乳室",
       "colorToken": "secondary-700",
-      "iconColorToken": "gray-950"
+      "iconColorToken": "gray-950",
+      "iconColor": "#BF0060"
     },
     "info": {
       "name": "詢問處",
@@ -30,7 +31,8 @@
     },
     "phone": {
       "name": "公用電話",
-      "colorToken": "gray-600"
+      "colorToken": "gray-600",
+      "iconColor": "#2894FF"
     },
     "escalator": {
       "name": "電扶梯",
