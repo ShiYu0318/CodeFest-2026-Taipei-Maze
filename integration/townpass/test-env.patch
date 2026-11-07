@@ -32,16 +32,21 @@ index c7f6b01..ce869de 100644
      coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
  }
 diff --git a/android/app/src/main/AndroidManifest.xml b/android/app/src/main/AndroidManifest.xml
-index 771d33a..83a2459 100644
+index 771d33a..b4e8dbf 100644
 --- a/android/app/src/main/AndroidManifest.xml
 +++ b/android/app/src/main/AndroidManifest.xml
-@@ -1,4 +1,5 @@
+@@ -1,7 +1,10 @@
  <manifest xmlns:android="http://schemas.android.com/apk/res/android">
++    <uses-permission android:name="android.permission.INTERNET" />
 +    <uses-permission android:name="android.permission.RECORD_AUDIO" />
      <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
      <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
      <application
-@@ -47,6 +48,7 @@
++        android:networkSecurityConfig="@xml/codefest_network_security"
+         android:label="Town Pass"
+         android:name="${applicationName}"
+         android:icon="@mipmap/ic_launcher">
+@@ -47,6 +50,7 @@
  
           In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
      <queries>
@@ -49,7 +54,7 @@ index 771d33a..83a2459 100644
          <intent>
              <action android:name="android.intent.action.PROCESS_TEXT"/>
              <data android:mimeType="text/plain"/>
-@@ -54,6 +56,7 @@
+@@ -54,6 +58,7 @@
      </queries>
      <!-- Provide required visibility configuration for API level 30 and above -->
      <queries>
@@ -261,6 +266,23 @@ index 871556e..449c1eb 100644
 +    override fun onStop() { codefestAI?.background(); super.onStop() }
 +    override fun onDestroy() { codefestAI?.destroy(); super.onDestroy() }
 +}
+diff --git a/android/app/src/main/res/xml/codefest_network_security.xml b/android/app/src/main/res/xml/codefest_network_security.xml
+new file mode 100644
+index 0000000..b532e90
+--- /dev/null
++++ b/android/app/src/main/res/xml/codefest_network_security.xml
+@@ -0,0 +1,11 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- Local asset server + user-designated existing HTTP navigation site only.
++     Sensitive AI bridge separately rejects the remote HTTP origin. -->
++<network-security-config>
++    <base-config cleartextTrafficPermitted="false" />
++    <domain-config cleartextTrafficPermitted="true">
++        <domain includeSubdomains="false">127.0.0.1</domain>
++        <domain includeSubdomains="false">localhost</domain>
++        <domain includeSubdomains="false">home.yoyo899843.com</domain>
++    </domain-config>
++</network-security-config>
 diff --git a/ios/Podfile.lock b/ios/Podfile.lock
 index 10b0ecf..1518ece 100644
 --- a/ios/Podfile.lock
