@@ -1,7 +1,8 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
   <main
-    class="navigation-lab"
+    class="navigation-lab display-page"
+    :data-theme="theme"
     :class="{ 'simple-mode': simpleMode }"
     lang="zh-Hant"
   >
@@ -372,6 +373,8 @@ import graph from "../navigation/demo-graph.json";
 import { createSession } from "../navigation/session.mjs";
 import { createContinuousScanner } from "../navigation/continuous.mjs";
 import { createQrBridge } from "../navigation/bridge.mjs";
+import { useDisplayPreferences } from "../display/preferences.mjs";
+const { theme } = useDisplayPreferences();
 const route = useRoute();
 const router = useRouter();
 const session = createSession(graph);
@@ -645,11 +648,12 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .navigation-lab {
+  background: var(--demo-surface, transparent);
   max-width: 1120px;
   margin: 0 auto;
   padding: 20px max(16px, env(safe-area-inset-left)) 48px;
   text-align: left;
-  color: #213b43;
+  color: var(--demo-ink, #213b43);
   font-family: system-ui, "PingFang TC", sans-serif;
   line-height: 1.6;
 }
@@ -657,11 +661,11 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  border-bottom: 1px solid #cbdadd;
+  border-bottom: 1px solid var(--demo-border, #cbdadd);
   padding-bottom: 16px;
 }
 .navigation-lab a {
-  color: #326875;
+  color: var(--demo-accent, #326875);
 }
 h1 {
   font-size: clamp(1.65rem, 4vw, 2.3rem);
@@ -677,10 +681,10 @@ h3 {
   font-size: 1.15rem;
 }
 .synthetic-notice {
-  border-left: 5px solid #91601e;
+  border-left: 5px solid var(--demo-current, #91601e);
   padding: 12px 16px;
-  background: #fff6df;
-  color: #5b3c13;
+  background: var(--demo-warning, #fff6df);
+  color: var(--demo-warning-ink, #5b3c13);
 }
 .lab-layout {
   display: grid;
@@ -689,7 +693,7 @@ h3 {
   margin-top: 28px;
 }
 .lab-controls {
-  border-right: 1px solid #d7e3e6;
+  border-right: 1px solid var(--demo-border, #d7e3e6);
   padding-right: 28px;
 }
 button,
@@ -698,9 +702,9 @@ select {
   min-height: 46px;
   border-radius: 6px;
   padding: 9px 12px;
-  border: 1px solid #70949e;
-  background: white;
-  color: #213b43;
+  border: 1px solid var(--demo-border, #70949e);
+  background: var(--demo-surface, white);
+  color: var(--demo-ink, #213b43);
   max-width: 100%;
 }
 button {
@@ -708,9 +712,9 @@ button {
   margin: 4px 8px 4px 0;
 }
 button.primary {
-  background: #326875;
-  border-color: #326875;
-  color: white;
+  background: var(--demo-accent, #326875);
+  border-color: var(--demo-accent, #326875);
+  color: var(--demo-on-accent, white);
   font-weight: 700;
 }
 button:disabled {
@@ -721,7 +725,7 @@ button:focus-visible,
 select:focus-visible,
 a:focus-visible,
 summary:focus-visible {
-  outline: 3px solid #8a501b;
+  outline: 3px solid var(--demo-current, #8a501b);
   outline-offset: 3px;
 }
 .lab-controls > label {
@@ -735,17 +739,17 @@ summary:focus-visible {
 .hint,
 small {
   font-size: 0.85rem;
-  color: #465b62;
+  color: var(--demo-muted, #465b62);
 }
 .location-summary {
-  background: #eff7f9;
+  background: var(--demo-wash, #eff7f9);
   padding: 12px;
 }
 .confirmation {
-  background: #eff7f9;
+  background: var(--demo-wash, #eff7f9);
   padding: 16px;
   margin: 16px 0;
-  border-left: 4px solid #326875;
+  border-left: 4px solid var(--demo-accent, #326875);
 }
 fieldset {
   border: 0;
@@ -761,7 +765,7 @@ legend {
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid #d7e3e6;
+  border-bottom: 1px solid var(--demo-border, #d7e3e6);
   padding: 12px 0;
   cursor: pointer;
 }
@@ -769,7 +773,7 @@ legend {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  accent-color: #326875;
+  accent-color: var(--demo-accent, #326875);
 }
 .destination-option small {
   display: block;
@@ -784,12 +788,12 @@ legend {
   margin: 18px 0 10px;
 }
 .floor-tabs [aria-pressed="true"] {
-  background: #326875;
-  color: white;
+  background: var(--demo-accent, #326875);
+  color: var(--demo-on-accent, white);
 }
 .instruction-panel {
-  border-top: 3px solid #326875;
-  background: #f0f8fa;
+  border-top: 3px solid var(--demo-accent, #326875);
+  background: var(--demo-wash, #f0f8fa);
   padding: 20px;
   margin-top: 24px;
 }
@@ -799,11 +803,11 @@ legend {
 }
 .step-label {
   font-weight: 700;
-  color: #326875;
+  color: var(--demo-accent, #326875);
 }
 .test-tools {
   margin-top: 28px;
-  border-top: 1px solid #d7e3e6;
+  border-top: 1px solid var(--demo-border, #d7e3e6);
   padding-top: 16px;
 }
 summary {
@@ -813,7 +817,7 @@ pre {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font-size: 0.8rem;
-  background: #f3f6f7;
+  background: var(--demo-wash, #f3f6f7);
   padding: 12px;
 }
 @media (max-width: 720px) {
@@ -823,7 +827,7 @@ pre {
   }
   .lab-controls {
     border-right: 0;
-    border-bottom: 1px solid #d7e3e6;
+    border-bottom: 1px solid var(--demo-border, #d7e3e6);
     padding: 0 0 24px;
   }
 }

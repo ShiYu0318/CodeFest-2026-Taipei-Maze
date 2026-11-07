@@ -2,17 +2,31 @@
 import { reactive, readonly, toRefs } from "vue";
 
 const modes = ["standard", "child", "senior"];
+export const themeStorageKey = "taipei-maze.theme.v1";
+const browserStorage = () =>
+  typeof window === "undefined" ? undefined : window.localStorage;
 
-/** Fresh document loads always start light/standard; SPA pages share memory only. */
-export function createDisplayPreferences() {
+/** Remember only a manually chosen theme; age presets still start standard. */
+export function createDisplayPreferences(storage = browserStorage) {
+  let savedTheme;
+  try {
+    savedTheme = storage()?.getItem(themeStorageKey);
+  } catch {
+    /* Storage is optional. */
+  }
   const state = reactive({
-    theme: "light",
+    theme: savedTheme === "dark" ? "dark" : "light",
     displayMode: "standard",
   });
   return {
     ...toRefs(readonly(state)),
     toggleTheme() {
       state.theme = state.theme === "light" ? "dark" : "light";
+      try {
+        storage()?.setItem(themeStorageKey, state.theme);
+      } catch {
+        /* Keep in-memory choice. */
+      }
     },
     setDisplayMode(value) {
       if (!modes.includes(value)) return;

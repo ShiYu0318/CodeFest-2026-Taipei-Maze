@@ -12,10 +12,30 @@
 </template>
 
 <script setup>
+import { onMounted, watch } from "vue";
 import FloatingChat from "./components/FloatingChat.vue";
+import { useDisplayPreferences } from "./display/preferences.mjs";
+import "./display/display-preferences.css";
+
+const { theme } = useDisplayPreferences();
+onMounted(() => {
+  watch(
+    theme,
+    (value) => {
+      document.documentElement.dataset.mazeTheme = value;
+    },
+    { immediate: true }
+  );
+});
 </script>
 
 <style lang="scss">
+html[data-maze-theme="dark"] #app {
+  color: #e6f2f5;
+}
+html[data-maze-theme="dark"] .app-nav a {
+  color: #add5df;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

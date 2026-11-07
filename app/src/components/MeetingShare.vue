@@ -105,8 +105,8 @@ async function share() {
 </script>
 <style scoped>
 .meeting-share {
-  background: #f1f8f5;
-  border-left: 4px solid #39725b;
+  background: var(--demo-wash, #f1f8f5);
+  border-left: 4px solid var(--demo-destination, #39725b);
   padding: 16px;
   margin-top: 20px;
   line-height: 1.65;
@@ -122,7 +122,7 @@ input[readonly] {
   box-sizing: border-box;
   min-height: 44px;
   padding: 10px;
-  color: #213b43;
+  color: var(--demo-ink, #213b43);
 }
 button {
   min-height: 44px;
@@ -130,10 +130,10 @@ button {
   margin: 8px 8px 8px 0;
   padding: 8px 12px;
   cursor: pointer;
-  background: white;
-  border: 1px solid #39725b;
+  background: var(--demo-surface, white);
+  border: 1px solid var(--demo-destination, #39725b);
   border-radius: 6px;
-  color: #213b43;
+  color: var(--demo-ink, #213b43);
 }
 button:disabled {
   opacity: 0.5;
@@ -141,6 +141,6 @@ button:disabled {
 }
 a {
   display: block;
-  color: #326875;
+  color: var(--demo-accent, #326875);
 }
 </style>

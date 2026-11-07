@@ -17,17 +17,24 @@
           markerHeight="5"
           orient="auto-start-reverse"
         >
-          <path d="M0 0 10 5 0 10Z" fill="#326875" />
+          <path d="M0 0 10 5 0 10Z" fill="var(--demo-accent, #326875)" />
         </marker>
       </defs>
-      <rect x="0" y="0" width="560" height="340" rx="12" fill="#f0f8fa" />
+      <rect
+        x="0"
+        y="0"
+        width="560"
+        height="340"
+        rx="12"
+        fill="var(--demo-wash, #f0f8fa)"
+      />
       <text x="24" y="32" class="floor-title">{{ floorLabel }} · 合成測試</text>
       <path
         v-for="edge in floorEdges"
         :key="edge.id"
         :d="path(edge.geometry)"
         fill="none"
-        stroke="#c5d7dc"
+        stroke="var(--demo-edge, #c5d7dc)"
         stroke-width="10"
         stroke-linecap="round"
       />
@@ -36,7 +43,11 @@
         :key="'route_' + edge.id"
         :d="path(edge.geometry)"
         fill="none"
-        :stroke="edge.id === currentEdgeId ? '#8a501b' : '#326875'"
+        :stroke="
+          edge.id === currentEdgeId
+            ? 'var(--demo-current, #8a501b)'
+            : 'var(--demo-accent, #326875)'
+        "
         :stroke-width="edge.id === currentEdgeId ? 9 : 5"
         marker-end="url(#demo-route-arrow)"
       />
@@ -47,12 +58,12 @@
           :r="node.id === positionNodeId ? 10 : 7"
           :fill="
             node.id === positionNodeId
-              ? '#8a501b'
+              ? 'var(--demo-current, #8a501b)'
               : node.id === destinationNodeId
-              ? '#21604d'
-              : '#fff'
+              ? 'var(--demo-destination, #21604d)'
+              : 'var(--demo-surface, #fff)'
           "
-          stroke="#326875"
+          stroke="var(--demo-accent, #326875)"
           stroke-width="2"
         />
         <text :x="node.x" :y="node.y + 27" text-anchor="middle">
@@ -113,20 +124,20 @@ const path = (geometry) =>
 }
 .demo-map text {
   font: 13px system-ui, sans-serif;
-  fill: #263d44;
+  fill: var(--demo-ink, #263d44);
 }
 .demo-map .floor-title {
   font-size: 17px;
   font-weight: 700;
 }
 .demo-map .position-label {
-  fill: #76400d;
+  fill: var(--demo-current, #76400d);
   font-weight: 700;
 }
 .demo-map figcaption {
   font-size: 0.85rem;
   line-height: 1.6;
   margin-top: 10px;
-  color: #465b62;
+  color: var(--demo-muted, #465b62);
 }
 </style>

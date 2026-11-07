@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import {
   createDisplayPreferences,
   useDisplayPreferences,
+  themeStorageKey,
 } from "../src/display/preferences.mjs";
 
 test("fresh document state always starts light/standard after any prior mode", () => {
@@ -44,4 +45,40 @@ test("invalid modes are ignored and mode changes do not change theme", () => {
   assert.equal(prefs.theme.value, "light");
   prefs.toggleTheme();
   assert.equal(prefs.displayMode.value, "child");
+});
+
+test("only an explicit theme choice persists across document reloads", () => {
+  const values = new Map();
+  const storage = () => ({
+    getItem: (key) => values.get(key),
+    setItem: (key, value) => values.set(key, value),
+  });
+  const first = createDisplayPreferences(storage);
+  assert.equal(first.theme.value, "light");
+  assert.equal(values.size, 0);
+  first.toggleTheme();
+  first.setDisplayMode("child");
+  const next = createDisplayPreferences(storage);
+  assert.equal(next.theme.value, "dark");
+  assert.equal(next.displayMode.value, "standard");
+  next.toggleTheme();
+  assert.equal(createDisplayPreferences(storage).theme.value, "light");
+  assert.deepEqual([...values], [[themeStorageKey, "light"]]);
+});
+
+test("denied or malformed storage never prevents manual theme changes", () => {
+  const blocked = createDisplayPreferences(() => {
+    throw new Error("Denied");
+  });
+  blocked.toggleTheme();
+  assert.equal(blocked.theme.value, "dark");
+  const invalid = createDisplayPreferences(() => ({
+    getItem: () => "unexpected",
+    setItem: () => {
+      throw new Error("Quota");
+    },
+  }));
+  assert.equal(invalid.theme.value, "light");
+  invalid.toggleTheme();
+  assert.equal(invalid.theme.value, "dark");
 });

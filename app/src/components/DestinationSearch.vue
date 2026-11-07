@@ -190,11 +190,11 @@ function choose(match) {
 .destination-search {
   margin: 20px 0;
   padding: 18px;
-  border: 1px solid #b8cdd3;
+  border: 1px solid var(--demo-border, #b8cdd3);
   border-radius: 10px;
   text-align: left;
-  color: #213b43;
-  background: #f4fafb;
+  color: var(--demo-ink, #213b43);
+  background: var(--demo-wash, #f4fafb);
   font: inherit;
 }
 h2 {
@@ -208,7 +208,7 @@ p {
 small {
   display: block;
   font-size: 0.85rem;
-  color: #465b62;
+  color: var(--demo-muted, #465b62);
 }
 label {
   display: block;
@@ -225,32 +225,32 @@ button {
   font: inherit;
   min-height: 44px;
   border-radius: 6px;
-  border: 1px solid #70949e;
+  border: 1px solid var(--demo-border, #70949e);
   padding: 9px 12px;
 }
 input {
   min-width: 0;
   width: 100%;
   flex: 1 1 180px;
-  background: white;
-  color: #213b43;
+  background: var(--demo-surface, white);
+  color: var(--demo-ink, #213b43);
 }
 button {
-  background: white;
-  color: #284f5b;
+  background: var(--demo-surface, white);
+  color: var(--demo-accent, #284f5b);
   cursor: pointer;
   margin-top: 4px;
 }
 button[type="submit"] {
-  background: #326875;
-  color: white;
+  background: var(--demo-accent, #326875);
+  color: var(--demo-on-accent, white);
 }
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 :where(input, button):focus-visible {
-  outline: 3px solid #8a501b;
+  outline: 3px solid var(--demo-current, #8a501b);
   outline-offset: 3px;
 }
 .search-results {
@@ -267,14 +267,14 @@ button:disabled {
   align-items: center;
   gap: 8px;
   padding: 12px 0;
-  border-top: 1px solid #cbdadd;
+  border-top: 1px solid var(--demo-border, #cbdadd);
 }
 .search-results li > span {
   flex: 1 1 160px;
   overflow-wrap: anywhere;
 }
 .search-conditions {
-  border-left: 3px solid #326875;
+  border-left: 3px solid var(--demo-accent, #326875);
   padding-left: 10px;
 }
 </style>
