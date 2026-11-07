@@ -3,18 +3,20 @@
   <section class="station-scan-panel" aria-labelledby="station-scan-heading">
     <div class="scan-heading">
       <h2 id="station-scan-heading">
-        {{
-          view.mode === "navigation" || persistentScan
-            ? t("scan.navigation")
-            : t("scan.browsing")
-        }}
+        <ZhuyinText
+          :text="
+            view.mode === 'navigation' || persistentScan
+              ? t('scan.navigation')
+              : t('scan.browsing')
+          "
+        />
       </h2>
     </div>
     <p class="scan-caveat">
       {{ t("scan.caveat") }}
     </p>
     <p v-if="view.mode === 'browsing'">
-      {{ t("scan.browseHint") }}
+      <ZhuyinText :text="t('scan.browseHint')" />
     </p>
     <template v-if="view.mode === 'navigation'">
       <label for="station-destination">{{ t("scan.chooseDestination") }}</label>
@@ -57,9 +59,10 @@
       >
     </template>
     <p v-if="destination" class="scan-target">
-      <strong>{{
-        t("scan.destination", { place: place(destination) })
-      }}</strong>
+      <strong
+        ><ZhuyinText
+          :text="t('scan.destination', { place: place(destination) })"
+      /></strong>
     </p>
     <button
       v-if="destination"
@@ -85,7 +88,7 @@
           stroke-linecap="round"
         />
       </svg>
-      {{ t("staff.open") }}
+      <ZhuyinText :text="t('staff.open')" />
     </button>
     <StaffCard
       v-if="staffOpen && destination"
@@ -113,18 +116,22 @@
       :disabled="!available || active"
       @click="start"
     >
-      {{
-        active
-          ? t("scan.waiting")
-          : position
-          ? t("scan.rescan")
-          : t("scan.scan")
-      }}
+      <ZhuyinText
+        :text="
+          active
+            ? t('scan.waiting')
+            : position
+            ? t('scan.rescan')
+            : t('scan.scan')
+        "
+      />
     </button>
     <p v-if="!persistentScan && !available" class="scan-note">
       {{ t("scan.needApp") }}
     </p>
-    <p v-if="!persistentScan && notice" role="status">{{ notice }}</p>
+    <p v-if="!persistentScan && notice" role="status">
+      <ZhuyinText :text="notice" />
+    </p>
     <div
       v-if="position && destination"
       class="scan-overview"
@@ -162,7 +169,11 @@
       :disabled="active"
       @click="emit('cancel-trip')"
     >
-      {{ view.mode === "navigation" ? t("scan.exit") : t("scan.cancelTrip") }}
+      <ZhuyinText
+        v-if="view.mode === 'browsing'"
+        :text="t('scan.cancelTrip')"
+      />
+      <template v-else>{{ t("scan.exit") }}</template>
     </button>
   </section>
 </template>
@@ -171,6 +182,7 @@
 import { computed, ref } from "vue";
 import DestinationSearch from "./DestinationSearch.vue";
 import StaffCard from "./StaffCard.vue";
+import ZhuyinText from "./ZhuyinText.vue";
 import { stationCatalog } from "../search/catalog.mjs";
 import { stationPoints } from "../station/scan.mjs";
 import data from "../views/station-points.json";

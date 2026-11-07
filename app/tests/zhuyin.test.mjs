@@ -58,19 +58,36 @@ test("unknown characters, punctuation, English and floor identifiers are preserv
   assert.equal(annotateZhuyin("").length, 0);
 });
 
-test("all current facility categories and child explanations have annotation coverage", () => {
+test("facility categories, child explanations and browsing messages have annotation coverage", () => {
   const station = JSON.parse(
     readFileSync(new URL("../src/views/station-points.json", import.meta.url))
   );
   // Child explanations now live in the Traditional Chinese catalog.
   const help = Object.entries(zhTW)
-    .filter(([key]) => key.startsWith("help.") || key.startsWith("type."))
+    .filter(
+      ([key]) =>
+        key.startsWith("help.") ||
+        key.startsWith("type.") ||
+        key.startsWith("notice.") ||
+        [
+          "scan.browsing",
+          "scan.navigation",
+          "scan.caveat",
+          "scan.browseHint",
+          "scan.waiting",
+          "scan.scan",
+          "scan.rescan",
+          "scan.destination",
+          "scan.cancelTrip",
+          "staff.open",
+        ].includes(key)
+    )
     .map(([, text]) => text);
   for (const text of [
     ...Object.values(station.categories).map((entry) => entry.name),
     ...help,
   ]) {
-    const missing = annotateZhuyin(text).filter(
+    const missing = annotateZhuyin(text.replace(/\{\w+\}/g, "")).filter(
       (part) => /\p{Script=Han}/u.test(part.text) && !part.reading
     );
     assert.deepEqual(missing, [], text);
@@ -99,6 +116,7 @@ test("opted-in fixed labels and meeting messages have full Han coverage", () => 
   const texts = [];
   for (const path of [
     "components/DisplayControls.vue",
+    "components/StationScanPanel.vue",
     "views/StationMapView.vue",
     "views/MeetingView.vue",
   ]) {

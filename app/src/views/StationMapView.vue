@@ -131,14 +131,14 @@
             ref="mapSection"
             class="map-card"
             :aria-label="t('map.mapAria')"
+            @keydown.esc="
+              mapPickStep ? openEndpointPicker() : closeFacilityDetails()
+            "
           >
             <div
               ref="mapStage"
               class="map-stage"
               :style="{ '--map-top': mapTop * 1.5 + 'px' }"
-              @keydown.esc="
-                mapPickStep ? openEndpointPicker() : closeConnectorDetails()
-              "
             >
               <div class="map-corner">
                 <button
@@ -167,7 +167,6 @@
                   role="region"
                   :aria-label="t('map.interactiveAria', { floor: level })"
                   tabindex="0"
-                  @scroll.passive="placeConnectorPanel"
                   @wheel="zoomWithWheel"
                   @keydown.self="zoomWithKeyboard"
                   @pointerdown="startMapDrag"
@@ -232,10 +231,15 @@
                       :aria-hidden="!isPointVisible(point)"
                       :tabindex="isPointVisible(point) ? undefined : -1"
                       :aria-expanded="
-                        isConnector(point) && !mapPickStep
-                          ? point.id === selected?.id &&
-                            !floorChanging &&
-                            !!connectorPosition
+                        !mapPickStep
+                          ? point.id === selected?.id && !floorChanging
+                          : undefined
+                      "
+                      :aria-controls="
+                        !mapPickStep &&
+                        point.id === selected?.id &&
+                        !floorChanging
+                          ? 'station-facility-detail'
                           : undefined
                       "
                       @click="selectMapPoint(point, $event)"
@@ -311,77 +315,73 @@
                   </div>
                 </div>
               </div>
-
-              <section
-                v-if="isConnector(selected) && !floorChanging"
-                id="connector-panel"
-                ref="connectorPanel"
-                class="connector-panel"
-                :style="connectorPosition || { visibility: 'hidden' }"
-                aria-labelledby="connector-title"
-              >
-                <h3 id="connector-title" ref="connectorHeading" tabindex="-1">
-                  <ZhuyinText :text="pointName(selected)" />
-                </h3>
-                <p v-if="showHelp" class="display-hint">
-                  <ZhuyinText :text="t('help.' + pointHelpType(selected))" />
-                </p>
-                <template v-if="destinations.length">
-                  <div v-for="transfer in destinations" :key="transfer.id">
-                    <button
-                      type="button"
-                      class="floor-destination"
-                      @click="visitDestination(transfer)"
-                    >
-                      <span
-                        >{{ transfer.to.floor }}・<ZhuyinText
-                          :text="zoneName(transfer.to.zone)"
-                      /></span>
-                      <StationMapIcon name="arrow" />
-                    </button>
-                    <p v-if="transferNote(transfer)">
-                      <ZhuyinText :text="transferNote(transfer)" />
-                    </p>
-                  </div>
-                </template>
-                <p v-else><ZhuyinText :text="pointDescription(selected)" /></p>
-              </section>
             </div>
-            <div
-              v-if="selected && !isConnector(selected)"
+            <section
+              v-if="selected && !floorChanging"
+              id="station-facility-detail"
+              ref="facilityDetails"
               class="display-facility-detail"
-              role="status"
+              aria-labelledby="station-facility-title"
             >
-              <h3><ZhuyinText :text="pointName(selected)" /></h3>
+              <h3
+                id="station-facility-title"
+                ref="facilityHeading"
+                tabindex="-1"
+              >
+                <ZhuyinText :text="pointName(selected)" />
+              </h3>
               <p v-if="showHelp" class="display-hint">
                 <ZhuyinText :text="t('help.' + pointHelpType(selected))" />
               </p>
-              <p><ZhuyinText :text="pointDescription(selected)" /></p>
-              <button
-                v-if="selected.id !== targetPoint?.id"
-                type="button"
-                class="facility-go"
-                @click="goHere(selected)"
+              <div
+                v-if="isConnector(selected) && destinations.length"
+                class="facility-transfers"
               >
-                <StationMapIcon name="arrow" />
-                <ZhuyinText :text="t('map.goHere')" />
-              </button>
-              <button
-                type="button"
-                class="facility-staff"
-                @click="
-                  staffPoint = { ...selected, floor: selected.floor ?? level }
-                "
-              >
-                <ZhuyinText :text="t('staff.open')" />
-              </button>
+                <div v-for="transfer in destinations" :key="transfer.id">
+                  <button
+                    type="button"
+                    class="floor-destination"
+                    @click="visitDestination(transfer)"
+                  >
+                    <span
+                      >{{ transfer.to.floor }}・<ZhuyinText
+                        :text="zoneName(transfer.to.zone)"
+                    /></span>
+                    <StationMapIcon name="arrow" />
+                  </button>
+                  <p v-if="transferNote(transfer)">
+                    <ZhuyinText :text="transferNote(transfer)" />
+                  </p>
+                </div>
+              </div>
+              <p v-else><ZhuyinText :text="pointDescription(selected)" /></p>
+              <div class="facility-actions">
+                <button
+                  v-if="selected.id !== targetPoint?.id"
+                  type="button"
+                  class="facility-go"
+                  @click="goHere(selected)"
+                >
+                  <StationMapIcon name="arrow" />
+                  <ZhuyinText :text="t('map.goHere')" />
+                </button>
+                <button
+                  type="button"
+                  class="facility-staff"
+                  @click="
+                    staffPoint = { ...selected, floor: selected.floor ?? level }
+                  "
+                >
+                  <ZhuyinText :text="t('staff.open')" />
+                </button>
+              </div>
               <StaffCard
                 v-if="staffPoint"
                 :point="staffPoint"
                 :step-free="location.view.value.stepFree"
                 @close="staffPoint = null"
               />
-            </div>
+            </section>
           </section>
         </div>
 
@@ -604,9 +604,8 @@ function setScanTarget(point) {
   focusScanPoint(point);
 }
 const originView = ref(null);
-const connectorHeading = ref(null);
-const connectorPanel = ref(null);
-const connectorPosition = ref(null);
+const facilityHeading = ref(null);
+const facilityDetails = ref(null);
 const floorChanging = ref(false);
 const arrivalPointId = ref(null);
 let floorAnimation = null;
@@ -688,17 +687,12 @@ watch(displayMode, async () => {
   await nextTick();
   if (!frame.isConnected) return;
   centerOn(...center);
-  placeConnectorPanel();
-});
-watch([selected, zoom, showLayers, floorChanging], placeConnectorPanel, {
-  flush: "post",
 });
 
 onMounted(() => {
   updateMapLayout();
   window.addEventListener("resize", updateMapLayout);
   mobileZoomQuery.addEventListener("change", enforceZoomLimit);
-  document.addEventListener("click", dismissConnectorOutside, true);
   document.addEventListener("touchstart", startPinch, captureGesture);
   document.addEventListener("touchend", endPinch, captureGesture);
   document.addEventListener("touchcancel", endPinch, captureGesture);
@@ -717,7 +711,6 @@ onBeforeUnmount(() => {
   zoomRevision++;
   window.removeEventListener("resize", updateMapLayout);
   mobileZoomQuery.removeEventListener("change", enforceZoomLimit);
-  document.removeEventListener("click", dismissConnectorOutside, true);
   floorAnimation?.cancel();
   clearMapDrag();
   clearPinch();
@@ -1269,71 +1262,6 @@ function toggleLayers() {
 function updateMapLayout() {
   mapTop.value = mapStage.value.getBoundingClientRect().top + window.scrollY;
   enforceZoomLimit();
-  nextTick(placeConnectorPanel);
-}
-
-function placeConnectorPanel() {
-  const panel = connectorPanel.value;
-  if (!panel || !selected.value || floorChanging.value) {
-    connectorPosition.value = null;
-    return;
-  }
-
-  const frame = viewport.value;
-  const board = frame.firstElementChild;
-  const [pointX, pointY] = normalizedPoint(selected.value);
-  const x = board.offsetLeft + pointX * board.clientWidth - frame.scrollLeft;
-  const y = board.offsetTop + pointY * board.clientHeight - frame.scrollTop;
-  const width = frame.clientWidth;
-  const height = frame.clientHeight;
-  if (x < 0 || x > width || y < 0 || y > height) {
-    connectorPosition.value = null;
-    return;
-  }
-
-  const margin = 8;
-  const gap = 23;
-  panel.style.maxHeight =
-    Math.max(
-      48,
-      Math.min(
-        displayMode.value === "standard" ? 230 : 480,
-        height - margin * 2,
-        window.innerHeight * (displayMode.value === "standard" ? 0.45 : 0.7)
-      )
-    ) + "px";
-  const panelWidth = panel.offsetWidth;
-  const panelHeight = panel.offsetHeight;
-  const leftLimit = width - panelWidth - margin;
-  const topLimit = height - panelHeight - margin;
-  let left = x + gap;
-  let top = Math.max(margin, Math.min(topLimit, y - panelHeight / 2));
-  if (left > leftLimit) {
-    left = x - gap - panelWidth;
-    if (left < margin) {
-      left = Math.max(margin, Math.min(leftLimit, x - panelWidth / 2));
-      const above = y - gap - panelHeight;
-      const below = y + gap;
-      const frameTop = frame.getBoundingClientRect().top;
-      const aboveClearance = frameTop + above;
-      const belowClearance =
-        window.innerHeight - (frameTop + below + panelHeight);
-      if (above >= margin && aboveClearance >= 0) top = above;
-      else if (below + panelHeight <= height && belowClearance >= 0)
-        top = below;
-      else top = aboveClearance >= belowClearance ? above : below;
-    }
-  }
-
-  if (displayMode.value !== "standard") {
-    left = Math.max(margin, Math.min(leftLimit, left));
-    top = Math.max(margin, Math.min(topLimit, top));
-  }
-
-  connectorPosition.value = {
-    left: frame.clientLeft + left + "px",
-    top: frame.clientTop + top + "px",
-  };
 }
 
 function openEndpointPicker(event) {
@@ -1462,30 +1390,43 @@ async function selectMapPoint(point, event) {
   selected.value = selected.value?.id === point.id ? null : point;
   if (!selected.value) return;
   if (zoom.value > 1) centerOn(...normalizedPoint(point));
-  if (isConnector(point) && event.detail === 0) {
-    await nextTick();
-    connectorHeading.value?.focus();
+  await nextTick();
+  if (selected.value?.id !== point.id || floorChanging.value) return;
+  if (event.detail === 0) {
+    facilityHeading.value?.focus({ preventScroll: true });
   }
+  revealFacilityDetails();
 }
 
-function closeConnectorDetails() {
-  if (!isConnector(selected.value)) return;
+function revealFacilityDetails() {
+  const card = facilityDetails.value;
+  if (!card) return;
+  const headingHeight =
+    card
+      .closest(".station-page")
+      .querySelector(".station-heading")
+      ?.getBoundingClientRect().height ?? 0;
+  // Align the start of even a tall child-mode card below the sticky controls.
+  // The card remains normal page content, with no clipped or nested scroll area.
+  const top =
+    window.scrollY +
+    card.getBoundingClientRect().top -
+    headingHeight -
+    (window.visualViewport?.offsetTop ?? 0) -
+    12;
+  window.scrollTo({
+    top: Math.max(0, top),
+    behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "auto"
+      : "smooth",
+  });
+}
+
+function closeFacilityDetails() {
+  if (!selected.value) return;
   const trigger = viewport.value.querySelector('.map-pin[aria-pressed="true"]');
   selected.value = null;
   trigger?.focus({ preventScroll: true });
-}
-
-function dismissConnectorOutside(event) {
-  if (tourOpen.value) return;
-  const panel = connectorPanel.value;
-  if (!panel || panel.contains(event.target)) return;
-  if (event.target.closest?.(".display-controls")) return;
-  if (viewport.value.contains(event.target)) {
-    // Marker clicks handle selection, and a click following a drag is ignored.
-    const dragClick = ignoreMouseClick && event.detail !== 0;
-    if (event.target.closest?.(".map-pin") || dragClick) return;
-  }
-  selected.value = null;
 }
 
 function viewportCenter() {

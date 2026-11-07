@@ -644,35 +644,6 @@
 .theme-map-link {
   flex-shrink: 0;
 }
-.connector-panel {
-  position: absolute;
-  z-index: 4;
-  display: grid;
-  gap: 4px;
-  width: min(210px, calc(100% - 16px));
-  max-height: min(230px, 45vh);
-  overflow: auto;
-  overscroll-behavior: contain;
-  padding: 4px 8px 8px;
-  border: 1px solid var(--tp-primary-300);
-  border-radius: 10px;
-  background: var(--surface);
-  box-shadow: 0 4px 16px rgb(24 38 41 / 16%);
-}
-.connector-panel h3 {
-  padding-block: 4px;
-  font-size: 0.8125rem;
-  line-height: 1.4;
-}
-.connector-panel p {
-  padding-block: 4px;
-  color: var(--muted);
-  font-size: 0.75rem;
-  line-height: 1.45;
-}
-.floor-destination {
-  margin-top: 0;
-}
 .detail-heading {
   display: flex;
   align-items: center;
@@ -707,6 +678,10 @@
 .floor-destination svg {
   width: 16px;
   flex: 0 0 16px;
+}
+.floor-destination > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .facility-list {
   display: grid;
@@ -901,7 +876,7 @@
   color: #1a1306;
 }
 
-/* Reading presets change controls and details, not map geometry or idle pins. */
+/* Reading presets preserve map coordinates; senior markers scale below. */
 .station-page:not([data-display-mode="standard"]) .floor-controls,
 .station-page:not([data-display-mode="standard"]) .theme-group {
   gap: var(--display-gap);
@@ -936,26 +911,9 @@
 .station-page:not([data-display-mode="standard"]) .station-footer a {
   min-height: var(--display-control-height);
 }
-.station-page:not([data-display-mode="standard"]) .connector-panel {
-  width: min(20rem, calc(100% - 16px));
-  padding: 12px;
-  gap: var(--display-gap);
-  overflow-wrap: anywhere;
-}
-.station-page:not([data-display-mode="standard"]) .connector-panel h3,
 .station-page:not([data-display-mode="standard"]) .display-facility-detail h3 {
   font-size: var(--display-main-size);
   line-height: 1.5;
-}
-.station-page:not([data-display-mode="standard"]) .connector-panel p {
-  font-size: var(--display-secondary-size);
-  line-height: 1.65;
-}
-.station-page:not([data-display-mode="standard"])
-  .connector-panel
-  .display-hint {
-  color: var(--accent);
-  font-size: var(--display-main-size);
 }
 .station-page:not([data-display-mode="standard"])
   .map-pin[aria-pressed="true"] {
@@ -982,6 +940,24 @@
   font-size: var(--display-main-size, 0.9375rem);
   line-height: 1.65;
 }
+
+/* Double the current icon in every state (including mobile and selected pins)
+   without scaling labels, map artwork, or the position's coordinates. */
+.station-page[data-display-mode="senior"] .map-pin {
+  width: 48px;
+  height: 48px;
+}
+.station-page[data-display-mode="senior"] .map-pin.pin-location {
+  width: 76px;
+  height: 76px;
+}
+.station-page[data-display-mode="senior"] .map-pin[aria-pressed="true"] {
+  width: 96px;
+  height: 96px;
+}
+.station-page[data-display-mode="senior"] .map-pin :is(.point-pin, .pin-icon) {
+  transform: scale(2);
+}
 .display-facility-detail h3 {
   margin: 0;
   font-size: 1.0625rem;
@@ -990,13 +966,37 @@
 .display-facility-detail p {
   margin-top: 8px;
 }
+.display-facility-detail .display-hint {
+  color: var(--accent);
+}
+.facility-transfers {
+  display: grid;
+  gap: var(--display-gap, 12px);
+  margin-top: 12px;
+}
+.facility-transfers .floor-destination {
+  font-size: inherit;
+  line-height: 1.5;
+}
+.facility-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--display-gap, 8px);
+  margin-top: 12px;
+}
+.facility-actions > button {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
 
 .station-page .facility-go {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   min-height: var(--display-control-height, 44px);
-  margin-top: 12px;
+  margin: 0;
   padding: 8px 18px;
   border: 1px solid var(--tp-primary-600);
   border-radius: var(--tp-radius-button, 10px);
@@ -1010,10 +1010,11 @@
 .station-page .facility-go svg {
   width: 18px;
   height: 18px;
+  flex-shrink: 0;
 }
 .station-page .facility-staff {
   min-height: var(--display-control-height, 44px);
-  margin: 12px 0 0 8px;
+  margin: 0;
   padding: 8px 16px;
   border: 1px solid var(--tp-primary-500);
   border-radius: var(--tp-radius-button, 10px);
