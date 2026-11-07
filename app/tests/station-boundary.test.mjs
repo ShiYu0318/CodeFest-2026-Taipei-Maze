@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import {
   outlineRings,
   boundarySegments,
+  insetBoundaryMarker,
   scatterBoundary,
 } from "../src/station/boundary.mjs";
 import { plans, floors, b2Outline } from "../src/views/station-floor-plans.mjs";
@@ -52,6 +53,28 @@ test("linear SVG outlines preserve relative moves and separate holes from the pe
   assert.deepEqual(edges[0].to, [60, 17]);
   assert.throws(() => outlineRings("M0 0C1 1 2 2 3 3Z"), /linear/);
   assert.throws(() => outlineRings("M0 0L10 10"), /Unclosed/);
+});
+
+test("a platform badge clears both edges near a corner of a narrow outline", () => {
+  const edges = boundarySegments({ outlines: ["M0 0H50V10H0Z"] });
+  const point = {
+    x: 1,
+    y: 0,
+    boundary: { outline: 0, edge: 0, fraction: 0.02 },
+  };
+  const [dx, dy] = insetBoundaryMarker(point, edges, 12, 4);
+  assert.ok(point.x + dx >= 4 && point.x + dx <= 46);
+  assert.ok(point.y + dy >= 4 && point.y + dy <= 6);
+  assert.ok(Math.hypot(dx, dy) >= 12 - 0.001);
+  assert.equal(insetBoundaryMarker(point, edges, 12, 6), null);
+  const [along, inward] = insetBoundaryMarker(
+    { x: 25, y: 0, boundary: { outline: 0, edge: 0, fraction: 0.5 } },
+    edges,
+    12,
+    4
+  );
+  assert.ok(Math.abs(along) > inward);
+  assert.ok(inward >= 4 && inward <= 4.5);
 });
 
 test("each floor has eight fixed QR points on its actual transformed outer boundary", () => {

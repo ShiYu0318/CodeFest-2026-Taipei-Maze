@@ -354,8 +354,11 @@
 .active-with-layers {
   opacity: 0.87;
 }
-.map-pin {
+.map-pin,
+.pin-platform-icon {
   --marker-color: var(--marker-base-color);
+}
+.map-pin {
   position: absolute;
   touch-action: pan-x pan-y;
   display: flex;
@@ -369,7 +372,7 @@
   transform: translate(-50%, -50%);
   background: transparent;
 }
-.station-page[data-theme="dark"] .map-pin {
+.station-page[data-theme="dark"] :is(.map-pin, .pin-platform-icon) {
   --marker-color: color-mix(in srgb, var(--marker-base-color) 75%, white);
 }
 .map-pin.pin-filtered-out {
@@ -438,17 +441,7 @@
 }
 .pin-platform-icon {
   position: absolute;
-  top: 50%;
-  left: calc(100% + 2px);
-  width: 18px;
-  height: 18px;
-  padding: 2px;
-  border: 1px solid var(--tp-primary-300);
-  border-radius: 50%;
-  background: var(--surface);
-  color: var(--tp-primary-800);
-  transform: translateY(-50%);
-  pointer-events: none;
+  transform: translate(-50%, -50%) scale(var(--platform-icon-scale));
 }
 .pin-arrival .point-pin {
   outline: 2px solid var(--marker-color);
@@ -958,7 +951,9 @@
   width: 96px;
   height: 96px;
 }
-.station-page[data-display-mode="senior"] .map-pin :is(.point-pin, .pin-icon) {
+.station-page[data-display-mode="senior"]
+  .map-pin
+  :is(.point-pin:not(.pin-platform-icon), .pin-icon) {
   transform: scale(2);
 }
 .display-facility-detail h3 {

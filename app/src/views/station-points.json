@@ -7,7 +7,8 @@
     },
     "platform": {
       "name": "月台",
-      "colorToken": "primary-900"
+      "colorToken": "primary-900",
+      "iconColor": "#AC3BFF"
     },
     "restroom": {
       "name": "廁所",
