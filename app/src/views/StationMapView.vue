@@ -265,6 +265,13 @@
                         />
                       </span>
                       <span
+                        v-if="matchesTheme(point, 'platform')"
+                        class="pin-platform-label"
+                        aria-hidden="true"
+                      >
+                        <ZhuyinText :text="t('type.platform')" />
+                      </span>
+                      <span
                         v-if="point.id === scanPositionId"
                         class="location-badge"
                       >
@@ -908,6 +915,7 @@ function mapPointLabel(point) {
   const badge = endpointBadge(point);
   return (
     pointName(point) +
+    (matchesTheme(point, "platform") ? "・" + t("type.platform") : "") +
     (badge ? "・" + badge : "") +
     (point.id === scanPositionId.value
       ? t(

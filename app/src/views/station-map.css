@@ -436,6 +436,22 @@
   height: 9px;
   color: #fff;
 }
+.pin-platform-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  padding: 1px 4px;
+  border: 1px solid var(--tp-primary-300);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--tp-primary-800);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
 .pin-arrival .point-pin {
   outline: 2px solid var(--marker-color);
   outline-offset: 2px;
