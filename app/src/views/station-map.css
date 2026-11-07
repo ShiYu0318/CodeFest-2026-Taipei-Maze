@@ -278,16 +278,23 @@
 .map-header h2 {
   margin-top: 4px;
 }
+.map-stage {
+  position: relative;
+}
 .compass {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  left: 10px;
   display: grid;
   place-items: center;
   width: 34px;
-  flex: 0 0 34px;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--tp-primary-50);
   padding: 3px;
   color: var(--tp-primary-800);
+  pointer-events: none;
 }
 .compass span {
   font-size: 0.625rem;
@@ -304,6 +311,7 @@
   min-height: 0;
   aspect-ratio: var(--map-aspect);
   overflow: hidden;
+  touch-action: pan-x pan-y;
   border-block: 1px solid var(--border);
   background: radial-gradient(
       circle,
@@ -346,6 +354,7 @@
 }
 .map-pin {
   position: absolute;
+  touch-action: pan-x pan-y;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -409,7 +418,6 @@
   opacity: 0.78;
 }
 .map-tools {
-  min-height: 62px;
   padding-block: 8px;
   color: var(--muted);
   font-size: 0.75rem;
@@ -418,29 +426,19 @@
   color: var(--ink);
   font-weight: 750;
 }
-.zoom-controls {
-  display: flex;
+.map-gesture-help {
   flex-shrink: 0;
-  gap: 4px;
 }
-.zoom-controls button {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--tp-primary-50);
-  color: var(--accent);
+.map-gesture-touch {
+  display: none;
 }
-.zoom-controls button:disabled {
-  opacity: 0.48;
-  cursor: default;
-}
-.zoom-controls svg {
-  width: 18px;
-  height: 18px;
+@media (pointer: coarse) {
+  .map-gesture-touch {
+    display: inline;
+  }
+  .map-gesture-wheel {
+    display: none;
+  }
 }
 .map-note {
   display: flex;
@@ -784,7 +782,6 @@
   .layer-toggle:hover,
   .clear-selection:hover,
   .floor-destination:hover,
-  .zoom-controls button:not(:disabled):hover,
   .facility-list button:hover {
     background: var(--wash);
   }
