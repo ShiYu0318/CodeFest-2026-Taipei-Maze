@@ -16,3 +16,7 @@ bash scripts/townpass-env.sh serve
 
 
 持續模式使用新版 `qr_scan_session` handler，非循環呼叫舊掃碼頁。patch 另含原生單一相機、指引區與 session／guidance 版本防護，來源限制與操作方式見 [集合點與持續掃碼指南](../../docs/集合點與持續掃碼開發指南.md)。未套新版 patch 的宿主能力探測會失敗，網頁不會假稱常駐掃碼可用。
+
+### 裝置端聊天與內建網頁包
+
+目前 patch 另含 Google LiteRT-LM 0.19.1、原生本地語音、模型下載原生畫面與 loopback-only 網頁包。套用後先從作品 repo 執行 `bash scripts/townpass-env.sh bundle-web`，再 pub get／codegen／build；不要忘記產生 `assets/codefest_web.bundle`。此產物不提交宿主或 patch，由本 repo 的 Vue 原始碼重新生成。完整流程與未測限制見 [手機聊天與語音開發指南](../../docs/手機聊天與語音開發指南.md)。

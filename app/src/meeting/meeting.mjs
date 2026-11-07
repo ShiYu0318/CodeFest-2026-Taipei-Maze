@@ -4,6 +4,7 @@ export const PUBLIC_ORIGIN = "http://home.yoyo899843.com:8000";
 const approvedOrigins = [
   PUBLIC_ORIGIN,
   "http://127.0.0.1:8082",
+  "http://127.0.0.1:8766",
   "http://localhost:8082",
 ];
 const idPattern = /^[a-z][a-z0-9_]{0,63}$/;
