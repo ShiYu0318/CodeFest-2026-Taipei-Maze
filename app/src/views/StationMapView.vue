@@ -18,6 +18,10 @@
         <!-- <p>地下樓層站內地圖</p> -->
       </section>
 
+      <p>
+        <router-link to="/navigation-demo">測試導航流程（合成圖）</router-link>
+      </p>
+
       <div class="floor-controls">
         <div class="floor-switch" role="group" aria-label="選擇樓層">
           <button
@@ -237,7 +241,7 @@
               <button type="submit">展開轉乘圖</button>
             </form>
             <p class="transfer-hint">
-              預覽會列出已確認可通行的跨樓層接點。樓層內步行與驗票請依站內指標。
+              預覽依示意資料列出跨樓層接點，尚未完成現場通行核對。樓層內步行與驗票請依站內指標。
             </p>
             <p v-if="routeMessage" class="transfer-message" role="status">
               {{ routeMessage }}
