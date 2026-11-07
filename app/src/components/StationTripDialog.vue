@@ -11,9 +11,9 @@
       @keydown.tab="keepFocus"
     >
       <header>
-        <span v-if="!confirming" class="trip-step">{{
-          t("trip.step", { step })
-        }}</span>
+        <span v-if="!confirming" class="trip-step">
+          <ZhuyinText :text="t('trip.step', { step })" />
+        </span>
         <button
           v-if="!confirming"
           type="button"
@@ -25,25 +25,27 @@
         </button>
       </header>
       <h2 id="trip-dialog-title" ref="heading" tabindex="-1">
-        {{
-          confirming
-            ? t("trip.confirmTitle")
-            : step === 1
-            ? t("trip.faceQr")
-            : direction
-        }}
+        <ZhuyinText
+          :text="
+            confirming
+              ? t('trip.confirmTitle')
+              : step === 1
+              ? t('trip.faceQr')
+              : direction
+          "
+        />
       </h2>
-      <p v-if="confirming">{{ t("trip.cancelNote") }}</p>
+      <p v-if="confirming"><ZhuyinText :text="t('trip.cancelNote')" /></p>
       <footer v-if="confirming">
         <button type="button" :disabled="cancelling" @click="keepTrip">
-          {{ t("trip.keep") }}
+          <ZhuyinText :text="t('trip.keep')" />
         </button>
         <button
           type="button"
           :disabled="cancelling"
           @click="confirmCancellation"
         >
-          {{ t("trip.confirmCancel") }}
+          <ZhuyinText :text="t('trip.confirmCancel')" />
         </button>
       </footer>
       <footer v-else>
@@ -53,7 +55,7 @@
           :disabled="!ready"
           @click="continueTrip"
         >
-          {{ t("trip.continue") }}
+          <ZhuyinText :text="t('trip.continue')" />
         </button>
       </footer>
     </section>
@@ -64,6 +66,7 @@
 /* global defineProps, defineEmits */
 import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import { useI18n } from "../i18n/index.mjs";
+import ZhuyinText from "./ZhuyinText.vue";
 
 const props = defineProps({
   direction: { type: String, required: true },

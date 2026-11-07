@@ -257,6 +257,34 @@ test("the actual QR icon and every floor component render with the shared outlin
   }
 });
 
+test("B2 railway facilities stay inside their own platforms", () => {
+  const edges = boundarySegments(plans.B2);
+  for (const [index, platform] of b2RailPlatforms.entries()) {
+    const facilities = data.points.B2.filter(
+      (point) => point.platformId === platform.id && !isQrPoint(point)
+    );
+    const counts = {};
+    const outline = edges.filter((edge) => edge.outline === index + 1);
+    for (const point of facilities) {
+      counts[point.type] = (counts[point.type] ?? 0) + 1;
+      assert.equal(point.zone, `b2-${platform.id}`);
+      for (const { from, to, length } of outline) {
+        const distance =
+          ((to[0] - from[0]) * (point.y - from[1]) -
+            (to[1] - from[1]) * (point.x - from[0])) /
+          length;
+        assert.ok(distance >= 20, `${point.id} is too close to ${to}`);
+      }
+    }
+    assert.deepEqual(
+      counts,
+      platform.operator === "tra"
+        ? { escalator: 5, elevator: 2, stairs: 1 }
+        : { escalator: 6, elevator: 1, stairs: 1, phone: 2, aed: 1 }
+    );
+  }
+});
+
 test("B2 has four railway platforms, each with two QR anchors on each long side", () => {
   const points = qrPoints.filter((p) => p.platformId);
   assert.equal(points.length, 16);

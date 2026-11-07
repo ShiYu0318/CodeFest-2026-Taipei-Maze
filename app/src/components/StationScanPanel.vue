@@ -200,7 +200,11 @@
               stroke-linecap="round"
             />
           </svg>
-          <ZhuyinText :text="t('scan.cancelTrip')" />
+          <ZhuyinText
+            :text="
+              view.mode === 'browsing' ? t('scan.cancelTrip') : t('scan.exit')
+            "
+          />
         </button>
       </div>
     </div>
