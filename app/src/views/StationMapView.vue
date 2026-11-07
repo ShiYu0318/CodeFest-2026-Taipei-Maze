@@ -58,20 +58,7 @@
 
       <div class="station-layout">
         <div class="station-map-column">
-          <section
-            ref="mapSection"
-            class="map-card"
-            aria-labelledby="map-title"
-          >
-            <header class="map-header">
-              <div>
-                <!-- <p class="eyebrow">{{ level }} FLOOR PLAN</p> -->
-                <h2 id="map-title">
-                  {{ floors[level].name }}
-                </h2>
-              </div>
-            </header>
-
+          <section ref="mapSection" class="map-card" aria-label="車站地圖">
             <div class="map-stage">
               <div class="compass" aria-label="北方朝上略偏左" role="img">
                 <span>N</span>
@@ -86,7 +73,6 @@
                 :style="{ '--map-aspect': bounds[2] + ' / ' + bounds[3] }"
                 role="region"
                 :aria-label="level + ' 互動地圖，可用加減鍵縮放，0 鍵重設'"
-                aria-describedby="map-gesture-help"
                 tabindex="0"
                 @wheel="zoomWithWheel"
                 @keydown.self="zoomWithKeyboard"
@@ -160,13 +146,13 @@
                 }}
                 處</span
               >
-              <span v-else>{{
+              <!-- <span v-else>{{
                 zoom === 1 ? "選擇設施主題來顯示圖標" : "滑動地圖查看其他位置"
-              }}</span>
-              <span id="map-gesture-help" class="map-gesture-help">
+              }}</span> -->
+              <!-- <span id="map-gesture-help" class="map-gesture-help">
                 <span class="map-gesture-touch">雙指捏合縮放</span>
                 <span class="map-gesture-wheel">滑鼠滾輪縮放</span>
-              </span>
+              </span> -->
             </div>
             <div
               v-if="backgroundLayers.length"
@@ -312,7 +298,7 @@
               <StationMapIcon :name="type" />{{ categories[type].name }}
             </button>
           </div>
-          <div class="theme-feedback">
+          <!-- <div class="theme-feedback">
             <p class="theme-hint" role="status">{{ themeHint }}</p>
             <button
               v-if="activeTheme"
@@ -322,9 +308,9 @@
             >
               查看地圖
             </button>
-          </div>
+          </div> -->
 
-          <div
+          <!-- <div
             v-if="selected"
             class="facility-detail"
             aria-live="polite"
@@ -364,7 +350,7 @@
             >
               {{ transferNote(destination) }}
             </p>
-          </div>
+          </div> -->
 
           <!-- <ul class="facility-list" aria-label="標點明細">
             <li v-for="point in listedPoints" :key="point.id">
@@ -539,7 +525,6 @@ const backgroundLayers = computed(() => {
     ];
   });
 });
-const destination = computed(() => getDestination(selected.value));
 const mapNote = computed(() => {
   if (showLayers.value) return "實線是目前樓層，淡色虛線是其他樓層的相對輪廓。";
   return "實線為目前樓層。開啟透視樓層可查看其他樓層的相對位置。";
@@ -829,19 +814,10 @@ function togglePoint(point) {
   if (selected.value && zoom.value > 1) centerOn(...normalizedPoint(point));
 }
 
-// function toggleTheme(type) {
-//   activeTheme.value = activeTheme.value === type ? null : type;
-//   if (selected.value && !matchesTheme(selected.value, activeTheme.value))
-//     selected.value = null;
-// }
-
-async function followConnection() {
-  if (!destination.value) return;
-  routeMessage.value = "";
-  previewSteps.value = [destination.value];
-  await nextTick();
-  previewHeading.value?.scrollIntoView({ block: "nearest" });
-  previewHeading.value?.focus({ preventScroll: true });
+function toggleTheme(type) {
+  activeTheme.value = activeTheme.value === type ? null : type;
+  if (selected.value && !matchesTheme(selected.value, activeTheme.value))
+    selected.value = null;
 }
 
 function previewRoute() {
@@ -855,10 +831,10 @@ function previewRoute() {
     : "目前沒有已確認的跨樓層連接。";
 }
 
-function revealMap() {
-  mapSection.value.scrollIntoView({ block: "nearest" });
-  viewport.value.focus({ preventScroll: true });
-}
+// function revealMap() {
+//   mapSection.value.scrollIntoView({ block: "nearest" });
+//   viewport.value.focus({ preventScroll: true });
+// }
 </script>
 
 <style scoped src="./station-map.css"></style>
