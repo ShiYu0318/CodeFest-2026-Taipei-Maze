@@ -44,7 +44,7 @@ MIT、常見 BSD-2-Clause／BSD-3-Clause、Apache-2.0 可作優先候選，但�
 
 ## 2026-11-07 合成導航核心
 
-- `app/src/navigation/` 的核心模組、合成 fixture 與 `app/tests/` 為本專案新增原創內容，依根目錄 AGPL-3.0-or-later；互動式導航測試介面已移除，也不改寫匯入 Webview 各部分的權利狀態。
+- `app/src/navigation/` 的核心模組、合成 fixture、`NavigationDemoView`／`NavigationDemoMap` 與 `app/tests/` 為本專案新增原創內容，依根目錄 AGPL-3.0-or-later；不改寫匯入 Webview 各部分的權利狀態。
 - 合成地圖為程式繪製的簡單線段與節點，座標、文案與來源紀錄皆為測試用自製內容，沒有新增第三方圖資、照片、字型、模型、音檔、生成服務或 npm 依賴。
 - 新測試只使用 Node.js built-in test runner；Vue CLI 與既有依賴仍沿用現有 lockfile，未宣稱完成整棵供應鏈或匯入原型的發行審查。
 

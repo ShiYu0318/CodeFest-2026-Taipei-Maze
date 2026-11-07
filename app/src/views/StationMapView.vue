@@ -54,7 +54,12 @@
       </div>
 
       <div class="facility-header">
-        <h2 id="facility-title">設施主題</h2>
+        <div class="facility-title-group">
+          <h2 id="facility-title">設施主題</h2>
+          <router-link class="navigation-demo-link" to="/navigation-demo">
+            測試導航流程
+          </router-link>
+        </div>
         <span>{{ floorPoints.length }} 個標點</span>
       </div>
 
