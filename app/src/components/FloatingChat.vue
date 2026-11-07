@@ -34,7 +34,7 @@
           stroke-linecap="round"
         />
       </svg>
-      <span>{{ t("chat.launcher") }}</span>
+      <span><ZhuyinText :text="t('chat.launcher')" /></span>
     </button>
     <div
       v-if="opened"
@@ -77,9 +77,9 @@
             </svg>
           </button>
           <div class="maze-chat-heading">
-            <h2 id="maze-chat-title">{{ t("chat.title") }}</h2>
+            <h2 id="maze-chat-title"><ZhuyinText :text="t('chat.title')" /></h2>
             <p class="maze-chat-presence" :data-ready="!checking" role="status">
-              <span aria-hidden="true"></span>{{ statusText }}
+              <span aria-hidden="true"></span><ZhuyinText :text="statusText" />
             </p>
           </div>
           <button
@@ -122,21 +122,21 @@
                 <circle cx="12" cy="10" r="2.4" fill="currentColor" /></svg
             ></span>
             <p class="maze-chat-bubble maze-chat-static">
-              {{ t("chat.welcome2") }}
+              <ZhuyinText :text="t('chat.welcome2')" />
             </p>
           </article>
           <div
             v-if="nativeAvailable && !modelReady && !checking"
             class="maze-chat-setup"
           >
-            <p>{{ t("chat.optionalModel") }}</p>
+            <p><ZhuyinText :text="t('chat.optionalModel')" /></p>
             <div class="maze-chat-setup-actions">
               <button
                 type="button"
                 class="maze-chat-secondary"
                 @click="setupModel"
               >
-                {{ t("chat.install") }}
+                <ZhuyinText :text="t('chat.install')" />
               </button>
             </div>
           </div>
@@ -173,15 +173,18 @@
               >
                 <summary>
                   <span class="maze-chat-orb" aria-hidden="true"></span>
-                  <span class="maze-chat-thought-title">{{
-                    message.thinking.state === "done"
-                      ? t("chat.think.done", {
-                          seconds: message.thinking.seconds,
-                        })
-                      : message.thinking.state === "cancelled"
-                      ? t("chat.error.cancelled")
-                      : t("chat.think.title")
-                  }}</span>
+                  <span class="maze-chat-thought-title"
+                    ><ZhuyinText
+                      :text="
+                        message.thinking.state === 'done'
+                          ? t('chat.think.done', {
+                              seconds: message.thinking.seconds,
+                            })
+                          : message.thinking.state === 'cancelled'
+                          ? t('chat.error.cancelled')
+                          : t('chat.think.title')
+                      "
+                  /></span>
                   <span class="maze-chat-chev" aria-hidden="true"></span>
                 </summary>
                 <ol class="maze-chat-steps">
@@ -191,7 +194,7 @@
                     :data-state="step.state"
                   >
                     <span class="maze-chat-tick" aria-hidden="true"></span
-                    >{{ step.label }}
+                    ><ZhuyinText :text="step.label" />
                   </li>
                 </ol>
               </details>
@@ -199,8 +202,7 @@
                 v-if="message.text || !message.thinking"
                 class="maze-chat-bubble"
               >
-                {{ message.text
-                }}<span
+                <ZhuyinText :text="message.text" /><span
                   v-if="message.streaming"
                   class="maze-chat-caret"
                   aria-hidden="true"
@@ -213,22 +215,23 @@
                     <span class="maze-chat-place-name"
                       ><StationMapIcon
                         class="maze-chat-place-icon"
-                        :name="place.icon"
-                      />{{ place.label }}</span
-                    >
-                    <span class="maze-chat-place-action">{{
-                      t("chat.showOnMap")
-                    }}</span>
+                        :name="place.icon" /><ZhuyinText :text="place.label"
+                    /></span>
+                    <span class="maze-chat-place-action"
+                      ><ZhuyinText :text="t('chat.showOnMap')"
+                    /></span>
                   </button>
                 </li>
               </ul>
               <p v-if="message.more" class="maze-chat-more">
-                {{ message.more }}
+                <ZhuyinText :text="message.more" />
               </p>
             </div>
           </article>
         </div>
-        <p v-if="notice" class="maze-chat-notice" role="status">{{ notice }}</p>
+        <p v-if="notice" class="maze-chat-notice" role="status">
+          <ZhuyinText :text="notice" />
+        </p>
         <div
           v-if="starters.length"
           class="maze-chat-tray"
@@ -242,7 +245,7 @@
             :disabled="busy || listening"
             @click="ask(starter)"
           >
-            {{ starter }}
+            <ZhuyinText :text="starter" />
           </button>
         </div>
         <form class="maze-chat-compose" @submit.prevent="send">
@@ -257,7 +260,11 @@
               rows="1"
               maxlength="500"
               :placeholder="
-                listening ? t('chat.listening') : t('chat.placeholder')
+                displayPlainZhuyin(
+                  listening ? t('chat.listening') : t('chat.placeholder'),
+                  displayMode,
+                  uiLocale
+                )
               "
               :disabled="busy || listening"
               @keydown="composerKey"
@@ -377,14 +384,20 @@
                   :key="language[0]"
                   :value="language[0]"
                 >
-                  {{ language[1] }}
+                  <ZhuyinText
+                    :text="language[1]"
+                    :enabled="language[0] === 'zh-TW'"
+                    plain
+                  />
                 </option>
               </select>
             </label>
             <p class="maze-chat-caption">
-              {{
-                voiceAvailable ? t("chat.voiceDraft") : t("chat.typeInstead")
-              }}
+              <ZhuyinText
+                :text="
+                  voiceAvailable ? t('chat.voiceDraft') : t('chat.typeInstead')
+                "
+              />
             </p>
           </div>
         </form>
@@ -393,9 +406,11 @@
   </Teleport>
 </template>
 <script setup>
+import ZhuyinText from "./ZhuyinText.vue";
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useDisplayPreferences } from "../display/preferences.mjs";
+import { displayPlainZhuyin } from "../display/zhuyin.mjs";
 import "../display/display-preferences.css";
 import {
   buildChatPrompt,
@@ -953,13 +968,13 @@ onBeforeUnmount(() => {
   font-size: 12px;
   line-height: 1.4;
 }
-.maze-chat-presence span {
+.maze-chat-presence > span:first-child {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: var(--tp-secondary-600);
 }
-.maze-chat-presence[data-ready="true"] span {
+.maze-chat-presence[data-ready="true"] > span:first-child {
   background: #2e9a6c;
 }
 .maze-chat-icon {

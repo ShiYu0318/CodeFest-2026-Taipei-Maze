@@ -20,7 +20,7 @@
               type="button"
               aria-haspopup="dialog"
               :aria-label="t('tour.replay')"
-              :title="t('tour.replay')"
+              :title="displayPlainZhuyin(t('tour.replay'), displayMode, locale)"
               @click="tourOpen = true"
             >
               <StationMapIcon name="help" />
@@ -85,7 +85,7 @@
             role="switch"
             :aria-checked="showLayers && level !== '1F'"
             :aria-label="t('map.layersAria')"
-            :title="t('map.layers')"
+            :title="displayPlainZhuyin(t('map.layers'), displayMode, locale)"
             :disabled="floorChanging || level === '1F'"
             @click="toggleLayers"
           >
@@ -97,7 +97,7 @@
             type="button"
             :aria-label="t('map.locate')"
             aria-haspopup="dialog"
-            :title="t('map.locate')"
+            :title="displayPlainZhuyin(t('map.locate'), displayMode, locale)"
             :disabled="floorChanging"
             @click="openEndpointPicker"
           >
@@ -130,10 +130,14 @@
 
       <div v-if="mapPickStep" class="map-pick-instructions">
         <p role="status">
-          {{ mapPickStep === "start" ? t("map.pickStart") : t("map.pickEnd") }}
+          <ZhuyinText
+            :text="
+              mapPickStep === 'start' ? t('map.pickStart') : t('map.pickEnd')
+            "
+          />
         </p>
         <button type="button" @click="openEndpointPicker()">
-          {{ t("map.cancel") }}
+          <ZhuyinText :text="t('map.cancel')" />
         </button>
       </div>
 
@@ -340,8 +344,8 @@
                             point.id === mapTargetPoint?.id,
                         }"
                         aria-hidden="true"
-                        >{{ endpointBadge(point) }}</span
-                      >
+                        ><ZhuyinText :text="endpointBadge(point)"
+                      /></span>
                     </button>
                   </div>
                 </div>
@@ -452,6 +456,7 @@
 </template>
 
 <script setup>
+import { displayPlainZhuyin } from "../display/zhuyin.mjs";
 import {
   computed,
   nextTick,
