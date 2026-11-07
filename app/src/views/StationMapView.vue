@@ -580,6 +580,7 @@ function pointThemeStyle(type) {
         ? "#0c1315"
         : iconColor || paletteColor(iconColorToken),
     "--point-icon-color": iconColor || paletteColor(colorToken),
+    "--point-outline-color": iconColor || paletteColor(colorToken),
   };
 }
 
