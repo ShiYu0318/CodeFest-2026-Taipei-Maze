@@ -15,7 +15,8 @@ const server = http.createServer(async (request, response) => {
   const path = new URL(request.url, 'http://127.0.0.1').pathname;
   response.setHeader('Cache-Control', 'no-store');
   response.setHeader('X-Content-Type-Options', 'nosniff');
-  response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'");
+  // This loopback-only development server permits embedding in preview frames.
+  response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'");
   if (path === '/health') {
     response.writeHead(200, { 'Content-Type': 'application/json' });
     response.end(request.method === 'HEAD' ? undefined : JSON.stringify({ status: 'ok', service: 'townpass-local-smoke' }));
