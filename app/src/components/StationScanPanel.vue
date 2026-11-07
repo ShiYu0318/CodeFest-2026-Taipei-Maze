@@ -188,12 +188,14 @@ function reset() {
 .station-scan-panel {
   padding: 14px 16px;
   margin: 0 0 16px;
-  border: 1px solid #bdd0dc;
-  border-radius: 12px;
+  border: 0;
+  border-radius: var(--tp-radius-card, 12px);
   background: var(--surface, #fff);
+  box-shadow: var(--tp-shadow-card, 0 2px 12px rgb(0 0 0 / 4%));
   text-align: left;
-  color: var(--ink, #173649);
-  font: var(--display-main-size, 15px) / 1.55 system-ui, sans-serif;
+  color: var(--ink, #112629);
+  font: var(--display-main-size, 15px) / 1.55 var(--tp-font, system-ui),
+    sans-serif;
 }
 .scan-heading {
   display: flex;
@@ -203,6 +205,7 @@ function reset() {
 }
 .scan-heading h2 {
   font-size: 18px;
+  font-weight: 600;
   margin: 0;
 }
 .scan-heading label {
@@ -224,8 +227,8 @@ function reset() {
   width: 100%;
   min-height: var(--display-control-height, 44px);
   font: inherit;
-  border: 1px solid #a3bac8;
-  border-radius: 7px;
+  border: 1px solid var(--tp-gray-200, #cad1d5);
+  border-radius: var(--tp-radius-button, 10px);
   background: var(--surface, #fff);
   padding: 8px;
   margin: 6px 0;
@@ -233,23 +236,34 @@ function reset() {
 .station-scan-panel button {
   min-height: var(--display-control-height, 44px);
   margin: 6px 6px 0 0;
-  padding: 9px 12px;
-  background: var(--wash, #eef4f7);
-  border: 1px solid #afc5d2;
-  border-radius: 8px;
+  padding: 8px 16px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--tp-primary-500, #5ab4c5);
+  border-radius: var(--tp-radius-button, 10px);
   font: inherit;
-  color: inherit;
+  font-weight: 600;
+  color: var(--tp-primary-700, #356c77);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 150ms ease, transform 120ms ease;
+}
+.station-scan-panel button:active:not(:disabled) {
+  transform: scale(0.98);
+  background: var(--tp-primary-50, #edf8fa);
 }
 .station-scan-panel .scan-start {
-  background: #153d53;
-  color: white;
+  background: var(--tp-primary-600, #468d9b);
+  color: #fff;
   width: 100%;
-  border-color: #153d53;
-  font-weight: 600;
+  border-color: var(--tp-primary-600, #468d9b);
+}
+.station-scan-panel .scan-start:active:not(:disabled) {
+  background: var(--tp-primary-700, #356c77);
 }
 .station-scan-panel button:disabled {
-  opacity: 0.5;
+  background: var(--tp-gray-100, #e3e7e9);
+  border-color: var(--tp-gray-100, #e3e7e9);
+  color: var(--tp-gray-500, #738995);
   cursor: default;
 }
 .station-scan-panel details {
@@ -260,11 +274,11 @@ function reset() {
   min-height: 36px;
 }
 .station-scan-panel :focus-visible {
-  outline: 3px solid #b8801f;
+  outline: 3px solid var(--tp-primary-500, #5ab4c5);
   outline-offset: 2px;
 }
 .scan-overview {
-  border-top: 1px solid #d9e4ea;
+  border-top: 1px solid var(--tp-gray-100, #e3e7e9);
   margin-top: 12px;
   padding-top: 6px;
 }
