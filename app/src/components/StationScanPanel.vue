@@ -109,6 +109,7 @@
     <button
       v-if="!persistentScan"
       class="scan-start"
+      data-tour-target="scan"
       :disabled="!available || active"
       @click="start"
     >

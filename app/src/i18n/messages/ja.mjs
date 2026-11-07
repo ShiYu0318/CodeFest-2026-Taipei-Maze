@@ -1,6 +1,30 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "tour.step": "ガイド {step}/{total}",
+  "tour.skip": "ガイドをスキップ",
+  "tour.tapOutside": "暗い部分をタップして次へ",
+  "tour.next": "次へ",
+  "tour.finish": "完了",
+  "tour.replay": "機能ガイドをもう一度見る",
+  "tour.facilitiesTitle": "施設の絞り込み",
+  "tour.markerTitle": "地図上のマーカー",
+  "tour.themeTitle": "ライト／ダークモード",
+  "tour.scan":
+    "TownPassで駅構内のQRコードを読み取り、現在の階と位置を確認します。",
+  "tour.floors": "B1〜B4をタップすると、その階の地図が表示されます。",
+  "tour.layers":
+    "オンにすると、他の階の輪郭が破線で表示され、位置を比較できます。",
+  "tour.locate": "一覧または地図から出発地と目的地を選びます。",
+  "tour.facilities":
+    "トイレやエレベーターなどの種類を選ぶと、この階の施設を探せます。",
+  "tour.marker":
+    "マーカーをタップすると詳細が表示されます。階段、エスカレーター、エレベーターでは接続する階を確認できます。",
+  "tour.language": "画面の表示言語を選びます。",
+  "tour.theme": "ライト表示とダーク表示を切り替えます。",
+  "tour.contrast": "ハイコントラストにすると、文字や枠線が見やすくなります。",
+  "tour.mode":
+    "標準、子ども、シニアからモードを選び、文字の大きさや表示を調整します。",
   "lang.label": "言語",
   "display.group": "表示設定",
   "display.dark": "ダークモード",

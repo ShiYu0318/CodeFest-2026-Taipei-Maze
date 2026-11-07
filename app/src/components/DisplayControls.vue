@@ -1,7 +1,11 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
   <div class="display-controls" role="group" :aria-label="t('display.group')">
-    <label class="display-language" :title="t('lang.label')">
+    <label
+      class="display-language"
+      data-tour-target="language"
+      :title="t('lang.label')"
+    >
       <span class="display-visually-hidden">{{ t("lang.label") }}</span>
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <circle
@@ -35,6 +39,7 @@
     </label>
     <button
       class="display-icon-button"
+      data-tour-target="theme"
       type="button"
       role="switch"
       :aria-checked="theme === 'dark'"
@@ -72,6 +77,7 @@
     </button>
     <button
       class="display-icon-button display-contrast-switch"
+      data-tour-target="contrast"
       type="button"
       role="switch"
       :aria-checked="contrast === 'high'"
@@ -91,7 +97,7 @@
       </svg>
       <span class="display-visually-hidden">{{ t("display.contrast") }}</span>
     </button>
-    <label class="display-mode-label">
+    <label class="display-mode-label" data-tour-target="mode">
       <span class="display-visually-hidden">{{ t("display.mode") }}</span>
       <select
         :value="displayMode"

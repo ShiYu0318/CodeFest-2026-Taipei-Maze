@@ -7,6 +7,7 @@
     :data-display-mode="displayMode"
   >
     <div
+      ref="stationShell"
       class="station-shell"
       :inert="endpointPickerOpen || tripDialog ? '' : null"
     >
@@ -38,6 +39,7 @@
       >
         <div
           class="floor-switch"
+          data-tour-target="floors"
           role="group"
           :aria-label="t('map.floorGroup')"
         >
@@ -56,6 +58,7 @@
         <div class="floor-actions">
           <button
             class="display-icon-button"
+            data-tour-target="layers"
             type="button"
             role="switch"
             :aria-checked="showLayers"
@@ -68,6 +71,7 @@
           </button>
           <button
             class="display-icon-button"
+            data-tour-target="locate"
             type="button"
             :aria-label="t('map.locate')"
             aria-haspopup="dialog"
@@ -83,6 +87,7 @@
       <div
         v-if="!navigationMap.active"
         class="theme-group horizontal-scroll"
+        data-tour-target="facilities"
         role="group"
         :aria-label="t('map.themesAria')"
         tabindex="0"
@@ -142,6 +147,7 @@
                 <div
                   ref="viewport"
                   class="map-viewport"
+                  data-tour-target="marker"
                   :class="{ 'map-zoomed': zoom > 1, 'map-dragging': dragging }"
                   :style="{
                     '--map-aspect': bounds[2] + ' / ' + bounds[3],
@@ -393,6 +399,13 @@
           <router-link to="/about" class="station-about-link">{{
             t("map.about", { version: buildInfo.short })
           }}</router-link>
+          <button
+            type="button"
+            class="map-tour-replay"
+            @click="tourOpen = true"
+          >
+            {{ t("tour.replay") }}
+          </button>
         </footer>
       </div>
     </div>
@@ -417,6 +430,11 @@
       @continue="closeTripDialog"
       @cancel="cancelTrip"
     />
+    <StationMapTour
+      v-if="tourOpen"
+      :root="stationShell"
+      @finish="finishMapTour"
+    />
   </main>
 </template>
 
@@ -438,6 +456,7 @@ import StationNavigationRescan from "../components/StationNavigationRescan.vue";
 import StaffCard from "../components/StaffCard.vue";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
+import StationMapTour from "../components/StationMapTour.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import DisplayControls from "../components/DisplayControls.vue";
 import ZhuyinText from "../components/ZhuyinText.vue";
@@ -452,6 +471,7 @@ import {
   navigationMapState,
   navigationPointVisible,
 } from "../station/navigation-view.mjs";
+import { hasSeenMapTour, rememberMapTour } from "../station/map-tour.mjs";
 import { floors, stackBounds } from "./station-floor-plans.mjs";
 import stationData from "./station-points.json";
 import stationConnections from "./station-connections.json";
@@ -461,6 +481,14 @@ const { categories, points } = stationData;
 const { theme, displayMode } = useDisplayPreferences();
 const i18n = useI18n();
 const { locale, t } = i18n;
+const stationShell = ref(null);
+const tourOpen = ref(false);
+
+function finishMapTour() {
+  rememberMapTour();
+  tourOpen.value = false;
+}
+
 const pointName = (point) => placeName(point, i18n);
 // Visitors who do not read Chinese get the plain-language help instead.
 const showHelp = computed(
@@ -677,6 +705,7 @@ onMounted(() => {
   nextTick(() => {
     const point = currentPoint.value ?? targetPoint.value;
     centerOn(...(point ? normalizedPoint(point) : [0.5, 0.5]));
+    tourOpen.value = !hasSeenMapTour();
   });
 });
 
@@ -1444,6 +1473,7 @@ function closeConnectorDetails() {
 }
 
 function dismissConnectorOutside(event) {
+  if (tourOpen.value) return;
   const panel = connectorPanel.value;
   if (!panel || panel.contains(event.target)) return;
   if (event.target.closest?.(".display-controls")) return;

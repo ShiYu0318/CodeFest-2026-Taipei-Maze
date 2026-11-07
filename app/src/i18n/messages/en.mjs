@@ -1,6 +1,32 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "tour.step": "Tour {step} of {total}",
+  "tour.skip": "Skip tour",
+  "tour.tapOutside": "Tap the shaded area to continue",
+  "tour.next": "Next",
+  "tour.finish": "Done",
+  "tour.replay": "Replay feature tour",
+  "tour.facilitiesTitle": "Facility filters",
+  "tour.markerTitle": "Map markers",
+  "tour.themeTitle": "Light and dark modes",
+  "tour.scan":
+    "Scan a station QR code in TownPass to confirm your floor and location.",
+  "tour.floors": "Tap B1–B4 to view that floor.",
+  "tour.layers":
+    "Turn this on to see other floors as dashed outlines and compare their positions.",
+  "tour.locate":
+    "Choose a start and destination from the list or pick them on the map.",
+  "tour.facilities":
+    "Select a category, such as restrooms or elevators, to find those facilities on this floor.",
+  "tour.marker":
+    "Tap a marker for details. Stairs, escalators, and elevators show which floors they connect to.",
+  "tour.language": "Choose the language you want to use for the interface.",
+  "tour.theme": "Switch between the light and dark appearance.",
+  "tour.contrast":
+    "Turn on high contrast to make text and borders easier to distinguish.",
+  "tour.mode":
+    "Choose Standard, Child, or Senior to adjust text size and appearance.",
   "lang.label": "Language",
   "display.group": "Display settings",
   "display.dark": "Dark mode",

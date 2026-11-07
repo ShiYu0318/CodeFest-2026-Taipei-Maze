@@ -1,6 +1,29 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "tour.step": "안내 {step}/{total}",
+  "tour.skip": "안내 건너뛰기",
+  "tour.tapOutside": "어두운 영역을 눌러 계속",
+  "tour.next": "다음",
+  "tour.finish": "완료",
+  "tour.replay": "기능 안내 다시 보기",
+  "tour.facilitiesTitle": "시설 필터",
+  "tour.markerTitle": "지도 표식",
+  "tour.themeTitle": "밝은 모드와 어두운 모드",
+  "tour.scan":
+    "TownPass에서 역의 QR 코드를 스캔해 현재 층과 위치를 확인하세요.",
+  "tour.floors": "B1–B4를 눌러 해당 층의 지도를 보세요.",
+  "tour.layers": "켜면 다른 층이 점선으로 표시되어 위치를 비교할 수 있어요.",
+  "tour.locate": "목록이나 지도에서 출발지와 목적지를 선택하세요.",
+  "tour.facilities":
+    "화장실이나 엘리베이터 같은 유형을 골라 이 층의 시설을 찾으세요.",
+  "tour.marker":
+    "표식을 누르면 상세 정보가 나와요. 계단, 에스컬레이터, 엘리베이터는 연결되는 층을 표시해요.",
+  "tour.language": "화면에 사용할 언어를 선택하세요.",
+  "tour.theme": "밝은 화면과 어두운 화면을 전환하세요.",
+  "tour.contrast": "고대비를 켜면 글자와 테두리가 더 뚜렷해져요.",
+  "tour.mode":
+    "표준, 어린이, 시니어 모드를 골라 글자 크기와 표시 방식을 조정하세요.",
   "lang.label": "언어",
   "display.group": "화면 설정",
   "display.dark": "다크 모드",

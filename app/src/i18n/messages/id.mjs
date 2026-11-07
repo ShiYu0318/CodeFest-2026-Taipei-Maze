@@ -1,6 +1,32 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "tour.step": "Panduan {step}/{total}",
+  "tour.skip": "Lewati panduan",
+  "tour.tapOutside": "Ketuk area gelap untuk lanjut",
+  "tour.next": "Berikutnya",
+  "tour.finish": "Selesai",
+  "tour.replay": "Putar ulang panduan",
+  "tour.facilitiesTitle": "Filter fasilitas",
+  "tour.markerTitle": "Penanda peta",
+  "tour.themeTitle": "Mode terang dan gelap",
+  "tour.scan":
+    "Pindai kode QR stasiun di TownPass untuk memastikan lantai dan posisi Anda.",
+  "tour.floors": "Ketuk B1–B4 untuk melihat peta lantai tersebut.",
+  "tour.layers":
+    "Aktifkan untuk melihat garis putus-putus lantai lain dan membandingkan posisinya.",
+  "tour.locate":
+    "Pilih titik awal dan tujuan dari daftar atau langsung pada peta.",
+  "tour.facilities":
+    "Pilih kategori, seperti toilet atau lift, untuk menemukan fasilitas di lantai ini.",
+  "tour.marker":
+    "Ketuk penanda untuk melihat detail. Tangga, eskalator, dan lift menampilkan lantai yang terhubung.",
+  "tour.language": "Pilih bahasa antarmuka yang ingin Anda gunakan.",
+  "tour.theme": "Beralih antara tampilan terang dan gelap.",
+  "tour.contrast":
+    "Aktifkan kontras tinggi agar teks dan garis tepi lebih mudah terlihat.",
+  "tour.mode":
+    "Pilih Standar, Anak, atau Lansia untuk menyesuaikan ukuran teks dan tampilan.",
   "lang.label": "Bahasa",
   "display.group": "Pengaturan tampilan",
   "display.dark": "Mode gelap",

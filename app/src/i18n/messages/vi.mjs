@@ -1,6 +1,32 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "tour.step": "Hướng dẫn {step}/{total}",
+  "tour.skip": "Bỏ qua",
+  "tour.tapOutside": "Chạm vùng tối để tiếp tục",
+  "tour.next": "Tiếp theo",
+  "tour.finish": "Xong",
+  "tour.replay": "Xem lại hướng dẫn",
+  "tour.facilitiesTitle": "Bộ lọc tiện ích",
+  "tour.markerTitle": "Điểm đánh dấu",
+  "tour.themeTitle": "Chế độ sáng và tối",
+  "tour.scan":
+    "Quét mã QR tại ga trong TownPass để xác nhận tầng và vị trí hiện tại.",
+  "tour.floors": "Chạm B1–B4 để xem bản đồ của tầng tương ứng.",
+  "tour.layers":
+    "Bật để xem đường viền nét đứt của các tầng khác và so sánh vị trí.",
+  "tour.locate":
+    "Chọn điểm đi và điểm đến từ danh sách hoặc trực tiếp trên bản đồ.",
+  "tour.facilities":
+    "Chọn một loại tiện ích, như nhà vệ sinh hay thang máy, để tìm trên tầng này.",
+  "tour.marker":
+    "Chạm vào điểm đánh dấu để xem chi tiết. Cầu thang, thang cuốn và thang máy hiển thị các tầng kết nối.",
+  "tour.language": "Chọn ngôn ngữ giao diện bạn muốn dùng.",
+  "tour.theme": "Chuyển giữa giao diện sáng và tối.",
+  "tour.contrast":
+    "Bật độ tương phản cao để dễ phân biệt chữ và đường viền hơn.",
+  "tour.mode":
+    "Chọn chế độ Tiêu chuẩn, Trẻ em hoặc Người cao tuổi để điều chỉnh cỡ chữ và hiển thị.",
   "lang.label": "Ngôn ngữ",
   "display.group": "Cài đặt hiển thị",
   "display.dark": "Chế độ tối",
