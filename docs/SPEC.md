@@ -1,6 +1,6 @@
 # Taipei Maze 北車不迷路產品與技術規格
 
-版本：1.0｜制定日期：2026-11-07｜文件狀態：開發規格，尚非完成實作或現場安全認證
+版本：1.1｜更新日期：2026-11-07｜文件狀態：開發規格，尚非完成實作或現場安全認證
 
 本規格將[提案企劃書](./提案企劃書.md)轉為可分工、實作、測試與交付的要求。產品讓旅客掃描 QR Code 確認位置，以局部跨樓層路網規劃路線，再透過一步一圖、多語文字與預生成語音理解下一步。核心承諾是「找得到、走得了、看得懂」，不能用完整功能數量取代路線正確性。
 
@@ -44,13 +44,13 @@
 
 ### 01.1 資料優先順序
 
-1. 使用者本輪明確指示：七語優先及排除中國相關資源。
+1. 使用者最新提供的《2026 城市通入門指引》及架構資訊：作品為 WebView 微服務網頁、前端框架不限；七語與排除中國相關來源要求繼續適用。
 2. 提案第 17 章及第 15 章最新功能取捨；第 16 章認知排序維持 P1。
-3. 提案第 13、14 章已確認的 Flutter 與預生成音檔架構。
+3. 提案第 13、14 章的預生成音檔決策保留；獨立 Flutter 導航客戶端已被本次 WebView 架構覆寫，Flutter 改作城市通宿主。
 4. 提案較早章節的長期願景，僅在不牴觸上述決策時採用。
 5. 本 SPEC 補充的工程預設。這些是為使規格可執行而制定，不代表使用者曾逐項指定。
 
-來源基準為提案最近一次提交 `19182be56d9edab30a66fac12bc8fadf5e09279e`。本文件不修改原提案，不讀取或採用尚未提交的 `map/` 圖片作為已授權底圖。
+來源基準為提案最近一次提交 `19182be56d9edab30a66fac12bc8fadf5e09279e`。本次另在原提案開頭標明架構更正；不採用來源未核准圖片作為已授權底圖。開發實務見[城市通開發指南](./城市通開發指南.md)。
 
 ### 01.2 規範詞與狀態
 
@@ -67,15 +67,15 @@
 
 | ID | 決策 | 來源或理由 |
 | --- | --- | --- |
-| ADR-01 | 核心客戶端採 Flutter，路網、地圖、字型與語音本地打包 | 提案已定；城市通交付相容性另設門檻 |
-| ADR-02 | 純 Dart Dijkstra；P0 無後端、無 LLM、無執行期翻譯或 TTS | 提案已定，降低網路與模型依賴 |
+| ADR-01 | 正式作品為城市通 Flutter App 內的 WebView 微服務網頁；路網、文字、地圖及音檔為可封裝靜態資產 | 最新入門指引第 9 頁覆寫舊獨立 App 決策 |
+| ADR-02 | 網頁端純 TypeScript Dijkstra；P0 無後端、無 LLM、無執行期翻譯或 TTS | 原演算法契約保留，執行端更正 |
 | ADR-03 | P0 七語介面與固定語音；不只三語 | 使用者本輪更新，覆寫原三語 MVP |
 | ADR-04 | 重新掃碼定位為 P0；不能假裝有連續定位 | 提案第 15、17 章 |
 | ADR-05 | 通行條件先做硬性過濾；模型或偏好不得放寬 | 提案已定 |
 | ADR-06 | 位置由掃碼確認，步驟由使用者確認，兩者分開保存 | 工程預設，避免虛構即時位置 |
-| ADR-07 | 狀態用 Riverpod 管理；以介面隔離掃碼、播放與儲存 | 工程預設，實際套件仍須來源及授權審查 |
+| ADR-07 | 一份 TypeScript session store；掃碼採 TownPass bridge adapter，播放用 HTMLAudioElement，儲存用本地 adapter | 工程預設，不強制引入框架或 Riverpod |
 | ADR-08 | 開發期翻譯／語音服務採允許清單，首選候選為 Microsoft 全球 Azure 服務 | 工程建議，非已採購或已核准；不得使用中國營運雲或來源不明替代模型 |
-| ADR-09 | 本次建立 SPEC，不代表七語素材、App、資料或測試已完成 | 防止將規格寫作混同實作成果 |
+| ADR-09 | 本次更新文件與 AGPL 設定，不代表微服務、宿主修改、七語素材或測試已完成 | repo 公開與產品原始碼入口另需完成 |
 
 ## 02 產品目標與使用者
 
@@ -138,25 +138,44 @@
 
 ## 04 平台與城市通整合
 
-### 04.1 工程基準
+### 04.1 正式架構
 
-- 主要驗收載體預設為一台具後鏡頭的 Android 真機與 release APK；此為工程預設，型號與 OS 需在開發第 0–1 小時記錄於測試表。
-- iOS 與 Web 是條件式交付，未測試不得宣稱支援。不得以模擬器代替真機掃碼驗收。
-- Flutter／Dart 版本在初始化時選擇能相容已審查套件的穩定版，寫入工具鏈檔與 lockfile；本文件不虛構已驗證的版本組合。
-- App 核心不需要 HTTP API、資料庫或雲端伺服器。Repo 既有 `compose.yml` 不構成必須新增後端的依據。
+```text
+城市通 App（Flutter 宿主）
+  ├── 服務註冊：destinationUrl
+  ├── WebView／flutterObject 雙向橋接
+  └── 原生 QR 掃描及必要的本地 bundle 載入
+           ↕ JSON 字串 {name,data}
+Taipei Maze 微服務網頁（HTML／CSS／TypeScript）
+  ├── SVG／Canvas 地圖與路線
+  ├── Dijkstra、無障礙過濾、導航狀態
+  ├── 七語 JSON 與 HTMLAudioElement
+  └── 靜態 Graph／地圖／字型／音檔 package
+           ↕ 選配 API（P0 不需要）
+開放資料與未來必要的後端
+```
 
-### 04.2 城市通交付門檻 GATE-01
+前端語言及框架不限，官方 Vue 3 僅為範例。本案工程預設原生 HTML／CSS／TypeScript，避免不必要依賴；所有新增工具仍需來源及授權審查。不可再將獨立 Flutter App 或 APK 下載頁當作正式微服務。
 
-產品／整合負責人須於第 0–1 小時取得主辦或官方文件對 Flutter、Flutter Web、原生入口或 Vue 微服務交付方式的明確答案，紀錄來源、日期及接受格式。
+### 04.2 宿主版本與交付門檻 GATE-01
 
-| 確認結果 | 執行方式 |
-| --- | --- |
-| 接受 Flutter App 整合 | 維持本規格，實作並測試主辦指定入口 |
-| 接受 Flutter Web | 額外驗證相機、音訊啟動、路由及離線資產，不以 Android 通過代替 Web 通過 |
-| 必須 Vue 3／Vite 微服務 | 在第 1 小時內切換交付端，沿用 JSON、需求 ID 與測試資料；Dart 演算法須移植並重跑相同案例 |
-| 尚未確認 | 可繼續純資料與演算法工作；交付狀態保持 blocked，不能以放上一個下載 APK 的頁面宣稱完成微服務 |
+已核對 TownPass commit `c8e5d4d3f8f699f3d9d6cd68e129ed4da12037b3`：Flutter 3.47.6、Dart `>=3.13.0 <4.0.0`、AGP 9.1.0、Kotlin 2.4.0、Gradle 9.3.1，Java target 17。PDF 概稱 iOS 15，該快照 Runner target 為 15.5，測試須以實際 target 為準；上游保留 SPM 與 Podfile 設定。
 
-正式服務 URL、deep link scheme、Web base path 均不得先捏造為已核准。站內 QR 使用下文自含識別資料，由 App 內掃碼解析，因此不依賴未定域名。
+GATE-01 不再是「Flutter 能否當作品」的開放選項，而是必須完成：真實 HTTPS／封裝入口註冊、從 Android／iOS 城市通開啟、QR bridge 往返、返回及生命週期、對應原始碼。基準裝置、OS、宿主 commit 及修改 patch 需記錄。宿主建置依其 `.fvmrc`，本 repo 根目錄尚非 Flutter 專案，不新增虛假的宿主設定。
+
+### 04.3 掃碼橋接
+
+網頁先監聽 `flutterObject` 的 message，再送 `JSON.stringify({name:'qr_code_scan',data:null})`。回覆仍為 JSON 字串，data 只接受字串；null 視為取消，其他型別視為協定錯誤。原始字串再進本地 QrDecoder，不能直接當 URL 開啟。GPS `location` 不作本案室內定位。
+
+舊橋接沒有 requestId，最多一個掃碼在途。工程預設 60 秒等待提示；逾時不自動重送，該通道進 waiting_for_drain，遲到結果只丟棄、不定位，收到後才可再掃。未收到前須退出原生掃碼並重新開啟服務；若仍無法保證清空，需最小自訂 handler 加 correlation ID 並測試，不能假設 Web 自建 ID 會被舊宿主回傳。
+
+一般瀏覽器沒有 flutterObject，顯示需在城市通開啟或明確 demo_manual adapter，不能偽造掃碼成功。WebView 暫時被原生掃碼覆蓋時保留 listener 與 pending；頁面真正卸載才清理。原生端限制可信 origin、main frame 與能力，不全域開放任意網站呼叫。
+
+### 04.4 離線交付
+
+原「新安裝首次離線」目標保留，需把完整 `web/dist/` 封裝進宿主並實作可信本地載入，**不是只填 destinationUrl 就有的官方能力**。遠端 HTTPS 服務與內嵌 bundle 使用同一內容 hash；必要宿主修改、origin、base path、音訊及 bridge 權限須在雙平台實測。
+
+開頁後斷網、預載快取後離線重開、全新安裝的內嵌離線是三個不同案例。未完成內嵌載入時標 GATE-06 未通過，不把原先要求默默降成只有預載。宿主既有帳號／定位／通知不是本案必需資料；P0 不新增後端。
 
 ## 05 使用流程與畫面
 
@@ -259,7 +278,8 @@
 | FR-OFF-01 | 全部核心資產離線載入 | 首次安裝後未曾連線也可完成主流程 |
 | FR-SRC-01 | 顯示資料版本、覆蓋及驗證狀態 | 示意路網與官方來源分別標示 |
 | FR-SRC-02 | 所有依賴與素材符合來源允許清單 | 未審查資產不得進正式包 |
-| FR-DEL-01 | 完成主辦接受的交付端 | 可啟動 App 不等於已完成城市通微服務整合 |
+| FR-DEL-01 | 完成城市通 WebView 微服務整合 | 從服務入口真機掃碼，普通瀏覽器或獨立 App 不等於完成 |
+| FR-LIC-01 | 顯著提供部署版本的原始碼與授權 | repo 匿名可讀、commit／tag 對應、建置資料及第三方通知齊全 |
 
 ## 07 導航狀態與一致性
 
@@ -298,7 +318,7 @@
 3. 進入重掃立即停止舊語音。成功確認新位置後，舊路線標失效並重算；失敗時不得繼續播放舊路線作為新起點指引。
 4. 取消重掃而未確認新位置，回舊路線，顯示上次確認時間並要求使用者手動重播。
 5. 改語言只更新呈現與音訊 token，不改 routeRevision；改通行需求必須重新規劃。
-6. App 進背景停止相機與語音；回前景保留畫面，要求使用者確認繼續，不自動播報或推進。
+6. 網頁進背景停止語音與非必要動畫；相機生命週期由宿主處理。原生掃碼頁覆蓋 WebView 時保留 pending 與 receiver，hidden 不表示取消；真正卸載才移除。回前景不自動播報或推進。
 7. 程序被終止後 P0 只恢復語言／模式／靜音，不恢復成正在導航；重新掃碼開始。
 
 同起終點是明確特例：收到 alreadyAtDestination 後直接進 confirmingArrival，跳過 routePreview、orienting、導航開始語音與步驟建立；使用者或有效 QR 確認後才播放抵達句。
@@ -312,36 +332,25 @@
 ### 08.1 檔案分工
 
 ```text
-app/
-  assets/
-    manifest.json
-    maps/B1.svg
-    maps/B2.svg
-    data/floors.json
-    data/nodes.json
-    data/edges.json
-    data/pois.json
-    data/qr_anchors.json
-    data/landmarks.json
-    data/orientation_guides.json
-    data/sources.json
-    navigation/voice_manifest.json
-    i18n/zh-TW.json
-    i18n/en.json
-    i18n/vi.json
-    i18n/id.json
-    i18n/th.json
-    i18n/ko.json
-    i18n/ja.json
-    audio/{locale}/{sentence_id}.mp3
-    fonts/{reviewed_font_file}
-  lib/l10n/app_zh_TW.arb
-  lib/l10n/app_en.arb
-  lib/l10n/app_vi.arb
-  lib/l10n/app_id.arb
-  lib/l10n/app_th.arb
-  lib/l10n/app_ko.arb
-  lib/l10n/app_ja.arb
+web/
+  src/
+    main.ts
+    navigation/
+    bridge/
+    map/
+    voice/
+    i18n/
+  public/
+    assets/
+      manifest.json
+      maps/B1.svg
+      maps/B2.svg
+      data/{floors,nodes,edges,pois,qr_anchors,landmarks,orientation_guides,sources}.json
+      navigation/voice_manifest.json
+      i18n/{zh-TW,en,vi,id,th,ko,ja}.json
+      audio/{locale}/{sentence_id}.mp3
+      fonts/{reviewed_font_file}
+  dist/
 content/
   messages.zh-TW.json
   translations/{locale}.json
@@ -349,9 +358,14 @@ content/
   review_status.json
   voices.lock.json
   provenance.json
+integration/townpass/
+  README.md
+  patches/
 ```
 
-`content/` 是唯一編輯來源。`assets/i18n/` 供動態 POI、地標與導航指令；ARB 供 Flutter UI 及參數化訊息，兩者由同一來源產生，不允許各自手改後分歧。舊提案的 `graph.json` 視為概念名稱，本版正式採分檔資料，由 GraphRepository 載入組合；不維持兩份不同內容的圖。
+`content/` 是唯一編輯來源，產生全部 UI、動態 POI、地標與指令的七語 JSON，以及 TypeScript key 型別；網頁不產生 Flutter ARB。`assets/` 路徑是相對於微服務 base URL 的發行資產，不能混成 rootBundle 路徑。舊提案 graph.json 是概念名稱，本版採分檔，由 GraphRepository 組成一份不可變圖。
+
+`dist/` 為建置產物；宿主內嵌時將同一 build package 複製進其明確宣告的資產目錄，保存 hash 與載入 patch，不在本 repo 建第二個 Git root。以上目錄為預計結構，目前尚未建立產品。
 
 ### 08.2 Package manifest
 
@@ -666,27 +680,24 @@ Controller 收到非零邊 Route 後呼叫 InstructionBuilder；兩者均成功�
 
 固定 UI 文字至少覆蓋上述需求，實際 key 數以凍結 catalog 為準，不把「24 句語音」誤當成整個 App 只有 24 條翻譯。
 
-### 13.3 Flutter 實作
+### 13.3 微服務網頁實作
 
-工程預設採 Flutter 官方 `flutter_localizations` 與 `gen_l10n` 產生 typed UI 存取；內容工具將主檔輸出 ARB。動態地標等使用相同輸入產生 JSON catalog。完整句子採命名參數，不用「字串 A＋名詞＋字串 B」拼成所有語言共用語序。
-
-ARB 例子：
+單一中文主 catalog 產生七語 JSON 與 TypeScript key 型別，UI、POI、指令共用 LocalizationRepository。完整句子用命名參數與每語完整模板，不用共通字串片段硬串語序；不使用 runtime AI 或 eval。動態資料透過 textContent／安全文字渲染，不能把翻譯當 HTML 任意插入。
 
 ```json
 {
-  "@@locale": "en",
-  "confirmLocation": "Confirm your location",
-  "goToFloor": "Take the elevator to {floor}",
-  "@goToFloor": {
-    "description": "Navigation instruction for a verified elevator connection",
-    "placeholders": {
-      "floor": {"type": "String"}
-    }
+  "locale": "en",
+  "messages": {
+    "confirm_location": "Confirm your location",
+    "go_to_floor": "Take the elevator to {floor}"
+  },
+  "parameters": {
+    "go_to_floor": {"floor": "string"}
   }
 }
 ```
 
-所有語言的 placeholder 集合與型別必須相同；不能把 `{floor}` 翻成另一個 key。地標的站內原文保留在第二行，不由翻譯覆蓋。
+所有語系 placeholder 集合與型別必須相同；不能翻譯 key、B1／B2、出口碼或 URL。切換 locale 時更新文件 lang；繁中對應 zh-Hant-TW，其他語言依矩陣，並保持站內原文對照。宿主 Flutter 的國際化屬其自身設定，不代表我們的網頁需用 ARB。
 
 ### 13.4 缺譯與字型
 
@@ -731,7 +742,7 @@ Azure Translator 官方方法支援同一請求使用多個 `to` 參數；批次
 6. **鎖定語音。** 從已核准區域的 voices list 查詢實際可用名稱；每語一個固定 voice，不自動改用另一模型或中國語音。
 7. **批次合成 168 個音檔。** 工作鍵為 locale＋sentenceId＋文字 hash＋voice＋格式。只重做變動項目；短句獨立音檔，不生成一整段再猜切點。
 8. **驗證音訊。** 檢查可解碼、非空、無截斷、音量及語速一致；每句聽檢並比對語系與左右方向。輸出 mp3 與 manifest。
-9. **產出 UI 資源。** 同一 catalog 產生 JSON 與 ARB，執行 gen_l10n。拒絕任何未核准譯文進正式包。
+9. **產出 UI 資源。** 同一 catalog 產生七語 JSON 與 TypeScript key 型別，驗證全部介面及動態標籤。拒絕任何未核准譯文進正式包。
 10. **離線真機驗收。** 關網後冷啟動，逐語操作、播放、切語言、重掃；保存資產版本及測試結果。
 
 ### 14.4 建議語音設定
@@ -760,9 +771,9 @@ Azure Translator 官方方法支援同一請求使用多個 `to` 參數；批次
 | `tools/content/translate_batch.py` | 已審查 provider config、中文 catalog | 六語草稿，不覆寫人工 reviewed 文案 |
 | `tools/content/build_voice_jobs.py` | approved 句庫、voices.lock | 168 個 idempotent 工作及預估字數 |
 | `tools/content/synthesize_audio.py` | 核准工作、憑證環境變數 | 音檔、來源 metadata、失敗工作清單 |
-| `tools/content/build_localizations.py` | 同一版 reviewed catalog | assets JSON 與 Flutter ARB |
+| `tools/content/build_localizations.py` | 同一版 reviewed catalog | 七語 assets JSON 與 TypeScript key 型別 |
 | `tools/content/validate_audio.py` | manifest、音檔 | hash、解碼、時長、缺失及審查報告 |
-| `tools/data/validate_package.dart` | package manifest | 路網、來源、語系與資產一致性報告 |
+| `tools/data/validate_package.ts` | package manifest | 路網、來源、語系與資產一致性報告 |
 
 建置工具憑證只從環境或本機密鑰儲存讀取，不出現在命令範例、stdout、manifest、App assets 或 Git。HTTP timeout 預設 30 秒，最多 3 次 retry；429／暫時 5xx 用退避並尊重 Retry-After，401／403 不反覆重試。SSML 特殊字元須 escape，文字只能進文字節點，不能當任意 XML 或 shell 執行。
 
@@ -881,13 +892,13 @@ P0 音量遵從系統與使用者靜音，不強制最大音量、不要求麥�
 
 每項資源：`resource_id`、`resource_type`、`supplier`、`operator`、`origin_reference`、`version`、`download_url`（不得含 token）、`sha256`、`deployment_region`（無服務則 null）、`license_reference`、`redistribution_evidence`、`china_origin_review`、`reviewer`、`reviewed_at`、`status`。
 
-status 僅有 proposed／approved／rejected／unverified；**只有 approved 可進 release package**。本 SPEC 的 Microsoft、Flutter 套件及字型均是選型候選，不代表已完成整個依賴樹審查。審查負責人依證據簽認，不能由工具偵測「沒有 .cn 網址」自動變成 approved。
+status 僅有 proposed／approved／rejected／unverified；**只有 approved 可進 release package**。本 SPEC 的 Microsoft、宿主套件、前端工具及字型均是選型候選，不代表已完成整個依賴樹審查。審查負責人依證據簽認，不能由工具偵測「沒有 .cn 網址」自動變成 approved。
 
 ### 16.4 自動門檻與人工門檻
 
 CI 應列出 lockfile、assets、endpoint、CDN、模型與授權清單，對照允許清單；發現未知來源、未鎖版、未審查新依賴或被禁止域名就失敗。這是查漏工具，不是完整來源保證。人工核對營運者、模型繼承及輸出權利才可放行。
 
-App runtime 不需要任何翻譯／TTS／LLM 網路連線；測試以網路紀錄與斷網證明，不單靠搜尋程式字串。Web 的掃碼 library、WASM、字型及音效也需本地封裝。官方 mobile_scanner 文件指出 Android 可選 bundled／unbundled 掃碼資源，Web 後端可能載入外部 library；本案必須避免首次使用下載依賴。[mobile_scanner 官方說明](https://pub.dev/packages/mobile_scanner)。
+微服務 runtime 不需要任何翻譯／TTS／LLM 網路連線；測試以網路紀錄與斷網證明，不單靠搜尋程式字串。正式掃碼使用宿主 qr_code_scan，不在網頁新增掃碼引擎；需審查宿主實際 mobile_scanner 與 bundled／unbundled 資源，避免首次掃碼還要下載。若另做瀏覽器相機 fallback，才另行審查並封裝其 library／WASM；不可默默引入 CDN。[mobile_scanner 官方說明](https://pub.dev/packages/mobile_scanner)。
 
 ### 16.5 競賽開源與建置工具的界線
 
@@ -917,43 +928,46 @@ App runtime 不需要任何翻譯／TTS／LLM 網路連線；測試以網路紀�
 以下是供實作對齊的語意介面，型別及測試需按此契約建立；本次不建立產品程式碼。
 
 ```text
-AssetRepository.loadPackage() -> Future<PackageLoadResult>
+AssetRepository.loadPackage() -> Promise<PackageLoadResult>
 GraphRepository.snapshot() -> GraphSnapshot
 QrDecoder.decode(rawText, graphSnapshot) -> QrDecodeResult
 RoutePlanner.plan(RouteRequest, GraphSnapshot) -> RouteResult
 InstructionBuilder.build(Route, GraphSnapshot, OrientationContext) -> InstructionBuildResult
 NavigationController.dispatch(NavigationEvent) -> void
 LocalizationRepository.message(key, locale, params) -> LocalizedMessage
-VoiceService.play(VoiceRequest) -> Future<PlaybackOutcome>
-VoiceService.pause() / resume() / stop() -> Future<void>
-PreferencesStore.load() / save(UserPreferences) -> Future<void>
+VoiceService.play(VoiceRequest) -> Promise<PlaybackOutcome>
+VoiceService.pause() / resume() / stop() -> Promise<void>
+PreferencesStore.load() -> Promise<UserPreferences>
+PreferencesStore.save(UserPreferences) -> Promise<void>
 ```
 
 `RouteRequest`＝requestId、routeRevision、startNodeId、destinationPoiId、options、graphVersion；routeRevision 由 Controller 預先保留，只在整份 NavigationPlan 成功時發布。`OrientationContext`＝已確認的 startAnchorId 與 startNodeId；後續 connector exit 上下文從 Route 的設備及到層 edge 推得。示範手動選點也須指定具可用 OrientationGuide 的 anchor，不提供任意座標作起點。`VoiceRequest`＝sessionId、routeRevision、instructionId、locale、generation、sentenceIds。各 Result 採明確成功／失敗型別，不用 null 同時代表「未載入」「不存在」「無路徑」。
 
-路網演算法及指令生成不 import Flutter UI、相機或播放器；可用純 Dart fixture 測試。平台套件採 adapter 包裝，Web 切換時沿用資料契約及 golden fixture，不複製一套不同通行規則。
+路網演算法及指令生成為純 TypeScript，不 import DOM、宿主 bridge 或播放器；以同一 fixture 驗證。平台能力採 adapter，不能讓普通瀏覽器與城市通各自有不同通行規則。
 
 ### 17.3 建議原始碼位置
 
 ```text
-app/lib/app.dart
-app/lib/features/navigation/domain/{graph,route,instruction,route_options}.dart
-app/lib/features/navigation/application/{route_planner,instruction_builder,navigation_controller}.dart
-app/lib/features/navigation/data/{asset_repository,graph_repository}.dart
-app/lib/features/navigation/presentation/{home,scanner,destinations,route_preview,guidance,arrival}_screen.dart
-app/lib/features/map/{floor_map,coordinate_transform}.dart
-app/lib/features/voice/{voice_service,audio_player_adapter}.dart
-app/lib/features/settings/{preferences_store,settings_screen}.dart
-app/lib/l10n/
-app/test/fixtures/
-app/test/{routing,instructions,qr,voice,localization,state,map}/
-app/integration_test/
+web/src/main.ts
+web/src/navigation/domain/{graph,route,instruction,route-options}.ts
+web/src/navigation/{route-planner,instruction-builder,navigation-controller}.ts
+web/src/data/{asset-repository,graph-repository}.ts
+web/src/bridge/{townpass-bridge,qr-adapter,mock-bridge}.ts
+web/src/views/{home,destinations,route-preview,guidance,arrival}.ts
+web/src/map/{floor-map,coordinate-transform}.ts
+web/src/voice/{voice-service,html-audio-adapter}.ts
+web/src/settings/{preferences-store,settings-view}.ts
+web/src/i18n/
+web/tests/fixtures/
+web/tests/{routing,instructions,qr,voice,localization,state,map}/
+web/tests/e2e/
+integration/townpass/{README.md,patches/}
 tools/content/
 tools/data/
 docs/acceptance/
 ```
 
-檔名可在實作規劃時細分，但同一責任不得散在多個畫面自行決策。沒有必要為此 MVP 引入網路微服務、雲端資料庫或模型推論伺服器。
+檔名可細分但責任不可散在畫面。掃碼 QrDecoder 負責本案 payload，TownPassBridge 負責 string/null 原生結果及單一在途／逾時清空。資料載入必須相對 base URL，支援 HTTPS 與經測試的本地 bundle。沒有必要引入後端資料庫、模型伺服器或獨立 Flutter 導航頁。
 
 ## 18 例外處理與恢復
 
@@ -987,8 +1001,8 @@ docs/acceptance/
 | NFR-05 | 中止語音 | 控制事件後 300ms 內停止舊聲音，不出現新舊交疊 |
 | NFR-06 | 離線 | 未曾連網的新安裝完成三次完整流程；零 runtime 翻譯／TTS／LLM 連線 |
 | NFR-07 | 穩定 | 連續 30 分鐘操作，含 20 次重掃、20 次換語言，無 crash／掛死 |
-| NFR-08 | 可操作性 | 標準最小觸控區 48×48 logical px；簡易主要按鈕高度 ≥56 |
-| NFR-09 | 可讀性 | 標準正文基準 18、簡易 24 logical px；200% 系統字級主操作可達 |
+| NFR-08 | 可操作性 | 標準最小觸控區 48×48 CSS px；簡易主要按鈕高度 ≥56 |
+| NFR-09 | 可讀性 | 標準正文基準 18 CSS px、簡易 24 CSS px；200% 系統字級主操作可達 |
 | NFR-10 | 對比與非色彩提示 | 一般文字對比目標 ≥4.5:1；路徑與狀態同時使用圖示／文字 |
 | NFR-11 | 螢幕閱讀 | 按鈕具語系化 semantics label，焦點順序符合流程，不重複讀裝飾圖 |
 | NFR-12 | 包體 | 工程預算 assets ≤80MB、Android APK ≤120MB；超標記錄來源，先壓縮非必要素材 |
@@ -1060,7 +1074,10 @@ QR parser 限制 1024 bytes、欄位及型別；不支援任意 URL 跳轉。資
 | T-QR-01 | 4 個已知 anchor 真機掃描 | 每碼正確節點及樓層，等待確認 |
 | T-QR-02 | 普通網址、錯 JSON、1025 bytes、其他 site／major | 拒絕，不開外部網址、不改定位 |
 | T-QR-03 | 1 秒內同碼回呼 10 次 | 只進一次確認；下一 scanning session 可再掃 |
-| T-QR-04 | 拒絕權限、永久拒絕、無相機 | 可取消／依平台設定，不崩潰 |
+| T-QR-04 | 宿主拒絕權限、永久拒絕、無相機或回覆 null | 可取消／依平台設定，不崩潰 |
+| T-BRIDGE-01 | 無 flutterObject、錯 JSON、非字串回覆 | 不偽造掃碼，顯示可理解錯誤 |
+| T-BRIDGE-02 | 逾時或 Web 取消後舊成功／null 回覆、再次點掃碼 | waiting_for_drain 不接新請求，遲到值只清空通道、不改定位 |
+| T-BRIDGE-03 | 原生掃碼覆蓋 WebView、之後正常回覆 | listener 保留，可確認位置；真正卸載才清理 |
 | T-RT-01 | fixture a→d standard | edge 對應正確、cost 6、經樓梯 |
 | T-RT-02 | fixture a→d stepFree | cost 12、經電梯、不含 stairs／escalator |
 | T-RT-03 | 電梯 closed／unknown／session unavailable | 無障礙 NoRoute，不回退樓梯 |
@@ -1093,6 +1110,7 @@ QR parser 限制 1024 bytes、欄位及型別；不支援任意 URL 跳轉。資
 | T-OFF-02 | Web 版本無 CDN 快取（若交付 Web） | 必要 JS／WASM／字型本地化，離線能力按第 25 節定義驗收 |
 | T-SRC-01 | 加入未核准依賴／音檔／endpoint | release gate 失敗，無自動來源放行 |
 | T-PRIV-01 | 全流程網路與檔案檢查 | 無定位／照片上傳、無 key、無不必要權限 |
+| T-LIC-01 | 正式服務的原始碼入口與部署版本 | 匿名可取得對應原始碼、授權、必要建置及上游修改 |
 | T-PREF-01 | 重啟 App | 語言／模式／靜音保留，導航位置不自動恢復 |
 | T-E2E-01 | 兩 QR 起點、四目的地、跨層、重掃、抵達 | 至少兩組完整閉環實機通過 |
 | T-P1-01 | 最短與易懂候選相同或 ranker 失敗 | 只有有效最短路，不造差異 |
@@ -1100,14 +1118,14 @@ QR parser 限制 1024 bytes、欄位及型別；不支援任意 URL 跳轉。資
 
 ### 22.3 測試分層
 
-純單元測試覆蓋資料解析、硬限制、演算法、角度、指令與 token；widget 測試覆蓋語言、模式、錯誤與導航狀態；真機 integration 測試覆蓋相機、音訊、離線與完整操作。不能以 mocked player 測試證明 MP3 真機能播放，也不能以固定 route fixture 取代實際 Dijkstra 結果。
+純 TypeScript 單元測試覆蓋資料解析、硬限制、演算法、角度、指令與 token；DOM／component 測試覆蓋語言、模式、錯誤與導航狀態；城市通真機 integration 測試覆蓋原生橋接、相機、音訊、離線與完整操作。不能以 mocked player 測試證明 MP3 真機能播放，也不能以固定 route fixture 取代實際 Dijkstra 結果。
 
 ### 22.4 最低平台矩陣
 
-| 條件 | P0 Android | iOS／Web（若被選為交付） |
+| 條件 | P0 Android | iOS 城市通（P0）；獨立瀏覽器另測 |
 | --- | --- | --- |
 | 相機允許／拒絕／取消 | 必測 | 必測各平台行為 |
-| 首次離線啟動 | 必測 | Web 首次離線需先明確封裝或安裝方式，不以空快取 URL 可開啟為假設 |
+| 首次離線啟動 | 必測 | Web 首次離線依本地 bundle 封裝驗收，不以空快取 URL 可開啟為假設 |
 | 七語字型及音檔 | 每語必測 | 同樣必測，不沿用 Android 結果 |
 | 全主流程、旋轉／背景 | 必測 | 必測支援方向與平台生命週期 |
 | 裝置型號及版本 | 記錄實際值 | 記錄瀏覽器、OS、HTTPS／安裝方式 |
@@ -1118,7 +1136,7 @@ QR parser 限制 1024 bytes、欄位及型別；不支援任意 URL 跳轉。資
 
 | Gate | 必要證據 | 未達處置 |
 | --- | --- | --- |
-| GATE-01 交付相容 | 主辦接受格式及實際啟動／入口測試 | 不宣稱城市通整合完成 |
+| GATE-01 城市通整合 | 服務註冊、Android／iOS WebView 與 QR bridge 實測 | 不宣稱城市通整合完成 |
 | GATE-02 資料與方向 | 範圍、節點邊、來源、驗證狀態及已核對 Demo 路線 | 只能 synthetic demo，不對外提供實際導航 |
 | GATE-03 路線正確 | T-RT、T-NV、T-DIR、T-MAP 相關案例 | 停止新增功能，先修正 |
 | GATE-04 七語 | 所有必要 UI key 與 168 核心音檔完成審查／測試 | 標實際支援，不算本版 P0 完成 |
@@ -1159,7 +1177,7 @@ docs/acceptance/
 | --- | --- | --- |
 | A 產品／整合 | GATE-01、範圍、操作流程、展示及打包 | 本 SPEC、release checklist |
 | B 路網／演算法 | JSON、Dijkstra、可及性、方向與 fixture | GraphSnapshot、RouteResult、Instruction |
-| C Flutter／介面 | 掃碼、畫面、地圖、狀態、易讀 | QrDecodeResult、NavigationSession |
+| C Web／宿主整合 | 網頁、掃碼 bridge、地圖、狀態、必要宿主 patch | QrDecodeResult、NavigationSession |
 | D 多語／音訊 | key、翻譯、校對、168 檔、播放器 | locale、sentenceId、voice manifest |
 | 全員 | 真機閉環、授權與來源審查 | 測試與 provenance 報告 |
 
@@ -1191,7 +1209,7 @@ docs/acceptance/
 | WP-02 路線與指令 | WP-01 | RoutePlanner、InstructionBuilder；T-RT、T-DIR |
 | WP-03 掃碼與 session | WP-01、WP-02 | QrDecoder、Controller；T-QR、T-NV |
 | WP-04 地圖與畫面 | WP-02、WP-03 | FloorMap、screens、模式；T-MAP、T-NV |
-| WP-05 七語內容 | 中文 catalog、來源核准 | 七語 catalog、ARB、字型；T-L10N |
+| WP-05 七語內容 | 中文 catalog、來源核准 | 七語 JSON catalog、TypeScript 型別、字型；T-L10N |
 | WP-06 語音 | WP-05、語音權利核准 | manifest、168 檔、VoiceService；T-AUD |
 | WP-07 交付整合 | WP-03 至 WP-06 | 官方入口、release、README；T-OFF、T-E2E、T-SRC |
 | WP-08 P1 擴充 | 全部 P0 穩定 | 候選排序／最近設施；T-P1 |
@@ -1211,13 +1229,17 @@ docs/acceptance/
 
 ### 25.2 建置檢查順序
 
-未來 CI 依序執行來源允許清單→catalog／audio／Graph validation→Flutter localization generation→format／analyze→單元與 widget 測試→release build。真機與權利審查不得假裝由 CI 自動完成。
+未來 CI 順序：來源允許清單→catalog／audio／Graph validation→TypeScript 型別檢查→單元／DOM 測試→靜態 build→宿主整合與真機測試。Node／TypeScript 與套件管理器版本在 web 子專案初始化時鎖定，不虛構目前已有 package scripts。
 
-Flutter App 建立後的驗證指令預期包括 `flutter gen-l10n`、`dart format --output=none --set-exit-if-changed lib test integration_test`、`flutter analyze`、`flutter test`、`flutter build apk --release`；資料工具按第 14 節建立後執行。這些是實作後的預期檢查，本次沒有 App，不能宣稱已執行。
+實作後應提供 `typecheck`、`test`、`build`、`validate:assets` 等腳本並在 README 對應實際命令；本次尚未建立 web/package.json，不能宣稱 npm／TypeScript 測試已通過。宿主建置則依開發指南執行 `fvm flutter pub get`、build_runner、analyze／test 與必要 release build。
 
-### 25.3 Web 條件
+### 25.3 WebView、原始碼與公開
 
-Web 相機需在相容瀏覽器及安全來源執行，按實際部署驗證；掃碼 library／WASM／字型／音訊不得默默走外部 CDN。離線 Web 必須明確說明安裝或預載條件：從未訪問、沒有本地包與快取時，不能保證任意網站 URL 在斷網狀態第一次開啟。若主辦要求此場景，交付可離線啟動的封裝載體或經允許的本地託管方式，不能沿用原生 APK 的離線宣稱。
+正式驗收必須從城市通服務入口開始；Chrome 只作第一層驗證，不取代原生 qr_code_scan。Web 音訊需處理使用者手勢政策、生命週期、返回、路徑 base 及 MIME；如額外支援瀏覽器相機，另審查 library、WASM 與權限，不默默走外部 CDN。
+
+原創程式碼以 AGPL-3.0-or-later 發布，根目錄 LICENSE 與主辦聲明已建立；上游 TownPass GPL 聲明保留。網頁須顯著提供與部署版本對應的原始碼及授權入口，包含必要建置／安裝資料。repo 查驗目前 private，尚需明確公開授權及匿名可讀驗證；不能以新增 LICENSE 代表已公開。得獎後至少一年公開為競賽義務，不是授權到期。
+
+離線模式以第 04.4 節為準。全新無快取的 HTTPS URL 不可能僅憑靜態 hosting 就在斷網首次載入；需交付完整本地 bundle 與宿主可信載入 patch，並在 Android／iOS 測橋接及音訊。既有普通 HTTP cache 或 Service Worker 不視為已驗證保證。
 
 ### 25.4 更新與維護
 
@@ -1257,12 +1279,12 @@ Repo 的[競賽指南](./2026-fall-competition-guide.md)記錄官方線上規則
 
 | ID | 未決事項 | 負責方向／期限 | 預設處置 |
 | --- | --- | --- | --- |
-| OPEN-01 | 城市通正式交付格式與 Flutter 接受度 | A，H1 前 | 不宣稱整合完成；早期切換端 |
+| OPEN-01 | 微服務 destinationUrl、雙平台宿主整合及可信本地 bundle 載入 | A＋C，H1 前鎖方案 | WebView 網頁架構已定；整合與首次離線仍須實作驗證 |
 | OPEN-02 | 示範 B1／B2 確切區域與現場核對能力 | B＋A，H2 前鎖範圍 | 未核對只 synthetic demo，不輸出真實站內行走保證 |
 | OPEN-03 | 官方 PDF 改繪／重製權利 | A，素材進包前 | 用有權利依據的自製示意圖，清楚標示 |
 | OPEN-04 | 翻譯及 TTS 供應商、區域、輸出再散布及競賽接受度 | D＋A，呼叫服務前 | 未核准不呼叫；真人翻譯錄音替代 |
 | OPEN-05 | 七語具能力校對者及聽檢 | D，H3 前排定 | 未校對語系維持草稿，未通過七語 gate |
-| OPEN-06 | 真機型號、SDK／套件版本、字型來源 | C，H1 前 | 鎖一組實機基準，不能寫成全平台支援 |
+| OPEN-06 | Android／iOS 真機、宿主版本、前端工具與字型來源 | C，H1 前 | 依核對宿主快照鎖版本，未測平台不宣稱通過 |
 | OPEN-07 | 泰文實際可用 voice | D，合成前 | 以已核准區域查詢並鎖版，不偷偷替換 |
 | OPEN-08 | 正式題目、提交入口、凍結及截止 | A，立即核對行前信／現場 | 相對 24 小時規劃不能代替官方截止 |
 | OPEN-09 | 來源限制是否延伸到不可得知的訓練資料或硬體上游 | A，遇不明項目前 | 不自行宣告豁免；標 unverified，排除該資源 |
@@ -1280,7 +1302,7 @@ Repo 的[競賽指南](./2026-fall-competition-guide.md)記錄官方線上規則
 | 無障礙路線誤用未知資料 | unknown 被當 true、設備狀態過時 | 保守排除、非即時提示、無路徑誠實告知 |
 | 語音／地圖／步驟不同步 | 切語言還播舊句、重掃後仍畫舊線 | revision／generation 原子更新 |
 | 只在開發機能跑 | 需雲端 key、字型或模型首次下載 | 新安裝先關網真機測試 |
-| 比賽交付形式不符 | 最後才做空 Web 外殼 | H1 內確認並決策 |
+| 比賽交付形式不符 | 只做獨立 App 或普通瀏覽器 Mock | 從城市通服務進入；H1 內確認宿主整合與本地載入方案 |
 
 ## 28 需求追溯與完成定義
 
@@ -1330,15 +1352,15 @@ Repo 的[競賽指南](./2026-fall-competition-guide.md)記錄官方線上規則
 | S03 | [臺北捷運車站設施資訊](https://data.taipei/dataset/detail?id=659b9f55-a687-4e55-a17b-ceca5743c514) | 官方設施資料入口，非可導航路網 |
 | S04 | [臺北捷運臺北車站 PDF](https://web.metro.taipei/img/ALL/INFOPDF/051.pdf) | 原提案站圖參考；不據此聲稱已測量或獲再散布授權 |
 | S05 | [TownPass](https://github.com/taipei-doit/TownPass)／[TownPass-Services](https://github.com/taipei-doit/TownPass-Services) | 原提案官方程式入口，實作時再核對整合規範 |
-| S06 | [Flutter 官方國際化](https://docs.flutter.dev/ui/internationalization) | localization、ARB 與語系設定 |
+| S06 | [城市通開發指南](./城市通開發指南.md) | 最新 WebView 架構、宿主版本、橋接與授權；取代前版網頁採 Flutter ARB 的預設 |
 | S07 | [Azure Translator 語言支援](https://learn.microsoft.com/en-us/azure/ai-services/translator/language-support) | 七語代碼與文字翻譯能力 |
 | S08 | [Translator Translate 方法](https://learn.microsoft.com/en-us/azure/ai-services/translator/text-translation/reference/v3/translate) | 批次字串、多目標語言與 key 映射 |
 | S09 | [Azure Speech 語言及聲音](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts) | 候選語音，實際區域 voices list 另查 |
 | S10 | [Speech TTS REST](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/rest-text-to-speech) | 區域、授權與聲音清單查詢 |
 | S11 | [Speech Batch Synthesis](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/batch-synthesis) | 開發期非同步批次合成工作流程 |
-| S12 | [mobile_scanner](https://pub.dev/packages/mobile_scanner) | 相機掃碼、bundled 資源及 Web 外部下載風險 |
-| S13 | [just_audio](https://pub.dev/packages/just_audio) | 本地資產播放、播放器狀態與中止行為 |
+| S12 | [mobile_scanner](https://pub.dev/packages/mobile_scanner) | 宿主原生掃碼依賴審查；不是微服務新增 Web 掃碼引擎的要求 |
+| S13 | [TownPass 橋接原始碼](https://github.com/taipei-doit/TownPass/tree/c8e5d4d3f8f699f3d9d6cd68e129ed4da12037b3/lib/util/web_message_handler) | QR／JSON 字串協定；前版 just_audio 為獨立 Flutter 客戶端方案，不再是本案網頁依賴 |
 
 ### 本版相對原提案的明確取捨
 
-七語覆寫三語；重新定位為 P0；語音明確為預生成資產；規則排序及 ML 維持 P1；導航步驟不偽裝連續定位；距離未知不顯示公尺；中國相關與不明來源不得以功能或時程理由繞過；城市通相容、素材權利與現場驗證均需真實證據。
+WebView 微服務網頁覆寫獨立 Flutter 導航 App；宿主保留 Flutter 並使用原生掃碼；七語覆寫三語；重新定位為 P0；語音明確為預生成資產；規則排序及 ML 維持 P1；導航步驟不偽裝連續定位；距離未知不顯示公尺；中國相關與不明來源不得以功能或時程理由繞過；城市通相容、素材權利與現場驗證均需真實證據。
