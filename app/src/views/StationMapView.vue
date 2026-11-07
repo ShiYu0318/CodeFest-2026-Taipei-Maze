@@ -240,6 +240,9 @@ import { zones, transfersFromPoint } from "./station-routing";
 const { categories, points } = stationData;
 // const searchCatalogEntries = stationCatalog(stationData);
 // let searchPointRevision = 0;
+const mobileZoomQuery = window.matchMedia(
+  "(max-width: 719px), (pointer: coarse)"
+);
 const connectorTypes = new Set([
   "elevator",
   "stairs",
@@ -307,6 +310,7 @@ watch([selected, zoom, showLayers, floorChanging], placeConnectorPanel, {
 onMounted(() => {
   updateMapLayout();
   window.addEventListener("resize", updateMapLayout);
+  mobileZoomQuery.addEventListener("change", enforceZoomLimit);
   document.addEventListener("click", dismissConnectorOutside, true);
   document.addEventListener("touchstart", startPinch, captureGesture);
   document.addEventListener("touchend", endPinch, captureGesture);
@@ -319,6 +323,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", updateMapLayout);
+  mobileZoomQuery.removeEventListener("change", enforceZoomLimit);
   document.removeEventListener("click", dismissConnectorOutside, true);
   floorAnimation?.cancel();
   clearMapDrag();
@@ -455,9 +460,11 @@ function pointThemeStyle(type) {
   const category = categories[type];
   const colorToken = category?.colorToken || "gray-700";
   const iconColorToken = category?.iconColorToken || "gray-50";
+  const iconColor = category?.iconColor;
   return {
     "--pin-color": paletteColor(colorToken),
-    "--pin-icon": paletteColor(iconColorToken),
+    "--pin-icon": iconColor || paletteColor(iconColorToken),
+    "--point-icon-color": iconColor || paletteColor(colorToken),
   };
 }
 
@@ -477,7 +484,12 @@ function focusVisiblePin(point, event) {
 }
 
 function constrainZoom(scale) {
-  return Math.min(3, Math.max(1, scale));
+  return Math.min(mobileZoomQuery.matches ? 1.5 : 3, Math.max(1, scale));
+}
+
+function enforceZoomLimit() {
+  const maxZoom = constrainZoom(zoom.value);
+  if (maxZoom !== zoom.value) zoomAt(maxZoom, viewportCenter());
 }
 
 function viewportPoint(clientX, clientY) {
@@ -499,6 +511,7 @@ function zoomAnchor([x, y]) {
 }
 
 async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
+  scale = constrainZoom(scale);
   clearMapDrag();
   const frame = viewport.value;
   const board = frame.firstElementChild;
@@ -798,6 +811,7 @@ function toggleLayers() {
 
 function updateMapLayout() {
   mapTop.value = mapStage.value.getBoundingClientRect().top + window.scrollY;
+  enforceZoomLimit();
   nextTick(placeConnectorPanel);
 }
 
