@@ -109,6 +109,26 @@ html[data-maze-theme="dark"] {
   --display-control-height: 48px;
   --display-gap: 8px;
 }
+/* Native controls use a text annotation; allow room for the selected label. */
+.display-page[data-display-mode="child"] .display-controls {
+  flex-wrap: wrap;
+}
+.display-page[data-display-mode="child"] .display-mode-label {
+  flex-basis: 100%;
+  width: 100%;
+}
+.display-page[data-display-mode="child"] .display-mode-label select {
+  width: 100%;
+  max-width: 100%;
+}
+.display-page[data-display-mode="child"] .endpoint-value {
+  max-height: 5.7em;
+  line-height: 1.9;
+  white-space: normal;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  overflow-wrap: anywhere;
+}
 .display-page[data-display-mode="senior"] {
   --display-main-size: 1.5rem;
   --display-secondary-size: 1.125rem;

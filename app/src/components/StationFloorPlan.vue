@@ -26,14 +26,15 @@
           :class="`plan-${kind}`"
           :d="path"
         />
-        <text
+        <ZhuyinSvgText
           v-for="[x, y, label] in plan.labels"
           :key="label"
           class="plan-label"
           :x="x"
           :y="y"
-          >{{ label }}</text
-        >
+          :text="label"
+          :reading-below="floor === '1F' && y < 50"
+        />
       </g>
     </g>
     <g v-if="!outlineOnly">
@@ -64,6 +65,7 @@
 </template>
 
 <script>
+import ZhuyinSvgText from "./ZhuyinSvgText.vue";
 import StationB2Plan from "./StationB2Plan.vue";
 import { plans } from "../views/station-floor-plans.mjs";
 import stationData from "../views/station-points.json";
@@ -76,7 +78,7 @@ const stairwayTypes = new Set([
 ]);
 
 export default {
-  components: { StationB2Plan },
+  components: { ZhuyinSvgText, StationB2Plan },
   props: {
     floor: { type: String, required: true },
     outlineOnly: Boolean,

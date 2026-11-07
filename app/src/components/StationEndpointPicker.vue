@@ -16,7 +16,9 @@
       @keydown.tab="keepFocus"
     >
       <header>
-        <h2 id="endpoint-dialog-title">{{ t("map.locate") }}</h2>
+        <h2 id="endpoint-dialog-title">
+          <ZhuyinText :text="t('map.locate')" />
+        </h2>
         <button
           ref="closeButton"
           class="endpoint-close"
@@ -41,13 +43,19 @@
           :aria-pressed="role === activeRole"
           @click="showRole(role)"
         >
-          <strong>{{ label }}</strong>
-          <span class="endpoint-value">
-            {{
-              choices[role]
-                ? choices[role].floor + "・" + placeName(choices[role], i18n)
-                : t("endpoint.none")
-            }}
+          <strong><ZhuyinText :text="label" /></strong>
+          <span
+            class="endpoint-value"
+            @touchmove="displayMode === 'child' && $event.stopPropagation()"
+            @wheel="displayMode === 'child' && $event.stopPropagation()"
+          >
+            <ZhuyinText
+              :text="
+                choices[role]
+                  ? choices[role].floor + '・' + placeName(choices[role], i18n)
+                  : t('endpoint.none')
+              "
+            />
           </span>
         </button>
       </div>
@@ -79,7 +87,7 @@
                   :aria-pressed="point.id === choices[activeRole]?.id"
                   @click="choosePoint({ ...point, floor })"
                 >
-                  {{ placeLabel(point, i18n) }}
+                  <ZhuyinText :text="placeLabel(point, i18n)" />
                 </button>
               </li>
             </ul>
@@ -92,14 +100,16 @@
           :disabled="!choices[activeRole]"
           @click="choosePoint(null)"
         >
-          {{ t("endpoint.clear", { role: labels[activeRole] }) }}
+          <ZhuyinText
+            :text="t('endpoint.clear', { role: labels[activeRole] })"
+          />
         </button>
         <button
           type="button"
           class="endpoint-map-pick"
           @click="emit('map-pick')"
         >
-          {{ t("endpoint.mapPick") }}
+          <ZhuyinText :text="t('endpoint.mapPick')" />
         </button>
       </footer>
     </section>
@@ -107,9 +117,11 @@
 </template>
 
 <script setup>
+import ZhuyinText from "./ZhuyinText.vue";
 /* global defineProps, defineEmits */
 import { computed, nextTick, onMounted, reactive, ref } from "vue";
 import { useI18n } from "../i18n/index.mjs";
+import { useDisplayPreferences } from "../display/preferences.mjs";
 import { placeLabel, placeName } from "../i18n/places.mjs";
 import stationData from "../views/station-points.json";
 import DestinationSearch from "./DestinationSearch.vue";
@@ -132,6 +144,7 @@ const { points } = stationData;
 const searchEntries = stationCatalog(stationData);
 const i18n = useI18n();
 const { t } = i18n;
+const { displayMode } = useDisplayPreferences();
 const labels = computed(() => ({
   start: t("endpoint.start"),
   destination: t("endpoint.destination"),

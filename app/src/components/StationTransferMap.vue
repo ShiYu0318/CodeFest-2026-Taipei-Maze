@@ -25,21 +25,22 @@
       <li v-for="marker in markers" :key="marker.stop.pointId">
         <StationMapIcon :name="markerIconType(marker.stop.point)" />
         <span
-          ><strong>{{ marker.label }}</strong>
-          {{ marker.stop.point.name }}</span
-        >
+          ><strong><ZhuyinText :text="marker.label" /></strong>
+          <ZhuyinText :text="marker.stop.point.name"
+        /></span>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
+import ZhuyinText from "./ZhuyinText.vue";
 import StationFloorPlan from "./StationFloorPlan.vue";
 import StationMapIcon from "./StationMapIcon.vue";
 import { floors } from "../views/station-floor-plans.mjs";
 
 export default {
-  components: { StationFloorPlan, StationMapIcon },
+  components: { ZhuyinText, StationFloorPlan, StationMapIcon },
   props: { arrival: { type: Object, required: true }, departure: Object },
   computed: {
     bounds() {
