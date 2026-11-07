@@ -8,7 +8,7 @@
   >
     <div
       class="station-shell"
-      :inert="endpointPickerOpen || tripDialog ? '' : null"
+      :inert="endpointPickerOpen || tripDialog || informationOpen ? '' : null"
     >
       <section class="station-heading" :aria-label="t('display.group')">
         <div class="station-title-row">
@@ -75,10 +75,10 @@
             data-tour-target="layers"
             type="button"
             role="switch"
-            :aria-checked="showLayers"
+            :aria-checked="showLayers && level !== '1F'"
             :aria-label="t('map.layersAria')"
             :title="t('map.layers')"
-            :disabled="floorChanging"
+            :disabled="floorChanging || level === '1F'"
             @click="toggleLayers"
           >
             <StationMapIcon name="layers" />
@@ -144,6 +144,17 @@
               class="map-stage"
               :style="{ '--map-top': mapTop * 1.5 + 'px' }"
             >
+              <button
+                ref="informationButton"
+                type="button"
+                class="map-information-button"
+                aria-haspopup="dialog"
+                :aria-label="t('map.information')"
+                :title="t('map.information')"
+                @click="informationOpen = true"
+              >
+                <StationMapIcon name="info" />
+              </button>
               <div class="map-corner">
                 <button
                   v-if="originView"
@@ -181,7 +192,11 @@
                   @lostpointercapture="endMapDrag"
                   @click.capture="ignoreDragClick"
                 >
-                  <div class="map-board" :style="{ '--map-zoom': zoom }">
+                  <div
+                    ref="mapBoard"
+                    class="map-board"
+                    :style="{ '--map-zoom': zoom }"
+                  >
                     <svg
                       class="floor-plan"
                       :viewBox="bounds.join(' ')"
@@ -263,6 +278,13 @@
                           class="point-icon"
                           :name="pointIconType(point)"
                         />
+                      </span>
+                      <span
+                        v-if="platformIcons[point.id]"
+                        class="point-pin pin-platform-icon"
+                        :style="platformIcons[point.id]"
+                      >
+                        <StationMapIcon class="point-icon" name="platform" />
                       </span>
                       <span
                         v-if="point.id === scanPositionId"
@@ -396,34 +418,13 @@
             </section>
           </section>
         </div>
-
-        <footer class="station-footer">
-          <span>{{ t("map.footerNote") }}</span>
-          <div>
-            <a
-              v-for="[label, url] in sources"
-              :key="url"
-              :href="url"
-              target="_blank"
-              rel="noopener noreferrer"
-              >{{ label }}</a
-            >
-          </div>
-          <p class="station-data-status">
-            {{
-              t("map.dataStatus", {
-                points: dataStatus.points,
-                connections: dataStatus.connections,
-                unverified: dataStatus.unverifiedConnections,
-              })
-            }}
-          </p>
-          <router-link to="/about" class="station-about-link">{{
-            t("map.about", { version: buildInfo.short })
-          }}</router-link>
-        </footer>
       </div>
     </div>
+    <StationInformationDialog
+      v-if="informationOpen"
+      :floor="level"
+      @close="closeInformation"
+    />
     <StationEndpointPicker
       :current-options="{
         mobilityProfile: location.view.value.stepFree ? 'stepFree' : 'standard',
@@ -470,6 +471,7 @@ import StationScanPanel from "../components/StationScanPanel.vue";
 import StationNavigationRescan from "../components/StationNavigationRescan.vue";
 import StaffCard from "../components/StaffCard.vue";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
+import StationInformationDialog from "../components/StationInformationDialog.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
 import StationMapTour from "../components/StationMapTour.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
@@ -478,7 +480,6 @@ import ZhuyinText from "../components/ZhuyinText.vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { useStationLocation } from "../station/useStationLocation";
 import { stationPoints } from "../station/scan.mjs";
-import { buildInfo, summarizeStationData } from "../about/about.mjs";
 import { htmlLang, useI18n } from "../i18n/index.mjs";
 import { placeName } from "../i18n/places.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
@@ -487,7 +488,8 @@ import {
   navigationPointVisible,
 } from "../station/navigation-view.mjs";
 import { hasSeenMapTour, rememberMapTour } from "../station/map-tour.mjs";
-import { floors, stackBounds } from "./station-floor-plans.mjs";
+import { boundarySegments, insetBoundaryMarker } from "../station/boundary.mjs";
+import { floors, plans, stackBounds } from "./station-floor-plans.mjs";
 import stationData from "./station-points.json";
 import stationConnections from "./station-connections.json";
 import { zones, transfersFromPoint } from "./station-routing";
@@ -535,6 +537,12 @@ const connectorTypes = new Set([
 const floorIds = Object.keys(floors);
 const initialMapZoom = 1.15;
 const floorPalette = {
+  "1F": {
+    tone: "primary-400",
+    tint: "primary-50",
+    ink: "primary-700",
+    onTone: "primary-950",
+  },
   B1: {
     tone: "primary-500",
     tint: "primary-100",
@@ -621,7 +629,7 @@ const facilityDetails = ref(null);
 const floorChanging = ref(false);
 const arrivalPointId = ref(null);
 let floorAnimation = null;
-const zoom = ref(initialMapZoom);
+const zoom = ref(level.value === "1F" ? 1 : initialMapZoom);
 const viewport = ref(null);
 const dragging = ref(false);
 let mapDrag = null;
@@ -634,6 +642,9 @@ const webkitGestures = ["gesturestart", "gesturechange", "gestureend"];
 const mapSection = ref(null);
 const mapStage = ref(null);
 const mapTop = ref(0);
+const mapBoard = ref(null);
+const mapBoardWidth = ref(0);
+let mapBoardObserver;
 const location = useStationLocation(stationData, stationConnections);
 const navigationMap = computed(() =>
   navigationMapState(location.view.value, {
@@ -706,6 +717,10 @@ watch(displayMode, async () => {
 
 onMounted(() => {
   updateMapLayout();
+  mapBoardObserver = new ResizeObserver(([entry]) => {
+    mapBoardWidth.value = entry.contentRect.width;
+  });
+  mapBoardObserver.observe(mapBoard.value);
   window.addEventListener("resize", updateMapLayout);
   mobileZoomQuery.addEventListener("change", enforceZoomLimit);
   document.addEventListener("touchstart", startPinch, captureGesture);
@@ -722,6 +737,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  mapBoardObserver?.disconnect();
   scanFocusRevision++;
   zoomRevision++;
   window.removeEventListener("resize", updateMapLayout);
@@ -757,19 +773,29 @@ const availableThemes = computed(() =>
 );
 const bounds = computed(() => {
   const floor = floors[level.value];
-  const [left, top, width, height] = showLayers.value
-    ? stackBounds
-    : floor.bounds;
+  const [left, top, width, height] =
+    showLayers.value && level.value !== "1F" ? stackBounds : floor.bounds;
   const [x, y] = floor.center;
   const halfWidth = Math.max(x - left, left + width - x);
   const halfHeight = Math.max(y - top, top + height - y);
   return [x - halfWidth, y - halfHeight, 2 * halfWidth, 2 * halfHeight];
 });
+const platformIcons = computed(() => {
+  const scale = mapBoardWidth.value / bounds.value[2];
+  const platforms = floorPoints.value.filter(
+    (point) => point.boundary && matchesTheme(point, "platform")
+  );
+  if (!scale || !platforms.length) return {};
+  const edges = boundarySegments(plans[level.value]);
+  return Object.fromEntries(
+    platforms.map((point) => [point.id, platformIconStyle(point, edges, scale)])
+  );
+});
 const backgroundLayers = computed(() => {
-  if (!showLayers.value) return [];
+  if (!showLayers.value || level.value === "1F") return [];
   const activeIndex = floorIds.indexOf(level.value);
   return floorIds.flatMap((floor, index) => {
-    if (floor === level.value) return [];
+    if (floor === level.value || floor === "1F") return [];
     const offset = index - activeIndex;
     return [
       {
@@ -781,22 +807,13 @@ const backgroundLayers = computed(() => {
     ];
   });
 });
-const dataStatus = summarizeStationData(stationData, stationConnections);
-const sources = computed(() => [
-  [
-    t("map.sourceInfo", { floor: level.value }),
-    "https://web.metro.taipei/img/ALL/INFOPDF/051.pdf#page=" +
-      (floorIds.indexOf(level.value) + 1),
-  ],
-  [
-    t("map.sourceFacilities"),
-    "https://web.metro.taipei/pages2026/WebStation/051/1",
-  ],
-  [
-    t("map.sourceSection"),
-    "https://web.metro.taipei/pages2026/WebStation/051/4",
-  ],
-]);
+const informationOpen = ref(false);
+const informationButton = ref(null);
+async function closeInformation() {
+  informationOpen.value = false;
+  await nextTick();
+  informationButton.value?.focus({ preventScroll: true });
+}
 
 function isConnector(point) {
   return pointTypes(point).some((type) => connectorTypes.has(type));
@@ -807,7 +824,10 @@ function pointTypes(point) {
 }
 
 function pointIconType(point) {
-  return pointTypes(point)[0];
+  const types = pointTypes(point);
+  return types[0] === "exit" && types.includes(activeTheme.value)
+    ? activeTheme.value
+    : types[0];
 }
 
 function pointHelpType(point) {
@@ -897,8 +917,34 @@ function pinStyle(point) {
   return {
     left: x * 100 + "%",
     top: y * 100 + "%",
-    ...pointThemeStyle(point.type),
+    ...pointThemeStyle(pointIconType(point)),
   };
+}
+
+function platformIconStyle(point, edges, scale) {
+  const enlarged = displayMode.value === "senior";
+  const active =
+    point.id === selected.value?.id || point.id === mapCurrentPoint.value?.id;
+  // Allow for the primary marker's outer ring when the QR point is selected.
+  const qrRadius = (active ? 26 : 7) * (enlarged ? 2 : 1);
+  for (const iconScale of enlarged ? [2, 1] : [1]) {
+    const radius = 7 * iconScale;
+    const offset = insetBoundaryMarker(
+      point,
+      edges,
+      (qrRadius + radius + 2) / scale,
+      (radius + 1) / scale
+    );
+    if (offset) {
+      return {
+        left: `calc(50% + ${offset[0] * scale}px)`,
+        top: `calc(50% + ${offset[1] * scale}px)`,
+        "--marker-base-color": categories.platform.iconColor,
+        "--platform-icon-scale": iconScale,
+      };
+    }
+  }
+  return null;
 }
 
 function endpointBadge(point) {
@@ -913,6 +959,7 @@ function mapPointLabel(point) {
   const badge = endpointBadge(point);
   return (
     pointName(point) +
+    (matchesTheme(point, "platform") ? "・" + t("type.platform") : "") +
     (badge ? "・" + badge : "") +
     (point.id === scanPositionId.value
       ? t(
@@ -926,8 +973,7 @@ function mapPointLabel(point) {
 }
 
 function pointThemeStyle(type) {
-  const primaryType = Array.isArray(type) ? type[0] : type;
-  const category = categories[primaryType];
+  const category = categories[type];
   const colorToken = category?.colorToken || "gray-700";
   const iconColor = category?.iconColor;
   return {
@@ -955,7 +1001,7 @@ function focusVisiblePin(point, event) {
 }
 
 function constrainZoom(scale) {
-  const minZoom = mobileZoomQuery.matches ? 1.5 : 1;
+  const minZoom = mobileZoomQuery.matches && level.value !== "1F" ? 1.5 : 1;
   return Math.min(3, Math.max(minZoom, scale));
 }
 
@@ -1232,7 +1278,7 @@ async function showFloor(floor, { arrival, origin } = {}) {
     } else if (!availableThemes.value.includes(activeTheme.value)) {
       activeTheme.value = null;
     }
-    await resetZoom(initialMapZoom);
+    await resetZoom(floor === "1F" ? 1 : initialMapZoom);
     if (!frame.isConnected) return;
     if (origin) await zoomAt(origin.scale, viewportCenter(), origin.center);
     else if (arrival)

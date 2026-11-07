@@ -3,6 +3,11 @@
 // tones (一 / 不 keep their base tones), not connected-speech tone changes.
 // Match reviewed phrases only; never guess an unknown character's pronunciation.
 const entries = [
+  ["出口", "ㄔㄨ ㄎㄡˇ"],
+  [
+    "請依出口編號及現場指標確認方向",
+    "ㄑㄧㄥˇ ㄧ ㄔㄨ ㄎㄡˇ ㄅㄧㄢ ㄏㄠˋ ㄐㄧˊ ㄒㄧㄢˋ ㄔㄤˇ ㄓˇ ㄅㄧㄠ ㄑㄩㄝˋ ㄖㄣˋ ㄈㄤ ㄒㄧㄤˋ",
+  ],
   ["無法處理掃描結果", "ㄨˊ ㄈㄚˇ ㄔㄨˇ ㄌㄧˇ ㄙㄠˇ ㄇㄧㄠˊ ㄐㄧㄝˊ ㄍㄨㄛˇ"],
   ["手動確認位置", "ㄕㄡˇ ㄉㄨㄥˋ ㄑㄩㄝˋ ㄖㄣˋ ㄨㄟˋ ㄓˋ"],
   ["定位點", "ㄉㄧㄥˋ ㄨㄟˋ ㄉㄧㄢˇ"],

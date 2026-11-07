@@ -2,6 +2,11 @@
   "schemaVersion": 2,
   "zones": [
     {
+      "id": "1f-hall",
+      "floor": "1F",
+      "name": "車站大廳"
+    },
+    {
       "id": "b1-passage",
       "floor": "B1",
       "name": "站內通道"

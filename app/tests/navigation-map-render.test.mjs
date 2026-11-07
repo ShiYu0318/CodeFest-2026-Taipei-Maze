@@ -23,6 +23,7 @@ import * as searchFallback from "../src/search/fallback.mjs";
 const dictionary = JSON.parse(
   readFileSync(new URL("../src/search/dictionary.json", import.meta.url))
 );
+import * as boundary from "../src/station/boundary.mjs";
 import * as locationHook from "../src/station/useStationLocation.js";
 import { createStationLocation } from "../src/station/location.mjs";
 import { iosWebMessageData } from "./helpers/ios-web-message.mjs";
@@ -47,7 +48,7 @@ const realComponents = new Set([
 ]);
 function component(name) {
   if (components.has(name)) return components.get(name);
-  const directory = name === "StationMapView" ? "views" : "components";
+  const directory = name.endsWith("View") ? "views" : "components";
   const source = readFileSync(
     new URL(`../src/${directory}/${name}.vue`, import.meta.url),
     "utf8"
@@ -95,6 +96,7 @@ function component(name) {
     "search.mjs": searchEngine,
     "fallback.mjs": searchFallback,
     "dictionary.json": dictionary,
+    "boundary.mjs": boundary,
     useStationLocation: locationHook,
     "station-routing": {
       zones: connections.zones,
@@ -416,6 +418,81 @@ test("endpoint picker exposes search with the active start or destination role",
       const list = html.indexOf('class="endpoint-list"');
       assert.ok(form >= 0 && list > form, action);
     }
+  } finally {
+    language.setLocale(previous);
+  }
+});
+
+test("map sources stay behind an information entry rather than consuming map footer space", async () => {
+  const previousWindow = globalThis.window;
+  globalThis.window = { matchMedia: () => ({ matches: false }) };
+  const router = VueRouter.createRouter({
+    history: VueRouter.createMemoryHistory(),
+    routes: [{ path: "/station-map", component: component("StationMapView") }],
+  });
+  try {
+    await router.push("/station-map");
+    await router.isReady();
+    const app = Vue.createSSRApp({ render: () => Vue.h(VueRouter.RouterView) });
+    app.use(router);
+    const html = await renderToString(app);
+    assert.equal(html.includes('class="station-footer"'), false);
+    assert.equal(
+      html.includes("https://web.metro.taipei/img/ALL/INFOPDF/051.pdf"),
+      false
+    );
+    assert.ok(html.includes('aria-haspopup="dialog"'));
+    assert.ok(html.includes('class="map-information-button"'));
+  } finally {
+    globalThis.window = previousWindow;
+  }
+});
+
+test("information page retains the floor reference, map notes, source links and licensing", async () => {
+  const language = i18n.useI18n(),
+    previous = language.locale.value;
+  language.setLocale("zh-TW");
+  try {
+    const app = Vue.createSSRApp(component("AboutView"), {
+      embedded: true,
+      floor: "B3",
+    });
+    app.use(
+      VueRouter.createRouter({
+        history: VueRouter.createMemoryHistory(),
+        routes: [],
+      })
+    );
+    const html = await renderToString(app);
+    assert.ok(html.includes("051.pdf#page=3"));
+    assert.ok(html.includes("WebStation/051/1"));
+    assert.ok(html.includes("WebStation/051/4"));
+    assert.ok(html.includes(language.t("map.footerNote")));
+    assert.ok(html.includes("AGPL-3.0-or-later"));
+    assert.ok(html.includes("about-version"));
+  } finally {
+    language.setLocale(previous);
+  }
+});
+
+test("first-floor information uses its own source note rather than a metro basement page", async () => {
+  const language = i18n.useI18n(),
+    previous = language.locale.value;
+  language.setLocale("zh-TW");
+  try {
+    const app = Vue.createSSRApp(component("AboutView"), {
+      embedded: true,
+      floor: "1F",
+    });
+    app.use(
+      VueRouter.createRouter({
+        history: VueRouter.createMemoryHistory(),
+        routes: [],
+      })
+    );
+    const html = await renderToString(app);
+    assert.ok(html.includes(language.t("map.firstFloorNote")));
+    assert.equal(html.includes("051.pdf#page="), false);
   } finally {
     language.setLocale(previous);
   }

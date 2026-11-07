@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "type.exit": "Lối ra",
+  "help.exit": "Kiểm tra số lối ra và đi theo biển chỉ dẫn trong ga.",
+  "floor.1F": "Tầng 1",
+  "zone.1f-hall": "Sảnh nhà ga",
+  "map.firstFloorNote":
+    "Bản đồ 1F được vẽ lại từ ảnh sơ đồ nhà ga được cung cấp. Vị trí tiện ích chỉ mang tính minh họa. Hãy theo biển chỉ dẫn tại ga.",
   "tour.helper":
     "Chạm vào trợ lý ở góc dưới bên phải để hỏi về tiện ích trong ga hoặc cách dùng bản đồ.",
   "tour.reopen":
@@ -16,7 +22,7 @@ export default {
   "tour.themeTitle": "Chế độ sáng và tối",
   "tour.scan":
     "Quét mã QR tại ga trong TownPass để xác nhận tầng và vị trí hiện tại.",
-  "tour.floors": "Chạm B1–B4 để xem bản đồ của tầng tương ứng.",
+  "tour.floors": "Chạm 1F hoặc B1–B4 để xem bản đồ của tầng tương ứng.",
   "tour.layers":
     "Bật để xem đường viền nét đứt của các tầng khác và so sánh vị trí.",
   "tour.locate":
@@ -52,6 +58,7 @@ export default {
   "zone.b3-red": "Sảnh tuyến Tamsui-Xinyi",
   "zone.b4-platform": "Sân ga tuyến Tamsui-Xinyi",
 
+  "type.platform": "Sân ga",
   "type.elevator": "Thang máy",
   "type.restroom": "Nhà vệ sinh",
   "type.nursing": "Phòng cho con bú",
@@ -105,6 +112,8 @@ export default {
   "map.ariaYouAreHere": ", bạn đang ở đây",
   "map.ariaDestination": ", điểm đến",
   "map.youAreHere": "Bạn đang ở đây",
+  "map.information": "Thông tin bản đồ, nguồn và giấy phép",
+  "about.mapNotes": "Ghi chú và tài liệu bản đồ",
   "map.footerNote":
     "Vẽ lại từ bản đồ nhà ga công khai. Vị trí chỉ mang tính minh họa; hãy theo biển chỉ dẫn tại chỗ.",
   "map.dataStatus":
@@ -200,7 +209,7 @@ export default {
   "notice.suspended":
     "Đã tạm dừng quét. Vị trí của bạn không thay đổi. Hãy đóng máy quét trước.",
 
-  "title.station": "Chỉ đường tầng hầm ga Đài Bắc",
+  "title.station": "Bản đồ ga chính Đài Bắc",
   "title.meeting": "Điểm hẹn",
   "title.about": "Mã nguồn và giấy phép",
   "title.default": "Taipei Maze",

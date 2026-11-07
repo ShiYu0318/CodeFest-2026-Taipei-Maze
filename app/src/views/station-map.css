@@ -177,9 +177,9 @@
 }
 .floor-switch {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 4px;
-  flex: 0 0 clamp(172px, 45%, 244px);
+  flex: 0 0 clamp(216px, 45%, 264px);
 }
 .floor-actions {
   display: flex;
@@ -354,7 +354,8 @@
 .active-with-layers {
   opacity: 0.87;
 }
-.map-pin {
+.map-pin,
+.pin-platform-icon {
   --marker-color: var(--marker-base-color);
 }
 .map-pin {
@@ -371,7 +372,7 @@
   transform: translate(-50%, -50%);
   background: transparent;
 }
-.station-page[data-theme="dark"] .map-pin {
+.station-page[data-theme="dark"] :is(.map-pin, .pin-platform-icon) {
   --marker-color: color-mix(in srgb, var(--marker-base-color) 75%, white);
 }
 .map-pin.pin-filtered-out {
@@ -437,6 +438,10 @@
   width: 9px;
   height: 9px;
   color: #fff;
+}
+.pin-platform-icon {
+  position: absolute;
+  transform: translate(-50%, -50%) scale(var(--platform-icon-scale));
 }
 .pin-arrival .point-pin {
   outline: 2px solid var(--marker-color);
@@ -733,33 +738,24 @@
   width: 14px;
   color: var(--tp-gray-700);
 }
-.station-footer {
+.map-information-button {
+  position: absolute;
+  z-index: 3;
+  right: 10px;
+  top: 10px;
   display: grid;
-  justify-items: center;
-  gap: 4px;
-  margin: 30px 30px 20px;
-  padding-top: 14px;
-  color: #9d9d9d;
-  font-size: 12px;
-  line-height: 1.6;
-  text-align: center;
+  place-items: center;
+  width: var(--display-control-height, 44px);
+  min-height: var(--display-control-height, 44px);
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgb(8 19 21 / 12%);
+  cursor: pointer;
 }
-.station-footer > div {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0 12px;
-}
-.station-footer a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  color: inherit;
-}
-.station-footer .station-about-link {
-  font-weight: 600;
-  text-decoration: none;
-}
+.map-information-button svg { width: 24px; height: 24px; }
 
 @media (hover: hover) {
   .floor-switch button:not([aria-pressed="true"]):hover {
@@ -877,7 +873,7 @@
   gap: var(--display-gap);
 }
 .station-page:not([data-display-mode="standard"]) .floor-switch {
-  flex-basis: 220px;
+  flex-basis: 264px;
   gap: 6px;
 }
 .station-page:not([data-display-mode="standard"])
@@ -898,9 +894,6 @@
   width: 24px;
   height: 24px;
   flex-shrink: 0;
-}
-.station-page:not([data-display-mode="standard"]) .station-footer a {
-  min-height: var(--display-control-height);
 }
 .station-page:not([data-display-mode="standard"]) .display-facility-detail h3 {
   font-size: var(--display-main-size);
@@ -946,7 +939,9 @@
   width: 96px;
   height: 96px;
 }
-.station-page[data-display-mode="senior"] .map-pin :is(.point-pin, .pin-icon) {
+.station-page[data-display-mode="senior"]
+  .map-pin
+  :is(.point-pin:not(.pin-platform-icon), .pin-icon) {
   transform: scale(2);
 }
 .display-facility-detail h3 {

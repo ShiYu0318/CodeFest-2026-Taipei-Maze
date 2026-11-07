@@ -192,3 +192,35 @@ test("reduced motion holds partial model text until the final answer", async () 
     h.dispose();
   }
 });
+
+test("unused suggestions remain available across replies, closing and language changes until cleared", async () => {
+  const h = mountChat({ reducedMotion: true });
+  const language = i18n.useI18n(),
+    originalLocale = language.locale.value;
+  try {
+    const questions = [...h.chat.starters.value];
+    h.chat.ask(questions[0]);
+    assert.deepEqual(h.chat.starters.value, questions.slice(1));
+    h.chat.ask(questions[1]);
+    assert.deepEqual(
+      h.chat.starters.value,
+      questions.slice(1),
+      "busy suggestions are not consumed"
+    );
+    h.chat.close();
+    h.chat.opened.value = true;
+    assert.equal(h.chat.starters.value.length, 2);
+    language.setLocale(originalLocale === "en" ? "ja" : "en");
+    assert.equal(h.chat.starters.value.length, 2);
+    h.chat.ask(h.chat.starters.value[0]);
+    assert.equal(h.chat.starters.value.length, 1);
+    h.chat.close();
+    h.chat.opened.value = true;
+    h.chat.clear();
+    assert.equal(h.chat.starters.value.length, 3);
+    await pause(5);
+  } finally {
+    h.dispose();
+    language.setLocale(originalLocale);
+  }
+});

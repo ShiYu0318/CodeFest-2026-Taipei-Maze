@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "type.exit": "ทางออก",
+  "help.exit": "ตรวจสอบหมายเลขทางออกและเดินตามป้ายในสถานี",
+  "floor.1F": "ชั้น 1",
+  "zone.1f-hall": "โถงสถานี",
+  "map.firstFloorNote":
+    "แผนที่ 1F วาดใหม่จากภาพผังสถานีที่ได้รับ ตำแหน่งสิ่งอำนวยความสะดวกเป็นตำแหน่งโดยประมาณ โปรดดูป้ายในสถานี",
   "tour.helper":
     "แตะผู้ช่วยที่มุมขวาล่างเพื่อถามเรื่องสิ่งอำนวยความสะดวกในสถานีหรือวิธีใช้แผนที่",
   "tour.reopen":
@@ -16,7 +22,7 @@ export default {
   "tour.themeTitle": "โหมดสว่างและมืด",
   "tour.scan":
     "สแกนคิวอาร์โค้ดในสถานีผ่าน TownPass เพื่อยืนยันชั้นและตำแหน่งปัจจุบัน",
-  "tour.floors": "แตะ B1–B4 เพื่อดูแผนที่ของชั้นนั้น",
+  "tour.floors": "แตะ 1F หรือ B1–B4 เพื่อดูแผนที่ของชั้นนั้น",
   "tour.layers": "เปิดเพื่อดูเส้นประของชั้นอื่นและเปรียบเทียบตำแหน่ง",
   "tour.locate": "เลือกจุดเริ่มต้นและจุดหมายจากรายการหรือแตะบนแผนที่",
   "tour.facilities":
@@ -49,6 +55,7 @@ export default {
   "zone.b3-red": "โถงสายตั้นสุ่ย-ซิ่นอี้ (Tamsui-Xinyi)",
   "zone.b4-platform": "ชานชาลาสายตั้นสุ่ย-ซิ่นอี้ (Tamsui-Xinyi)",
 
+  "type.platform": "ชานชาลา",
   "type.elevator": "ลิฟต์",
   "type.restroom": "ห้องน้ำ",
   "type.nursing": "ห้องให้นมบุตร",
@@ -99,6 +106,8 @@ export default {
   "map.ariaYouAreHere": " คุณอยู่ที่นี่",
   "map.ariaDestination": " จุดหมาย",
   "map.youAreHere": "คุณอยู่ที่นี่",
+  "map.information": "ข้อมูลแผนที่ แหล่งข้อมูล และใบอนุญาต",
+  "about.mapNotes": "คำอธิบายและเอกสารอ้างอิงแผนที่",
   "map.footerNote":
     "วาดใหม่จากแผนผังสถานีที่เปิดเผยต่อสาธารณะ ตำแหน่งเป็นเพียงการประมาณ โปรดดูป้ายในสถานที่จริง",
   "map.dataStatus":
@@ -189,7 +198,7 @@ export default {
   "notice.suspended":
     "หยุดการสแกนชั่วคราว ตำแหน่งของคุณไม่เปลี่ยน โปรดปิดหน้าสแกนก่อน",
 
-  "title.station": "นำทางชั้นใต้ดินสถานีไทเป",
+  "title.station": "แผนที่สถานีหลักไทเป",
   "title.meeting": "จุดนัดพบ",
   "title.about": "ซอร์สโค้ดและสัญญาอนุญาต",
   "title.default": "Taipei Maze",

@@ -3,7 +3,52 @@
 // Centers are the area centroids of the solid outlines in shared map coordinates.
 export const b2Outline =
   "M34 495H634L708 61l91 17 4-17 100 45-1-12 88 15-68 386h427v57l18 1-34 77h16v59H34v-62H18l34-79H34Z";
+// Railway platforms: north-to-south order checked against TRA's B2 plan.
+// Relative placement follows the railway footprint north/west of the metro
+// concourse in Metro 051.pdf. These are schematic, not surveyed coordinates.
+export const b2RailPlatforms = [
+  {
+    id: "tra-4",
+    operator: "tra",
+    number: 4,
+    x: -785,
+    y: -720,
+    label: "台鐵 TRA・4 月台",
+  },
+  {
+    id: "tra-3",
+    operator: "tra",
+    number: 3,
+    x: -785,
+    y: -500,
+    label: "台鐵 TRA・3 月台",
+  },
+  {
+    id: "hsr-2",
+    operator: "hsr",
+    number: 2,
+    x: -785,
+    y: -280,
+    label: "高鐵 HSR・2 月台",
+  },
+  {
+    id: "hsr-1",
+    operator: "hsr",
+    number: 1,
+    x: -785,
+    y: -60,
+    label: "高鐵 HSR・1 月台",
+  },
+];
+const railOutlines = b2RailPlatforms.map(
+  ({ x, y }) => `M${x} ${y}l1900-140v160L${x} ${y + 160}Z`
+);
 export const floors = {
+  "1F": {
+    name: "車站大廳",
+    bounds: [5, 0, 909, 793],
+    center: [459.5, 396.5],
+  },
   B1: {
     name: "站內通道與出口",
     bounds: [14, 375, 1190, 1000],
@@ -11,8 +56,8 @@ export const floors = {
   },
   B2: {
     name: "板南線大廳與轉乘通道",
-    bounds: [495, 921, 733, 413],
-    center: [877.32, 1207.9],
+    bounds: [95, 490, 1133, 844],
+    center: [661.5, 912],
   },
   B3: {
     name: "板南線月台・淡水信義線大廳",
@@ -29,10 +74,37 @@ export const floors = {
 export const stackBounds = [-65, 235, 1385, 1190];
 
 export const plans = {
+  // The reference plan shows south at the top. The schematic is north-up.
+  "1F": {
+    outlines: ["M68 97H851V696H68Z"],
+    regions: [
+      [
+        "context",
+        "M255 265H648V526H255Z M68 282H200V504H68Z M714 282H851V504H714Z",
+      ],
+      ["blue", "M349 311H608V481H349Z"],
+      ["red", "M255 265H324V526H255Z M714 454H851V504H714Z"],
+    ],
+    labels: [
+      [460, 26, "市民大道"],
+      [218, 76, "北3門"],
+      [456, 76, "北2門"],
+      [695, 76, "北1門"],
+      [32, 254, "W1"],
+      [32, 565, "W3"],
+      [888, 254, "E1"],
+      [888, 565, "E3"],
+      [478, 408, "車站大廳"],
+      [219, 735, "南3門"],
+      [460, 735, "南2門"],
+      [701, 735, "南1門"],
+      [460, 779, "忠孝西路"],
+    ],
+  },
   B2: {
     offset: [512.5, 960],
     scale: 0.5,
-    outlines: [b2Outline],
+    outlines: [b2Outline, ...railOutlines],
   },
   B1: {
     outlines: [

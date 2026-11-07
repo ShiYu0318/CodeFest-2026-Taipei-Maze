@@ -46,7 +46,14 @@ test("a facility answer streams real steps, then text, then the places", async (
   assert.ok(firstDelta > 0);
   assert.ok(kinds.slice(firstDelta, -1).every((kind) => kind === "delta"));
   const steps = events.filter((event) => event.type === "thinking");
-  assert.ok(steps.some((event) => /8 Restroom/.test(event.step.label)));
+  const restroomCount = points.filter((point) =>
+    [point.type].flat().includes("restroom")
+  ).length;
+  assert.ok(
+    steps.some((event) =>
+      event.step.label.includes(`${restroomCount} Restroom`)
+    )
+  );
   assert.ok(
     steps.every((event) => ["active", "done"].includes(event.step.state))
   );

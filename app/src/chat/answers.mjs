@@ -386,7 +386,7 @@ const THANKS = [
   "고마워",
   "ありがとう",
 ];
-const FLOORS = ["B1", "B2", "B3", "B4"];
+const FLOORS = ["1F", "B1", "B2", "B3", "B4"];
 
 const normalize = (text) =>
   String(text ?? "")
