@@ -1,32 +1,11 @@
 <template>
   <main class="station-page" lang="zh-Hant">
     <div class="station-shell">
-      <!-- <header class="station-header">
-        <router-link class="brand" to="/" aria-label="回 TownPass 首頁">
-          <span class="brand-icon"><StationMapIcon name="map" /></span>
-          <span>TownPass</span>
-        </router-link>
-        <span class="preview-tag">站內導覽・試用版</span>
-      </header> -->
-
       <section class="station-heading" aria-labelledby="station-title">
-        <!-- <p class="eyebrow">TAIPEI MAIN STATION</p> -->
         <div class="station-title-row">
           <h1 id="station-title">台北車站</h1>
-          <!-- <span class="floor-tag" :style="floorStyle(level)">{{ level }}</span> -->
         </div>
-        <!-- <p>地下樓層站內地圖</p> -->
       </section>
-
-      <p>
-        <router-link to="/navigation-demo">測試導航流程（合成圖）</router-link>
-      </p>
-
-      <DestinationSearch
-        id="station-facility-search"
-        :catalog="searchCatalogEntries"
-        @select="selectSearchPoint"
-      />
 
       <div class="floor-controls">
         <div class="floor-switch" role="group" aria-label="選擇樓層">
@@ -36,6 +15,7 @@
             type="button"
             :style="floorStyle(floor)"
             :aria-pressed="level === floor"
+            :disabled="floorChanging"
             @click="showFloor(floor)"
           >
             {{ floor }}
@@ -47,6 +27,7 @@
           role="switch"
           :aria-checked="showLayers"
           aria-label="透視其他樓層"
+          :disabled="floorChanging"
           @click="toggleLayers"
         >
           <StationMapIcon name="layers" />
@@ -55,381 +36,222 @@
         </button>
       </div>
 
-      <section
-        v-if="level === 'B2'"
-        class="b2-guide"
-        aria-labelledby="b2-guide-title"
+      <div class="facility-header">
+        <h2 id="facility-title">設施主題</h2>
+        <span>{{ floorPoints.length }} 個標點</span>
+      </div>
+
+      <div
+        class="theme-group"
+        role="group"
+        aria-label="設施主題，可左右滑動查看更多"
+        tabindex="0"
+        @wheel="scrollThemesWithWheel"
       >
-        <h2 id="b2-guide-title">B2 是北捷穿堂</h2>
-        <p class="b2-hint">
-          板南線月台在 B3，淡水信義線月台在 B4。可在地圖下方展開轉乘樓層。
-        </p>
-      </section>
+        <button
+          v-for="type in availableThemes"
+          :key="type"
+          type="button"
+          :aria-pressed="activeTheme === type"
+          :style="pointThemeStyle(type)"
+          @click="toggleTheme(type)"
+        >
+          <StationMapIcon :name="type" />{{ categories[type].name }}
+        </button>
+      </div>
 
       <div class="station-layout">
         <div class="station-map-column">
           <section ref="mapSection" class="map-card" aria-label="車站地圖">
-            <div class="map-stage">
-              <div class="compass" aria-label="北方朝上略偏左" role="img">
-                <span>N</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 3 20 21l-8-4-8 4Z" />
-                </svg>
-              </div>
-              <div
-                ref="viewport"
-                class="map-viewport"
-                :class="{ 'map-zoomed': zoom > 1, 'map-dragging': dragging }"
-                :style="{ '--map-aspect': bounds[2] + ' / ' + bounds[3] }"
-                role="region"
-                :aria-label="level + ' 互動地圖，可用加減鍵縮放，0 鍵重設'"
-                tabindex="0"
-                @wheel="zoomWithWheel"
-                @keydown.self="zoomWithKeyboard"
-                @pointerdown="startMapDrag"
-                @pointermove="moveMapDrag"
-                @pointerup="endMapDrag"
-                @pointercancel="endMapDrag"
-                @pointerleave="leaveMapDrag"
-                @lostpointercapture="endMapDrag"
-                @click.capture="ignoreDragClick"
-              >
-                <div class="map-board" :style="{ width: zoom * 100 + '%' }">
-                  <svg
-                    class="floor-plan"
-                    :viewBox="bounds.join(' ')"
-                    role="img"
-                    :aria-label="level + ' 平面示意圖'"
-                  >
-                    <g
-                      v-for="layer in backgroundLayers"
-                      :key="layer.floor"
-                      class="ghost-layer"
-                      :style="{ '--ghost-ink': layer.color }"
-                      :transform="layer.transform"
-                      aria-hidden="true"
-                    >
-                      <StationFloorPlan :floor="layer.floor" outline-only />
-                    </g>
-                    <g
-                      :class="{ 'active-with-layers': backgroundLayers.length }"
-                    >
-                      <StationFloorPlan :floor="level" />
-                    </g>
-                  </svg>
-                  <button
-                    v-for="point in floorPoints"
-                    :key="point.id"
-                    class="map-pin"
-                    :class="{
-                      'pin-themed': matchesTheme(point, activeTheme),
-                      'pin-route': point.id === routeOrigin?.pointId,
-                    }"
-                    type="button"
-                    :style="pinStyle(point)"
-                    :aria-label="point.name"
-                    :aria-pressed="point.id === selected?.id"
-                    @click="togglePoint(point)"
-                    @focus="focusVisiblePin(point, $event)"
-                  >
-                    <span
-                      v-if="
-                        matchesTheme(point, activeTheme) ||
-                        point.id === routeOrigin?.pointId
-                      "
-                      class="pin-icon"
-                      ><StationMapIcon :name="point.type"
-                    /></span>
-                    <svg
-                      v-else
-                      class="point-dot"
-                      viewBox="0 0 12 12"
-                      aria-hidden="true"
-                    >
-                      <circle cx="6" cy="6" r="5" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="map-tools">
-              <span v-if="selected" class="map-selection">{{
-                selected.name
-              }}</span>
-              <span v-else-if="activeTheme" class="map-selection"
-                >{{ categories[activeTheme].name }}・{{
-                  listedPoints.length
-                }}
-                處</span
-              >
-              <!-- <span v-else>{{
-                zoom === 1 ? "選擇設施主題來顯示圖標" : "滑動地圖查看其他位置"
-              }}</span> -->
-              <!-- <span id="map-gesture-help" class="map-gesture-help">
-                <span class="map-gesture-touch">雙指捏合縮放</span>
-                <span class="map-gesture-wheel">滑鼠滾輪縮放</span>
-              </span> -->
-            </div>
             <div
-              v-if="backgroundLayers.length"
-              class="layer-key"
-              aria-label="背景樓層圖例"
+              ref="mapStage"
+              class="map-stage"
+              :style="{ '--map-top': mapTop + 'px' }"
+              @keydown.esc="closeConnectorDetails"
             >
-              <span
-                v-for="layer in backgroundLayers"
-                :key="layer.floor"
-                :style="{ '--ghost-ink': layer.ink }"
-                >{{ layer.floor }}</span
-              >
-            </div>
-            <p class="map-note">
-              <span aria-hidden="true"></span>{{ mapNote }}
-            </p>
-          </section>
-
-          <section class="transfer-card" aria-labelledby="transfer-title">
-            <div class="transfer-heading">
-              <h2 id="transfer-title">跨樓層預覽</h2>
-              <span class="floor-tag" :style="floorStyle(level)"
-                >目前 {{ level }}</span
-              >
-            </div>
-            <form class="transfer-form" @submit.prevent="previewRoute">
-              <label v-if="startOptions.length > 1">
-                出發區域
-                <select v-model="startZone" required>
-                  <option disabled value="">選擇目前區域</option>
-                  <option
-                    v-for="zone in startOptions"
-                    :key="zone.id"
-                    :value="zone.id"
-                  >
-                    {{ zone.name }}
-                  </option>
-                </select>
-              </label>
-              <label>
-                前往樓層
-                <select v-model="targetZone" required>
-                  <option disabled value="">選擇目的樓層</option>
-                  <option
-                    v-for="zone in targetOptions"
-                    :key="zone.id"
-                    :value="zone.id"
-                  >
-                    {{ zone.floor }}・{{ zone.name }}
-                  </option>
-                </select>
-              </label>
-              <button type="submit">展開轉乘圖</button>
-            </form>
-            <p class="transfer-hint">
-              預覽依示意資料列出跨樓層接點，尚未完成現場通行核對。樓層內步行與驗票請依站內指標。
-            </p>
-            <p v-if="routeMessage" class="transfer-message" role="status">
-              {{ routeMessage }}
-            </p>
-          </section>
-
-          <Transition name="floor-reveal">
-            <div v-if="previewSteps.length" class="transfer-reveal">
-              <div class="transfer-reveal-content">
-                <section
-                  class="transfer-card transfer-results"
-                  aria-labelledby="transfer-results-title"
+              <div class="map-corner">
+                <div class="compass" aria-label="北方朝上略偏左" role="img">
+                  <span>N</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3 20 21l-8-4-8 4Z" />
+                  </svg>
+                </div>
+                <button
+                  v-if="originView"
+                  type="button"
+                  class="map-return"
+                  :disabled="floorChanging"
+                  @click="returnToOrigin"
                 >
-                  <div class="transfer-heading">
-                    <h2
-                      id="transfer-results-title"
-                      ref="previewHeading"
-                      tabindex="-1"
+                  回到起點・{{ originView.floor }}
+                </button>
+              </div>
+              <div class="map-window" :inert="floorChanging ? '' : null">
+                <div
+                  ref="viewport"
+                  class="map-viewport"
+                  :class="{ 'map-zoomed': zoom > 1, 'map-dragging': dragging }"
+                  :style="{ '--map-aspect': bounds[2] + ' / ' + bounds[3] }"
+                  role="region"
+                  :aria-label="level + ' 互動地圖，可用加減鍵縮放，0 鍵重設'"
+                  tabindex="0"
+                  @scroll.passive="placeConnectorPanel"
+                  @wheel="zoomWithWheel"
+                  @keydown.self="zoomWithKeyboard"
+                  @pointerdown="startMapDrag"
+                  @pointermove="moveMapDrag"
+                  @pointerup="endMapDrag"
+                  @pointercancel="endMapDrag"
+                  @pointerleave="leaveMapDrag"
+                  @lostpointercapture="endMapDrag"
+                  @click.capture="ignoreDragClick"
+                >
+                  <div class="map-board" :style="{ '--map-zoom': zoom }">
+                    <svg
+                      class="floor-plan"
+                      :viewBox="bounds.join(' ')"
+                      role="img"
+                      :aria-label="level + ' 平面示意圖'"
                     >
-                      {{ level }} 往
-                      {{ previewSteps[previewSteps.length - 1].to.floor }}
-                    </h2>
+                      <g
+                        v-for="layer in backgroundLayers"
+                        :key="layer.floor"
+                        class="ghost-layer"
+                        :style="{ '--ghost-ink': layer.color }"
+                        :transform="layer.transform"
+                        aria-hidden="true"
+                      >
+                        <StationFloorPlan :floor="layer.floor" outline-only />
+                      </g>
+                      <g
+                        :class="{
+                          'active-with-layers': backgroundLayers.length,
+                        }"
+                      >
+                        <StationFloorPlan :floor="level" />
+                      </g>
+                    </svg>
                     <button
+                      v-for="point in floorPoints"
+                      :key="point.id"
+                      class="map-pin"
+                      :class="{
+                        'pin-themed': matchesTheme(point, activeTheme),
+                        'pin-arrival': point.id === arrivalPointId,
+                      }"
                       type="button"
-                      class="clear-selection"
-                      @click="previewSteps = []"
+                      :style="pinStyle(point)"
+                      :aria-label="point.name"
+                      :aria-pressed="point.id === selected?.id"
+                      :aria-expanded="
+                        isConnector(point)
+                          ? point.id === selected?.id &&
+                            !floorChanging &&
+                            !!connectorPosition
+                          : undefined
+                      "
+                      @click="selectMapPoint(point, $event)"
+                      @focus="focusVisiblePin(point, $event)"
                     >
-                      收起轉乘圖
+                      <span v-if="point.id === selected?.id" class="pin-icon">
+                        <StationMapIcon :name="point.type" />
+                      </span>
+                      <StationMapIcon
+                        v-else
+                        class="point-icon"
+                        :name="point.type"
+                      />
                     </button>
                   </div>
-                  <p class="transfer-hint">
-                    從 {{ routeOrigin.floor }} 的「{{
-                      routeOrigin.point.name
-                    }}」出發。
-                  </p>
-                  <ol class="transfer-results-list">
-                    <li
-                      v-for="(step, index) in previewSteps"
-                      :key="step.id"
-                      class="transfer-step"
-                    >
-                      <header>
-                        <span
-                          class="floor-tag"
-                          :style="floorStyle(step.to.floor)"
-                          >{{ step.to.floor }}</span
-                        >
-                        <div>
-                          <h3>{{ zoneName(step.to.zone) }}</h3>
-                          <p>
-                            {{ categories[step.type].name }}・{{
-                              step.from.point.name
-                            }}
-                          </p>
-                        </div>
-                      </header>
-                      <StationTransferMap
-                        :arrival="step.to"
-                        :departure="previewSteps[index + 1]?.from"
-                      />
-                      <p v-if="transferNote(step)" class="transfer-hint">
-                        {{ transferNote(step) }}
-                      </p>
-                    </li>
-                  </ol>
-                </section>
+                </div>
               </div>
+
+              <section
+                v-if="isConnector(selected) && !floorChanging"
+                id="connector-panel"
+                ref="connectorPanel"
+                class="connector-panel"
+                :style="connectorPosition || { visibility: 'hidden' }"
+                aria-labelledby="connector-title"
+              >
+                <h3 id="connector-title" ref="connectorHeading" tabindex="-1">
+                  {{ selected.name }}
+                </h3>
+                <template v-if="destinations.length">
+                  <div v-for="transfer in destinations" :key="transfer.id">
+                    <button
+                      type="button"
+                      class="floor-destination"
+                      @click="visitDestination(transfer)"
+                    >
+                      <span
+                        >{{ transfer.to.floor }}・{{
+                          zoneName(transfer.to.zone)
+                        }}</span
+                      >
+                      <StationMapIcon name="arrow" />
+                    </button>
+                    <p v-if="transferNote(transfer)">
+                      {{ transferNote(transfer) }}
+                    </p>
+                  </div>
+                </template>
+                <p v-else>{{ selected.description }}</p>
+              </section>
             </div>
-          </Transition>
+          </section>
         </div>
 
-        <section class="facility-card" aria-labelledby="facility-title">
-          <div class="facility-header">
-            <h2 id="facility-title">設施主題</h2>
-            <span>{{ floorPoints.length }} 個標點</span>
+        <footer class="station-footer">
+          <span>依公開站圖重繪。標點與樓層相對位置為示意，請依現場指標。</span>
+          <div>
+            <a
+              v-for="[label, url] in sources"
+              :key="url"
+              :href="url"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ label }}</a
+            >
           </div>
-
-          <div class="theme-group" role="group" aria-label="設施主題">
-            <button
-              v-for="type in availableThemes"
-              :key="type"
-              type="button"
-              :aria-pressed="activeTheme === type"
-              :style="pointThemeStyle(type)"
-              @click="toggleTheme(type)"
-            >
-              <StationMapIcon :name="type" />{{ categories[type].name }}
-            </button>
-          </div>
-          <!-- <div class="theme-feedback">
-            <p class="theme-hint" role="status">{{ themeHint }}</p>
-            <button
-              v-if="activeTheme"
-              type="button"
-              class="theme-map-link"
-              @click="revealMap"
-            >
-              查看地圖
-            </button>
-          </div> -->
-
-          <!-- <div
-            v-if="selected"
-            class="facility-detail"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            <div class="detail-heading">
-              <p class="eyebrow">
-                {{ level }}・{{ categories[selected.type].name }}
-              </p>
-              <button
-                type="button"
-                class="clear-selection"
-                @click="selected = null"
-              >
-                關閉明細
-              </button>
-            </div>
-            <h3>{{ selected.name }}</h3>
-            <p>{{ selected.description }}</p>
-            <p v-if="destination">
-              對應端點 {{ destination.to.floor }}・{{
-                destination.to.point.name
-              }}
-            </p>
-            <button
-              v-if="destination"
-              type="button"
-              class="floor-destination"
-              @click="followConnection"
-            >
-              展開 {{ destination.to.floor }} 端點
-              <StationMapIcon name="arrow" />
-            </button>
-            <p
-              v-if="destination && transferNote(destination)"
-              class="direction-note"
-            >
-              {{ transferNote(destination) }}
-            </p>
-          </div> -->
-
-          <!-- <ul class="facility-list" aria-label="標點明細">
-            <li v-for="point in listedPoints" :key="point.id">
-              <button
-                type="button"
-                :aria-pressed="point.id === selected?.id"
-                :style="pointThemeStyle(point.type)"
-                @click="togglePoint(point)"
-              >
-                <svg class="point-dot" viewBox="0 0 12 12" aria-hidden="true">
-                  <circle cx="6" cy="6" r="5" />
-                </svg>
-                <span
-                  >{{ point.name
-                  }}<small
-                    v-if="getDestination(point)"
-                    class="connector-type"
-                    >{{ categories[point.type].name }}</small
-                  ></span
-                >
-                <span v-if="getDestination(point)" class="floor-link-label">{{
-                  getDestination(point).to.floor
-                }}</span>
-                <StationMapIcon v-else class="list-arrow" name="arrow" />
-              </button>
-            </li>
-          </ul> -->
-        </section>
+        </footer>
       </div>
-
-      <footer class="station-footer">
-        <span>依公開站圖重繪。標點與樓層相對位置為示意，請依現場指標。</span>
-        <div>
-          <a
-            v-for="[label, url] in sources"
-            :key="url"
-            :href="url"
-            target="_blank"
-            rel="noopener noreferrer"
-            >{{ label }}</a
-          >
-        </div>
-      </footer>
     </div>
   </main>
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
-import DestinationSearch from "../components/DestinationSearch.vue";
-import { stationCatalog } from "../search/catalog.mjs";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
+// import DestinationSearch from "../components/DestinationSearch.vue";
+// import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
-import StationTransferMap from "../components/StationTransferMap.vue";
 import { floors, stackBounds } from "./station-floor-plans";
 import stationData from "./station-points.json";
-import { zones, planFloorTransfer, transferFromPoint } from "./station-routing";
+import { zones, transfersFromPoint } from "./station-routing";
 
 const { categories, points } = stationData;
-const searchCatalogEntries = stationCatalog(stationData);
-let searchPointRevision = 0;
+// const searchCatalogEntries = stationCatalog(stationData);
+// let searchPointRevision = 0;
+const mobileZoomQuery = window.matchMedia(
+  "(max-width: 719px), (pointer: coarse)"
+);
+const connectorTypes = new Set([
+  "elevator",
+  "stairs",
+  "escalator",
+  "stairs-escalator",
+  "stairway",
+]);
 const floorIds = Object.keys(floors);
+const initialMapZoom = 1.15;
 const floorPalette = {
   B1: {
     tone: "primary-500",
@@ -460,7 +282,14 @@ const level = ref("B2");
 const showLayers = ref(false);
 const activeTheme = ref(null);
 const selected = ref(null);
-const zoom = ref(1);
+const originView = ref(null);
+const connectorHeading = ref(null);
+const connectorPanel = ref(null);
+const connectorPosition = ref(null);
+const floorChanging = ref(false);
+const arrivalPointId = ref(null);
+let floorAnimation = null;
+const zoom = ref(initialMapZoom);
 const viewport = ref(null);
 const dragging = ref(false);
 let mapDrag = null;
@@ -471,22 +300,32 @@ let zoomRevision = 0;
 const captureGesture = { capture: true, passive: false };
 const webkitGestures = ["gesturestart", "gesturechange", "gestureend"];
 const mapSection = ref(null);
-const startZone = ref("");
-const targetZone = ref("");
-const previewSteps = ref([]);
-const routeMessage = ref("");
-const previewHeading = ref(null);
+const mapStage = ref(null);
+const mapTop = ref(0);
+watch(level, updateMapLayout, { flush: "post" });
+watch([selected, zoom, showLayers, floorChanging], placeConnectorPanel, {
+  flush: "post",
+});
 
 onMounted(() => {
+  updateMapLayout();
+  window.addEventListener("resize", updateMapLayout);
+  mobileZoomQuery.addEventListener("change", enforceZoomLimit);
+  document.addEventListener("click", dismissConnectorOutside, true);
   document.addEventListener("touchstart", startPinch, captureGesture);
   document.addEventListener("touchend", endPinch, captureGesture);
   document.addEventListener("touchcancel", endPinch, captureGesture);
   for (const type of webkitGestures) {
     document.addEventListener(type, handleWebkitGesture, captureGesture);
   }
+  nextTick(() => centerOn(0.5, 0.5));
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateMapLayout);
+  mobileZoomQuery.removeEventListener("change", enforceZoomLimit);
+  document.removeEventListener("click", dismissConnectorOutside, true);
+  floorAnimation?.cancel();
   clearMapDrag();
   clearPinch();
   document.removeEventListener("touchstart", startPinch, true);
@@ -497,18 +336,12 @@ onBeforeUnmount(() => {
   }
 });
 
-const startOptions = computed(() =>
-  zones.filter((zone) => zone.floor === level.value)
-);
-const targetOptions = computed(() =>
-  zones.filter((zone) => zone.floor !== level.value)
-);
-const routeOrigin = computed(() => previewSteps.value[0]?.from);
+const destinations = computed(() => transfersFromPoint(selected.value?.id));
 const floorPoints = computed(() => {
   const current = points[level.value];
   return [
-    ...current.filter((point) => !getDestination(point)),
-    ...current.filter((point) => getDestination(point)),
+    ...current.filter((point) => !isConnector(point)),
+    ...current.filter((point) => isConnector(point)),
   ];
 });
 const availableThemes = computed(() =>
@@ -516,21 +349,6 @@ const availableThemes = computed(() =>
     floorPoints.value.some((point) => matchesTheme(point, type))
   )
 );
-const listedPoints = computed(() =>
-  activeTheme.value
-    ? floorPoints.value.filter((point) =>
-        matchesTheme(point, activeTheme.value)
-      )
-    : floorPoints.value
-);
-// const themeHint = computed(() =>
-//   activeTheme.value
-//     ? categories[activeTheme.value].name +
-//       "・" +
-//       listedPoints.value.length +
-//       " 處，再點主題可恢復圓點。"
-//     : "選一個主題，同類標點會一起顯示圖標。"
-// );
 const bounds = computed(() => {
   return showLayers.value ? stackBounds : floors[level.value].bounds;
 });
@@ -550,10 +368,6 @@ const backgroundLayers = computed(() => {
     ];
   });
 });
-const mapNote = computed(() => {
-  if (showLayers.value) return "實線是目前樓層，淡色虛線是其他樓層的相對輪廓。";
-  return "實線為目前樓層。開啟透視樓層可查看其他樓層的相對位置。";
-});
 const sources = computed(() => [
   [
     "台北捷運 " + level.value + " 資訊圖",
@@ -564,12 +378,33 @@ const sources = computed(() => [
   ["台北捷運剖面圖", "https://web.metro.taipei/pages2026/WebStation/051/4"],
 ]);
 
-function getDestination(point) {
-  return transferFromPoint(point?.id);
+function isConnector(point) {
+  return connectorTypes.has(point?.type);
 }
 
 function zoneName(id) {
   return zones.find((zone) => zone.id === id)?.name;
+}
+
+function scrollThemesWithWheel(event) {
+  const element = event.currentTarget;
+  const delta =
+    Math.abs(event.deltaX) > Math.abs(event.deltaY)
+      ? event.deltaX
+      : event.deltaY;
+  const normalizedDelta =
+    event.deltaMode === WheelEvent.DOM_DELTA_LINE
+      ? delta * 16
+      : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+      ? delta * element.clientWidth
+      : delta;
+  const canScroll =
+    (normalizedDelta < 0 && element.scrollLeft > 0) ||
+    (normalizedDelta > 0 &&
+      element.scrollLeft + element.clientWidth < element.scrollWidth);
+  if (!canScroll) return;
+  event.preventDefault();
+  element.scrollLeft += normalizedDelta;
 }
 
 function matchesTheme(point, type) {
@@ -622,18 +457,24 @@ function pinStyle(point) {
 }
 
 function pointThemeStyle(type) {
-  const { colorToken, iconColorToken = "gray-50" } = categories[type];
+  const category = categories[type];
+  const colorToken = category?.colorToken || "gray-700";
+  const iconColorToken = category?.iconColorToken || "gray-50";
+  const iconColor = category?.iconColor;
   return {
     "--pin-color": paletteColor(colorToken),
-    "--pin-icon": paletteColor(iconColorToken),
+    "--pin-icon": iconColor || paletteColor(iconColorToken),
+    "--point-icon-color": iconColor || paletteColor(colorToken),
   };
 }
 
 function centerOn(x, y) {
   const frame = viewport.value;
   const board = frame.firstElementChild;
-  frame.scrollLeft = x * board.clientWidth - frame.clientWidth / 2;
-  frame.scrollTop = y * board.clientHeight - frame.clientHeight / 2;
+  frame.scrollLeft =
+    board.offsetLeft + x * board.clientWidth - frame.clientWidth / 2;
+  frame.scrollTop =
+    board.offsetTop + y * board.clientHeight - frame.clientHeight / 2;
 }
 
 function focusVisiblePin(point, event) {
@@ -643,7 +484,13 @@ function focusVisiblePin(point, event) {
 }
 
 function constrainZoom(scale) {
-  return Math.min(3, Math.max(1, scale));
+  const minZoom = mobileZoomQuery.matches ? 1.5 : 1;
+  return Math.min(3, Math.max(minZoom, scale));
+}
+
+function enforceZoomLimit() {
+  const constrainedZoom = constrainZoom(zoom.value);
+  if (constrainedZoom !== zoom.value) zoomAt(constrainedZoom, viewportCenter());
 }
 
 function viewportPoint(clientX, clientY) {
@@ -659,12 +506,13 @@ function zoomAnchor([x, y]) {
   const frame = viewport.value;
   const board = frame.firstElementChild;
   return [
-    (frame.scrollLeft + x) / board.clientWidth,
-    (frame.scrollTop + y) / board.clientHeight,
+    (frame.scrollLeft + x - board.offsetLeft) / board.clientWidth,
+    (frame.scrollTop + y - board.offsetTop) / board.clientHeight,
   ];
 }
 
 async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
+  scale = constrainZoom(scale);
   clearMapDrag();
   const frame = viewport.value;
   const board = frame.firstElementChild;
@@ -675,8 +523,8 @@ async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
   if (scale === 1) frame.scrollTo(0, 0);
   else
     frame.scrollTo(
-      anchor[0] * board.clientWidth - x,
-      anchor[1] * board.clientHeight - y
+      board.offsetLeft + anchor[0] * board.clientWidth - x,
+      board.offsetTop + anchor[1] * board.clientHeight - y
     );
 }
 
@@ -783,7 +631,7 @@ function pinchPosition(touches) {
 }
 
 function startPinch(event) {
-  if (event.touches.length < 2) return;
+  if (floorChanging.value || event.touches.length < 2) return;
   // The second finger may land outside the map and dispatch its own touchstart there.
   if (
     !pinch &&
@@ -827,6 +675,7 @@ function clearPinch() {
 }
 
 function handleWebkitGesture(event) {
+  if (floorChanging.value) return;
   // WebKit can also send native gesture events for the same pinch.
   if (event.type === "gesturestart") {
     webkitPinch = null;
@@ -869,22 +718,75 @@ function zoomWithKeyboard(event) {
   }
   if (event.key !== "+" && event.key !== "=" && event.key !== "-") return;
   event.preventDefault();
-  const frame = viewport.value;
   const scale = constrainZoom(zoom.value + (event.key === "-" ? -0.5 : 0.5));
-  zoomAt(scale, [frame.clientWidth / 2, frame.clientHeight / 2]);
+  zoomAt(scale, viewportCenter());
 }
 
-async function showFloor(floor) {
-  if (floor === level.value) return;
-  level.value = floor;
-  selected.value = null;
-  startZone.value = "";
-  targetZone.value = "";
-  previewSteps.value = [];
-  routeMessage.value = "";
-  if (!availableThemes.value.includes(activeTheme.value))
-    activeTheme.value = null;
-  await resetZoom();
+async function showFloor(floor, { arrival, origin } = {}) {
+  if (floorChanging.value || (floor === level.value && !origin)) return;
+  const frame = viewport.value;
+  const currentFloor = floorIds.indexOf(level.value);
+  const targetFloor = floorIds.indexOf(floor);
+  const animate =
+    currentFloor !== targetFloor &&
+    typeof frame.animate === "function" &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const goingUp = targetFloor < currentFloor;
+  const scale = zoom.value;
+  floorChanging.value = true;
+  clearMapDrag();
+  clearPinch();
+  webkitPinch = null;
+
+  try {
+    await nextTick();
+    if (animate) {
+      floorAnimation = frame.animate(
+        {
+          transform: ["scale(1)", goingUp ? "scale(.72)" : "scale(1.3)"],
+          opacity: [1, 0],
+        },
+        { duration: 180, easing: "ease-in", fill: "forwards" }
+      );
+      await floorAnimation.finished;
+    }
+    if (!frame.isConnected) return;
+
+    level.value = floor;
+    selected.value = origin?.point ?? null;
+    arrivalPointId.value = arrival?.point.id ?? null;
+    if (origin) {
+      showLayers.value = origin.layers;
+      activeTheme.value = origin.theme;
+    } else if (!availableThemes.value.includes(activeTheme.value)) {
+      activeTheme.value = null;
+    }
+    await resetZoom();
+    if (!frame.isConnected) return;
+    if (!origin) await zoomAt(initialMapZoom, viewportCenter());
+    if (origin) await zoomAt(origin.scale, viewportCenter(), origin.center);
+    else if (arrival)
+      await zoomAt(scale, viewportCenter(), normalizedPoint(arrival.point));
+    if (!frame.isConnected) return;
+
+    if (animate) {
+      floorAnimation.cancel();
+      floorAnimation = frame.animate(
+        {
+          transform: [goingUp ? "scale(1.3)" : "scale(.72)", "scale(1)"],
+          opacity: [0, 1],
+        },
+        { duration: 220, easing: "ease-out" }
+      );
+      await floorAnimation.finished;
+    }
+  } catch (error) {
+    if (error.name !== "AbortError") throw error;
+  } finally {
+    floorAnimation?.cancel();
+    floorAnimation = null;
+    floorChanging.value = false;
+  }
 }
 
 function toggleLayers() {
@@ -892,27 +794,141 @@ function toggleLayers() {
   resetZoom();
 }
 
-async function selectSearchPoint({ poiId }) {
-  const requestRevision = ++searchPointRevision;
-  const entry = searchCatalogEntries.find((p) => p.id === poiId);
-  if (!entry) return;
-  const point = points[entry.floorId].find((p) => p.id === poiId);
-  if (!point) return;
-  await showFloor(entry.floorId);
-  if (requestRevision !== searchPointRevision || level.value !== entry.floorId)
-    return;
-  activeTheme.value = null;
-  selected.value = point;
-  await nextTick();
-  if (zoom.value > 1) centerOn(...normalizedPoint(point));
-  mapSection.value?.scrollIntoView({ block: "start" });
+// async function selectSearchPoint({ poiId }) {
+//   const requestRevision = ++searchPointRevision;
+//   const entry = searchCatalogEntries.find((p) => p.id === poiId);
+//   if (!entry) return;
+//   const point = points[entry.floorId].find((p) => p.id === poiId);
+//   if (!point) return;
+//   await showFloor(entry.floorId);
+//   if (requestRevision !== searchPointRevision || level.value !== entry.floorId)
+//     return;
+//   activeTheme.value = null;
+//   selected.value = point;
+//   await nextTick();
+//   if (zoom.value > 1) centerOn(...normalizedPoint(point));
+//   mapSection.value?.scrollIntoView({ block: "start" });
+// }
+
+function updateMapLayout() {
+  mapTop.value = mapStage.value.getBoundingClientRect().top + window.scrollY;
+  enforceZoomLimit();
+  nextTick(placeConnectorPanel);
 }
 
-function togglePoint(point) {
+function placeConnectorPanel() {
+  const panel = connectorPanel.value;
+  if (!panel || !selected.value || floorChanging.value) {
+    connectorPosition.value = null;
+    return;
+  }
+
+  const frame = viewport.value;
+  const board = frame.firstElementChild;
+  const [pointX, pointY] = normalizedPoint(selected.value);
+  const x = board.offsetLeft + pointX * board.clientWidth - frame.scrollLeft;
+  const y = board.offsetTop + pointY * board.clientHeight - frame.scrollTop;
+  const width = frame.clientWidth;
+  const height = frame.clientHeight;
+  if (x < 0 || x > width || y < 0 || y > height) {
+    connectorPosition.value = null;
+    return;
+  }
+
+  const margin = 8;
+  const gap = 23;
+  const panelWidth = panel.offsetWidth;
+  const panelHeight = panel.offsetHeight;
+  const leftLimit = width - panelWidth - margin;
+  const topLimit = height - panelHeight - margin;
+  let left = x + gap;
+  let top = Math.max(margin, Math.min(topLimit, y - panelHeight / 2));
+  if (left > leftLimit) {
+    left = x - gap - panelWidth;
+    if (left < margin) {
+      left = Math.max(margin, Math.min(leftLimit, x - panelWidth / 2));
+      const above = y - gap - panelHeight;
+      const below = y + gap;
+      const frameTop = frame.getBoundingClientRect().top;
+      const aboveClearance = frameTop + above;
+      const belowClearance =
+        window.innerHeight - (frameTop + below + panelHeight);
+      if (above >= margin && aboveClearance >= 0) top = above;
+      else if (below + panelHeight <= height && belowClearance >= 0)
+        top = below;
+      else top = aboveClearance >= belowClearance ? above : below;
+    }
+  }
+
+  connectorPosition.value = {
+    left: frame.clientLeft + left + "px",
+    top: frame.clientTop + top + "px",
+  };
+}
+
+async function selectMapPoint(point, event) {
+  if (floorChanging.value) return;
+  arrivalPointId.value = null;
   selected.value = selected.value?.id === point.id ? null : point;
-  if (selected.value && startOptions.value.length > 1)
-    startZone.value = point.zone;
-  if (selected.value && zoom.value > 1) centerOn(...normalizedPoint(point));
+  if (!selected.value) return;
+  if (zoom.value > 1) centerOn(...normalizedPoint(point));
+  if (isConnector(point) && event.detail === 0) {
+    await nextTick();
+    connectorHeading.value?.focus();
+  }
+}
+
+function closeConnectorDetails() {
+  if (!isConnector(selected.value)) return;
+  const trigger = viewport.value.querySelector('.map-pin[aria-pressed="true"]');
+  selected.value = null;
+  trigger?.focus({ preventScroll: true });
+}
+
+function dismissConnectorOutside(event) {
+  const panel = connectorPanel.value;
+  if (!panel || panel.contains(event.target)) return;
+  if (viewport.value.contains(event.target)) {
+    // Marker clicks handle selection, and a click following a drag is ignored.
+    const dragClick = ignoreMouseClick && event.detail !== 0;
+    if (event.target.closest?.(".map-pin") || dragClick) return;
+  }
+  selected.value = null;
+}
+
+function viewportCenter() {
+  const frame = viewport.value;
+  return [frame.clientWidth / 2, frame.clientHeight / 2];
+}
+
+async function visitDestination(transfer) {
+  if (floorChanging.value) return;
+  const arrival = transfer.to;
+  if (!originView.value) {
+    originView.value = {
+      floor: level.value,
+      point: selected.value,
+      layers: showLayers.value,
+      theme: activeTheme.value,
+      scale: zoom.value,
+      center: zoomAnchor(viewportCenter()),
+    };
+  }
+  await showFloor(arrival.floor, { arrival });
+  if (!viewport.value) return;
+  mapSection.value.scrollIntoView({ block: "nearest" });
+  viewport.value.querySelector(".pin-arrival")?.focus({ preventScroll: true });
+}
+
+async function returnToOrigin() {
+  const origin = originView.value;
+  if (!origin || floorChanging.value) return;
+  await showFloor(origin.floor, { origin });
+  originView.value = null;
+  await nextTick();
+  if (!viewport.value) return;
+  mapSection.value.scrollIntoView({ block: "nearest" });
+  viewport.value.focus({ preventScroll: true });
 }
 
 function toggleTheme(type) {
@@ -920,22 +936,6 @@ function toggleTheme(type) {
   if (selected.value && !matchesTheme(selected.value, activeTheme.value))
     selected.value = null;
 }
-
-function previewRoute() {
-  const origin =
-    startOptions.value.length === 1
-      ? startOptions.value[0].id
-      : startZone.value;
-  previewSteps.value = planFloorTransfer(origin, targetZone.value);
-  routeMessage.value = previewSteps.value.length
-    ? ""
-    : "目前沒有已確認的跨樓層連接。";
-}
-
-// function revealMap() {
-//   mapSection.value.scrollIntoView({ block: "nearest" });
-//   viewport.value.focus({ preventScroll: true });
-// }
 </script>
 
 <style scoped src="./station-map.css"></style>
