@@ -6,6 +6,7 @@ const routes = [
   {
     path: "/meet",
     name: "meeting",
+    meta: { title: "集合點" },
     component: () => import("../views/MeetingView.vue"),
   },
   {
@@ -25,6 +26,7 @@ const routes = [
   {
     path: "/station-map",
     name: "station-map",
+    meta: { title: "台北車站地下導航" },
     component: () => import("../views/StationMapView.vue"),
   },
 ];
@@ -32,6 +34,11 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+});
+
+// TownPass shows the WebView document title in its native app bar.
+router.afterEach((to) => {
+  document.title = to.meta?.title || "北車不迷路";
 });
 
 export default router;
