@@ -70,76 +70,87 @@
                   {{ floors[level].name }}
                 </h2>
               </div>
+            </header>
+
+            <div class="map-stage">
               <div class="compass" aria-label="北方朝上略偏左" role="img">
                 <span>N</span>
                 <svg viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 3 20 21l-8-4-8 4Z" />
                 </svg>
               </div>
-            </header>
-
-            <div
-              ref="viewport"
-              class="map-viewport"
-              :class="{ 'map-zoomed': zoom > 1 }"
-              :style="{ '--map-aspect': bounds[2] + ' / ' + bounds[3] }"
-              role="region"
-              :aria-label="level + ' 互動地圖，放大後可滑動查看'"
-              :tabindex="zoom > 1 ? 0 : -1"
-            >
-              <div class="map-board" :style="{ width: zoom * 100 + '%' }">
-                <svg
-                  class="floor-plan"
-                  :viewBox="bounds.join(' ')"
-                  role="img"
-                  :aria-label="level + ' 平面示意圖'"
-                >
-                  <g
-                    v-for="layer in backgroundLayers"
-                    :key="layer.floor"
-                    class="ghost-layer"
-                    :style="{ '--ghost-ink': layer.color }"
-                    :transform="layer.transform"
-                    aria-hidden="true"
-                  >
-                    <StationFloorPlan :floor="layer.floor" outline-only />
-                  </g>
-                  <g :class="{ 'active-with-layers': backgroundLayers.length }">
-                    <StationFloorPlan :floor="level" />
-                  </g>
-                </svg>
-                <button
-                  v-for="point in floorPoints"
-                  :key="point.id"
-                  class="map-pin"
-                  :class="{
-                    'pin-themed': matchesTheme(point, activeTheme),
-                    'pin-route': point.id === routeOrigin?.pointId,
-                  }"
-                  type="button"
-                  :style="pinStyle(point)"
-                  :aria-label="point.name"
-                  :aria-pressed="point.id === selected?.id"
-                  @click="togglePoint(point)"
-                  @focus="focusVisiblePin(point, $event)"
-                >
-                  <span
-                    v-if="
-                      matchesTheme(point, activeTheme) ||
-                      point.id === routeOrigin?.pointId
-                    "
-                    class="pin-icon"
-                    ><StationMapIcon :name="point.type"
-                  /></span>
+              <div
+                ref="viewport"
+                class="map-viewport"
+                :class="{ 'map-zoomed': zoom > 1 }"
+                :style="{ '--map-aspect': bounds[2] + ' / ' + bounds[3] }"
+                role="region"
+                :aria-label="level + ' 互動地圖，可用加減鍵縮放，0 鍵重設'"
+                aria-describedby="map-gesture-help"
+                tabindex="0"
+                @wheel="zoomWithWheel"
+                @touchstart="startPinch"
+                @touchmove="movePinch"
+                @touchend="endPinch"
+                @touchcancel="endPinch"
+                @keydown.self="zoomWithKeyboard"
+              >
+                <div class="map-board" :style="{ width: zoom * 100 + '%' }">
                   <svg
-                    v-else
-                    class="point-dot"
-                    viewBox="0 0 12 12"
-                    aria-hidden="true"
+                    class="floor-plan"
+                    :viewBox="bounds.join(' ')"
+                    role="img"
+                    :aria-label="level + ' 平面示意圖'"
                   >
-                    <circle cx="6" cy="6" r="5" />
+                    <g
+                      v-for="layer in backgroundLayers"
+                      :key="layer.floor"
+                      class="ghost-layer"
+                      :style="{ '--ghost-ink': layer.color }"
+                      :transform="layer.transform"
+                      aria-hidden="true"
+                    >
+                      <StationFloorPlan :floor="layer.floor" outline-only />
+                    </g>
+                    <g
+                      :class="{ 'active-with-layers': backgroundLayers.length }"
+                    >
+                      <StationFloorPlan :floor="level" />
+                    </g>
                   </svg>
-                </button>
+                  <button
+                    v-for="point in floorPoints"
+                    :key="point.id"
+                    class="map-pin"
+                    :class="{
+                      'pin-themed': matchesTheme(point, activeTheme),
+                      'pin-route': point.id === routeOrigin?.pointId,
+                    }"
+                    type="button"
+                    :style="pinStyle(point)"
+                    :aria-label="point.name"
+                    :aria-pressed="point.id === selected?.id"
+                    @click="togglePoint(point)"
+                    @focus="focusVisiblePin(point, $event)"
+                  >
+                    <span
+                      v-if="
+                        matchesTheme(point, activeTheme) ||
+                        point.id === routeOrigin?.pointId
+                      "
+                      class="pin-icon"
+                      ><StationMapIcon :name="point.type"
+                    /></span>
+                    <svg
+                      v-else
+                      class="point-dot"
+                      viewBox="0 0 12 12"
+                      aria-hidden="true"
+                    >
+                      <circle cx="6" cy="6" r="5" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -156,32 +167,10 @@
               <span v-else>{{
                 zoom === 1 ? "選擇設施主題來顯示圖標" : "滑動地圖查看其他位置"
               }}</span>
-              <div class="zoom-controls" role="group" aria-label="地圖縮放">
-                <button
-                  type="button"
-                  aria-label="縮小地圖"
-                  :disabled="zoom === 1"
-                  @click="setZoom(zoom - 0.5)"
-                >
-                  <StationMapIcon name="minus" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="重設地圖縮放"
-                  :disabled="zoom === 1"
-                  @click="setZoom(1)"
-                >
-                  <StationMapIcon name="reset" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="放大地圖"
-                  :disabled="zoom === 3"
-                  @click="setZoom(zoom + 0.5)"
-                >
-                  <StationMapIcon name="plus" />
-                </button>
-              </div>
+              <span id="map-gesture-help" class="map-gesture-help">
+                <span class="map-gesture-touch">雙指捏合縮放</span>
+                <span class="map-gesture-wheel">滑鼠滾輪縮放</span>
+              </span>
             </div>
             <div
               v-if="backgroundLayers.length"
@@ -470,6 +459,8 @@ const activeTheme = ref(null);
 const selected = ref(null);
 const zoom = ref(1);
 const viewport = ref(null);
+let pinch = null;
+let zoomRevision = 0;
 const mapSection = ref(null);
 const startZone = ref("");
 const targetZone = ref("");
@@ -623,15 +614,126 @@ function focusVisiblePin(point, event) {
   }
 }
 
-async function setZoom(level) {
+function constrainZoom(scale) {
+  return Math.min(3, Math.max(1, scale));
+}
+
+function viewportPoint(clientX, clientY) {
+  const frame = viewport.value;
+  const rect = frame.getBoundingClientRect();
+  return [
+    clientX - rect.left - frame.clientLeft,
+    clientY - rect.top - frame.clientTop,
+  ];
+}
+
+function zoomAnchor([x, y]) {
   const frame = viewport.value;
   const board = frame.firstElementChild;
-  const x = (frame.scrollLeft + frame.clientWidth / 2) / board.clientWidth;
-  const y = (frame.scrollTop + frame.clientHeight / 2) / board.clientHeight;
-  zoom.value = level;
+  return [
+    (frame.scrollLeft + x) / board.clientWidth,
+    (frame.scrollTop + y) / board.clientHeight,
+  ];
+}
+
+async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
+  const frame = viewport.value;
+  const board = frame.firstElementChild;
+  const revision = ++zoomRevision;
+  zoom.value = scale;
   await nextTick();
-  if (level === 1) frame.scrollTo(0, 0);
-  else centerOn(...(selected.value ? normalizedPoint(selected.value) : [x, y]));
+  if (revision !== zoomRevision || !frame.isConnected) return;
+  if (scale === 1) frame.scrollTo(0, 0);
+  else
+    frame.scrollTo(
+      anchor[0] * board.clientWidth - x,
+      anchor[1] * board.clientHeight - y
+    );
+}
+
+function resetZoom() {
+  pinch = null;
+  return zoomAt(1, [0, 0], [0, 0]);
+}
+
+function zoomWithWheel(event) {
+  if (
+    event.ctrlKey ||
+    event.metaKey ||
+    event.shiftKey ||
+    Math.abs(event.deltaX) > Math.abs(event.deltaY)
+  )
+    return;
+  const unit =
+    event.deltaMode === 1
+      ? 16
+      : event.deltaMode === 2
+      ? viewport.value.clientHeight
+      : 1;
+  const scale = constrainZoom(
+    zoom.value * Math.exp((-event.deltaY * unit) / 600)
+  );
+  if (scale === zoom.value) return;
+  event.preventDefault();
+  zoomAt(scale, viewportPoint(event.clientX, event.clientY));
+}
+
+function pinchPosition(event) {
+  const touches = Array.from(event.touches).filter((touch) =>
+    viewport.value.contains(touch.target)
+  );
+  if (touches.length !== 2) return null;
+  const [first, second] = touches;
+  const distance = Math.hypot(
+    first.clientX - second.clientX,
+    first.clientY - second.clientY
+  );
+  if (distance === 0) return null;
+  const center = viewportPoint(
+    (first.clientX + second.clientX) / 2,
+    (first.clientY + second.clientY) / 2
+  );
+  return { distance, center };
+}
+
+function startPinch(event) {
+  const position = pinchPosition(event);
+  if (!position) return;
+  if (event.cancelable) event.preventDefault();
+  pinch = {
+    distance: position.distance,
+    scale: zoom.value,
+    anchor: zoomAnchor(position.center),
+  };
+}
+
+function movePinch(event) {
+  if (!pinch) return;
+  const position = pinchPosition(event);
+  if (!position) return;
+  if (event.cancelable) event.preventDefault();
+  const scale = constrainZoom(
+    (pinch.scale * position.distance) / pinch.distance
+  );
+  zoomAt(scale, position.center, pinch.anchor);
+}
+
+function endPinch() {
+  pinch = null;
+}
+
+function zoomWithKeyboard(event) {
+  if (event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.key === "0") {
+    event.preventDefault();
+    resetZoom();
+    return;
+  }
+  if (event.key !== "+" && event.key !== "=" && event.key !== "-") return;
+  event.preventDefault();
+  const frame = viewport.value;
+  const scale = constrainZoom(zoom.value + (event.key === "-" ? -0.5 : 0.5));
+  zoomAt(scale, [frame.clientWidth / 2, frame.clientHeight / 2]);
 }
 
 async function showFloor(floor) {
@@ -644,12 +746,12 @@ async function showFloor(floor) {
   routeMessage.value = "";
   if (!availableThemes.value.includes(activeTheme.value))
     activeTheme.value = null;
-  await setZoom(1);
+  await resetZoom();
 }
 
 function toggleLayers() {
   showLayers.value = !showLayers.value;
-  setZoom(1);
+  resetZoom();
 }
 
 function togglePoint(point) {
