@@ -64,6 +64,11 @@
       "name": "QR 定位點",
       "colorToken": "primary-900",
       "iconColor": "#244e57"
+    },
+    "platform": {
+      "name": "月台",
+      "colorToken": "primary-900",
+      "iconColor": "#AC3BFF"
     }
   },
   "points": {
@@ -814,6 +819,310 @@
           "outline": 0,
           "edge": 14,
           "fraction": 0.85455206222409
+        }
+      },
+      {
+        "id": "b2-tra-4-qr-01",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 4 號月台北側 QR 1 號示意定位點",
+        "x": 357.5,
+        "y": 582.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-4",
+        "boundary": {
+          "outline": 1,
+          "edge": 0,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-tra-4-qr-02",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 4 號月台北側 QR 2 號示意定位點",
+        "x": 832.5,
+        "y": 547.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-4",
+        "boundary": {
+          "outline": 1,
+          "edge": 0,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-tra-4-qr-03",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 4 號月台南側 QR 3 號示意定位點",
+        "x": 832.5,
+        "y": 627.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-4",
+        "boundary": {
+          "outline": 1,
+          "edge": 2,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-tra-4-qr-04",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 4 號月台南側 QR 4 號示意定位點",
+        "x": 357.5,
+        "y": 662.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-4",
+        "boundary": {
+          "outline": 1,
+          "edge": 2,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-tra-3-qr-01",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 3 號月台北側 QR 1 號示意定位點",
+        "x": 357.5,
+        "y": 692.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-3",
+        "boundary": {
+          "outline": 2,
+          "edge": 0,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-tra-3-qr-02",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 3 號月台北側 QR 2 號示意定位點",
+        "x": 832.5,
+        "y": 657.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-3",
+        "boundary": {
+          "outline": 2,
+          "edge": 0,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-tra-3-qr-03",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 3 號月台南側 QR 3 號示意定位點",
+        "x": 832.5,
+        "y": 737.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-3",
+        "boundary": {
+          "outline": 2,
+          "edge": 2,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-tra-3-qr-04",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "臺鐵 3 號月台南側 QR 4 號示意定位點",
+        "x": 357.5,
+        "y": 772.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "tra-3",
+        "boundary": {
+          "outline": 2,
+          "edge": 2,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-hsr-2-qr-01",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 2 號月台北側 QR 1 號示意定位點",
+        "x": 357.5,
+        "y": 802.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-2",
+        "boundary": {
+          "outline": 3,
+          "edge": 0,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-hsr-2-qr-02",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 2 號月台北側 QR 2 號示意定位點",
+        "x": 832.5,
+        "y": 767.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-2",
+        "boundary": {
+          "outline": 3,
+          "edge": 0,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-hsr-2-qr-03",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 2 號月台南側 QR 3 號示意定位點",
+        "x": 832.5,
+        "y": 847.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-2",
+        "boundary": {
+          "outline": 3,
+          "edge": 2,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-hsr-2-qr-04",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 2 號月台南側 QR 4 號示意定位點",
+        "x": 357.5,
+        "y": 882.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-2",
+        "boundary": {
+          "outline": 3,
+          "edge": 2,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-hsr-1-qr-01",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 1 號月台北側 QR 1 號示意定位點",
+        "x": 357.5,
+        "y": 912.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-1",
+        "boundary": {
+          "outline": 4,
+          "edge": 0,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-hsr-1-qr-02",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 1 號月台北側 QR 2 號示意定位點",
+        "x": 832.5,
+        "y": 877.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-1",
+        "boundary": {
+          "outline": 4,
+          "edge": 0,
+          "fraction": 0.75
+        }
+      },
+      {
+        "id": "b2-hsr-1-qr-03",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 1 號月台南側 QR 3 號示意定位點",
+        "x": 832.5,
+        "y": 957.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-1",
+        "boundary": {
+          "outline": 4,
+          "edge": 2,
+          "fraction": 0.25
+        }
+      },
+      {
+        "id": "b2-hsr-1-qr-04",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
+        "name": "高鐵 1 號月台南側 QR 4 號示意定位點",
+        "x": 357.5,
+        "y": 992.5,
+        "description": "月台邊界上的示意定位點，尚未現地設置；位置與通行關係待現場核對。",
+        "zone": null,
+        "placement": "boundary-demo",
+        "platformId": "hsr-1",
+        "boundary": {
+          "outline": 4,
+          "edge": 2,
+          "fraction": 0.75
         }
       }
     ],

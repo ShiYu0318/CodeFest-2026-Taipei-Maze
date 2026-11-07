@@ -52,6 +52,7 @@ export default {
   "zone.b3-red": "Tamsui-Xinyi Line concourse",
   "zone.b4-platform": "Tamsui-Xinyi Line platform",
 
+  "type.platform": "Platform",
   "type.elevator": "Elevator",
   "type.restroom": "Restroom",
   "type.nursing": "Nursing room",

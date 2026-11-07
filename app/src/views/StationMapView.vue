@@ -181,7 +181,11 @@
                   @lostpointercapture="endMapDrag"
                   @click.capture="ignoreDragClick"
                 >
-                  <div class="map-board" :style="{ '--map-zoom': zoom }">
+                  <div
+                    ref="mapBoard"
+                    class="map-board"
+                    :style="{ '--map-zoom': zoom }"
+                  >
                     <svg
                       class="floor-plan"
                       :viewBox="bounds.join(' ')"
@@ -263,6 +267,13 @@
                           class="point-icon"
                           :name="pointIconType(point)"
                         />
+                      </span>
+                      <span
+                        v-if="platformIcons[point.id]"
+                        class="point-pin pin-platform-icon"
+                        :style="platformIcons[point.id]"
+                      >
+                        <StationMapIcon class="point-icon" name="platform" />
                       </span>
                       <span
                         v-if="point.id === scanPositionId"
@@ -482,7 +493,8 @@ import {
   navigationPointVisible,
 } from "../station/navigation-view.mjs";
 import { hasSeenMapTour, rememberMapTour } from "../station/map-tour.mjs";
-import { floors, stackBounds } from "./station-floor-plans.mjs";
+import { boundarySegments, insetBoundaryMarker } from "../station/boundary.mjs";
+import { floors, plans, stackBounds } from "./station-floor-plans.mjs";
 import stationData from "./station-points.json";
 import stationConnections from "./station-connections.json";
 import { zones, transfersFromPoint } from "./station-routing";
@@ -629,6 +641,9 @@ const webkitGestures = ["gesturestart", "gesturechange", "gestureend"];
 const mapSection = ref(null);
 const mapStage = ref(null);
 const mapTop = ref(0);
+const mapBoard = ref(null);
+const mapBoardWidth = ref(0);
+let mapBoardObserver;
 const location = useStationLocation(stationData, stationConnections);
 const navigationMap = computed(() =>
   navigationMapState(location.view.value, {
@@ -701,6 +716,10 @@ watch(displayMode, async () => {
 
 onMounted(() => {
   updateMapLayout();
+  mapBoardObserver = new ResizeObserver(([entry]) => {
+    mapBoardWidth.value = entry.contentRect.width;
+  });
+  mapBoardObserver.observe(mapBoard.value);
   window.addEventListener("resize", updateMapLayout);
   mobileZoomQuery.addEventListener("change", enforceZoomLimit);
   document.addEventListener("touchstart", startPinch, captureGesture);
@@ -717,6 +736,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  mapBoardObserver?.disconnect();
   scanFocusRevision++;
   zoomRevision++;
   window.removeEventListener("resize", updateMapLayout);
@@ -759,6 +779,17 @@ const bounds = computed(() => {
   const halfWidth = Math.max(x - left, left + width - x);
   const halfHeight = Math.max(y - top, top + height - y);
   return [x - halfWidth, y - halfHeight, 2 * halfWidth, 2 * halfHeight];
+});
+const platformIcons = computed(() => {
+  const scale = mapBoardWidth.value / bounds.value[2];
+  const platforms = floorPoints.value.filter(
+    (point) => point.boundary && matchesTheme(point, "platform")
+  );
+  if (!scale || !platforms.length) return {};
+  const edges = boundarySegments(plans[level.value]);
+  return Object.fromEntries(
+    platforms.map((point) => [point.id, platformIconStyle(point, edges, scale)])
+  );
 });
 const backgroundLayers = computed(() => {
   if (!showLayers.value) return [];
@@ -896,6 +927,32 @@ function pinStyle(point) {
   };
 }
 
+function platformIconStyle(point, edges, scale) {
+  const enlarged = displayMode.value === "senior";
+  const active =
+    point.id === selected.value?.id || point.id === mapCurrentPoint.value?.id;
+  // Allow for the primary marker's outer ring when the QR point is selected.
+  const qrRadius = (active ? 26 : 7) * (enlarged ? 2 : 1);
+  for (const iconScale of enlarged ? [2, 1] : [1]) {
+    const radius = 7 * iconScale;
+    const offset = insetBoundaryMarker(
+      point,
+      edges,
+      (qrRadius + radius + 2) / scale,
+      (radius + 1) / scale
+    );
+    if (offset) {
+      return {
+        left: `calc(50% + ${offset[0] * scale}px)`,
+        top: `calc(50% + ${offset[1] * scale}px)`,
+        "--marker-base-color": categories.platform.iconColor,
+        "--platform-icon-scale": iconScale,
+      };
+    }
+  }
+  return null;
+}
+
 function endpointBadge(point) {
   const start =
     point.id === mapCurrentPoint.value?.id ? t("map.badgeStart") : "";
@@ -908,6 +965,7 @@ function mapPointLabel(point) {
   const badge = endpointBadge(point);
   return (
     pointName(point) +
+    (matchesTheme(point, "platform") ? "・" + t("type.platform") : "") +
     (badge ? "・" + badge : "") +
     (point.id === scanPositionId.value
       ? t(

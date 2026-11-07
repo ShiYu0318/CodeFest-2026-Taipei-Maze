@@ -113,10 +113,16 @@ export default {
   fill: var(--tp-gray-50);
 }
 .plan-red {
-  fill: var(--tp-secondary-200);
+  fill: #d12d33;
+  fill-opacity: 0.22;
+  stroke: #d12d33;
+  stroke-width: 3;
 }
 .plan-blue {
-  fill: var(--tp-primary-200);
+  fill: #0072c6;
+  fill-opacity: 0.2;
+  stroke: #0072c6;
+  stroke-width: 3;
 }
 .plan-stairs {
   fill: var(--tp-surface);

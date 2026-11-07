@@ -17,6 +17,7 @@ import * as scan from "../src/station/scan.mjs";
 import * as mapFocus from "../src/station/map-focus.mjs";
 import * as mapTour from "../src/station/map-tour.mjs";
 import * as about from "../src/about/about.mjs";
+import * as boundary from "../src/station/boundary.mjs";
 import * as locationHook from "../src/station/useStationLocation.js";
 import { createStationLocation } from "../src/station/location.mjs";
 import { iosWebMessageData } from "./helpers/ios-web-message.mjs";
@@ -84,6 +85,7 @@ function component(name) {
     "map-focus.mjs": mapFocus,
     "map-tour.mjs": mapTour,
     "about.mjs": about,
+    "boundary.mjs": boundary,
     useStationLocation: locationHook,
     "station-routing": {
       zones: connections.zones,
