@@ -30,7 +30,7 @@ export default {
   "tour.contrast":
     "Turn on high contrast to make text and borders easier to distinguish.",
   "tour.mode":
-    "Choose Standard, Child, or Senior to adjust text size and appearance.",
+    "Choose Default, Child, or Older adults to adjust text size and appearance.",
   "lang.label": "Language",
   "display.group": "Display settings",
   "display.dark": "Dark mode",
@@ -38,9 +38,9 @@ export default {
   "display.toDark": "Switch to dark mode",
   "display.contrast": "High contrast",
   "display.mode": "Interface mode",
-  "display.standard": "Standard",
+  "display.standard": "Default",
   "display.child": "Kids",
-  "display.senior": "Senior",
+  "display.senior": "Older adults",
 
   "floor.B1": "Basement 1",
   "floor.B2": "Basement 2",

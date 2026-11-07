@@ -30,7 +30,7 @@ export default {
   "tour.contrast":
     "Bật độ tương phản cao để dễ phân biệt chữ và đường viền hơn.",
   "tour.mode":
-    "Chọn chế độ Tiêu chuẩn, Trẻ em hoặc Người cao tuổi để điều chỉnh cỡ chữ và hiển thị.",
+    "Chọn chế độ Mặc định, Trẻ em hoặc Người cao tuổi để điều chỉnh cỡ chữ và hiển thị.",
   "lang.label": "Ngôn ngữ",
   "display.group": "Cài đặt hiển thị",
   "display.dark": "Chế độ tối",
@@ -38,7 +38,7 @@ export default {
   "display.toDark": "Chuyển sang chế độ tối",
   "display.contrast": "Tương phản cao",
   "display.mode": "Chế độ giao diện",
-  "display.standard": "Tiêu chuẩn",
+  "display.standard": "Mặc định",
   "display.child": "Trẻ em",
   "display.senior": "Người cao tuổi",
 

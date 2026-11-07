@@ -27,7 +27,7 @@ export default {
   "tour.theme": "밝은 화면과 어두운 화면을 전환하세요.",
   "tour.contrast": "고대비를 켜면 글자와 테두리가 더 뚜렷해져요.",
   "tour.mode":
-    "표준, 어린이, 시니어 모드를 골라 글자 크기와 표시 방식을 조정하세요.",
+    "기본, 어린이, 시니어 모드를 골라 글자 크기와 표시 방식을 조정하세요.",
   "lang.label": "언어",
   "display.group": "화면 설정",
   "display.dark": "다크 모드",
@@ -35,7 +35,7 @@ export default {
   "display.toDark": "다크 모드로 전환",
   "display.contrast": "고대비",
   "display.mode": "화면 모드",
-  "display.standard": "표준",
+  "display.standard": "기본",
   "display.child": "어린이",
   "display.senior": "어르신",
 

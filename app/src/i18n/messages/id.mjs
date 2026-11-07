@@ -30,7 +30,7 @@ export default {
   "tour.contrast":
     "Aktifkan kontras tinggi agar teks dan garis tepi lebih mudah terlihat.",
   "tour.mode":
-    "Pilih Standar, Anak, atau Lansia untuk menyesuaikan ukuran teks dan tampilan.",
+    "Pilih Default, Anak, atau Lansia untuk menyesuaikan ukuran teks dan tampilan.",
   "lang.label": "Bahasa",
   "display.group": "Pengaturan tampilan",
   "display.dark": "Mode gelap",
@@ -38,7 +38,7 @@ export default {
   "display.toDark": "Beralih ke mode gelap",
   "display.contrast": "Kontras tinggi",
   "display.mode": "Mode tampilan",
-  "display.standard": "Standar",
+  "display.standard": "Default",
   "display.child": "Anak",
   "display.senior": "Lansia",
 

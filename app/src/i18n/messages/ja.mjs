@@ -28,7 +28,7 @@ export default {
   "tour.theme": "ライト表示とダーク表示を切り替えます。",
   "tour.contrast": "ハイコントラストにすると、文字や枠線が見やすくなります。",
   "tour.mode":
-    "標準、子ども、シニアからモードを選び、文字の大きさや表示を調整します。",
+    "デフォルト、子ども、シニアからモードを選び、文字の大きさや表示を調整します。",
   "lang.label": "言語",
   "display.group": "表示設定",
   "display.dark": "ダークモード",
@@ -36,7 +36,7 @@ export default {
   "display.toDark": "ダークモードに切り替え",
   "display.contrast": "ハイコントラスト",
   "display.mode": "表示モード",
-  "display.standard": "標準",
+  "display.standard": "デフォルト",
   "display.child": "こども",
   "display.senior": "シニア",
 
