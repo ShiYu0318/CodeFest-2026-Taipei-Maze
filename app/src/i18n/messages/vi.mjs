@@ -397,7 +397,7 @@ export default {
   "about.compGemma": "Google Gemma 3 1B (tải tùy chọn)",
   "about.compTownpass": "Ứng dụng nền TownPass",
   "chat.think.title": "Đang suy nghĩ…",
-  "chat.think.done": "Đã suy nghĩ {seconds} giây",
+  "chat.think.done": "Tóm tắt xử lý · {seconds} giây",
   "chat.think.understand": "Hiểu câu hỏi của bạn",
   "chat.think.searchPlaces": "Tra dữ liệu nhà ga: tìm thấy {count} {type}",
   "chat.think.searchExit": "Tìm các điểm hướng về lối ra {code}: {count}",

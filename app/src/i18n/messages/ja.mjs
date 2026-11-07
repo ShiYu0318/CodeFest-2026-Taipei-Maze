@@ -402,7 +402,7 @@ export default {
   "about.compGemma": "Google Gemma 3 1B（任意ダウンロード）",
   "about.compTownpass": "TownPass ホストアプリ",
   "chat.think.title": "考えています…",
-  "chat.think.done": "{seconds}秒考えました",
+  "chat.think.done": "処理の概要 · {seconds}秒",
   "chat.think.understand": "質問を理解しています",
   "chat.think.searchPlaces": "駅のデータを検索：{type}が{count}か所",
   "chat.think.searchExit": "{code}出口方向の場所を検索：{count}か所",

@@ -4,7 +4,8 @@
 //   { type: "delta", text }   — the next slice of the reply
 //   { type: "done", places }  — the reply is complete
 // The thinking steps describe what the offline engine really did (which data
-// it searched and what it found); they are not decorative filler.
+// it searched and what it found). The answer is already computed: delays
+// animate its processing summary, and are not measured inference timings.
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 

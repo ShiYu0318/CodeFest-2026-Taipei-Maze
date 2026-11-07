@@ -398,7 +398,7 @@ export default {
   "about.compGemma": "Google Gemma 3 1B (optional download)",
   "about.compTownpass": "TownPass host app",
   "chat.think.title": "Thinking…",
-  "chat.think.done": "Thought for {seconds}s",
+  "chat.think.done": "Processing summary · {seconds}s",
   "chat.think.understand": "Understanding your question",
   "chat.think.searchPlaces": "Searched station data: found {count} {type}",
   "chat.think.searchExit": "Looked for places toward exit {code}: {count}",

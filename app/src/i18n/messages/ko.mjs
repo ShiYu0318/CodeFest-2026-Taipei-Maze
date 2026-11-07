@@ -391,7 +391,7 @@ export default {
   "about.compGemma": "Google Gemma 3 1B(선택 다운로드)",
   "about.compTownpass": "TownPass 호스트 앱",
   "chat.think.title": "생각하는 중…",
-  "chat.think.done": "{seconds}초 동안 생각함",
+  "chat.think.done": "처리 요약 · {seconds}초",
   "chat.think.understand": "질문 이해하기",
   "chat.think.searchPlaces": "역 데이터 검색: {type} {count}곳 찾음",
   "chat.think.searchExit": "{code} 출구 방향 장소 찾기: {count}곳",

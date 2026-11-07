@@ -407,7 +407,7 @@ export default {
   "about.compGemma": "Google Gemma 3 1B (unduhan opsional)",
   "about.compTownpass": "Aplikasi induk TownPass",
   "chat.think.title": "Sedang berpikir…",
-  "chat.think.done": "Berpikir selama {seconds} detik",
+  "chat.think.done": "Ringkasan pemrosesan · {seconds} detik",
   "chat.think.understand": "Memahami pertanyaan Anda",
   "chat.think.searchPlaces": "Mencari data stasiun: ditemukan {count} {type}",
   "chat.think.searchExit": "Mencari tempat menuju pintu keluar {code}: {count}",

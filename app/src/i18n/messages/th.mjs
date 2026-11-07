@@ -379,7 +379,7 @@ export default {
   "about.compGemma": "Google Gemma 3 1B (ดาวน์โหลดเพิ่มได้)",
   "about.compTownpass": "แอปหลัก TownPass",
   "chat.think.title": "กำลังคิด…",
-  "chat.think.done": "คิดอยู่ {seconds} วินาที",
+  "chat.think.done": "สรุปการประมวลผล · {seconds} วินาที",
   "chat.think.understand": "ทำความเข้าใจคำถาม",
   "chat.think.searchPlaces": "ค้นข้อมูลสถานี: พบ{type} {count} แห่ง",
   "chat.think.searchExit": "ค้นจุดที่ไปทางออก {code}: {count} แห่ง",

@@ -353,7 +353,7 @@ export default {
   "about.compGemma": "Google Gemma 3 1B（選配下載）",
   "about.compTownpass": "台北通 TownPass 宿主",
   "chat.think.title": "思考中…",
-  "chat.think.done": "已思考 {seconds} 秒",
+  "chat.think.done": "處理摘要 · {seconds} 秒",
   "chat.think.understand": "理解你的問題",
   "chat.think.searchPlaces": "查詢車站資料：找到 {count} 處{type}",
   "chat.think.searchExit": "查詢往 {code} 出口方向的地點：{count} 處",

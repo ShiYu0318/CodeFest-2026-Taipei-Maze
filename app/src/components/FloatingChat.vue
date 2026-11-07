@@ -177,6 +177,8 @@
                       ? t("chat.think.done", {
                           seconds: message.thinking.seconds,
                         })
+                      : message.thinking.state === "cancelled"
+                      ? t("chat.error.cancelled")
                       : t("chat.think.title")
                   }}</span>
                   <span class="maze-chat-chev" aria-hidden="true"></span>
@@ -527,6 +529,9 @@ async function open() {
 function close() {
   epoch++;
   streamControl?.abort();
+  for (const reply of messages.value.filter((item) => item.streaming))
+    stopReply(reply);
+  streamControl = null;
   bridge.cancelAll();
   bridge.request("unload");
   busy.value = false;
@@ -599,6 +604,17 @@ function finishThinking(reply) {
     (performance.now() - reply.thinking.startedAt) / 1000
   ).toFixed(1);
 }
+function stopReply(reply) {
+  reply.streaming = false;
+  if (reply.thinking.state === "active") {
+    reply.thinking.state = "cancelled";
+    reply.thinking.open = false;
+    for (const step of reply.thinking.steps)
+      if (step.state === "active") step.state = "cancelled";
+  }
+  if (!reply.text)
+    messages.value = messages.value.filter((item) => item !== reply);
+}
 async function playLocal(reply, answer, signal) {
   const fast = reducedMotion();
   for await (const event of streamLocalAnswer(answer, i18n, {
@@ -622,7 +638,7 @@ async function playLocal(reply, answer, signal) {
     }
   }
 }
-async function playModel(reply, prompt, current) {
+async function playModel(reply, prompt, current, signal) {
   applyStep(reply, {
     id: "understand",
     label: t("chat.think.understand"),
@@ -640,7 +656,7 @@ async function playModel(reply, prompt, current) {
     {
       // SSE-style partial chunks from the on-device model, when available.
       onPartial(part) {
-        if (current !== epoch) return;
+        if (current !== epoch || signal.aborted || reducedMotion()) return;
         streamed = true;
         finishThinking(reply);
         reply.text += part;
@@ -648,7 +664,7 @@ async function playModel(reply, prompt, current) {
       },
     }
   );
-  if (current !== epoch || !opened.value) return null;
+  if (current !== epoch || !opened.value || signal.aborted) return null;
   if (
     result.status !== "success" ||
     typeof result.text !== "string" ||
@@ -660,12 +676,13 @@ async function playModel(reply, prompt, current) {
     // Older hosts send one final reply: reveal it progressively anyway.
     reply.text = "";
     for (const part of chunkText(result.text, 2)) {
-      if (current !== epoch || streamControl?.signal.aborted) break;
+      if (current !== epoch || signal.aborted) return null;
       reply.text += part;
       scroll();
       await new Promise((resolve) => setTimeout(resolve, 18));
     }
   }
+  if (current !== epoch || signal.aborted) return null;
   reply.text = result.text;
   return result;
 }
@@ -705,7 +722,12 @@ async function send() {
         languageName: LOCALES.find((item) => item.code === uiLocale.value)
           ?.nativeName,
       });
-      const result = await playModel(reply, prompt, current);
+      const result = await playModel(
+        reply,
+        prompt,
+        current,
+        streamControl.signal
+      );
       if (result && result.status !== "success") {
         messages.value = messages.value.filter((item) => item !== reply);
         notice.value = explain(result);
@@ -717,16 +739,18 @@ async function send() {
     }
   } finally {
     if (current === epoch) {
-      if (streamControl?.signal.aborted && !reply.text) {
-        messages.value = messages.value.filter((item) => item !== reply);
-        notice.value = t("chat.error.cancelled");
+      if (streamControl?.signal.aborted) {
+        stopReply(reply);
+        if (!reply.text) notice.value = t("chat.error.cancelled");
+      } else {
+        finishThinking(reply);
+        reply.streaming = false;
       }
-      finishThinking(reply);
-      reply.streaming = false;
       busy.value = false;
       streamControl = null;
     }
   }
+  if (current !== epoch || !opened.value) return;
   scroll();
   await nextTick();
   grow();
@@ -1053,7 +1077,8 @@ onBeforeUnmount(() => {
   mask: radial-gradient(circle, transparent 3.5px, #000 4px);
   animation: maze-spin 0.9s linear infinite;
 }
-.maze-chat-thought[data-state="done"] .maze-chat-orb {
+.maze-chat-thought[data-state="done"] .maze-chat-orb,
+.maze-chat-thought[data-state="cancelled"] .maze-chat-orb {
   animation: none;
   background: #2e9a6c;
   -webkit-mask: none;
