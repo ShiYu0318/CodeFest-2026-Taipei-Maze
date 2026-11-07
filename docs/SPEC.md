@@ -1,0 +1,1344 @@
+# Taipei Maze 北車不迷路產品與技術規格
+
+版本：1.0｜制定日期：2026-11-07｜文件狀態：開發規格，尚非完成實作或現場安全認證
+
+本規格將[提案企劃書](./提案企劃書.md)轉為可分工、實作、測試與交付的要求。產品讓旅客掃描 QR Code 確認位置，以局部跨樓層路網規劃路線，再透過一步一圖、多語文字與預生成語音理解下一步。核心承諾是「找得到、走得了、看得懂」，不能用完整功能數量取代路線正確性。
+
+**最新使用者指示優先：介面與語音優先支援繁體中文、英文、越南文、印尼文、泰文、韓文、日文，共七種。** 使用者同時說「五種」與列出七種，本規格依明列清單採七種；「印」依提案原有語言清單解讀為印尼文，不是印地文。若日後更正，需同步更動語系矩陣、資產及驗收，不可只改說明文字。
+
+**來源限制為必要條件：不得使用中國廠牌、模型、服務或相關未經核准資源。** 本文件制定可稽核的選用、來源與打包門檻；不將單看品牌名稱或套件註冊站點視為完整供應鏈證明。語言為繁體中文不等於採用中國供應商。
+
+## 目錄
+
+- [01 文件效力與決策紀錄](#01-文件效力與決策紀錄)
+- [02 產品目標與使用者](#02-產品目標與使用者)
+- [03 交付範圍與優先級](#03-交付範圍與優先級)
+- [04 平台與城市通整合](#04-平台與城市通整合)
+- [05 使用流程與畫面](#05-使用流程與畫面)
+- [06 功能需求](#06-功能需求)
+- [07 導航狀態與一致性](#07-導航狀態與一致性)
+- [08 資料封裝與版本](#08-資料封裝與版本)
+- [09 路網與定位資料契約](#09-路網與定位資料契約)
+- [10 路徑演算法與無障礙](#10-路徑演算法與無障礙)
+- [11 方向與指令生成](#11-方向與指令生成)
+- [12 地圖繪製與樓層](#12-地圖繪製與樓層)
+- [13 七語介面規格](#13-七語介面規格)
+- [14 快速翻譯與語音製作流程](#14-快速翻譯與語音製作流程)
+- [15 離線語音與播放契約](#15-離線語音與播放契約)
+- [16 非中國來源與授權門檻](#16-非中國來源與授權門檻)
+- [17 架構與模組介面](#17-架構與模組介面)
+- [18 例外處理與恢復](#18-例外處理與恢復)
+- [19 非功能需求](#19-非功能需求)
+- [20 隱私與資料安全](#20-隱私與資料安全)
+- [21 P1 認知友善路線與 ML](#21-p1-認知友善路線與-ml)
+- [22 測試資料與案例](#22-測試資料與案例)
+- [23 驗收與證據](#23-驗收與證據)
+- [24 開發分工與時程](#24-開發分工與時程)
+- [25 建置交付與維護](#25-建置交付與維護)
+- [26 競賽展示與評分對齊](#26-競賽展示與評分對齊)
+- [27 未決事項與風險](#27-未決事項與風險)
+- [28 需求追溯與完成定義](#28-需求追溯與完成定義)
+- [29 參考來源](#29-參考來源)
+
+## 01 文件效力與決策紀錄
+
+### 01.1 資料優先順序
+
+1. 使用者本輪明確指示：七語優先及排除中國相關資源。
+2. 提案第 17 章及第 15 章最新功能取捨；第 16 章認知排序維持 P1。
+3. 提案第 13、14 章已確認的 Flutter 與預生成音檔架構。
+4. 提案較早章節的長期願景，僅在不牴觸上述決策時採用。
+5. 本 SPEC 補充的工程預設。這些是為使規格可執行而制定，不代表使用者曾逐項指定。
+
+來源基準為提案最近一次提交 `19182be56d9edab30a66fac12bc8fadf5e09279e`。本文件不修改原提案，不讀取或採用尚未提交的 `map/` 圖片作為已授權底圖。
+
+### 01.2 規範詞與狀態
+
+| 用詞 | 意義 |
+| --- | --- |
+| 必須／不得 | 驗收條件，不符合不得宣稱對應功能已完成 |
+| 應 | 預設實作方式；變更須記錄理由、替代方式及受影響測試 |
+| 可 | 選配，不影響 P0 完成定義 |
+| 工程預設 | 本 SPEC 所選的可執行方案，尚未實機驗證 |
+| 待確認 | 有指定負責人、期限及無法確認時的處置，不得當成已核准 |
+| P0／P1／P2 | 必交閉環／有餘裕擴充／本次不交付 |
+
+### 01.3 關鍵決策
+
+| ID | 決策 | 來源或理由 |
+| --- | --- | --- |
+| ADR-01 | 核心客戶端採 Flutter，路網、地圖、字型與語音本地打包 | 提案已定；城市通交付相容性另設門檻 |
+| ADR-02 | 純 Dart Dijkstra；P0 無後端、無 LLM、無執行期翻譯或 TTS | 提案已定，降低網路與模型依賴 |
+| ADR-03 | P0 七語介面與固定語音；不只三語 | 使用者本輪更新，覆寫原三語 MVP |
+| ADR-04 | 重新掃碼定位為 P0；不能假裝有連續定位 | 提案第 15、17 章 |
+| ADR-05 | 通行條件先做硬性過濾；模型或偏好不得放寬 | 提案已定 |
+| ADR-06 | 位置由掃碼確認，步驟由使用者確認，兩者分開保存 | 工程預設，避免虛構即時位置 |
+| ADR-07 | 狀態用 Riverpod 管理；以介面隔離掃碼、播放與儲存 | 工程預設，實際套件仍須來源及授權審查 |
+| ADR-08 | 開發期翻譯／語音服務採允許清單，首選候選為 Microsoft 全球 Azure 服務 | 工程建議，非已採購或已核准；不得使用中國營運雲或來源不明替代模型 |
+| ADR-09 | 本次建立 SPEC，不代表七語素材、App、資料或測試已完成 | 防止將規格寫作混同實作成果 |
+
+## 02 產品目標與使用者
+
+### 02.1 問題
+
+臺北車站的多樓層、轉乘系統與出口需要使用者自行把平面圖、所在位置、目的地及方向連結起來。產品降低理解與操作負擔，不要求使用者先學會閱讀完整車站圖。
+
+### 02.2 使用者需求
+
+| 需求情境 | 可觀察的障礙 | 產品回應 | 不採用的推論 |
+| --- | --- | --- | --- |
+| 外籍旅客 | 不理解中文文字與地標 | 七語文字、圖示、本地語音、保留站內原文對照 | 不依國籍自動推斷語言 |
+| 兒童或初次使用者 | 難同時記住整張圖及多個步驟 | 簡易模式，一次一動作，具體地標 | 不蒐集年齡，不認定兒童一定無法讀圖 |
+| 數位素養不足 | 搜尋、縮放、選單操作困難 | 大型目的地卡、少層級、明顯的重新掃碼入口 | 不把所有人強制導向簡易模式 |
+| 行動需求不同 | 樓梯、電扶梯或受限通道不可走 | 無障礙硬限制、可驗證電梯路線、無路線提示 | 不以高分數交換不可通行路段 |
+
+### 02.3 成功條件
+
+- 至少兩組不同起訖點能完成掃碼、目的地、跨樓層、步驟、語音、重新定位及抵達流程。
+- 同一組起訖點可展示一般路線與無障礙路線差異，或明確回報無障礙路線不存在。
+- 核心操作不需要輸入文字、不登入、不提供個資；搜尋可選。
+- 七種語言的必要畫面與 24 個核心語音句均有可驗證資產。
+- 實機離線冷啟動與三次連續主流程演練成功，不能只測曾快取的線上版本。
+- 所有實際使用的來源、依賴及音檔權利可追溯；沒有未核准的中國相關資源。
+
+### 02.4 非目標
+
+本次不提供全站覆蓋、GPS／藍牙連續定位、即時設備故障資料、緊急疏散建議、無人確認的安全導航、即時翻譯、即時 TTS、LLM／OCR、360 度環景、完整 Graph Editor、帳號及社群功能。P1 模型不影響 P0。
+
+## 03 交付範圍與優先級
+
+### 03.1 P0 範圍
+
+| 項目 | 最低交付 | 完成證據 |
+| --- | --- | --- |
+| 場域 | 同一連續示範區域的 B1、B2 | 範圍圖、路網及資料說明 |
+| 路網 | 20–30 節點，包含走道、交會、樓梯、電梯及 POI | 資料驗證通過，不以節點數代替有效連通 |
+| QR | 4–6 個不同定位點，其中至少 2 點用於重新定位 | 列印 QR、對照表、實機測試 |
+| 目的地 | 4–6 個，至少涵蓋出口、廁所、電梯 | 每個目的地具可到達節點與多語名稱 |
+| 路線 | 最短可行、無障礙，跨 B1／B2 | 路徑測試與地圖疊圖 |
+| 指引 | 一步一圖、地標、樓層、手動步驟確認 | 指令與路線共用版本 |
+| 自適應 | 標準／簡易；大字、高對比 | 同一任務不同呈現，操作狀態保留 |
+| 重新定位 | 「我迷路了」→ 掃新 QR → 重算 | 同路線前後與偏離節點案例 |
+| 語言 | `zh-TW`、`en`、`vi`、`id`、`th`、`ko`、`ja` | 必要介面翻譯 100%，24 句 × 7＝168 個核心音檔 |
+| 離線 | 路網、地圖、文字、字型、音檔及掃碼元件所需資源本地可用 | 飛航模式冷啟動測試 |
+| 交付 | 可執行版本與經確認的城市通整合方式 | 交付形式確認紀錄 |
+
+節點、QR、目的地數量是最低展示規模，不表示這些資料已存在。若資料未經現場核對，只能標「示意測試場景」，不得以北車真實可通行路線對外發布。
+
+### 03.2 P1
+
+1. 以 Graph 距離找最近廁所／電梯，不使用直線距離代替可達距離。
+2. 規則式「容易理解」候選路線與可解釋差異；有資料再評估 ML。
+3. 語速 0.8／1.0／1.2 倍、較完整的播放佇列、語言包擴充。
+4. 小型志願者可用性測試；只呈現實際樣本與條件。
+
+### 03.3 時間不足的降級規則
+
+先停 P1，再縮減 POI 數、非必要介面裝飾與音檔擴充。不得自行把七語改回三語、略過通行檢查、偽造翻譯已校對或把錯誤導引藏起來。若七語未達標，記錄為未完成項，清楚標示實際支援語系，不能宣稱符合本版 P0。
+
+## 04 平台與城市通整合
+
+### 04.1 工程基準
+
+- 主要驗收載體預設為一台具後鏡頭的 Android 真機與 release APK；此為工程預設，型號與 OS 需在開發第 0–1 小時記錄於測試表。
+- iOS 與 Web 是條件式交付，未測試不得宣稱支援。不得以模擬器代替真機掃碼驗收。
+- Flutter／Dart 版本在初始化時選擇能相容已審查套件的穩定版，寫入工具鏈檔與 lockfile；本文件不虛構已驗證的版本組合。
+- App 核心不需要 HTTP API、資料庫或雲端伺服器。Repo 既有 `compose.yml` 不構成必須新增後端的依據。
+
+### 04.2 城市通交付門檻 GATE-01
+
+產品／整合負責人須於第 0–1 小時取得主辦或官方文件對 Flutter、Flutter Web、原生入口或 Vue 微服務交付方式的明確答案，紀錄來源、日期及接受格式。
+
+| 確認結果 | 執行方式 |
+| --- | --- |
+| 接受 Flutter App 整合 | 維持本規格，實作並測試主辦指定入口 |
+| 接受 Flutter Web | 額外驗證相機、音訊啟動、路由及離線資產，不以 Android 通過代替 Web 通過 |
+| 必須 Vue 3／Vite 微服務 | 在第 1 小時內切換交付端，沿用 JSON、需求 ID 與測試資料；Dart 演算法須移植並重跑相同案例 |
+| 尚未確認 | 可繼續純資料與演算法工作；交付狀態保持 blocked，不能以放上一個下載 APK 的頁面宣稱完成微服務 |
+
+正式服務 URL、deep link scheme、Web base path 均不得先捏造為已核准。站內 QR 使用下文自含識別資料，由 App 內掃碼解析，因此不依賴未定域名。
+
+## 05 使用流程與畫面
+
+### 05.1 主流程
+
+```text
+首次啟動／資料驗證
+  → 選語言與模式
+  → 開相機掃碼
+  → 顯示定位點、樓層與確認時間
+  → 選目的地與路線需求
+  → 規劃路線並顯示概要
+  → 確認出發朝向／地標
+  → 一步一圖導航＋本地語音
+  → 使用者確認下一步／再次掃碼
+  → 新定位後重算，或確認抵達
+```
+
+### 05.2 畫面規格
+
+| 畫面 ID | 主要內容與動作 | 返回與狀態 |
+| --- | --- | --- |
+| SCR-01 啟動 | 載入資產、版本檢查；錯誤時重試或看資料說明 | 驗證失敗不得進導航 |
+| SCR-02 首頁 | 七語切換、標準／簡易、掃碼開始、示範範圍 | 未掃碼不顯示虛構目前位置 |
+| SCR-03 掃碼 | 相機框、手電筒（裝置支援才顯示）、權限提示、取消 | 取消回原畫面，保留既有路線 |
+| SCR-04 位置確認 | 定位點標籤、樓層、地標、來源、時間；確認或重掃 | 明確顯示「上次確認位置」 |
+| SCR-05 目的地 | 4–6 個大卡片、分類圖示、樓層、通行需求開關 | 未定位時引導先掃碼 |
+| SCR-06 路線概要 | 起終點、跨層方式、距離可信度、一般／無障礙差異、開始 | 變更需求重算；失敗保留可重試選擇 |
+| SCR-07 導航 | 大箭頭、單一步驟、地標、樓層、進度、地圖、重播、靜音、下一步、我迷路了 | 返回先詢問是否結束導航，不默默重置 |
+| SCR-08 跨樓層 | 搭乘方式、目標樓層、到層確認或 QR 驗證 | 手動切圖不等於到層 |
+| SCR-09 重新定位 | 暫停語音、掃新 QR、新位置確認、重算結果 | 失敗／取消不得把新位置部分寫入舊路線 |
+| SCR-10 抵達 | 目的地名稱、圖示、確認方式、重新開始 | 只有手動或有效 QR 確認後顯示已抵達 |
+| SCR-11 設定與來源 | 語言、模式、靜音、資料來源／版本／範圍、素材聲明 | 變更呈現不改變路線偏好 |
+| SCR-12 無路線 | 原因分類、重選目的地、重掃、保留目前需求 | 不提供違反無障礙條件的替代路線 |
+
+### 05.3 首次使用與最少操作
+
+預設語系依裝置語言匹配，無匹配時英文；首頁始終可改為繁中或其他六語。首次進入可見七語原文選單，不能要求先讀懂英文。語言記錄本機，介面模式預設標準，語音預設開啟但首次需使用者按「開始導航／播放」觸發。
+
+主流程不要求搜尋鍵盤、不要求讀設定頁。掃碼成功顯示位置後，使用者確認再選目的地，避免誤掃靜默變更起點。
+
+## 06 功能需求
+
+### 06.1 掃碼與位置
+
+| ID | 必要行為 | 驗收條件 |
+| --- | --- | --- |
+| FR-QR-01 | 只接收本專案支援版本的 QR payload | URL、任意字串、錯誤 JSON 不可導向外部頁面 |
+| FR-QR-02 | QR 對應一個場域、路網主版本與 anchor | 不存在、停用、其他場域或不相容版本均明確拒絕 |
+| FR-QR-03 | 連續偵測只產生一個確認事件 | 同一掃描 session 成功後停止掃描；非靠時間延遲當唯一保護 |
+| FR-QR-04 | 權限拒絕可取消、重試或依 OS 前往設定 | 不閃退、不無限彈窗、不謊稱已定位 |
+| FR-QR-05 | 保留掃碼時間、anchor、節點與來源 | 不上傳相機畫面或定位紀錄 |
+| FR-QR-06 | 沒有連續定位時不移動「已確認位置」點 | 使用者按下一步只能改步驟，不能更新掃碼位置 |
+
+### 06.2 目的地與路線
+
+| ID | 必要行為 | 驗收條件 |
+| --- | --- | --- |
+| FR-RT-01 | 起點取自已確認定位，目的地取自 POI | 缺起點、目的地或有效圖時不可開始導航 |
+| FR-RT-02 | 一般模式算最短可行路徑 | 已封閉、方向不符、付費區不符的邊一律排除 |
+| FR-RT-03 | 無障礙模式做硬性過濾 | 不走樓梯、電扶梯、不可及或無障礙未知邊 |
+| FR-RT-04 | 跨樓層只透過有效 connector | 不以相同 x/y 自動連樓層 |
+| FR-RT-05 | 切換無障礙條件重算，不回退一般模式 | 新路線不可行時明確無路線，原路線只可作歷史摘要 |
+| FR-RT-06 | 同起終點立即提供抵達確認 | 不產生零長度轉向或重複路徑 |
+| FR-RT-07 | 路線結果具 requestId、graphVersion、routeRevision | 舊請求較晚完成不可覆蓋新選擇 |
+| FR-RT-08 | 說明距離是公尺或相對距離 | 未校準資料不能顯示「30 公尺／步行幾分鐘」 |
+
+### 06.3 導航與重新定位
+
+| ID | 必要行為 | 驗收條件 |
+| --- | --- | --- |
+| FR-NV-01 | 同時只有一個 active instruction | 文字、箭頭、語音引用同一指令及路線版本 |
+| FR-NV-02 | 步驟由使用者明確確認，保留返回上一步 | 未導入定位感測前不得用計時器自動推進 |
+| FR-NV-03 | 每一步提供具體地標或清楚參照 | 沒有可靠初始朝向時不直接指令「向左」 |
+| FR-NV-04 | 跨層到達必須手動確認或再次掃碼 | 切換地圖不代表使用者已換層 |
+| FR-NV-05 | 「我迷路了」隨時可用 | 在導航畫面一個可見按鈕進入重掃 |
+| FR-NV-06 | 有效新掃碼保留目的地與通行需求，重新規劃 | 不能只剪裁舊路徑而忽略實際新起點 |
+| FR-NV-07 | 抵達須使用者確認，或掃到有效目的地 anchor | 選了最後一步、切到終點樓層不自動宣告實際抵達 |
+| FR-NV-08 | 重掃失敗／取消可回原指引 | 保留舊 routeRevision 與上次確認位置，提示仍未重新定位 |
+
+### 06.4 多語與易讀
+
+| ID | 必要行為 | 驗收條件 |
+| --- | --- | --- |
+| FR-I18N-01 | 七語覆蓋 P0 全部必要介面與指令 | 不顯示 key、空字串或混入未標示的繁中 |
+| FR-I18N-02 | 語言切換即時生效並持久化 | 保留目的地、路線、步驟；停止舊語音再播新語音 |
+| FR-I18N-03 | 地標保留站內原文對照 | 外語名稱與場站實際標示可對照，不自行創造地標 |
+| FR-UI-01 | 標準／簡易切換無需輸入年齡 | 簡易模式確實改變字級、選項密度及下一步呈現 |
+| FR-UI-02 | 圖像、文字、語音可各自理解 | 靜音、音檔缺失或色覺差異不阻斷主流程 |
+| FR-UI-03 | 文字放大、長翻譯與字型缺字可測 | 200% 文字縮放不遮住主要操作；泰文上下標不裁切 |
+
+### 06.5 音訊、離線與來源
+
+| ID | 必要行為 | 驗收條件 |
+| --- | --- | --- |
+| FR-AUD-01 | 導航只播放 assets 預生成音檔 | runtime 無 TTS／翻譯／模型 API |
+| FR-AUD-02 | 重播、播放／暫停與靜音 | 重播從當前指令開頭；暫停不推進導航 |
+| FR-AUD-03 | 新指令與重規劃中止舊語音 | 不交疊播放、不播過期指令 |
+| FR-AUD-04 | 缺檔或解碼錯誤保留文字圖像 | 顯示可理解提示，不偷偷切成使用者未選語言 |
+| FR-OFF-01 | 全部核心資產離線載入 | 首次安裝後未曾連線也可完成主流程 |
+| FR-SRC-01 | 顯示資料版本、覆蓋及驗證狀態 | 示意路網與官方來源分別標示 |
+| FR-SRC-02 | 所有依賴與素材符合來源允許清單 | 未審查資產不得進正式包 |
+| FR-DEL-01 | 完成主辦接受的交付端 | 可啟動 App 不等於已完成城市通微服務整合 |
+
+## 07 導航狀態與一致性
+
+### 07.1 導航狀態
+
+| 狀態 | 允許事件 | 下一狀態及副作用 |
+| --- | --- | --- |
+| booting | assetsValid／assetsInvalid | idle／dataError |
+| idle | startScan | scanning；請求相機權限 |
+| scanning | decoded／cancel／failure | confirmingLocation／原狀態／scanningError |
+| confirmingLocation | confirm／rescan | choosingDestination 或重規劃／scanning |
+| choosingDestination | selectDestination | planning |
+| planning | success／alreadyAtDestination／noRoute／instructionFailure／cancel | routePreview／confirmingArrival／noRoute／guidanceUnavailable／choosingDestination |
+| routePreview | start／changeOptions | orienting／planning |
+| orienting | confirmFacing | navigating；播當前指令 |
+| navigating | next／previous／rescan／changeOptions／finish | navigating／relocating／planning／confirmingArrival |
+| relocating | decoded／cancel／failure | confirmingLocation／navigating／保留待重掃提示 |
+| confirmingArrival | confirm／cancel | arrived／navigating |
+| arrived | newDestination／restart | choosingDestination／idle |
+| noRoute | retry／changeDestination／rescan | planning／choosingDestination／scanning |
+| guidanceUnavailable | retry／changeDestination／rescan | planning／choosingDestination／scanning；可看路線摘要，不可開始導航 |
+| dataError | retry | booting；不保留可執行導航 |
+
+語言、介面模式與靜音是獨立狀態，不因切換語系清除導航。相機權限與音訊狀態不直接決定路線成功或失敗。
+
+### 07.2 Session 欄位
+
+`NavigationSession` 至少保存 `sessionId`、`requestId`、`routeRevision`、`graphVersion`、`confirmedLocation`、`destinationPoiId`、`options`、`activeRoute`、`instructionIndex`、`locale`、`uiMode`、`voiceEnabled`、`arrivalConfirmation`。
+
+`confirmedLocation` 保存 `anchorId`、`nodeId`、`confirmedAt`、`source=qr`；手動展示選點若開放，來源必須為 `demo_manual` 並顯示「示範選點」，不得偽裝為掃碼。`instructionIndex` 表示使用者檢視到哪一步，不能當作感測位置。
+
+### 07.3 事件與原子更新
+
+1. 每次規劃建立新 `requestId`；結果只可套用在相同請求、圖版本與選項。
+2. 規劃成功後，一次更新路線、指令列表、地圖路徑與 `routeRevision`，步驟回到 0。
+3. 進入重掃立即停止舊語音。成功確認新位置後，舊路線標失效並重算；失敗時不得繼續播放舊路線作為新起點指引。
+4. 取消重掃而未確認新位置，回舊路線，顯示上次確認時間並要求使用者手動重播。
+5. 改語言只更新呈現與音訊 token，不改 routeRevision；改通行需求必須重新規劃。
+6. App 進背景停止相機與語音；回前景保留畫面，要求使用者確認繼續，不自動播報或推進。
+7. 程序被終止後 P0 只恢復語言／模式／靜音，不恢復成正在導航；重新掃碼開始。
+
+同起終點是明確特例：收到 alreadyAtDestination 後直接進 confirmingArrival，跳過 routePreview、orienting、導航開始語音與步驟建立；使用者或有效 QR 確認後才播放抵達句。
+
+### 07.4 並行防護
+
+掃碼成功後鎖住該 scanning session；使用者重新開啟掃碼即為新 session，可再次掃同碼。音訊以 `(sessionId, routeRevision, instructionId, locale, generation)` 識別。新事件遞增 generation；舊載入即使晚完成也不能播放。連按「下一步」在提交前鎖住單一 UI 事件，禁止因重繪重複推進。
+
+## 08 資料封裝與版本
+
+### 08.1 檔案分工
+
+```text
+app/
+  assets/
+    manifest.json
+    maps/B1.svg
+    maps/B2.svg
+    data/floors.json
+    data/nodes.json
+    data/edges.json
+    data/pois.json
+    data/qr_anchors.json
+    data/landmarks.json
+    data/orientation_guides.json
+    data/sources.json
+    navigation/voice_manifest.json
+    i18n/zh-TW.json
+    i18n/en.json
+    i18n/vi.json
+    i18n/id.json
+    i18n/th.json
+    i18n/ko.json
+    i18n/ja.json
+    audio/{locale}/{sentence_id}.mp3
+    fonts/{reviewed_font_file}
+  lib/l10n/app_zh_TW.arb
+  lib/l10n/app_en.arb
+  lib/l10n/app_vi.arb
+  lib/l10n/app_id.arb
+  lib/l10n/app_th.arb
+  lib/l10n/app_ko.arb
+  lib/l10n/app_ja.arb
+content/
+  messages.zh-TW.json
+  translations/{locale}.json
+  glossary.json
+  review_status.json
+  voices.lock.json
+  provenance.json
+```
+
+`content/` 是唯一編輯來源。`assets/i18n/` 供動態 POI、地標與導航指令；ARB 供 Flutter UI 及參數化訊息，兩者由同一來源產生，不允許各自手改後分歧。舊提案的 `graph.json` 視為概念名稱，本版正式採分檔資料，由 GraphRepository 載入組合；不維持兩份不同內容的圖。
+
+### 08.2 Package manifest
+
+以下所有 JSON 範例均為規格示例，不是真實北車座標、測量或審查完成證據。
+
+```json
+{
+  "schema_version": "1.0.0",
+  "package_id": "taipei_maze_demo",
+  "site_id": "taipei_main_demo",
+  "graph_version": "1.0.0",
+  "content_version": "1.0.0",
+  "map_version": "1.0.0",
+  "voice_version": "1.0.0",
+  "coordinate_system": "floor_local_xy",
+  "routing_unit": "relative",
+  "validation_mode": "synthetic_demo",
+  "supported_locales": ["zh-TW", "en", "vi", "id", "th", "ko", "ja"],
+  "required_voice_count_per_locale": 24,
+  "entry_points": {
+    "floors": "assets/data/floors.json",
+    "nodes": "assets/data/nodes.json",
+    "edges": "assets/data/edges.json",
+    "pois": "assets/data/pois.json",
+    "anchors": "assets/data/qr_anchors.json",
+    "landmarks": "assets/data/landmarks.json",
+    "orientation_guides": "assets/data/orientation_guides.json",
+    "sources": "assets/data/sources.json",
+    "voices": "assets/navigation/voice_manifest.json"
+  }
+}
+```
+
+正式 manifest 另含 `files` 陣列，每項有 `path`、`sha256`、`byte_size`、`source_ids`；hash 不包含 manifest 自己，避免自我參照。路網、底圖與語音分版，但打包時鎖成一個 package，不在導航途中熱更新。
+
+### 08.3 載入驗證
+
+必須檢查 JSON 可解析、schema major 相容、ID 唯一、引用存在、樓層一致、非負有限成本、方向及 connector 正確、座標在 viewBox、地標存在、七語 key 完整、音檔與檔案 hash 正確。拒絕 `NaN`、無限值、重複邊 ID、重複 anchor ID、空標籤與非法相對路徑。
+
+核心路網或地圖無效則停止導航；單一語音損毀可降級文字但對應語音包標不可用，正式包仍不通過 P0 全功能驗收。未知 schema major 不猜測相容。可接受新增非必要欄位，不能忽略已知欄位的錯誤型別。
+
+## 09 路網與定位資料契約
+
+### 09.1 共通規則
+
+- ID 使用 ASCII 小寫字母、數字、底線，長度 1–64，規則 `^[a-z][a-z0-9_]{0,63}$`；舊提案大寫 ID 在匯入時一次轉換並更新引用，runtime 不模糊比對。
+- 時間用含時區 ISO 8601；資料檔可標 UTC，介面依臺灣時間顯示。
+- 樓層 ID 採 `b1`、`b2`，畫面標籤為 B1／B2；不可將樓層排序當海拔或方向座標。
+- 所有 `*_key` 指向七語文字資源；`source_ids` 指向來源紀錄。
+- `verification_status` 為 `synthetic`、`desk_checked`、`field_checked`；只能根據實際核對證據設定。
+- P0 正式導航要求連續示範路線中的節點、邊及方向指引具符合交付模式的驗證；桌面推估不能寫成現場核對。
+
+### 09.2 Floor
+
+| 欄位 | 型別 | 規則 |
+| --- | --- | --- |
+| id | string | `b1`／`b2`，唯一 |
+| label_key | string | 多語樓層名稱 |
+| order | int | 顯示順序，不能用於推斷 connector |
+| map_asset | string | 本地 SVG 或審查後點陣圖 |
+| view_box | object | x、y、width、height；寬高 > 0 |
+| source_ids | string[] | 圖檔與改繪來源 |
+| coverage_key | string | 已覆蓋區域文字，不得寫全站 |
+
+每層有自己的座標系：原點左上、x 向右、y 向下。跨層 x/y 不可直接比較距離或轉向。
+
+### 09.3 Node
+
+```json
+{
+  "id": "b1_n01",
+  "floor_id": "b1",
+  "x": 120.0,
+  "y": 180.0,
+  "type": "qr_anchor",
+  "label_key": "node_b1_n01",
+  "zone_id": "public_demo",
+  "landmark_ids": ["lm_elevator_sign"],
+  "verification_status": "synthetic",
+  "source_ids": ["src_synthetic_fixture"]
+}
+```
+
+`type` 為 `junction`、`qr_anchor`、`exit`、`facility`、`connector_landing`。POI 與 anchor 透過引用掛到節點，不因 type 相同就自動合併。節點本身沒有導航成本。
+
+### 09.4 Directed Edge
+
+```json
+{
+  "id": "e_b1_n01_n02",
+  "from_node_id": "b1_n01",
+  "to_node_id": "b1_n02",
+  "type": "walkway",
+  "routing_cost": 18.0,
+  "distance_m": null,
+  "status": "open",
+  "step_free": "yes",
+  "wheelchair_passable": "yes",
+  "zone_id": "public_demo",
+  "connector_id": null,
+  "geometry": [[120.0, 180.0], [200.0, 180.0]],
+  "verification_status": "synthetic",
+  "source_ids": ["src_synthetic_fixture"]
+}
+```
+
+| 欄位 | 規則 |
+| --- | --- |
+| from_node_id／to_node_id | 必須存在，不能同節點；P0 edge cost 必須 > 0 |
+| type | `walkway`、`stairs`、`elevator`、`escalator`、`gate` |
+| routing_cost | 有限正數，整個 package 同一尺度，不混用公尺與像素 |
+| distance_m | 已量測／校準才可為正數，否則 null；未知不得填 0 |
+| status | `open`、`closed`、`unknown`；P0 unknown 視為不可通行 |
+| step_free／wheelchair_passable | `yes`、`no`、`unknown`；無障礙兩者均須 yes |
+| zone_id | P0 僅 `public_demo`，跨付費區不列入本版 |
+| connector_id | 跨樓層必填；同層通常 null |
+| geometry | 同層繪圖折線；首尾須對應節點，容差 0.5 地圖單位 |
+
+每筆邊為單向。雙向走道儲存兩筆不同 edge ID；資料建置器可以從 authoring 的雙向宣告產生，runtime 不再有 `bidirectional` 自動反轉，避免電扶梯被錯誤補逆向邊。反向邊的 geometry、入口朝向與地標指引必須反向重建，不能複製左右提示。
+
+跨樓層邊的 geometry 固定為空陣列，不繪製橫跨兩張底圖的線；繪圖使用兩端落點及 connector 圖示。`connector_id` 相同只代表同設備，並不自動建立所有樓層連線。
+
+### 09.5 Connector 與設備資訊
+
+本版 connector 記錄於 `edges.json` 頂層 `connectors`，含 `id`、`type`、`landing_node_ids`、`label_key`、`verification_status`、`status_observed_at`、`source_ids`。每條跨層 edge 的兩端須出現在 connector 的 landing 清單。
+
+電梯可及性至少包括可由公共走道抵達、出入口可通行及樓層連通已核對；不可只因節點標為電梯就認定可供輪椅使用。資料為靜態快照，介面必須顯示「非即時設備狀態」。使用者回報電梯無法使用時，P0 可將該 session 的 connector 設為 unavailable 並重算，不上傳、不宣稱已更新官方資料。
+
+### 09.6 POI 與 Landmark
+
+| 實體 | 必填欄位 | 規則 |
+| --- | --- | --- |
+| POI | id、node_id、category、name_key、original_signage、enabled、source_ids | category 包含 exit／restroom／elevator；enabled=false 不出現在目的地清單 |
+| Landmark | id、node_id、name_key、original_signage、visibility_context、verification_status、source_ids | visibility_context 說明從哪些進入邊能看見；不能從所有方向都假設可見 |
+
+無障礙廁所必須另外有 `accessible_facility=true` 與驗證依據；一般廁所不能只因路徑無階梯就稱無障礙廁所。設施搜尋「能走到」與設施「本身符合無障礙」分開過濾。
+
+### 09.7 QR anchor 與 payload
+
+anchor 包含 `id`、`node_id`、`enabled`、`face_landmark_id`、`departure_edge_ids`、`signage_code`、`verification_status`、`source_ids`。`face_landmark_id` 用來要求使用者面向可辨識地標，不表示掃描相機自動知道手機朝向。
+
+payload 為 UTF-8 JSON，最多 1024 bytes，只接受下列欄位；不得將 payload 當檔案路徑、URI 或程式碼執行。
+
+```json
+{
+  "type": "taipei_maze_anchor",
+  "v": 1,
+  "site_id": "taipei_main_demo",
+  "graph_major": 1,
+  "anchor_id": "qr_b1_a"
+}
+```
+
+QR 不直接包含 x/y、可及性或導航文字，避免惡意內容覆蓋本地資料。查到本地 anchor 後仍需使用者確認位置。graph minor 更新可相容既有 anchor；major 不符拒絕並提示版本不支援。原型 QR 不含數位簽章，無法防止合法碼被搬到錯誤位置；正式部署須增加管理、巡檢與防替換設計，本次不得宣稱防偽。
+
+### 09.8 人工朝向指引 OrientationGuide
+
+`orientation_guides.json` 是人工核對方向的唯一來源，分為 `anchor_departure` 與 `connector_exit`。同一 anchor 走不同首條 edge，或同一電梯落點轉向不同出口，必須有各自明確對應，不能只靠「這裡有一個地標」推測左右。
+
+| 欄位 | 型別及規則 |
+| --- | --- |
+| id | 唯一 string ID |
+| context_type | anchor_departure／connector_exit |
+| anchor_id | anchor_departure 必填；connector_exit 為 null |
+| incoming_connector_id | connector_exit 必填；anchor_departure 為 null |
+| node_id | 當前出發或到層 landing node |
+| outgoing_edge_id | 必須存在，且 from_node_id=node_id |
+| face_landmark_id | 在該出發／出口位置可見的地標，必須存在 |
+| text_key／params | 七語朝向及出發指示，變數需符合 catalog |
+| icon_id／voice_sentence_ids | 與動作語意一致，不用另一方向的音檔 |
+| verification_status／source_ids | 依部署模式接受的人工核對證據 |
+
+複合鍵 `(context_type, anchor_id, incoming_connector_id, node_id, outgoing_edge_id)` 唯一。anchor_departure 的 node 必須等於 anchor 節點，outgoing edge 必須在該 anchor 的 departure_edge_ids；connector_exit 的 node 必須是該設備 landing。InstructionBuilder 依確切上下文查詢，缺失或互相矛盾返回 `OrientationUnavailable`，可顯示路線摘要但禁止啟動該導航，不用一般角度算法補猜。
+
+### 09.9 SourceRecord 與距離
+
+來源至少保存 `id`、`title`、`publisher`、`url`、`retrieved_at`、`source_updated_at`（可 null）、`license_reference`、`redistribution_status`、`verification_method`、`reviewer`。來源網站有公開檔不代表圖檔可任意重製。
+
+`routing_unit=relative`：所有 routing_cost 由統一規則建立，僅能稱「圖模型中的最短相對成本路線」，畫面顯示「距離未校準」。`routing_unit=meters`：所有邊具有可靠 distance_m，routing_cost 取 distance_m，顯示公尺。跨層設備移動長度亦需合理量測依據，沒有依據不得混進 meter package。
+
+P0 不顯示步行時間估計。未建立可驗證時間模型前，不提供「最快」按鈕，以「最短」或「較少轉彎」準確表達。
+
+## 10 路徑演算法與無障礙
+
+### 10.1 RouteOptions
+
+`mobilityProfile` 為 `standard`／`stepFree`；`preference` 為 `shortest`／`easyToUnderstand`，後者 P1 才可啟用。`unavailableConnectorIds` 為本次 session 使用者回報不可用設備；`allowedZoneIds` 在 P0 固定僅公共示範區，不開放任意付費區通行。
+
+UI 的「無障礙」對應 `stepFree`，文字說明是「依已核對資料避開樓梯與電扶梯，優先可及電梯」，不是對所有障別或即時狀態保證。
+
+### 10.2 過濾順序
+
+1. 驗證起終點存在且 enabled，圖版本可用。
+2. 排除 status 非 open、未符合部署驗證模式的邊。
+3. 排除不允許區域、方向不存在或 session 不可用 connector。
+4. `stepFree` 額外排除 stairs、escalator，並要求 step_free=yes 且 wheelchair_passable=yes；任何 unknown 不得視為 yes。
+5. 在剩餘有向圖上計算最短路徑；無候選即返回 NoRoute，不放寬上述條件。
+
+`synthetic_demo` 只允許清楚標示的模擬圖展示；實際場站導航採 `field_verified_demo`，僅接納 field_checked 邊。驗證模式不可由使用者隨意切成較寬鬆以取得路線。
+
+### 10.3 Dijkstra 契約
+
+- 使用 adjacency list 與 min-priority queue，P0 不要求 A*；避免沒有可信啟發式時誤用樓層像素距離。
+- 累積成本以 double；比較容差工程預設 `epsilon=1e-9`。同成本時選完整 edge ID 序列字典序較小者，使結果可重現。
+- 完整路徑不能含循環；結束時驗證每個相鄰 node 對應輸出 edge、起終點正確、所有硬限制仍成立。
+- source=destination 返回成功的單節點、零 edge 路線，之後進抵達確認。
+- 複雜度目標為 `O((V+E) log V)`；小圖不能成為省略方向檢查的理由。
+- 發生 schema／數值錯誤回 InvalidGraph，不包成 NoRoute；兩者使用者提示不同。
+
+### 10.4 RouteResult 與 NavigationPlan
+
+RoutePlanner 成功回傳 `RouteResult.success(route: Route)`；Route 欄位為 `routeId`、`requestId`、`graphVersion`、`routeRevision`、`nodeIds`、`edgeIds`、`totalRoutingCost`、`totalDistanceM`（任一邊未知則 null）、`floorSequence`、`connectorIds`、`optionsSnapshot`。Route 是不可變的純路徑結果，**不含 instructions**。
+
+失敗類型：`UnknownStart`、`UnknownDestination`、`InvalidGraph`、`NoRoute`、`UnsupportedOptions`、`Cancelled`。NoRoute 含經過哪些過濾類別，不顯示未經證實的「電梯壞掉」原因；只知道不連通時說「目前資料無法找到符合需求的路線」。
+
+Controller 收到非零邊 Route 後呼叫 InstructionBuilder；兩者均成功才建立不可變 `NavigationPlan(route, instructions, orientationContext)`，一次發布地圖、指令與新 revision。生成失敗回 `InstructionBuildResult.failure`，型別包含 `OrientationUnavailable`、`MissingLandmark`、`MissingMessage`、`InvalidGeometry`；進 guidanceUnavailable，只顯示已算出的路線摘要，禁止開始、停止語音。零邊 Route 走 alreadyAtDestination 特例，不要求方向指引。
+
+### 10.5 路線變更
+
+切換 mobilityProfile 必須以新 options 重算；保留最後掃碼位置作起點，明確要求使用者確認仍在該點。若使用者已走動，先重掃再採用新路線。不能用已走到的 instructionIndex 反推實際位置。
+
+## 11 方向與指令生成
+
+### 11.1 原則
+
+先算路徑，再生成指令；語言及音檔不參與圖拓樸或可通行性。每條路線的指令列表是不可變資料，所有呈現端共用。
+
+`Instruction` 必備：`id`、`routeRevision`、`sequence`、`type`、`fromNodeId`、`toNodeId`、`floorId`、`targetFloorId`（跨層用）、`edgeIds`、`textKey`、`params`、`iconId`、`voiceSentenceIds`、`landmarkId`（可 null）、`requiresOrientation`、`confirmationType`。
+
+`type` 至少包含 orient／straight／turnLeft／turnRight／turnBack／enterElevator／changeFloor／exitConnector／scanCheckpoint／arrival。`confirmationType` 為 manual／qrOrManual；此原型沒有 sensorAutomatic。
+
+### 11.2 起始朝向
+
+- QR 只決定節點，不提供使用者朝向。初始畫面要求「請面向〔現場標示名稱〕」，顯示經核對的參考圖示／文字。
+- 對應出發 edge 必須有可辨識地標及人工核對的起始指令；若當前 anchor 的參考方向無法套用該路線，顯示路線圖與「請重新確認方向」，不能猜左／右。
+- 沒有足夠方向參照的 anchor 不得作已驗證 Demo 路線起點，資料驗證須列出缺口。
+- 不使用手機指南針結果作 P0 確認，也不以掃描相機朝向充當使用者行進朝向。
+
+### 11.3 同樓層轉向
+
+同層使用前一折線末段向量與下一折線首段向量。座標 y 向下；`delta=normalize(atan2(outY,outX)-atan2(inY,inX))`，正規化至 `(-180,180]` 度。
+
+工程預設：絕對值 < 30 度為 straight；30–150 度正值為 turnRight、負值為 turnLeft；絕對值 >150 度為 turnBack。恰好 30 度歸轉彎，恰好 150 度仍為轉彎。零向量、跨層或幾何不足不使用角度分類，要求人工指令。
+
+原點或底圖變換不得左右鏡射；需有 east→south=右、east→north=左的回歸案例。圖面推算結果只是草稿，Demo 路線指引須按實際動線核對。
+
+### 11.4 合併與樓層指令
+
+連續直行可合併，但不得跨過岔路、QR checkpoint、重要地標、connector、方向變更或目的地。每個跨層段至少呈現「前往設備」「搭乘至目標樓層」「到層後確認方向」；電梯出口方向需有落點參照，不沿用前一層向量。
+
+指令中有距離時，只使用整段已知 distance_m 的總和；否則省略距離，改以地標說明。語音 P0 以固定短句表達動作，畫面補充動態地標／樓層；兩者必須語意一致，不宣稱逐字相同。
+
+### 11.5 抵達
+
+抵達判斷只接受：掃到 node 與目的地 node 相同的有效 anchor，或使用者在最後一步按「我已抵達」。紀錄 confirmationSource=qr／manual，畫面不宣稱系統感測到抵達。尚未確認時顯示「請確認是否已到達」，不自動播已抵達。
+
+## 12 地圖繪製與樓層
+
+### 12.1 疊圖
+
+底圖與路網使用相同 floor-local viewBox。縮放採等比 contain，保留 offset；節點、折線及 hit test 共用單一轉換：`screen = (local - viewBoxOrigin) × scale + contentOffset`。反向點擊用其逆變換，不能分別用畫面寬高各自縮放。
+
+### 12.2 呈現
+
+- 地圖同時顯示樓層標籤、起點、終點、路徑、connector 與圖例，不只靠顏色分辨。
+- 「上次確認位置」為實心標記並帶時間；「目前檢視步驟」用不同樣式，不畫成移動定位藍點。
+- 當前樓層只畫該層路段；跨樓層位置用電梯／樓梯圖示及前往哪層文字。
+- 手動切圖不改 `confirmedLocation`、instructionIndex 或 routeRevision。
+- 導航步驟進入另一層時可切換檢視樓層，但需標「指引目標樓層」，直到使用者確認或掃碼。
+- 縮放與平移有重設按鈕；簡易模式預設固定到當前步驟範圍，完整圖可展開。
+- 背景圖載入失敗時不顯示浮空路線；本次 P0 不能在沒有可信地圖的狀態下繼續導航。
+
+### 12.3 地圖素材
+
+官方 PDF 與設施資料是參考，不直接等於 Graph。未確認圖像再散布權利前，採團隊自行繪製並清楚標「示意」的局部幾何圖；不能因重新描繪就自動認定已消除原圖權利問題。若取得可使用來源，記錄來源、裁切、改繪方式及授權。
+
+## 13 七語介面規格
+
+### 13.1 語系與名稱
+
+| 排列 | 語言 | App locale／檔名 | 顯示原文 | 翻譯服務代碼 | TTS locale |
+| --- | --- | --- | --- | --- | --- |
+| 1 | 繁體中文（臺灣） | `zh-TW` | 繁體中文 | `zh-Hant`，作為來源 | `zh-TW` |
+| 2 | 英文 | `en` | English | `en` | `en-US` |
+| 3 | 越南文 | `vi` | Tiếng Việt | `vi` | `vi-VN` |
+| 4 | 印尼文 | `id` | Bahasa Indonesia | `id` | `id-ID` |
+| 5 | 泰文 | `th` | ไทย | `th` | `th-TH` |
+| 6 | 韓文 | `ko` | 한국어 | `ko` | `ko-KR` |
+| 7 | 日文 | `ja` | 日本語 | `ja` | `ja-JP` |
+
+排列是介面順序，不是可延後其中四語的交付分級。裝置語系匹配 `zh-Hant`／`zh-TW` 到繁中；其他中文區域可提供繁中但不生成簡中資源。`in`（舊式印尼文代碼）若由平台傳入，只在邊界正規化為 `id`，內部不得另建語言包。
+
+### 13.2 文案來源與 key
+
+`content/messages.zh-TW.json` 每項記錄穩定 key、中文原文、畫面／語音用途、情境、參數名稱及可否語音。翻譯只改 value，不改 key／ID／URL／`B1`／`B2`／QR 碼／placeholder。
+
+必備 key 群組：
+
+| 群組 | 必須涵蓋 |
+| --- | --- |
+| common | 開始、下一步、上一步、確認、取消、重試、返回、關閉 |
+| home | 產品名、掃碼開始、語言、模式、示範範圍 |
+| scan | 相機說明、拒絕權限、無相機、錯誤 QR、不支援版本、重掃 |
+| location | 上次確認位置、時間、樓層、地標、確認位置、示範選點 |
+| destination | 目的地、出口、廁所、電梯、無可用目的地 |
+| route | 一般、無障礙、開始、規劃中、無路線、距離未校準、資料非即時 |
+| guidance | 全部 Instruction types、進度、我迷路了、確認朝向、到層確認、抵達確認 |
+| audio | 播放、暫停、重播、靜音、缺檔、無法播放、語速（P1） |
+| settings | 標準／簡易、字級、高對比、來源、版本、範圍與驗證說明 |
+| error | 資料失效、圖損毀、找不到節點、重規劃失敗、恢復操作 |
+| dynamic | 每個已啟用 POI、節點標籤與地標的七語名稱 |
+
+固定 UI 文字至少覆蓋上述需求，實際 key 數以凍結 catalog 為準，不把「24 句語音」誤當成整個 App 只有 24 條翻譯。
+
+### 13.3 Flutter 實作
+
+工程預設採 Flutter 官方 `flutter_localizations` 與 `gen_l10n` 產生 typed UI 存取；內容工具將主檔輸出 ARB。動態地標等使用相同輸入產生 JSON catalog。完整句子採命名參數，不用「字串 A＋名詞＋字串 B」拼成所有語言共用語序。
+
+ARB 例子：
+
+```json
+{
+  "@@locale": "en",
+  "confirmLocation": "Confirm your location",
+  "goToFloor": "Take the elevator to {floor}",
+  "@goToFloor": {
+    "description": "Navigation instruction for a verified elevator connection",
+    "placeholders": {
+      "floor": {"type": "String"}
+    }
+  }
+}
+```
+
+所有語言的 placeholder 集合與型別必須相同；不能把 `{floor}` 翻成另一個 key。地標的站內原文保留在第二行，不由翻譯覆蓋。
+
+### 13.4 缺譯與字型
+
+開發版缺 key 顯示明顯診斷並在 CI 失敗；正式版先顯示同語系已核准通用短句，無可用短句時顯示英文備援並標明備援語言，不能顯示空白。此容錯不代表七語已通過驗收。
+
+字型須本地打包並審查來源／再散布權利，覆蓋繁中、拉丁及越南附加符號、泰文、韓文、日文。候選為可追溯的 Google Noto 字型官方來源，未審查前不列為 approved。不能用執行期 Google Fonts 網路下載滿足離線驗收。
+
+### 13.5 語言品質
+
+左右、上下、樓層、出口、電梯／電扶梯與否定句屬關鍵語意。必須逐條對照原文，至少由具該語言能力者確認導航與安全關鍵詞。無適任校對者時可先機器翻譯測試版，reviewStatus 保持 machine_draft，不能宣稱校對完成。反向翻譯可找疑點，不能取代該語言校對。
+
+## 14 快速翻譯與語音製作流程
+
+### 14.1 推薦方案
+
+**最快可維護的方法是共用 key 與固定句庫，批次生成七語文字及音檔，再全部打包；不是做七份介面，也不是讓手機即時呼叫翻譯或語音 API。**
+
+第一候選為開發階段使用 Microsoft 全球 Azure Translator 產生六種外語草稿、Azure Speech 生成七語音檔；實際採用前須完成第 16 節來源、區域、付費與輸出再散布審查。此方案不表示本次已建立帳號、購買額度、呼叫服務或產生音檔。
+
+Azure Translator 官方方法支援同一請求使用多個 `to` 參數；批次工具仍要按目前服務配額切分，不寫死無上限。Speech 可採 SDK 逐句合成，或非同步 Batch Synthesis 建立工作後下載結果；168 個短音檔以可斷點重跑的逐句工作佇列較容易對應 key。這些操作都只在開發環境執行。[Translator 方法](https://learn.microsoft.com/en-us/azure/ai-services/translator/text-translation/reference/v3/translate)、[Speech Batch Synthesis](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/batch-synthesis)。
+
+### 14.2 方案比較
+
+| 方法 | 速度與優點 | 限制 | 本案決策 |
+| --- | --- | --- | --- |
+| 已審查的全球 Azure 翻譯＋Speech | 一組 catalog 批次產出七語，便於版本控制 | 有帳號、費用、區域與輸出授權審查 | 首選候選，審查通過才使用 |
+| 具語言能力者翻譯＋真人逐句錄音 | 不需外部模型，可明確取得聲音與再散布授權 | 需七語人力與收音品質控管 | 服務來源或授權不符時的可靠替代 |
+| 其他非中國供應商的翻譯／TTS | 可作替代 | 每項重新審查，不自動納入允許清單 | 不在 P0 期間同時混用多家 |
+| 開源多語 TTS 自架 | 可離線建置 | 模型權重、訓練來源、授權、算力及語種能力未必清楚 | 不作快速交付預設 |
+| 裝置內建 TTS／瀏覽器 speechSynthesis | 程式接入快 | 裝置供應商與語音包來源、可用語種、離線能力不一致 | 不採用作 P0 必要語音 |
+| 免費匿名翻譯／TTS 網站、非官方代理 | 看似快 | 來源、資料流向及輸出權利不可稽核 | 禁止 |
+
+七語 UI 只需一套元件；固定文案與音檔可自動批次，真正容易耗時的是語意校對與路網核對。不得以批次完成等同七語品質完成。
+
+### 14.3 可執行製作步驟
+
+1. **凍結中文原稿。** 完成畫面 key、24 句語音、POI 及地標原文。每句有情境、變數、可否播報與安全重要性。
+2. **建立詞彙表。** 鎖定臺北車站、出口、電梯、電扶梯、無障礙、B1／B2、左／右等詞；站內原文保留，不機器改寫出口編號。
+3. **設定來源允許清單。** 記錄供應商、實際服務、非中國部署區域、endpoint、服務條款版本、輸出使用／再散布證據、審查人及日期。未完成時只製作本地資料架構，不呼叫未知服務。
+4. **產生六語翻譯草稿。** 明確指定 `from=zh-Hant`，目標 `en,vi,id,th,ko,ja`；以輸入索引映射原 key，拒絕缺項、語系重複、placeholder 遺失及 ID 變動。
+5. **逐語校對。** 用同一確認表檢查方向、樓層、否定、設施差異與地標。狀態依序為 machine_draft → language_reviewed → audio_reviewed → approved。
+6. **鎖定語音。** 從已核准區域的 voices list 查詢實際可用名稱；每語一個固定 voice，不自動改用另一模型或中國語音。
+7. **批次合成 168 個音檔。** 工作鍵為 locale＋sentenceId＋文字 hash＋voice＋格式。只重做變動項目；短句獨立音檔，不生成一整段再猜切點。
+8. **驗證音訊。** 檢查可解碼、非空、無截斷、音量及語速一致；每句聽檢並比對語系與左右方向。輸出 mp3 與 manifest。
+9. **產出 UI 資源。** 同一 catalog 產生 JSON 與 ARB，執行 gen_l10n。拒絕任何未核准譯文進正式包。
+10. **離線真機驗收。** 關網後冷啟動，逐語操作、播放、切語言、重掃；保存資產版本及測試結果。
+
+### 14.4 建議語音設定
+
+下列是官方語言支援頁中的候選聲音，僅作建置時選型起點，不保證在指定帳號／區域均可用。建置前查 voices list 並寫入 `voices.lock.json`，禁止無聲替換。若候選 unavailable，停止該語工作，由人工核准新候選。[語言與聲音支援](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts)、[區域聲音查詢與 TTS REST](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/rest-text-to-speech)。
+
+| App locale | 候選 voice | 選型條件 |
+| --- | --- | --- |
+| zh-TW | `zh-TW-HsiaoChenNeural` | 臺灣繁體中文，禁止自動改為 zh-CN 聲音 |
+| en | `en-US-JennyNeural` | 英文，優先清楚穩定，不依賴預覽模型 |
+| vi | `vi-VN-HoaiMyNeural` | 越南文 |
+| id | `id-ID-GadisNeural` | 印尼文，不得用印地文代替 |
+| th | 由已核准區域 API 選定 th-TH 聲音 | 需實際查詢與鎖版，不憑過時清單寫死 |
+| ko | `ko-KR-SunHiNeural` | 韓文 |
+| ja | `ja-JP-NanamiNeural` | 日文 |
+
+語音名稱、locale、供應商與非中國來源審查是不同層次；光是 voice 名含 zh-TW 並不能證明所有上游符合使用者要求。若無足夠證據，該項維持未核准，採已取得權利的真人錄音。
+
+### 14.5 工具契約
+
+以下是未來應建立的工具及指令介面，**本次僅寫規格，這些程式尚未建立**。
+
+| 工具 | 輸入 | 輸出與失敗條件 |
+| --- | --- | --- |
+| `tools/content/validate_catalog.py` | 主 catalog、七語翻譯、glossary | JSON 報告；缺 key／變數／審查狀態則 exit 1 |
+| `tools/content/translate_batch.py` | 已審查 provider config、中文 catalog | 六語草稿，不覆寫人工 reviewed 文案 |
+| `tools/content/build_voice_jobs.py` | approved 句庫、voices.lock | 168 個 idempotent 工作及預估字數 |
+| `tools/content/synthesize_audio.py` | 核准工作、憑證環境變數 | 音檔、來源 metadata、失敗工作清單 |
+| `tools/content/build_localizations.py` | 同一版 reviewed catalog | assets JSON 與 Flutter ARB |
+| `tools/content/validate_audio.py` | manifest、音檔 | hash、解碼、時長、缺失及審查報告 |
+| `tools/data/validate_package.dart` | package manifest | 路網、來源、語系與資產一致性報告 |
+
+建置工具憑證只從環境或本機密鑰儲存讀取，不出現在命令範例、stdout、manifest、App assets 或 Git。HTTP timeout 預設 30 秒，最多 3 次 retry；429／暫時 5xx 用退避並尊重 Retry-After，401／403 不反覆重試。SSML 特殊字元須 escape，文字只能進文字節點，不能當任意 XML 或 shell 執行。
+
+翻譯與合成前顯示工作數及預估字元量，費用依當時方案確認；本規格不承諾免費額度。批次中斷需可續跑，不能重做所有已通過 hash 的音檔而重複計費。供應商輸出只存媒體與必要 metadata，不保存憑證／簽名下載 URL。
+
+### 14.6 時間配置
+
+七語工作與 UI／路網平行：前 1 小時凍結短句及來源方案、1–3 小時批次草稿與 UI 生成、3–6 小時校對及音檔生成、6–10 小時真機與語音聽檢。這是工程估時，取決於帳號、配額及校對人力；不可將估時寫成實際完成紀錄。
+
+## 15 離線語音與播放契約
+
+### 15.1 24 句核心句庫
+
+| sentence_id | 繁體中文原稿 | 使用時機 |
+| --- | --- | --- |
+| nav_start | 導航開始，請依照指示前進。 | 使用者開始導航 |
+| go_straight | 請直走。 | 直行指令 |
+| turn_left | 請左轉。 | 已確認朝向的左轉 |
+| turn_right | 請右轉。 | 已確認朝向的右轉 |
+| turn_back | 請確認方向，再依畫面指示回轉。 | 安全可回轉路段 |
+| take_elevator | 請搭乘電梯，並確認畫面上的目標樓層。 | 電梯入口 |
+| go_upstairs | 請依指示上樓。 | 一般模式樓梯 |
+| go_downstairs | 請依指示下樓。 | 一般模式樓梯 |
+| take_escalator_up | 請搭乘上行電扶梯。 | 一般模式且方向已核對 |
+| take_escalator_down | 請搭乘下行電扶梯。 | 一般模式且方向已核對 |
+| exit_elevator | 請離開電梯，再確認下一步方向。 | 到層確認後 |
+| scan_qr | 請掃描附近的 QR Code，確認目前位置。 | 重新定位 |
+| location_confirmed | 已確認您掃描的位置。 | 使用者確認 anchor |
+| route_updated | 已重新規劃路線，請確認新的指引。 | 新路線完整套用後 |
+| destination_arrived | 您已確認抵達目的地。 | 使用者或有效 QR 抵達確認後 |
+| orientation_check | 請先面向畫面中的地標，再開始前進。 | 初始朝向確認 |
+| floor_b1 | 目標樓層是地下一樓。 | B1 目標層，按語言序列播放 |
+| floor_b2 | 目標樓層是地下二樓。 | B2 目標層，按語言序列播放 |
+| accessible_selected | 已選擇無障礙需求，將依現有資料規劃路線。 | 選項確認，不表示規劃成功 |
+| no_route | 目前找不到符合需求的路線，請重新選擇或求助。 | NoRoute |
+| scan_failed | 無法辨識這個定位點，請重新掃描。 | 無效碼 |
+| audio_unavailable | 語音暫時無法播放，請查看文字與圖示。 | 音訊診斷；不能依賴這段一定播得出來 |
+| confirm_next | 完成這一步後，請按下一步。 | 手動步驟說明 |
+| route_cancelled | 導航已結束。 | 明確結束導航 |
+
+每句七語各一檔，共 168 檔；不得將 en 複製進其他語系資料夾來湊數。音檔與文字需有不同 hash／來源紀錄；相同語意短句不必每個 POI 重做一份。
+
+### 15.2 動態內容
+
+P0 不為任意輸入即時造句。動態地標、出口與距離顯示在已翻譯文字中，語音先播已核准的動作短句；跨層再依語言模板播 `floor_b1`／`floor_b2`。每語可設定完整句序列，禁止假設七語語序都能直接串「直走＋30 公尺＋右轉」。
+
+完整常用導航句若需要更自然，可預生成額外音檔，新增 stable sentence_id 並納入翻譯及審查，不覆寫既有 ID 成不同意思。畫面必須呈現音訊實際播的動作與當前目的層；音訊不能說 B1 而畫面是 B2。
+
+### 15.3 voice manifest
+
+```json
+{
+  "schema_version": "1.0.0",
+  "voice_version": "1.0.0",
+  "entries": [
+    {
+      "locale": "en",
+      "sentence_id": "turn_left",
+      "asset_path": "assets/audio/en/turn_left.mp3",
+      "text": "Turn left.",
+      "provider_id": "pending_review",
+      "voice_id": "pending_selection",
+      "duration_ms": 1200,
+      "sample_rate_hz": 24000,
+      "channels": 1,
+      "review_status": "machine_draft",
+      "provenance_id": "audio_en_turn_left"
+    }
+  ]
+}
+```
+
+正式 entries 另有有效 sha256、text_sha256、license_reference 與 reviewer；上例 pending 值不能通過 release gate。音檔工程預設 MP3、24 kHz、mono、48 kbps；若供應商或目標平台不支援，先轉換並重跑解碼測試，不只改副檔名。單句目標 0.3–12 秒，超過需人工確認；不可把靜音長短判斷當作語言正確性驗證。
+
+### 15.4 音訊狀態機
+
+`idle → loading → playing ↔ paused → completed`；任何狀態可 stop 到 idle，載入或播放失敗進 error。UI 顯示的播放狀態取播放器真實 callback，不按下按鈕就假定播放成功。
+
+| 事件 | 行為 |
+| --- | --- |
+| 新導航步驟 | stop 舊音訊，核對 token，載入並播放新序列 |
+| 重播 | 停止並從目前 instruction 的序列開頭播放 |
+| 暫停／繼續 | 保留同指令 position；指令已改則不續播舊內容 |
+| 換語言 | 停止舊音訊，更新 locale，使用當前指令的新語系重新播放；靜音時不播 |
+| 我迷路了／重新規劃 | 立即中止；成功後只播新版本 |
+| App 背景／來電中斷 | 暫停；回前景由使用者確認後播放 |
+| 缺檔／解碼錯誤 | 停止該句，顯示同語系文字提示，繼續可操作導航 |
+| 連按重播 | latest-wins，一次只允許一個音訊來源 |
+
+P0 音量遵從系統與使用者靜音，不強制最大音量、不要求麥克風權限、不背景自動播報。Web 若被 autoplay 擋住，顯示「點擊播放」並讓使用者觸發，不循環重試。
+
+## 16 非中國來源與授權門檻
+
+### 16.1 使用者要求的執行原則
+
+此限制適用於本案新增的程式依賴、模型及權重、翻譯／語音服務、聲音包、託管／CDN、字型、地圖素材與產生資源。不得使用中國廠牌或其提供／代管的模型與服務，也不得以第三方代理、重新命名或西方公司的 wrapper 包裝後繞過來源要求。
+
+排除來源不明的套件、權重與聲音包；不能因「開源」「免費」「本地執行」「在 GitHub／pub.dev」就推定合規。開源授權與供應商來源須分開檢查。中國來源模型經量化、轉換或鏡像下載後，來源仍未改變。
+
+本文件不聲稱能證明所有商用模型的每筆訓練資料或全球硬體零件都與中國毫無關聯；若要求範圍涉及無法取得證據的上游，維持未核准並記錄疑義，不以品牌國籍替代證明。嚴格來源要求下，真人翻譯／錄音仍須具可稽核權利與來源資料。
+
+### 16.2 選用與審查
+
+| 層次 | 必查項目 | 放行證據 |
+| --- | --- | --- |
+| 供應商 | 法律實體、營運單位、實際產品提供者 | 官方公司／產品資料及審查紀錄 |
+| API／託管 | 實際 endpoint、部署與資料處理區域、代理及 CDN | 官方區域說明、資源設定與網路清單；非中國營運端點 |
+| 模型／語音 | 模型名稱、版本、原始提供者、權重來源、衍生來源 | 模型卡／產品文件／voice list，無未審查替換 |
+| 程式依賴 | 套件 publisher、官方 repo、直接與遞迴依賴、授權 | lockfile、dependency report、來源與審查狀態 |
+| 素材 | 作者／提供者、原始 URL、修改及生成方式 | 素材授權、再散布及製作紀錄 |
+| 最終輸出 | 是否能公開 repo、放進 App、移交政府與再散布 | 條款或權利人明確許可，不以「可商用」概括所有權利 |
+
+若採 Azure，僅可使用經審查的 Microsoft 全球服務與非中國部署，不使用中國營運雲、21Vianet 環境或中國區域 endpoint。全球品牌不代表每個區域都合規；審查未完成則不呼叫。不得以支援 zh-TW 為理由選用 zh-CN 模型替代。
+
+### 16.3 provenance 最低欄位
+
+每項資源：`resource_id`、`resource_type`、`supplier`、`operator`、`origin_reference`、`version`、`download_url`（不得含 token）、`sha256`、`deployment_region`（無服務則 null）、`license_reference`、`redistribution_evidence`、`china_origin_review`、`reviewer`、`reviewed_at`、`status`。
+
+status 僅有 proposed／approved／rejected／unverified；**只有 approved 可進 release package**。本 SPEC 的 Microsoft、Flutter 套件及字型均是選型候選，不代表已完成整個依賴樹審查。審查負責人依證據簽認，不能由工具偵測「沒有 .cn 網址」自動變成 approved。
+
+### 16.4 自動門檻與人工門檻
+
+CI 應列出 lockfile、assets、endpoint、CDN、模型與授權清單，對照允許清單；發現未知來源、未鎖版、未審查新依賴或被禁止域名就失敗。這是查漏工具，不是完整來源保證。人工核對營運者、模型繼承及輸出權利才可放行。
+
+App runtime 不需要任何翻譯／TTS／LLM 網路連線；測試以網路紀錄與斷網證明，不單靠搜尋程式字串。Web 的掃碼 library、WASM、字型及音效也需本地封裝。官方 mobile_scanner 文件指出 Android 可選 bundled／unbundled 掃碼資源，Web 後端可能載入外部 library；本案必須避免首次使用下載依賴。[mobile_scanner 官方說明](https://pub.dev/packages/mobile_scanner)。
+
+### 16.5 競賽開源與建置工具的界線
+
+不得把 Azure 商用服務 SDK、API key 或執行期合成依賴帶入參賽 App。開發期產生固定內容是否可採該商用製作工具、其輸出是否能依競賽要求再散布，仍須核對主辦及適用條款。雲端生成內容可用的原則不等於所有 TTS 輸出自動具有 AGPL 授權。
+
+程式碼授權、自製資料與聲音權利、第三方素材各自列明，不把所有檔案一律改標 AGPL。若素材權利不符，改用已取得同意的自製圖、人工翻譯及真人錄音；不能以縮小聲明文字取代必要授權。
+
+## 17 架構與模組介面
+
+### 17.1 模組責任
+
+| 模組 | 責任 | 不應負責 |
+| --- | --- | --- |
+| AssetRepository | package 載入、hash、schema、版本與引用驗證 | UI 導航狀態 |
+| GraphRepository | 提供不可變 GraphSnapshot 與 POI／anchor 查詢 | 直接操控相機或語音 |
+| QrDecoder | payload 檢查、版本及 anchor lookup | 開 URL、改任意系統狀態 |
+| RoutePlanner | 硬限制、有向 Dijkstra、可重現 RouteResult | 文案翻譯與音檔 |
+| InstructionBuilder | route→指令、朝向及地標判斷 | 創造不存在路段 |
+| NavigationController | 狀態機、revision、事件與原子更新 | 平台播放器實作 |
+| LocalizationRepository | typed UI 文案與動態 catalog | runtime 遠端翻譯 |
+| VoiceService | 指令音檔解析、token、中止與播放狀態 | 路線推進及位置推測 |
+| MapView | 同層底圖、變換與路徑呈現 | 自行重算另一條路 |
+| PreferencesStore | 本機語言、模式與靜音 | 保存個資、相機圖或自動恢復定位 |
+
+### 17.2 核心介面
+
+以下是供實作對齊的語意介面，型別及測試需按此契約建立；本次不建立產品程式碼。
+
+```text
+AssetRepository.loadPackage() -> Future<PackageLoadResult>
+GraphRepository.snapshot() -> GraphSnapshot
+QrDecoder.decode(rawText, graphSnapshot) -> QrDecodeResult
+RoutePlanner.plan(RouteRequest, GraphSnapshot) -> RouteResult
+InstructionBuilder.build(Route, GraphSnapshot, OrientationContext) -> InstructionBuildResult
+NavigationController.dispatch(NavigationEvent) -> void
+LocalizationRepository.message(key, locale, params) -> LocalizedMessage
+VoiceService.play(VoiceRequest) -> Future<PlaybackOutcome>
+VoiceService.pause() / resume() / stop() -> Future<void>
+PreferencesStore.load() / save(UserPreferences) -> Future<void>
+```
+
+`RouteRequest`＝requestId、routeRevision、startNodeId、destinationPoiId、options、graphVersion；routeRevision 由 Controller 預先保留，只在整份 NavigationPlan 成功時發布。`OrientationContext`＝已確認的 startAnchorId 與 startNodeId；後續 connector exit 上下文從 Route 的設備及到層 edge 推得。示範手動選點也須指定具可用 OrientationGuide 的 anchor，不提供任意座標作起點。`VoiceRequest`＝sessionId、routeRevision、instructionId、locale、generation、sentenceIds。各 Result 採明確成功／失敗型別，不用 null 同時代表「未載入」「不存在」「無路徑」。
+
+路網演算法及指令生成不 import Flutter UI、相機或播放器；可用純 Dart fixture 測試。平台套件採 adapter 包裝，Web 切換時沿用資料契約及 golden fixture，不複製一套不同通行規則。
+
+### 17.3 建議原始碼位置
+
+```text
+app/lib/app.dart
+app/lib/features/navigation/domain/{graph,route,instruction,route_options}.dart
+app/lib/features/navigation/application/{route_planner,instruction_builder,navigation_controller}.dart
+app/lib/features/navigation/data/{asset_repository,graph_repository}.dart
+app/lib/features/navigation/presentation/{home,scanner,destinations,route_preview,guidance,arrival}_screen.dart
+app/lib/features/map/{floor_map,coordinate_transform}.dart
+app/lib/features/voice/{voice_service,audio_player_adapter}.dart
+app/lib/features/settings/{preferences_store,settings_screen}.dart
+app/lib/l10n/
+app/test/fixtures/
+app/test/{routing,instructions,qr,voice,localization,state,map}/
+app/integration_test/
+tools/content/
+tools/data/
+docs/acceptance/
+```
+
+檔名可在實作規劃時細分，但同一責任不得散在多個畫面自行決策。沒有必要為此 MVP 引入網路微服務、雲端資料庫或模型推論伺服器。
+
+## 18 例外處理與恢復
+
+| 錯誤碼 | 觸發 | 使用者可見行為 | 恢復與資料處理 |
+| --- | --- | --- | --- |
+| E-DATA-01 | 核心資料解析、schema 或 hash 失敗 | 顯示資料無法使用及重試 | 不開始導航；不默默載入不相容舊檔 |
+| E-QR-01 | 非本專案碼／超長／格式錯誤 | 「這不是支援的定位碼」 | 停該次解析，可重掃 |
+| E-QR-02 | anchor 不存在、停用或版本不符 | 「定位點或版本不支援」 | 不接受 QR 自帶座標 |
+| E-CAM-01 | 無權限／相機不可用 | 權限說明、取消、依系統開設定 | 保留既有路線，未產生新定位 |
+| E-RT-01 | 無可行路徑 | 明確說找不到符合需求路線 | 重選／重掃／求助，不放寬需求 |
+| E-RT-02 | 新位置有效但重算失敗 | 顯示新位置、舊路線已失效 | 停語音；從新位置重試 |
+| E-DIR-01 | 初始朝向或出口地標未知／OrientationGuide 缺失 | 顯示指引尚不可用，不給猜測左右 | guidanceUnavailable，可看路線摘要但不可開始，改已核對起點 |
+| E-AUD-01 | 音檔不存在／解碼失敗 | 保留文字圖像及重試 | 不用另一語言靜默替代 |
+| E-I18N-01 | 缺 key／參數錯誤 | 使用明確備援訊息，開發報錯 | CI 阻止正式包 |
+| E-MAP-01 | 圖檔或變換無效 | 不顯示誤導疊圖 | 停止導航，提供資料問題資訊 |
+| E-CONN-01 | 使用者回報設備不可用 | 本次避開該設備重算 | 無替代即 NoRoute；不表示官方即時資訊 |
+| E-ASYNC-01 | 舊請求／音訊晚到 | 不顯示過時結果 | 以 requestId／generation 忽略 |
+
+錯誤提示須七語、短句與可操作按鈕，不把 stack trace、schema 名稱或模型技術細節放進使用者流程。開發診斷另存本機測試報告。
+
+## 19 非功能需求
+
+以下是待量測的驗收目標，不是已測成績。基準裝置型號、OS、build hash、資料版本與測試方法必須同時記錄。
+
+| ID | 項目 | 工程驗收目標 |
+| --- | --- | --- |
+| NFR-01 | 啟動 | release build 冷啟動至可操作首頁 p95 ≤3 秒，10 次測試 |
+| NFR-02 | 路徑計算 | 30 節點／100 有向邊 fixture，plan＋指令 p95 ≤100ms，100 次 |
+| NFR-03 | 定位回應 | 成功解碼 callback 後至位置確認畫面 p95 ≤500ms；不含相機對焦時間 |
+| NFR-04 | 語言切換 | 本地語言文字更新 p95 ≤300ms；音檔開始 ≤1 秒，10 次／語 |
+| NFR-05 | 中止語音 | 控制事件後 300ms 內停止舊聲音，不出現新舊交疊 |
+| NFR-06 | 離線 | 未曾連網的新安裝完成三次完整流程；零 runtime 翻譯／TTS／LLM 連線 |
+| NFR-07 | 穩定 | 連續 30 分鐘操作，含 20 次重掃、20 次換語言，無 crash／掛死 |
+| NFR-08 | 可操作性 | 標準最小觸控區 48×48 logical px；簡易主要按鈕高度 ≥56 |
+| NFR-09 | 可讀性 | 標準正文基準 18、簡易 24 logical px；200% 系統字級主操作可達 |
+| NFR-10 | 對比與非色彩提示 | 一般文字對比目標 ≥4.5:1；路徑與狀態同時使用圖示／文字 |
+| NFR-11 | 螢幕閱讀 | 按鈕具語系化 semantics label，焦點順序符合流程，不重複讀裝飾圖 |
+| NFR-12 | 包體 | 工程預算 assets ≤80MB、Android APK ≤120MB；超標記錄來源，先壓縮非必要素材 |
+| NFR-13 | 可重現性 | 工具鏈、lockfile、資料／內容／音檔 hash 鎖定，相同 fixture 結果一致 |
+
+P95 使用排序後 nearest-rank 法；10 次取第 10 筆，100 次取第 95 筆。相機實際掃碼另做印刷碼測試：一般室內光線、20–50 公分、各 anchor 至少 3 次；記錄成功率與失敗條件，不將 callback 速度冒充完整辨識速度。
+
+簡易模式限制為一次一個動作、顯示必要選項、主要按鈕固定可見；高對比不能只換背景色而使地圖與圖示不可辨。泰文行高與換行、越南文附加符號、日韓字型須逐語實機確認。
+
+## 20 隱私與資料安全
+
+不要求帳號、年齡、國籍、電話、麥克風或 GPS。相機僅解 QR，不錄影、不存影像、不上傳原始掃描資料。記憶體中的路線與最後掃碼位置隨 session 結束清除；僅持久保存語言、UI 模式及靜音設定。
+
+建置時只送固定自製句庫給已核准翻譯／語音服務，不傳使用者實際位置、輸入、照片或個資。API key 不進 git、App 或 screenshot。測試紀錄只保留 build、fixture ID、事件與耗時，若做志願者研究，使用匿名代碼且不寫可識別資料。
+
+QR parser 限制 1024 bytes、欄位及型別；不支援任意 URL 跳轉。資產路徑限定 manifest 中的相對位置，拒絕 `..`、絕對路徑及外部 scheme。正式 QR 部署需管理單位許可、實際點位核對及維護；原型不能解決遭移貼的合法碼。
+
+## 21 P1 認知友善路線與 ML
+
+### 21.1 P1 規則基線
+
+先以與 P0 完全相同的可行圖產生 2–5 條 simple candidate paths；工程預設採 Yen K-shortest paths，K=3，最多 5。候選不得含 cycle，成本不得超過最短可行路徑的 1.5 倍；此為工程預設繞路上限，不是研究證實的最佳門檻。
+
+特徵：相對成本或可靠 distance_m、turn_count、complex_junction_count、floor_change_count、instruction_count、landmark_count、ambiguous_segment_count、gate_transfer_count。不得以 null 公尺填 0，或從未驗證地標推得優勢。
+
+第一版規則分數預設為 `2×turns + 2×complexJunctions + 3×floorChanges + 3×ambiguousSegments + gateTransfers - min(landmarks,3)`；越低越優。只在候選成本上限內比較，同分以總成本，再以 edge ID 序列排序。權重標示為 rule_baseline_v1、示範參數，必須公開可重現，不能說是訓練模型。
+
+候選圖的「複雜岔路」工程預設定義為可行圖內可離開邊數 ≥3 的 decision node，計數時排除立即原路返回方向；計算規則須在 fixture 固定。若候選完全相同，只顯示一條，不能換顏色充當第二種路線。
+
+### 21.2 解釋與降級
+
+顯示「少 2 次轉彎」「多 1 次換層」等直接從資料計算的差異；不顯示憑空生成的安心分數或降低迷路率百分比。UI 名稱為「容易理解」，避免「安心」暗示安全保證。P1 失敗、無適當候選或資料不足時，返回最短可行路徑並標示目前無其他可比較路線。
+
+### 21.3 未來 ML 門檻
+
+只有取得真實標註、明確受測條件與保留測試集時才可稱 ML。模型輸入與輸出具版本；以受測者／場景分組避免洩漏，依任務選 MAE、Spearman 或 pairwise accuracy，另記錄任務成功、走錯次數及完成時間。不得用規則生成標籤再宣稱學到真實理解難度。
+
+模型本地或離線預計算，不能引入 runtime API；模型及衍生權重同樣受第 16 節來源限制。模型永遠只排序已驗證可行路線，不能增加邊或降低無障礙限制。未通過來源、資料與效果審查時不打包模型，P0 不受影響。
+
+## 22 測試資料與案例
+
+### 22.1 合成路網 fixture
+
+建立獨立於真實場域的 `routing_fixture_v1`，用可手算數值驗證演算法。以下邊均為明確有向邊；`↔` 表示建置時建立兩筆邊，非 runtime 隱含反向。
+
+| 節點／邊 | 規格 |
+| --- | --- |
+| a、s1、l1 | B1；a 是 QR 起點，s1 樓梯入口、l1 電梯入口 |
+| s2、l2、d、q | B2；d 為目的地、q 為另一 QR |
+| a↔s1 | walk，cost=2 |
+| s1↔s2 | stairs，cost=2，step_free=no、wheelchair=no |
+| s2↔d | walk，cost=2 |
+| a↔l1 | walk，cost=4 |
+| l1↔l2 | elevator，cost=4，兩個可及欄位 yes |
+| l2↔d | walk，cost=4 |
+| q↔l2 | walk，cost=1 |
+
+未特別標示者均 open、公共區、可及且 synthetic。一般 a→d 結果 a,s1,s2,d，成本 6；無障礙結果 a,l1,l2,d，成本 12；無障礙 q→d 成本 5。移除電梯兩向邊後 a→d 無障礙為 NoRoute，一般仍為 6。
+
+另建 fixture 覆蓋單向電扶梯、完全斷圖、同成本路徑、未知狀態、付費區、非法負成本、零成本、缺引用、跨層無 connector 及公尺未知。fixture 不是北車真實資料，不能拿測試 PASS 當作場站路線驗證。
+
+### 22.2 核心測試案例
+
+| Test ID | 輸入／動作 | 必須觀察到的結果 |
+| --- | --- | --- |
+| T-DATA-01 | 重複 ID、缺 node、負／零 cost、未知 schema major | PackageLoadResult 失敗，不進導航 |
+| T-DATA-02 | geometry 越界或跨層無 connector | 驗證失敗並指出檔案與欄位 |
+| T-DATA-03 | distance_m=null、routing_unit=relative | UI 無公尺／分鐘，結果 totalDistanceM=null |
+| T-QR-01 | 4 個已知 anchor 真機掃描 | 每碼正確節點及樓層，等待確認 |
+| T-QR-02 | 普通網址、錯 JSON、1025 bytes、其他 site／major | 拒絕，不開外部網址、不改定位 |
+| T-QR-03 | 1 秒內同碼回呼 10 次 | 只進一次確認；下一 scanning session 可再掃 |
+| T-QR-04 | 拒絕權限、永久拒絕、無相機 | 可取消／依平台設定，不崩潰 |
+| T-RT-01 | fixture a→d standard | edge 對應正確、cost 6、經樓梯 |
+| T-RT-02 | fixture a→d stepFree | cost 12、經電梯、不含 stairs／escalator |
+| T-RT-03 | 電梯 closed／unknown／session unavailable | 無障礙 NoRoute，不回退樓梯 |
+| T-RT-04 | 單向電扶梯反向規劃 | 不得逆行；無替代則 NoRoute |
+| T-RT-05 | 不允許付費區是較短捷徑 | 排除捷徑，不因更短放行 |
+| T-RT-06 | source=destination | 單 node、零 edges，進抵達確認 |
+| T-RT-07 | 同成本邊路徑，重算 100 次 | 每次同 edge ID 字典序結果 |
+| T-RT-08 | unknown 可及性、正向可走反向不可走 | stepFree 排除 unknown，保持有向語意 |
+| T-RT-09 | 舊規劃慢於新規劃完成 | 只套用最新 requestId |
+| T-NV-01 | 使用者連按下一步／上一步 | 一個事件一次推進，位置時間不改 |
+| T-NV-02 | 從 a 路線導航中掃 q | 保留目的地與需求，新起點 q，cost 5，revision 更新 |
+| T-NV-03 | 重掃取消或無效碼 | 舊位置與路線保持，未自動恢復語音 |
+| T-NV-04 | 有效新位置但無路線 | 新位置可見、舊指引失效、語音停止 |
+| T-NV-05 | 手動切 B1／B2 地圖 | confirmedLocation 及 instructionIndex 不變 |
+| T-NV-06 | 最後一步但未確認抵達 | 不播已抵達；確認後 arrivalSource 正確 |
+| T-DIR-01 | east→south、east→north、29／30／150／151 度 | 右、左及門檻分類符合第 11 節 |
+| T-DIR-02 | 起始無可靠參照／跨層向量 | 不猜左右，不沿用其他層向量 |
+| T-DIR-03 | 同一 anchor 不同 outgoing edge、同設備不同出口 | 查到對應人工 guide；缺項進 guidanceUnavailable，不能用 Route 成功當作可導航 |
+| T-MAP-01 | 畫面長寬改變、縮放平移 | 節點與底圖仍對齊，逆變換命中正確 |
+| T-MAP-02 | 地圖失敗或錯誤 viewBox | 不顯示誤導路線，不繼續導航 |
+| T-L10N-01 | 七語全部 key、參數、POI、地標 | 無缺譯／空值／參數異名，原標示保留 |
+| T-L10N-02 | 導航中七語輪切 | 路線不變，文字及音訊同語系 |
+| T-L10N-03 | 長文、泰文、越南附加符號、日韓、200% 字級 | 無缺字／遮住操作，可捲動完成任務 |
+| T-AUD-01 | 168 個核心音檔 | 全部可解碼、hash 正確、審查與權利齊全 |
+| T-AUD-02 | 播放中切語言／重規劃／背景 | 舊聲音中止，不重疊、不播舊 token |
+| T-AUD-03 | 連按重播 10 次＋慢載入 | 只有最新 generation 播放 |
+| T-AUD-04 | 缺檔／解碼失敗／裝置靜音 | 保留文字圖像，主流程仍可完成 |
+| T-AUD-05 | 暫停後換步驟再繼續 | 不續播前一指令 |
+| T-OFF-01 | release 新安裝，先關網再第一次打開 | 掃碼、地圖、七語、語音全部可用 |
+| T-OFF-02 | Web 版本無 CDN 快取（若交付 Web） | 必要 JS／WASM／字型本地化，離線能力按第 25 節定義驗收 |
+| T-SRC-01 | 加入未核准依賴／音檔／endpoint | release gate 失敗，無自動來源放行 |
+| T-PRIV-01 | 全流程網路與檔案檢查 | 無定位／照片上傳、無 key、無不必要權限 |
+| T-PREF-01 | 重啟 App | 語言／模式／靜音保留，導航位置不自動恢復 |
+| T-E2E-01 | 兩 QR 起點、四目的地、跨層、重掃、抵達 | 至少兩組完整閉環實機通過 |
+| T-P1-01 | 最短與易懂候選相同或 ranker 失敗 | 只有有效最短路，不造差異 |
+| T-P1-02 | 認知分數偏好含樓梯路線、使用者 stepFree | 樓梯從候選階段已排除，模型無權恢復 |
+
+### 22.3 測試分層
+
+純單元測試覆蓋資料解析、硬限制、演算法、角度、指令與 token；widget 測試覆蓋語言、模式、錯誤與導航狀態；真機 integration 測試覆蓋相機、音訊、離線與完整操作。不能以 mocked player 測試證明 MP3 真機能播放，也不能以固定 route fixture 取代實際 Dijkstra 結果。
+
+### 22.4 最低平台矩陣
+
+| 條件 | P0 Android | iOS／Web（若被選為交付） |
+| --- | --- | --- |
+| 相機允許／拒絕／取消 | 必測 | 必測各平台行為 |
+| 首次離線啟動 | 必測 | Web 首次離線需先明確封裝或安裝方式，不以空快取 URL 可開啟為假設 |
+| 七語字型及音檔 | 每語必測 | 同樣必測，不沿用 Android 結果 |
+| 全主流程、旋轉／背景 | 必測 | 必測支援方向與平台生命週期 |
+| 裝置型號及版本 | 記錄實際值 | 記錄瀏覽器、OS、HTTPS／安裝方式 |
+
+## 23 驗收與證據
+
+### 23.1 發布門檻
+
+| Gate | 必要證據 | 未達處置 |
+| --- | --- | --- |
+| GATE-01 交付相容 | 主辦接受格式及實際啟動／入口測試 | 不宣稱城市通整合完成 |
+| GATE-02 資料與方向 | 範圍、節點邊、來源、驗證狀態及已核對 Demo 路線 | 只能 synthetic demo，不對外提供實際導航 |
+| GATE-03 路線正確 | T-RT、T-NV、T-DIR、T-MAP 相關案例 | 停止新增功能，先修正 |
+| GATE-04 七語 | 所有必要 UI key 與 168 核心音檔完成審查／測試 | 標實際支援，不算本版 P0 完成 |
+| GATE-05 來源與權利 | 無 unverified 依賴／素材；模型、服務及輸出權利通過 | 排除或換已核准來源，不降低限制 |
+| GATE-06 離線與穩定 | 新安裝關網完成、連續三次主流程、30 分鐘壓力操作 | 不宣稱完全離線與 Demo Ready |
+| GATE-07 交付文件 | build hash、package、QR 對照、README、授權、測試結果 | 補齊後才交付 |
+
+這些 gate 是未來產品驗收，不是本次 SPEC 能否提交的門檻。提交規格只代表要求已定義，不能將表格勾成 App 已通過。
+
+### 23.2 證據目錄
+
+```text
+docs/acceptance/
+  release-checklist.md
+  environment.md
+  requirements-results.csv
+  graph-verification.csv
+  translations-review.csv
+  audio-review.csv
+  provenance-review.csv
+  demo-runs.md
+  performance-results.csv
+```
+
+每筆測試紀錄最少含 testId、buildCommit、packageVersion、device、OS、locale、options、expected、actual、result、tester、testedAt、evidencePath。未執行標 not_run，不填 PASS。證據路徑不得指向不存在的影片或私人帳號資料。
+
+### 23.3 可用性觀察
+
+若有時間，邀請自願參與者比較平面圖與本產品，記錄任務、順序、成功、時間、走錯、求助與主觀難度。避免把第二次走同路更熟悉的效果歸因給產品；使用不同但相近任務或交錯順序。沒有樣本時只展示設計與功能證據，不編造降低迷路率。
+
+## 24 開發分工與時程
+
+本節是依賴與里程碑，並非授權本次直接開始開發 App。實作前應把每項交付拆成具體檔案與失敗／成功測試。
+
+### 24.1 責任
+
+| 角色 | 主要交付 | 對接契約 |
+| --- | --- | --- |
+| A 產品／整合 | GATE-01、範圍、操作流程、展示及打包 | 本 SPEC、release checklist |
+| B 路網／演算法 | JSON、Dijkstra、可及性、方向與 fixture | GraphSnapshot、RouteResult、Instruction |
+| C Flutter／介面 | 掃碼、畫面、地圖、狀態、易讀 | QrDecodeResult、NavigationSession |
+| D 多語／音訊 | key、翻譯、校對、168 檔、播放器 | locale、sentenceId、voice manifest |
+| 全員 | 真機閉環、授權與來源審查 | 測試與 provenance 報告 |
+
+角色可兼任；七語校對需要實際語言能力，不能假設四名開發者自然涵蓋七語。任何 reviewer 未確認的語言保持 draft。
+
+### 24.2 24 小時相對時程
+
+| 時段 | 工作與依賴 | 退出條件 |
+| --- | --- | --- |
+| H0–H1 | 確認城市通格式、裝置、資料與非中國來源方案；凍結七語 key | 決策及風險有負責人 |
+| H1–H3 | 合成 fixture、schema、基礎專案；翻譯草稿平行 | 有可載入 package 與 fixture |
+| H2–H5 | Dijkstra、無障礙、單向與 NoRoute 測試 | T-RT 核心案例通過 |
+| H3–H8 | 畫面、圖層、步驟狀態；七語資產生成 | 可手動測起終點，內容不與 UI 耦合 |
+| H5–H9 | 真機 QR、重新定位、token 與地圖一致性 | 掃第二碼能重算，不播舊音訊 |
+| H3–H10 | 語言校對、音檔聽檢、字型及離線驗證 | 七語審查狀態可查，缺口未被隱藏 |
+| H9–H13 | 標準／簡易、完整三種 Demo 情境 | 第一版閉環可操作 |
+| H13–H17 | 全流程整合、真實範圍核對、失敗恢復 | 核心測試與來源報告 |
+| H17–H20 | 修復、必要 UI 打磨；P1 僅在 P0 通過後 | 無阻斷錯誤，不犧牲七語與路線 |
+| H20–H22 | 120 秒／5 分鐘展示、三次實機、release 打包 | Demo 及測試證據齊全 |
+| H22–H24 | 凍結功能，只修阻斷；依正式截止提交 | hash、交付及確認回條 |
+
+以上 H 是開始工作後相對時數，不是官方競賽時程，不能取代主辦的提交截止。H12 尚無掃碼→路徑→地圖→中文語音時停止所有 P1；H18 停止新增功能；H22 凍結。七語仍有缺口時公開列出，不能自行縮成三語後宣稱全部完成。
+
+### 24.3 實作工作包與依賴
+
+| 工作包 | 依賴 | 具體交付與必要測試 |
+| --- | --- | --- |
+| WP-01 資料基礎 | 範圍與 schema | loaders、validator、fixture；T-DATA |
+| WP-02 路線與指令 | WP-01 | RoutePlanner、InstructionBuilder；T-RT、T-DIR |
+| WP-03 掃碼與 session | WP-01、WP-02 | QrDecoder、Controller；T-QR、T-NV |
+| WP-04 地圖與畫面 | WP-02、WP-03 | FloorMap、screens、模式；T-MAP、T-NV |
+| WP-05 七語內容 | 中文 catalog、來源核准 | 七語 catalog、ARB、字型；T-L10N |
+| WP-06 語音 | WP-05、語音權利核准 | manifest、168 檔、VoiceService；T-AUD |
+| WP-07 交付整合 | WP-03 至 WP-06 | 官方入口、release、README；T-OFF、T-E2E、T-SRC |
+| WP-08 P1 擴充 | 全部 P0 穩定 | 候選排序／最近設施；T-P1 |
+
+## 25 建置交付與維護
+
+### 25.1 最低交付清單
+
+1. 原始碼與鎖定依賴、工具鏈版本、經主辦接受的執行入口。
+2. 實際可執行 release 檔、build commit、SHA-256、安裝與啟動步驟。
+3. 完整本地 package、七語 catalog／字型／語音、版本及 hash manifest。
+4. QR 列印檔及 anchor→node→樓層→地標對照表，標示 Demo 用途。
+5. 資料來源、示範範圍、核對方式、限制、非即時狀態。
+6. 程式授權、第三方 notices、音檔／字型／地圖權利與來源審查表。
+7. 實際測試結果、已知問題、展示劇本與重新開始方式。
+8. 未來重做翻譯／音檔的工作設定與文件；不附憑證，不依賴原開發者私人帳號才能執行 App。
+
+### 25.2 建置檢查順序
+
+未來 CI 依序執行來源允許清單→catalog／audio／Graph validation→Flutter localization generation→format／analyze→單元與 widget 測試→release build。真機與權利審查不得假裝由 CI 自動完成。
+
+Flutter App 建立後的驗證指令預期包括 `flutter gen-l10n`、`dart format --output=none --set-exit-if-changed lib test integration_test`、`flutter analyze`、`flutter test`、`flutter build apk --release`；資料工具按第 14 節建立後執行。這些是實作後的預期檢查，本次沒有 App，不能宣稱已執行。
+
+### 25.3 Web 條件
+
+Web 相機需在相容瀏覽器及安全來源執行，按實際部署驗證；掃碼 library／WASM／字型／音訊不得默默走外部 CDN。離線 Web 必須明確說明安裝或預載條件：從未訪問、沒有本地包與快取時，不能保證任意網站 URL 在斷網狀態第一次開啟。若主辦要求此場景，交付可離線啟動的封裝載體或經允許的本地託管方式，不能沿用原生 APK 的離線宣稱。
+
+### 25.4 更新與維護
+
+資料更新先在獨立 package 驗證，通過後隨新版本發布；P0 不熱更新。變更節點 ID、QR 語意或座標基準需評估 major 升版與重印 QR；只修文案可升 content minor／patch。原路線 session 不與新圖混用。
+
+正式場域需另外建立點位許可、定期巡檢、QR 替換、路網變更、電梯資訊更新、異常回報與營運責任；這些是部署前工作，競賽原型不聲稱已有正式維運能力。
+
+## 26 競賽展示與評分對齊
+
+### 26.1 評分版本
+
+本 SPEC 依提案第 17 章保存團隊最新提供版本：初選服務應用 40、視覺 30、技術完整度 30；決選服務應用 25、技術完整度 30、穩定 20、視覺 15、創意公益 10。
+
+Repo 的[競賽指南](./2026-fall-competition-guide.md)記錄官方線上規則決選 30 分項名稱為「服務完整度」，提案最新版稱「技術完整度」。配分總和均為 100，本 SPEC 不沿用提案第 13 章「加總不為 100」的舊備註；對外投件名稱與時限仍須核對現場最新公告。
+
+### 26.2 120 秒實機劇本
+
+| 秒數 | 操作 | 驗證點 |
+| --- | --- | --- |
+| 0–15 | 首頁與局部場域說明 | 痛點與範圍誠實 |
+| 15–35 | 掃實體 QR，確認 B1 起點 | 真實掃碼、固定定位 |
+| 35–60 | 選目的地，顯示 B2 路線與單步箭頭 | 跨層、圖像、地標 |
+| 60–80 | 切無障礙並確認起點 | 排除樓梯，改電梯，不虛構位置 |
+| 80–100 | 選越南／印尼／泰文之一及簡易模式，播放；展示七語選單 | 多語＋易讀，已驗證素材 |
+| 100–115 | 我迷路了，掃第二碼 | 新定位與路線完整更新 |
+| 115–120 | 說明七語本地素材與公共價值 | 不宣稱 runtime AI |
+
+七語完整性以驗收報告證明，不必在兩分鐘逐語播放 168 檔。決選可增加來源、無路線、離線、架構與七語切換測試；禁止以展示預錄音檔的能力包裝成即時生成語音模型。
+
+### 26.3 現場規則
+
+依競賽指南，成果發表須投影實際作品，不使用簡報。備援錄影只用於排錯／核對，能否在發表使用須問主辦，不能自行當作替代 DEMO。功能、效果與來源只陳述實際完成部分；不展示未核准中國來源資源以求短期效果。
+
+## 27 未決事項與風險
+
+### 27.1 決策責任表
+
+| ID | 未決事項 | 負責方向／期限 | 預設處置 |
+| --- | --- | --- | --- |
+| OPEN-01 | 城市通正式交付格式與 Flutter 接受度 | A，H1 前 | 不宣稱整合完成；早期切換端 |
+| OPEN-02 | 示範 B1／B2 確切區域與現場核對能力 | B＋A，H2 前鎖範圍 | 未核對只 synthetic demo，不輸出真實站內行走保證 |
+| OPEN-03 | 官方 PDF 改繪／重製權利 | A，素材進包前 | 用有權利依據的自製示意圖，清楚標示 |
+| OPEN-04 | 翻譯及 TTS 供應商、區域、輸出再散布及競賽接受度 | D＋A，呼叫服務前 | 未核准不呼叫；真人翻譯錄音替代 |
+| OPEN-05 | 七語具能力校對者及聽檢 | D，H3 前排定 | 未校對語系維持草稿，未通過七語 gate |
+| OPEN-06 | 真機型號、SDK／套件版本、字型來源 | C，H1 前 | 鎖一組實機基準，不能寫成全平台支援 |
+| OPEN-07 | 泰文實際可用 voice | D，合成前 | 以已核准區域查詢並鎖版，不偷偷替換 |
+| OPEN-08 | 正式題目、提交入口、凍結及截止 | A，立即核對行前信／現場 | 相對 24 小時規劃不能代替官方截止 |
+| OPEN-09 | 來源限制是否延伸到不可得知的訓練資料或硬體上游 | A，遇不明項目前 | 不自行宣告豁免；標 unverified，排除該資源 |
+
+七語與來源限制是已決事項，不列入可自行降低的待確認項。待確認的是實現方式、證據與場域，不是使用者已指定的方向。
+
+### 27.2 主要失敗風險
+
+| 風險 | 早期徵兆 | 應對 |
+| --- | --- | --- |
+| 地圖有圖但沒有可靠 Graph | 節點靠猜、跨層靠 x/y 相同 | 先固定局部與合成 fixture，逐段核對 |
+| 七語擴張拖慢閉環 | 一直換服務、文字未凍結 | 先凍結 24 句與必要 UI，增量批次生成 |
+| 語音／翻譯來源無法審查 | 免費代理、未知模型、只有「可商用」宣稱 | 排除，換可證明來源的服務或真人素材 |
+| 方向錯誤比沒有導航更糟 | 掃碼即自動左轉、樓層向量混用 | 朝向確認＋人工核對 Demo 指令 |
+| 無障礙路線誤用未知資料 | unknown 被當 true、設備狀態過時 | 保守排除、非即時提示、無路徑誠實告知 |
+| 語音／地圖／步驟不同步 | 切語言還播舊句、重掃後仍畫舊線 | revision／generation 原子更新 |
+| 只在開發機能跑 | 需雲端 key、字型或模型首次下載 | 新安裝先關網真機測試 |
+| 比賽交付形式不符 | 最後才做空 Web 外殼 | H1 內確認並決策 |
+
+## 28 需求追溯與完成定義
+
+### 28.1 來源到實作及驗收
+
+| 來源需求 | SPEC | 對應測試／Gate |
+| --- | --- | --- |
+| QR 固定定位及不依賴 GPS | 第 06、07、09 節，FR-QR | T-QR、T-PRIV |
+| 跨 B1／B2 路線與地圖 | 第 09–12 節，FR-RT／NV | T-RT、T-DIR、T-MAP |
+| 無障礙硬條件 | 第 10 節 | T-RT-02／03／04／05／08，GATE-03 |
+| 一步一圖、地標、易讀 | 第 05、06、11、19 節 | T-NV、T-L10N-03 |
+| 我迷路了重新掃碼 | 第 06、07、18 節 | T-NV-02／03／04 |
+| 使用者最新七語 | 第 13–15 節 | T-L10N、T-AUD-01，GATE-04 |
+| 快速製作多語介面及語音 | 第 14 節 | catalog、批次工作、審查及可續跑工具契約 |
+| 絕不採中國相關資源 | 第 16、20、23 節 | T-SRC-01、T-PRIV-01，GATE-05 |
+| 預生成而非即時 AI | 第 14、15 節 | T-OFF、T-AUD、runtime 連線檢查 |
+| 認知理解難度排序 | 第 21 節，P1 | T-P1，明確 rule／ML 標示 |
+| 24 小時可 Demo 與交付 | 第 23–26 節 | GATE-01 至 07、T-E2E |
+| 官方資料、開源與部署許可 | 第 09、12、16、25 節 | provenance、QR 許可與驗證報告 |
+
+### 28.2 P0 完成定義
+
+- [ ] 主辦接受的交付形式已確認，交付入口真實可用。
+- [ ] B1／B2 局部示範路網、4–6 個 QR、4–6 個目的地及 20–30 節點完成資料驗證。
+- [ ] 至少兩組起訖完整閉環，至少一次跨層與重新定位，並含明確抵達確認。
+- [ ] 同起訖一般／無障礙差異及無路線案例均通過，不放寬不可通行條件。
+- [ ] 朝向、地標與跨層指引可理解，位置與步驟不混淆。
+- [ ] 七語全部必要 UI／POI／地標翻譯及 168 核心音檔完成可追溯審查。
+- [ ] 標準／簡易模式及大字、圖像、文字、語音可獨立使用。
+- [ ] 新指令、換語言、重掃、背景時，舊音訊不重播或交疊。
+- [ ] 新安裝關網可用，全部必要字型／掃碼／地圖／語音資產已封裝。
+- [ ] 沒有未核准中國相關或來源不明依賴／模型／服務／素材，輸出權利允許所需交付。
+- [ ] 正確標示示範範圍、人工建模、核對狀態、距離可信度與非即時限制。
+- [ ] 三次完整實機演練、必要錯誤恢復及性能結果已記錄，無捏造 PASS。
+- [ ] release hash、原始碼、README、授權、QR 對照、資料／內容版本及測試結果齊備。
+
+本規格不勾選以上產品驗收項；實作後以證據逐項簽認。
+
+## 29 參考來源
+
+查閱日期：2026-11-07。外部頁面可能更新，實作時需核對適用版本；本規格不把工具文件當作供應鏈或輸出授權的完整證明。
+
+| 編號 | 來源 | 本規格用途 |
+| --- | --- | --- |
+| S01 | [原提案](./提案企劃書.md) | 產品範圍、最新決策、24 小時規劃與評分版本 |
+| S02 | [競賽完整指南](./2026-fall-competition-guide.md) | 賽制、開源、展示及交付待確認事項 |
+| S03 | [臺北捷運車站設施資訊](https://data.taipei/dataset/detail?id=659b9f55-a687-4e55-a17b-ceca5743c514) | 官方設施資料入口，非可導航路網 |
+| S04 | [臺北捷運臺北車站 PDF](https://web.metro.taipei/img/ALL/INFOPDF/051.pdf) | 原提案站圖參考；不據此聲稱已測量或獲再散布授權 |
+| S05 | [TownPass](https://github.com/taipei-doit/TownPass)／[TownPass-Services](https://github.com/taipei-doit/TownPass-Services) | 原提案官方程式入口，實作時再核對整合規範 |
+| S06 | [Flutter 官方國際化](https://docs.flutter.dev/ui/internationalization) | localization、ARB 與語系設定 |
+| S07 | [Azure Translator 語言支援](https://learn.microsoft.com/en-us/azure/ai-services/translator/language-support) | 七語代碼與文字翻譯能力 |
+| S08 | [Translator Translate 方法](https://learn.microsoft.com/en-us/azure/ai-services/translator/text-translation/reference/v3/translate) | 批次字串、多目標語言與 key 映射 |
+| S09 | [Azure Speech 語言及聲音](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts) | 候選語音，實際區域 voices list 另查 |
+| S10 | [Speech TTS REST](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/rest-text-to-speech) | 區域、授權與聲音清單查詢 |
+| S11 | [Speech Batch Synthesis](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/batch-synthesis) | 開發期非同步批次合成工作流程 |
+| S12 | [mobile_scanner](https://pub.dev/packages/mobile_scanner) | 相機掃碼、bundled 資源及 Web 外部下載風險 |
+| S13 | [just_audio](https://pub.dev/packages/just_audio) | 本地資產播放、播放器狀態與中止行為 |
+
+### 本版相對原提案的明確取捨
+
+七語覆寫三語；重新定位為 P0；語音明確為預生成資產；規則排序及 ML 維持 P1；導航步驟不偽裝連續定位；距離未知不顯示公尺；中國相關與不明來源不得以功能或時程理由繞過；城市通相容、素材權利與現場驗證均需真實證據。
