@@ -2,6 +2,17 @@
 import { createQrBridge } from "../navigation/bridge.mjs";
 import { createStationScanSession } from "./scan.mjs";
 import { parseStationLocationQuery } from "./location-link.mjs";
+import zhTW from "../i18n/messages/zh-TW.mjs";
+
+const knownFailures = new Set([
+  "Cancelled",
+  "Unavailable",
+  "Busy",
+  "Timeout",
+  "WaitingForDrain",
+  "SendFailed",
+  "InvalidReply",
+]);
 
 /** Framework-independent owner of one native scan and the last supplied position. */
 export function createStationLocation({
@@ -15,7 +26,7 @@ export function createStationLocation({
   const session = createStationScanSession(data, connections);
   let bridge = createQrBridge(native, timeoutMs),
     active = false,
-    notice = "",
+    noticeKey = "",
     generation = 0,
     disposed = false;
   const snapshot = () => ({
@@ -23,7 +34,9 @@ export function createStationLocation({
     active,
     available: bridge.available,
     mode: session.snapshot().position ? "navigation" : "browsing",
-    notice,
+    noticeKey,
+    // Traditional Chinese text kept for callers that do not localize.
+    notice: noticeKey ? zhTW[noticeKey] : "",
   });
   const publish = () => {
     if (!disposed) onChange(snapshot());
@@ -53,13 +66,10 @@ export function createStationLocation({
       cancelPending();
       if (result.type === "success") {
         session.locatePoint(result.point.id, "url");
-        notice = "由定位連結帶入位置；請核對現場點位。";
+        noticeKey = "notice.linkLoaded";
       } else {
         session.reset();
-        notice =
-          result.type === "Browsing"
-            ? ""
-            : "定位參數無效或點位不存在，已返回瀏覽模式。";
+        noticeKey = result.type === "Browsing" ? "" : "notice.linkInvalid";
       }
       publish();
       return result;
@@ -69,20 +79,20 @@ export function createStationLocation({
       if (active) return { type: "Busy" };
       const ticket = ++generation;
       active = true;
-      notice = "等待城市通原生掃碼結果…";
+      noticeKey = "notice.waiting";
       publish();
       const reply = await bridge.scan();
       if (disposed || ticket !== generation) return { type: "Stale" };
       const result =
         reply.type === "success" ? session.scan(reply.payload) : reply;
       if (result.type === "success") {
-        notice = "定位已更新；您在這裡。選擇目的地或繼續查看地圖。";
+        noticeKey = "notice.located";
         publish();
         try {
           await onLocated(result.point);
         } catch {
           if (!disposed && ticket === generation) {
-            notice = "定位已更新，但網址同步失敗，請重新掃描。";
+            noticeKey = "notice.locatedUrlFailed";
           }
         }
         if (disposed || ticket !== generation) return { type: "Stale" };
@@ -90,18 +100,9 @@ export function createStationLocation({
         publish();
       } else {
         active = false;
-        notice =
-          {
-            Cancelled: "已取消掃描，原位置保持不變。",
-            Unavailable: "請由城市通 App 開啟以使用原生掃碼。",
-            Busy: "掃碼尚未結束，請先完成或關閉原生掃碼頁。",
-            Timeout:
-              "等待掃碼逾時。請先關閉原生掃碼頁；舊回覆清空前無法重掃，必要時關閉並重新進入服務。",
-            WaitingForDrain:
-              "仍在等待舊掃碼回覆。請先關閉原生掃碼頁，必要時關閉並重新進入服務。",
-            SendFailed: "無法啟動掃碼。請關閉並重新進入服務後再試。",
-            InvalidReply: "App 回傳格式不正確，原位置保持不變。",
-          }[result.type] ?? "不是本地圖支援的定位碼，原位置與目的地保持不變。";
+        noticeKey = knownFailures.has(result.type)
+          ? `notice.${result.type}`
+          : "notice.unsupportedCode";
         publish();
       }
       return result;
@@ -116,12 +117,12 @@ export function createStationLocation({
       if (disposed) return;
       cancelPending();
       session.reset();
-      notice = "";
+      noticeKey = "";
       publish();
       try {
         await onLocated(null);
       } catch {
-        notice = "網址同步失敗，請移除 point 參數後重新開啟地圖。";
+        noticeKey = "notice.resetUrlFailed";
         publish();
       }
     },
@@ -129,8 +130,7 @@ export function createStationLocation({
       if (disposed) return;
       const wasActive = active;
       cancelPending();
-      if (wasActive)
-        notice = "掃碼已暫停，原位置保持不變。請先關閉原生掃碼頁。";
+      if (wasActive) noticeKey = "notice.suspended";
       publish();
     },
     dispose() {

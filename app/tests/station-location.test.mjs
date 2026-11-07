@@ -78,8 +78,10 @@ test("URL entries carry no invented scan timestamp and invalid/removed parameter
   assert.equal(location.snapshot().mode, "browsing");
   assert.equal(location.snapshot().position, null);
   assert.match(location.snapshot().notice, /無效/);
+  assert.equal(location.snapshot().noticeKey, "notice.linkInvalid");
   location.applyQuery({});
   assert.equal(location.snapshot().notice, "");
+  assert.equal(location.snapshot().noticeKey, "");
   location.dispose();
 });
 
