@@ -1,6 +1,6 @@
 # 本機開發：docker compose -f compose.yml -f compose.dev.yml up --build
 services:
-  townpass:
+  codefest:
     build:
       target: dev
     ports: !override
