@@ -246,6 +246,7 @@
   </main>
 </template>
 
+const initialMapZoom = 1.15;
 <script setup>
 import {
   computed,
@@ -307,11 +308,12 @@ const selected = ref(null);
 const originView = ref(null);
 const connectorHeading = ref(null);
 const connectorPanel = ref(null);
+  nextTick(() => centerOn(0.5, 0.5));
 const connectorPosition = ref(null);
 const floorChanging = ref(false);
 const arrivalPointId = ref(null);
 let floorAnimation = null;
-const zoom = ref(1);
+const zoom = ref(initialMapZoom);
 const viewport = ref(null);
 const dragging = ref(false);
 let mapDrag = null;
@@ -739,6 +741,7 @@ function zoomWithKeyboard(event) {
     resetZoom();
     return;
   }
+    if (!origin) await zoomAt(initialMapZoom, viewportCenter());
   if (event.key !== "+" && event.key !== "=" && event.key !== "-") return;
   event.preventDefault();
   const scale = constrainZoom(zoom.value + (event.key === "-" ? -0.5 : 0.5));
