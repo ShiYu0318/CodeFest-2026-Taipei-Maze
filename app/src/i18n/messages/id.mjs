@@ -324,4 +324,14 @@ export default {
   "trip.keep": "Tetap lanjut",
   "trip.confirmCancel": "Ya, batalkan",
   "trip.continue": "Lanjut",
+  "staff.open": "Tunjukkan ke petugas",
+  "staff.title": "Tunjukkan ini ke petugas",
+  "staff.showThis":
+    "Tunjukkan layar ini kepada petugas stasiun atau orang di dekat Anda.",
+  "staff.close": "Tutup",
+  "staff.ask": "Bagaimana cara ke {place}?",
+  "staff.stepFree":
+    "Saya perlu rute tanpa anak tangga, saya tidak bisa naik tangga.",
+  "staff.thanks": "Saya kurang bisa berbahasa Mandarin. Terima kasih!",
+  "staff.thanksPlain": "Terima kasih!",
 };

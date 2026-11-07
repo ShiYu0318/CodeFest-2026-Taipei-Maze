@@ -277,4 +277,12 @@ export default {
   "trip.keep": "保留行程",
   "trip.confirmCancel": "確認取消",
   "trip.continue": "繼續",
+  "staff.open": "給站務人員看",
+  "staff.title": "請出示給站務人員",
+  "staff.showThis": "把這個畫面給站務人員或附近的人看。",
+  "staff.close": "關閉",
+  "staff.ask": "請問「{place}」怎麼走？",
+  "staff.stepFree": "我需要無障礙路線，不能走樓梯。",
+  "staff.thanks": "我不太會說中文，謝謝您！",
+  "staff.thanksPlain": "謝謝您！",
 };

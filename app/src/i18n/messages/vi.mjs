@@ -317,4 +317,14 @@ export default {
   "trip.keep": "Giữ chuyến đi",
   "trip.confirmCancel": "Đồng ý hủy",
   "trip.continue": "Tiếp tục",
+  "staff.open": "Đưa cho nhân viên xem",
+  "staff.title": "Đưa màn hình này cho nhân viên",
+  "staff.showThis":
+    "Hãy đưa màn hình này cho nhân viên nhà ga hoặc người ở gần.",
+  "staff.close": "Đóng",
+  "staff.ask": "Làm sao để đến {place}?",
+  "staff.stepFree":
+    "Tôi cần lối đi không có bậc thang, tôi không thể đi cầu thang.",
+  "staff.thanks": "Tôi không nói giỏi tiếng Trung. Cảm ơn bạn!",
+  "staff.thanksPlain": "Cảm ơn bạn!",
 };

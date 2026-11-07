@@ -321,4 +321,12 @@ export default {
   "trip.keep": "Keep trip",
   "trip.confirmCancel": "Yes, cancel",
   "trip.continue": "Continue",
+  "staff.open": "Show to staff",
+  "staff.title": "Show this to staff",
+  "staff.showThis": "Show this screen to station staff or someone nearby.",
+  "staff.close": "Close",
+  "staff.ask": "How do I get to {place}?",
+  "staff.stepFree": "I need a step-free route — I can't use stairs.",
+  "staff.thanks": "I don't speak Chinese well. Thank you!",
+  "staff.thanksPlain": "Thank you!",
 };

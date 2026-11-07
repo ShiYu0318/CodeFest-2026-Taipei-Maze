@@ -312,4 +312,12 @@ export default {
   "trip.keep": "여정 유지",
   "trip.confirmCancel": "취소하기",
   "trip.continue": "계속",
+  "staff.open": "직원에게 보여주기",
+  "staff.title": "직원에게 보여 주세요",
+  "staff.showThis": "이 화면을 역 직원이나 근처 사람에게 보여 주세요.",
+  "staff.close": "닫기",
+  "staff.ask": "{place}에 어떻게 가나요?",
+  "staff.stepFree": "계단 없는 길이 필요해요. 계단을 이용할 수 없어요.",
+  "staff.thanks": "중국어를 잘 못해요. 감사합니다!",
+  "staff.thanksPlain": "감사합니다!",
 };
