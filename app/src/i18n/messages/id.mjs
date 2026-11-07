@@ -364,6 +364,7 @@ export default {
   "map.faceChoose": "Hadap ke papan petunjuk stasiun, lalu pilih tujuan.",
   "map.badgeStart": "A",
   "map.badgeEnd": "T",
+  "scan.actions": "Tindakan perjalanan",
   "scan.cancelTrip": "Batalkan perjalanan",
   "endpoint.close": "Tutup lokasi",
   "endpoint.roles": "Pilih titik awal atau tujuan",

@@ -45,6 +45,7 @@ const realComponents = new Set([
   "StationNavigationRescan",
   "StationTransferStep",
   "DestinationSearch",
+  "StationScanPanel",
 ]);
 function component(name) {
   if (components.has(name)) return components.get(name);
@@ -167,7 +168,7 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
     assert.ok(trip.includes('class="navigation-rescan-bar"'));
     assert.equal(trip.includes('class="theme-group'), false);
     assert.equal(trip.includes('class="plan-stairs"'), false);
-    assert.ok(trip.includes('data-persistent-scan="true"'));
+    assert.ok(trip.includes('class="station-scan-panel"'));
     assert.ok(trip.includes("重新掃描定位"));
     const restored = await render({});
     assert.equal(
@@ -495,5 +496,31 @@ test("first-floor information uses its own source note rather than a metro basem
     assert.equal(html.includes("051.pdf#page="), false);
   } finally {
     language.setLocale(previous);
+  }
+});
+
+test("navigation actions keep one scan control followed by staff help and trip cancellation", async () => {
+  for (const persistentScan of [false, true]) {
+    const location = createStationLocation({ data, connections, native: null });
+    try {
+      location.applyQuery({ point: "b1-e4", v: "1" });
+      location.choose("m-e4");
+      const html = await renderToString(
+        Vue.createSSRApp(component("StationScanPanel"), {
+          location: { view: Vue.ref(location.snapshot()) },
+          persistentScan,
+        })
+      );
+      const actions = html.indexOf('class="scan-actions"');
+      const scan = html.indexOf('data-tour-target="scan"');
+      const staff = html.indexOf('class="scan-staff"');
+      const cancel = html.indexOf('class="scan-cancel"');
+      assert.ok(
+        actions >= 0 && scan > actions && staff > scan && cancel > staff
+      );
+      assert.equal((html.match(/data-tour-target="scan"/g) ?? []).length, 1);
+    } finally {
+      location.dispose();
+    }
   }
 });

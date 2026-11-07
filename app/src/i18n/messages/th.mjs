@@ -337,6 +337,7 @@ export default {
   "map.faceChoose": "หันไปทางป้ายนำทางในสถานี แล้วเลือกจุดหมาย",
   "map.badgeStart": "เริ่ม",
   "map.badgeEnd": "ถึง",
+  "scan.actions": "การดำเนินการเดินทาง",
   "scan.cancelTrip": "ยกเลิกการเดินทาง",
   "endpoint.close": "ปิดการระบุตำแหน่ง",
   "endpoint.roles": "เลือกจุดเริ่มต้นหรือจุดหมาย",

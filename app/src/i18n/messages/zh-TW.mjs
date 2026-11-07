@@ -306,6 +306,7 @@ export default {
   "map.faceChoose": "請面向站內導引指標，接著選擇目的地。",
   "map.badgeStart": "起",
   "map.badgeEnd": "終",
+  "scan.actions": "行程操作",
   "scan.cancelTrip": "取消行程",
   "endpoint.close": "關閉定位",
   "endpoint.roles": "選擇起點或終點",
