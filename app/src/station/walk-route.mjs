@@ -13,8 +13,15 @@ export function walkingRouter(compact) {
   return createWalkingRouter(expandWalkingNetwork(compact));
 }
 
-const options = ({ stepFree, unavailableConnectorIds } = {}) => ({
+const options = ({
+  stepFree,
+  unavailableConnectorIds,
+  excludedEdgeTypes,
+  allowFareGates,
+} = {}) => ({
   stepFree: stepFree === true,
+  excludedEdgeTypes: excludedEdgeTypes ?? [],
+  allowFareGates: allowFareGates === true,
   unavailableConnectorIds: unavailableConnectorIds ?? [],
 });
 
