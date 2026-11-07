@@ -51,6 +51,16 @@ export function resolveMeetingPoint(graph, points, id) {
   if (matches.length !== 1) return { type: "UnknownPoint" };
   const point = matches[0];
   if (
+    [
+      "site_id",
+      "anchor_id",
+      "destination_poi_id",
+      "name_key",
+      "waiting_guidance_key",
+    ].some((key) => typeof point[key] !== "string")
+  )
+    return { type: "InvalidData" };
+  if (
     point.site_id !== graph.site_id ||
     point.enabled !== true ||
     point.shareable !== true ||
@@ -117,6 +127,7 @@ export function createMeetingLink(graph, points, request = {}) {
   return { ...resolved, url: url.href, confirmedAt: position.confirmedAt };
 }
 export function parseMeetingLink(raw, graph, points) {
+  if (validateGraph(graph).length) return { type: "InvalidData" };
   if (typeof raw !== "string" || new TextEncoder().encode(raw).length > 2048)
     return { type: "InvalidLink" };
   let url;

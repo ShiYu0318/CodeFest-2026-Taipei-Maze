@@ -114,3 +114,15 @@ test("stale/future timestamps are advisory; they do not expire static links or p
   assert.equal(timeNotice(stamp, Date.parse("2026-11-07T09:00:00Z")), "stale");
   assert.equal(timeNotice(stamp, Date.parse("2026-11-07T07:00:00Z")), "future");
 });
+
+test("malformed local graph/meeting metadata is rejected instead of throwing", () => {
+  const url = build().url;
+  for (const g of [null, {}]) {
+    assert.doesNotThrow(() => parseMeetingLink(url, g, points));
+    assert.notEqual(parseMeetingLink(url, g, points).type, "success");
+  }
+  const bad = structuredClone(points);
+  bad[0].name_key = { toString: null };
+  assert.doesNotThrow(() => resolveMeetingPoint(graph, bad, "mp_a"));
+  assert.notEqual(resolveMeetingPoint(graph, bad, "mp_a").type, "success");
+});

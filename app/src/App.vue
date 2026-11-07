@@ -1,6 +1,6 @@
 <template>
   <nav
-    v-if="!['station-map', 'navigation-demo'].includes($route.name)"
+    v-if="!['station-map', 'navigation-demo', 'meeting'].includes($route.name)"
     class="app-nav"
   >
     <router-link to="/">Home</router-link>
