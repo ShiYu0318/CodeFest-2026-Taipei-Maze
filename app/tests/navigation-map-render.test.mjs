@@ -250,6 +250,10 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
     assert.equal(trip.includes('class="theme-group'), false);
     assert.equal(trip.includes('class="plan-stairs"'), false);
     assert.ok(trip.includes('class="station-scan-panel'));
+    assert.ok(
+      trip.includes('class="endpoint-go"'),
+      "manual endpoints expose a direct go button without a scan prerequisite"
+    );
     assert.ok(trip.includes("重新掃描定位"));
     const restored = await render({});
     assert.equal(

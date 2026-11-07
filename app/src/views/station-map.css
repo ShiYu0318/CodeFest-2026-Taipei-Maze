@@ -1242,3 +1242,28 @@
   opacity: 0.5;
   cursor: default;
 }
+
+.endpoint-go {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--display-control-height, 52px);
+  margin: 0 0 12px;
+  padding: 12px;
+  border: 0;
+  border-radius: var(--tp-radius-button, 10px);
+  background: var(--tp-primary-600);
+  color: #fff;
+  font: inherit;
+  font-size: var(--display-main-size, 1rem);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.endpoint-go:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+[data-theme="dark"] .endpoint-go {
+  color: var(--tp-primary-950);
+}

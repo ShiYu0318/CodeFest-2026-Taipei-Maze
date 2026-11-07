@@ -68,6 +68,15 @@
           />
         </template>
       </StationEndpointBar>
+      <button
+        v-if="walkStart && walkDestination"
+        type="button"
+        class="endpoint-go"
+        :disabled="location.view.value.active"
+        @click="openGuide"
+      >
+        <ZhuyinText :text="t('map.goHere')" />
+      </button>
       <div class="walk-nearest" role="group" :aria-label="t('walk.nearest')">
         <span class="walk-nearest-label"
           ><ZhuyinText :text="t('walk.nearest')"
@@ -586,7 +595,7 @@
       :target-point="targetPoint"
       :initial-role="pickerRole"
       @close="closeEndpointPicker"
-      @select="chooseEndpoint"
+      @select="selectEndpoints"
       @map-pick="startMapPicking"
     />
     <PlaceShareSheet
@@ -1697,7 +1706,8 @@ async function chooseEndpoint(
   destination,
   point,
   role,
-  proposedOptions
+  proposedOptions,
+  showGuide = true
 ) {
   if (location.view.value.active) return;
   if (role === "destination") {
@@ -1711,11 +1721,18 @@ async function chooseEndpoint(
   await saveEndpoints(start, destination);
   await nextTick();
   if (
+    showGuide &&
     role === "destination" &&
     destination &&
     walkDestination.value === destination
   )
     openGuide();
+}
+
+// Endpoint selection stays on the map until the explicit Go action.
+async function selectEndpoints(start, destination, point, role, options) {
+  await chooseEndpoint(start, destination, point, role, options, false);
+  if (start && destination) await closeEndpointPicker();
 }
 
 // Swap start and destination without opening the trip dialog.
