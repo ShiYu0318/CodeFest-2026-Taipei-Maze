@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0
 
       - name: Pull latest main
-        run: git pull --ff-only origin main
+        run: git pull origin main
 
       - name: Start services
         working-directory: ./
