@@ -18,7 +18,7 @@
             type="button"
             aria-haspopup="dialog"
             :aria-label="t('tour.replay')"
-            :title="t('tour.replay')"
+            :title="displayPlainZhuyin(t('tour.replay'), displayMode, locale)"
             @click="tourOpen = true"
           >
             <StationMapIcon name="help" />
@@ -77,7 +77,7 @@
             role="switch"
             :aria-checked="showLayers && level !== '1F'"
             :aria-label="t('map.layersAria')"
-            :title="t('map.layers')"
+            :title="displayPlainZhuyin(t('map.layers'), displayMode, locale)"
             :disabled="floorChanging || level === '1F'"
             @click="toggleLayers"
           >
@@ -89,7 +89,7 @@
             type="button"
             :aria-label="t('map.locate')"
             aria-haspopup="dialog"
-            :title="t('map.locate')"
+            :title="displayPlainZhuyin(t('map.locate'), displayMode, locale)"
             :disabled="floorChanging"
             @click="openEndpointPicker"
           >
@@ -122,10 +122,14 @@
 
       <div v-if="mapPickStep" class="map-pick-instructions">
         <p role="status">
-          {{ mapPickStep === "start" ? t("map.pickStart") : t("map.pickEnd") }}
+          <ZhuyinText
+            :text="
+              mapPickStep === 'start' ? t('map.pickStart') : t('map.pickEnd')
+            "
+          />
         </p>
         <button type="button" @click="openEndpointPicker()">
-          {{ t("map.cancel") }}
+          <ZhuyinText :text="t('map.cancel')" />
         </button>
       </div>
 
@@ -332,8 +336,8 @@
                             point.id === mapTargetPoint?.id,
                         }"
                         aria-hidden="true"
-                        >{{ endpointBadge(point) }}</span
-                      >
+                        ><ZhuyinText :text="endpointBadge(point)"
+                      /></span>
                     </button>
                   </div>
                 </div>
@@ -409,9 +413,13 @@
         </div>
 
         <footer class="station-footer">
-          <span>{{
-            t(level === "1F" ? "map.firstFloorNote" : "map.footerNote")
-          }}</span>
+          <span
+            ><ZhuyinText
+              :enabled="false"
+              :text="
+                t(level === '1F' ? 'map.firstFloorNote' : 'map.footerNote')
+              "
+          /></span>
           <div v-if="sources.length">
             <a
               v-for="[label, url] in sources"
@@ -419,21 +427,26 @@
               :href="url"
               target="_blank"
               rel="noopener noreferrer"
-              >{{ label }}</a
-            >
+              ><ZhuyinText :text="label" :enabled="false"
+            /></a>
           </div>
           <p class="station-data-status">
-            {{
-              t("map.dataStatus", {
-                points: dataStatus.points,
-                connections: dataStatus.connections,
-                unverified: dataStatus.unverifiedConnections,
-              })
-            }}
+            <ZhuyinText
+              :enabled="false"
+              :text="
+                t('map.dataStatus', {
+                  points: dataStatus.points,
+                  connections: dataStatus.connections,
+                  unverified: dataStatus.unverifiedConnections,
+                })
+              "
+            />
           </p>
-          <router-link to="/about" class="station-about-link">{{
-            t("map.about", { version: buildInfo.short })
-          }}</router-link>
+          <router-link to="/about" class="station-about-link"
+            ><ZhuyinText
+              :text="t('map.about', { version: buildInfo.short })"
+              :enabled="false"
+          /></router-link>
         </footer>
       </div>
     </div>
@@ -462,6 +475,7 @@
 </template>
 
 <script setup>
+import { displayPlainZhuyin } from "../display/zhuyin.mjs";
 import {
   computed,
   nextTick,

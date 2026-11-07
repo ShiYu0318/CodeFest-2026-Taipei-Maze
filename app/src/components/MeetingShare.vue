@@ -5,40 +5,52 @@
     class="meeting-share"
     aria-labelledby="meeting-share-title"
   >
-    <h3 id="meeting-share-title">在這裡等朋友（合成測試）</h3>
-    <p>{{ graph.messages[point.name_key] }} · {{ floor.toUpperCase() }}</p>
-    <p>{{ graph.messages[point.waiting_guidance_key] }}</p>
+    <h3 id="meeting-share-title">
+      <ZhuyinText :text="'在這裡等朋友（合成測試）'" />
+    </h3>
     <p>
-      最後定位確認：{{
-        position.confirmedAt
-      }}。連結只代表固定集合點，不能證明你現在仍在場。
+      <ZhuyinText :text="graph.messages[point.name_key]" /> ·
+      <ZhuyinText :text="floor.toUpperCase()" />
+    </p>
+    <p><ZhuyinText :text="graph.messages[point.waiting_guidance_key]" /></p>
+    <p>
+      <ZhuyinText :text="' 最後定位確認：'" /><ZhuyinText
+        :text="position.confirmedAt"
+      /><ZhuyinText :text="'。連結只代表固定集合點，不能證明你現在仍在場。 '" />
     </p>
     <label
       ><input
         v-model="acknowledged"
         type="checkbox"
-        :disabled="!canShare"
-      />我仍在此點，並會在此等候；這不是即時位置分享。</label
-    >
+        :disabled="!canShare" /><ZhuyinText
+        :text="'我仍在此點，並會在此等候；這不是即時位置分享。'"
+    /></label>
     <button :disabled="!canShare || !acknowledged" @click="generate">
-      產生集合連結
+      <ZhuyinText :text="' 產生集合連結 '" />
     </button>
     <div v-if="link">
-      <label for="meeting-share-link">集合連結（可手動選取複製）</label>
+      <label for="meeting-share-link"
+        ><ZhuyinText :text="'集合連結（可手動選取複製）'"
+      /></label>
       <input
         id="meeting-share-link"
         :value="link"
         readonly
         @focus="$event.target.select()"
       />
-      <button @click="copy">複製連結</button
-      ><button v-if="canNativeShare" @click="share">開啟系統分享選單</button>
-      <router-link :to="localView">在這台裝置查看集合卡</router-link>
+      <button @click="copy"><ZhuyinText :text="'複製連結'" /></button
+      ><button v-if="canNativeShare" @click="share">
+        <ZhuyinText :text="'開啟系統分享選單'" />
+      </button>
+      <router-link :to="localView"
+        ><ZhuyinText :text="'在這台裝置查看集合卡'"
+      /></router-link>
     </div>
-    <p v-if="notice" role="status">{{ notice }}</p>
+    <p v-if="notice" role="status"><ZhuyinText :text="notice" /></p>
   </section>
 </template>
 <script setup>
+import ZhuyinText from "./ZhuyinText.vue";
 /* global defineProps */
 import { computed, ref, watch } from "vue";
 import points from "../meeting/meeting-points.json";

@@ -19,16 +19,21 @@
       <ZhuyinText :text="t('scan.browseHint')" />
     </p>
     <template v-if="view.mode === 'navigation'">
-      <label for="station-destination">{{ t("scan.chooseDestination") }}</label>
+      <label for="station-destination"
+        ><ZhuyinText :text="t('scan.chooseDestination')"
+      /></label>
       <select
         id="station-destination"
         :value="view.destinationId ?? ''"
         :disabled="active"
         @change="choose($event.target.value)"
       >
-        <option disabled value="">{{ t("scan.choosePlaceholder") }}</option>
+        <option disabled value="">
+          <ZhuyinText :text="t('scan.choosePlaceholder')" plain />
+        </option>
         <option v-for="point in catalog" :key="point.id" :value="point.id">
-          {{ point.floor }} · {{ label(point) }}
+          <ZhuyinText :text="point.floor" plain /> ·
+          <ZhuyinText :text="label(point)" plain />
         </option>
       </select>
       <button
@@ -36,10 +41,12 @@
         :disabled="active"
         @click="choose(props.selectedPoint.id)"
       >
-        {{ t("scan.useSelected", { name: name(props.selectedPoint) }) }}
+        <ZhuyinText
+          :text="t('scan.useSelected', { name: name(props.selectedPoint) })"
+        />
       </button>
       <details ref="searchDetails">
-        <summary>{{ t("scan.searchByName") }}</summary>
+        <summary><ZhuyinText :text="t('scan.searchByName')" /></summary>
         <DestinationSearch
           id="station-navigation-search"
           :catalog="searchEntries"
@@ -54,9 +61,9 @@
           :checked="view.stepFree"
           type="checkbox"
           :disabled="active"
-          @change="changeStepFree($event.target.checked)"
-        />{{ t("scan.stepFree") }}</label
-      >
+          @change="changeStepFree($event.target.checked)" /><ZhuyinText
+          :text="t('scan.stepFree')"
+      /></label>
     </template>
     <p v-if="destination" class="scan-target">
       <strong
@@ -97,20 +104,24 @@
       @close="closeStaffCard"
     />
     <p v-if="view.manualPosition && position" role="status">
-      {{ t("transfer.previousLocation", { place: place(position) }) }}
+      <ZhuyinText
+        :text="t('transfer.previousLocation', { place: place(position) })"
+      />
     </p>
     <p v-else-if="position || view.mode !== 'browsing'" role="status">
-      {{
-        position
-          ? t("scan.youAreHere", { place: place(position) })
-          : t("scan.notLocated")
-      }}
+      <ZhuyinText
+        :text="
+          position
+            ? t('scan.youAreHere', { place: place(position) })
+            : t('scan.notLocated')
+        "
+      />
     </p>
     <p v-if="view.position?.source === 'qr'" class="scan-time">
-      {{ t("scan.scannedAt", { time: confirmedTime }) }}
+      <ZhuyinText :text="t('scan.scannedAt', { time: confirmedTime })" />
     </p>
     <p v-else-if="view.position" class="scan-time">
-      {{ t("scan.fromLink") }}
+      <ZhuyinText :text="t('scan.fromLink')" />
     </p>
     <button
       v-if="!persistentScan"
@@ -141,15 +152,20 @@
       aria-live="polite"
     >
       <h3>
-        {{ view.arrived ? t("scan.arrivedTitle") : t("scan.currentHint") }}
+        <ZhuyinText
+          :text="view.arrived ? t('scan.arrivedTitle') : t('scan.currentHint')"
+        />
       </h3>
-      <p>{{ instruction }}</p>
+      <p><ZhuyinText :text="instruction" /></p>
       <StationTransferStep v-if="!persistentScan" :location="location" />
       <ol v-if="view.relation.steps.length">
         <li v-for="step in view.relation.steps" :key="step.id">
-          {{ stopLabel(step.from) }} → {{ stopLabel(step.to)
-          }}<button :disabled="active" @click="unavailable(step.id)">
-            {{ t("scan.unavailable") }}
+          <ZhuyinText :text="stopLabel(step.from)" /> →
+          <ZhuyinText :text="stopLabel(step.to)" /><button
+            :disabled="active"
+            @click="unavailable(step.id)"
+          >
+            <ZhuyinText :text="t('scan.unavailable')" />
           </button>
         </li>
       </ol>
@@ -158,14 +174,16 @@
         :disabled="active"
         @click="confirm(view.token)"
       >
-        {{ t("scan.confirmArrival") }}
+        <ZhuyinText :text="t('scan.confirmArrival')" />
       </button>
       <p v-if="view.excludedEdgeTypes.length">
-        {{
-          t("scan.excluded", {
-            list: view.excludedEdgeTypes.join(t("scan.listSeparator")),
-          })
-        }}
+        <ZhuyinText
+          :text="
+            t('scan.excluded', {
+              list: view.excludedEdgeTypes.join(t('scan.listSeparator')),
+            })
+          "
+        />
       </p>
     </div>
     <button

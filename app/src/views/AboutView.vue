@@ -11,7 +11,7 @@
         to="/station-map"
         class="about-back"
         :aria-label="t('meeting.back')"
-        :title="t('meeting.back')"
+        :title="displayPlainZhuyin(t('meeting.back'), displayMode, locale)"
         ><svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             d="m15 5-7 7 7 7"
@@ -25,33 +25,33 @@
       <DisplayControls />
     </div>
 
-    <h1>{{ t("title.about") }}</h1>
+    <h1><ZhuyinText :text="t('title.about')" /></h1>
 
     <section class="about-card" aria-labelledby="about-version">
-      <h2 id="about-version">{{ t("about.version") }}</h2>
+      <h2 id="about-version"><ZhuyinText :text="t('about.version')" /></h2>
       <dl>
-        <dt>{{ t("about.versionLabel") }}</dt>
+        <dt><ZhuyinText :text="t('about.versionLabel')" /></dt>
         <dd>
           <code>{{ build.short }}</code>
-          <span v-if="build.date" class="about-date">{{
-            t("about.builtOn", { date: build.date })
-          }}</span>
+          <span v-if="build.date" class="about-date"
+            ><ZhuyinText :text="t('about.builtOn', { date: build.date })"
+          /></span>
         </dd>
         <template v-if="build.known">
-          <dt>{{ t("about.fullCommit") }}</dt>
+          <dt><ZhuyinText :text="t('about.fullCommit')" /></dt>
           <dd>
             <code class="about-hash">{{ build.commit }}</code>
           </dd>
         </template>
       </dl>
       <p v-if="!build.known" class="about-note">
-        {{ t("about.unknownBuild") }}
+        <ZhuyinText :text="t('about.unknownBuild')" />
       </p>
     </section>
 
     <section class="about-card" aria-labelledby="about-source">
-      <h2 id="about-source">{{ t("about.source") }}</h2>
-      <p>{{ t("about.licenseIntro") }}</p>
+      <h2 id="about-source"><ZhuyinText :text="t('about.source')" /></h2>
+      <p><ZhuyinText :text="t('about.licenseIntro')" /></p>
       <p>
         <a
           href="https://www.gnu.org/licenses/agpl-3.0.html"
@@ -61,80 +61,90 @@
         >
       </p>
       <p>
-        {{ t("about.repository") }}<strong>{{ repository }}</strong>
+        <ZhuyinText :text="t('about.repository')" /><strong>{{
+          repository
+        }}</strong>
       </p>
-      <p class="about-warning">{{ t("about.privateRepo") }}</p>
+      <p class="about-warning"><ZhuyinText :text="t('about.privateRepo')" /></p>
       <details>
-        <summary>{{ t("about.noticeSummary") }}</summary>
+        <summary><ZhuyinText :text="t('about.noticeSummary')" /></summary>
         <pre lang="en">{{ notice }}</pre>
       </details>
     </section>
 
     <section class="about-card" aria-labelledby="about-data">
-      <h2 id="about-data">{{ t("about.data") }}</h2>
+      <h2 id="about-data"><ZhuyinText :text="t('about.data')" /></h2>
       <ul class="about-facts">
         <li>
-          {{
-            t("about.points", {
-              count: data.points,
-              floors: data.floors.join(" · "),
-            })
-          }}
+          <ZhuyinText
+            :text="
+              t('about.points', {
+                count: data.points,
+                floors: data.floors.join(' · '),
+              })
+            "
+          />
         </li>
         <li>
-          {{
-            t("about.connections", {
-              count: data.connections,
-              unverified: data.unverifiedConnections,
-            })
-          }}
+          <ZhuyinText
+            :text="
+              t('about.connections', {
+                count: data.connections,
+                unverified: data.unverifiedConnections,
+              })
+            "
+          />
         </li>
         <li>
-          {{
-            data.walkingNetwork ? t("about.networkYes") : t("about.networkNo")
-          }}
+          <ZhuyinText
+            :text="
+              data.walkingNetwork ? t('about.networkYes') : t('about.networkNo')
+            "
+          />
         </li>
       </ul>
-      <p>{{ t("about.mapSource") }}</p>
+      <p><ZhuyinText :text="t('about.mapSource')" /></p>
       <p class="about-links">
         <a
           href="https://web.metro.taipei/pages2026/WebStation/051/1"
           target="_blank"
           rel="noopener noreferrer"
-          >{{ t("about.linkFacilities") }}</a
-        >
+          ><ZhuyinText :text="t('about.linkFacilities')"
+        /></a>
         <a
           href="https://web.metro.taipei/img/ALL/INFOPDF/051.pdf"
           target="_blank"
           rel="noopener noreferrer"
-          >{{ t("about.linkInfo") }}</a
-        >
+          ><ZhuyinText :text="t('about.linkInfo')"
+        /></a>
       </p>
-      <p>{{ t("about.openData") }}</p>
+      <p><ZhuyinText :text="t('about.openData')" /></p>
       <p>
         <a
           href="https://data.gov.tw/license"
           target="_blank"
           rel="noopener noreferrer"
-          >{{ t("about.openDataLicense") }}</a
-        >
+          ><ZhuyinText :text="t('about.openDataLicense')"
+        /></a>
       </p>
     </section>
 
     <section class="about-card" aria-labelledby="about-third">
-      <h2 id="about-third">{{ t("about.thirdParty") }}</h2>
+      <h2 id="about-third"><ZhuyinText :text="t('about.thirdParty')" /></h2>
       <ul class="about-list">
         <li v-for="item in components" :key="item.name">
-          <span>{{ item.name }}</span>
+          <span><ZhuyinText :text="item.name" /></span>
           <small>{{ item.license }}</small>
         </li>
       </ul>
-      <p class="about-note">{{ t("about.gemmaNote") }}</p>
+      <p class="about-note"><ZhuyinText :text="t('about.gemmaNote')" /></p>
     </section>
   </main>
 </template>
 
 <script setup>
+import { displayPlainZhuyin } from "../display/zhuyin.mjs";
+import ZhuyinText from "../components/ZhuyinText.vue";
 import { computed } from "vue";
 import DisplayControls from "../components/DisplayControls.vue";
 import { htmlLang, useI18n } from "../i18n/index.mjs";

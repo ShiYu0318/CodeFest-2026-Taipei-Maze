@@ -1,12 +1,14 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
   <section class="destination-search" :aria-labelledby="id + '-title'">
-    <h2 :id="id + '-title'">{{ t("search.title") }}</h2>
+    <h2 :id="id + '-title'"><ZhuyinText :text="t('search.title')" /></h2>
     <p class="search-hint">
-      {{ t("search.note") }}
+      <ZhuyinText :text="t('search.note')" />
     </p>
     <form @submit.prevent="submit">
-      <label :for="id + '-query'">{{ t("search.label") }}</label>
+      <label :for="id + '-query'"
+        ><ZhuyinText :text="t('search.label')"
+      /></label>
       <div class="search-input-row">
         <input
           :id="id + '-query'"
@@ -15,10 +17,12 @@
           type="search"
           autocomplete="off"
           :spellcheck="false"
-          :placeholder="t('search.placeholder')"
+          :placeholder="
+            displayPlainZhuyin(t('search.placeholder'), displayMode, locale)
+          "
         />
         <button type="submit" :disabled="disabled || !query.trim()">
-          {{ t("search.submit") }}
+          <ZhuyinText :text="t('search.submit')" />
         </button>
       </div>
       <button
@@ -27,26 +31,30 @@
         :disabled="disabled"
         @click="query = ''"
       >
-        {{ t("search.clear") }}
+        <ZhuyinText :text="t('search.clear')" />
       </button>
     </form>
     <p v-if="!navigation" class="search-hint">
-      {{ t("search.scope") }}
+      <ZhuyinText :text="t('search.scope')" />
     </p>
     <div v-if="result" role="status" aria-live="polite">
-      <p>{{ statusText }}</p>
+      <p><ZhuyinText :text="statusText" /></p>
       <p v-if="result.unparsedTerms?.length" class="search-hint">
-        {{
-          t("search.unknown", {
-            terms: result.unparsedTerms.join(t("search.listSeparator")),
-          })
-        }}
+        <ZhuyinText
+          :text="
+            t('search.unknown', {
+              terms: result.unparsedTerms.join(t('search.listSeparator')),
+            })
+          "
+        />
       </p>
       <p v-if="selectable && restrictionText" class="search-conditions">
-        {{ restrictionText }}
+        <ZhuyinText :text="restrictionText" />
       </p>
       <p v-if="result.status === 'suggestionsOnly'" class="search-hint">
-        {{ t("search.maybe", { term: result.matches[0]?.matchedAlias }) }}
+        <ZhuyinText
+          :text="t('search.maybe', { term: result.matches[0]?.matchedAlias })"
+        />
       </p>
       <ul
         v-if="selectable && result.matches.length"
@@ -55,36 +63,43 @@
       >
         <li v-for="match in result.matches" :key="match.poiId">
           <span
-            ><strong>{{ matchName(match) }}</strong
+            ><strong><ZhuyinText :text="matchName(match)" /></strong
             ><small
-              >{{ match.floorId.toUpperCase() }} ·
-              {{
-                match.matchType === "fuzzy"
-                  ? t("search.typo")
-                  : match.matchType === "exact"
-                  ? t("search.exact")
-                  : t("search.dictionary")
-              }}
-              · {{ t("search.accessUnknown") }}</small
-            ></span
-          >
+              ><ZhuyinText :text="match.floorId.toUpperCase()" /> ·
+              <ZhuyinText
+                :text="
+                  match.matchType === 'fuzzy'
+                    ? t('search.typo')
+                    : match.matchType === 'exact'
+                    ? t('search.exact')
+                    : t('search.dictionary')
+                " />
+              · <ZhuyinText :text="t('search.accessUnknown')" /></small
+          ></span>
           <button :disabled="disabled" @click="choose(match)">
-            {{ navigation ? t("search.confirm") : t("search.showOnMap") }}
+            <ZhuyinText
+              :text="navigation ? t('search.confirm') : t('search.showOnMap')"
+            />
           </button>
         </li>
       </ul>
     </div>
-    <p v-if="selectionNotice" role="status">{{ selectionNotice }}</p>
+    <p v-if="selectionNotice" role="status">
+      <ZhuyinText :text="selectionNotice" />
+    </p>
   </section>
 </template>
 
 <script setup>
+import ZhuyinText from "./ZhuyinText.vue";
 /* global defineProps, defineEmits */
 import { computed, ref, shallowRef, watch } from "vue";
 import dictionary from "../search/dictionary.json";
 import { searchCatalog } from "../search/search.mjs";
 import { withLocalizedFallback } from "../search/fallback.mjs";
 import { useI18n } from "../i18n/index.mjs";
+import { useDisplayPreferences } from "../display/preferences.mjs";
+import { displayPlainZhuyin } from "../display/zhuyin.mjs";
 import { placeLabel } from "../i18n/places.mjs";
 const props = defineProps({
   id: { type: String, required: true },
@@ -104,6 +119,7 @@ const props = defineProps({
 const emit = defineEmits(["select"]);
 const i18n = useI18n();
 const { locale, t } = i18n;
+const { displayMode } = useDisplayPreferences();
 const matchName = (match) => {
   const entry = props.catalog.find((item) => item.id === match.poiId);
   return entry

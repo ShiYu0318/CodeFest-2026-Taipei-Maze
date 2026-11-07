@@ -1,8 +1,42 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Original, manually authored readings for this local prototype. Use dictionary
 // tones (一 / 不 keep their base tones), not connected-speech tone changes.
-// Match reviewed phrases only; never guess an unknown character's pronunciation.
+// Prefer reviewed phrases, then reviewed UI characters; leave unknown text plain.
+import { characterReadings } from "./zhuyin-characters.mjs";
 const entries = [
+  ["重繪", "ㄔㄨㄥˊ ㄏㄨㄟˋ"],
+  ["重看", "ㄔㄨㄥˊ ㄎㄢˋ"],
+  ["重設", "ㄔㄨㄥˊ ㄕㄜˋ"],
+  ["重試", "ㄔㄨㄥˊ ㄕˋ"],
+  ["更容易", "ㄍㄥˋ ㄖㄨㄥˊ ㄧˋ"],
+  ["更多", "ㄍㄥˋ ㄉㄨㄛ"],
+  ["更開放", "ㄍㄥˋ ㄎㄞ ㄈㄤˋ"],
+  ["應該", "ㄧㄥ ㄍㄞ"],
+  ["自行", "ㄗˋ ㄒㄧㄥˊ"],
+  ["虛線", "ㄒㄩ ㄒㄧㄢˋ"],
+  ["長者", "ㄓㄤˇ ㄓㄜˇ"],
+  ["重新", "ㄔㄨㄥˊ ㄒㄧㄣ"],
+  ["重複", "ㄔㄨㄥˊ ㄈㄨˋ"],
+  ["處理", "ㄔㄨˇ ㄌㄧˇ"],
+  ["行程", "ㄒㄧㄥˊ ㄔㄥˊ"],
+  ["行進", "ㄒㄧㄥˊ ㄐㄧㄣˋ"],
+  ["行李", "ㄒㄧㄥˊ ㄌㄧˇ"],
+  ["步行", "ㄅㄨˋ ㄒㄧㄥˊ"],
+  ["通行", "ㄊㄨㄥ ㄒㄧㄥˊ"],
+  ["行動", "ㄒㄧㄥˊ ㄉㄨㄥˋ"],
+  ["執行", "ㄓˊ ㄒㄧㄥˊ"],
+  ["了解", "ㄌㄧㄠˇ ㄐㄧㄝˇ"],
+  ["看得懂", "ㄎㄢˋ ˙ㄉㄜ ㄉㄨㄥˇ"],
+  ["還原", "ㄏㄨㄢˊ ㄩㄢˊ"],
+  ["作為", "ㄗㄨㄛˋ ㄨㄟˊ"],
+  ["因為", "ㄧㄣ ㄨㄟˋ"],
+  ["成為", "ㄔㄥˊ ㄨㄟˊ"],
+  ["切換為", "ㄑㄧㄝ ㄏㄨㄢˋ ㄨㄟˊ"],
+  ["分為", "ㄈㄣ ㄨㄟˊ"],
+  ["和平飯店", "ㄏㄜˊ ㄆㄧㄥˊ ㄈㄢˋ ㄉㄧㄢˋ"],
+  ["種子", "ㄓㄨㄥˇ ㄗˇ"],
+  ["柱子", "ㄓㄨˋ ˙ㄗ"],
+  ["接著", "ㄐㄧㄝ ˙ㄓㄜ"],
   // Navigation actions and orientation prompts, reviewed as complete phrases.
   ["迷路或不確定", "ㄇㄧˊ ㄌㄨˋ ㄏㄨㄛˋ ㄅㄨˋ ㄑㄩㄝˋ ㄉㄧㄥˋ"],
   ["掃描附近的", "ㄙㄠˇ ㄇㄧㄠˊ ㄈㄨˋ ㄐㄧㄣˋ ˙ㄉㄜ"],
@@ -381,23 +415,61 @@ export const zhuyinLexicon = entries.map(([text, reading]) => ({
 const phrases = [...zhuyinLexicon].sort(
   (a, b) => b.text.length - a.text.length
 );
+const phrasesByFirst = new Map();
+for (const phrase of phrases) {
+  const first = Array.from(phrase.text)[0];
+  if (!phrasesByFirst.has(first)) phrasesByFirst.set(first, []);
+  phrasesByFirst.get(first).push(phrase);
+}
 
 export function annotateZhuyin(text) {
   const result = [];
   for (let offset = 0; offset < text.length; ) {
-    const phrase = phrases.find((entry) => text.startsWith(entry.text, offset));
+    const character = String.fromCodePoint(text.codePointAt(offset));
+    const phrase = phrasesByFirst
+      .get(character)
+      ?.find((entry) => text.startsWith(entry.text, offset));
     if (phrase) {
       Array.from(phrase.text).forEach((character, index) => {
         result.push({ text: character, reading: phrase.readings[index] });
       });
       offset += phrase.text.length;
     } else {
-      const character = String.fromCodePoint(text.codePointAt(offset));
-      result.push({ text: character, reading: null });
+      result.push({
+        text: character,
+        reading: characterReadings.get(character) ?? null,
+      });
       offset += character.length;
     }
   }
   return result;
+}
+
+/** Native option/placeholder text cannot contain ruby markup. Keep its value separate. */
+export function plainZhuyin(text) {
+  let result = "",
+    word = "",
+    readings = [];
+  const flush = () => {
+    if (word) result += `${word}（${readings.join(" ")}）`;
+    word = "";
+    readings = [];
+  };
+  for (const part of annotateZhuyin(text)) {
+    if (part.reading) {
+      word += part.text;
+      readings.push(part.reading);
+    } else {
+      flush();
+      result += part.text;
+    }
+  }
+  flush();
+  return result;
+}
+
+export function displayPlainZhuyin(text, mode, locale) {
+  return mode === "child" && locale === "zh-TW" ? plainZhuyin(text) : text;
 }
 
 export function splitZhuyin(reading) {
