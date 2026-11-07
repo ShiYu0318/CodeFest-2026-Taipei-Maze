@@ -1,8 +1,8 @@
 diff --git a/.gitignore b/.gitignore
-index 680ec4d..bde3fef 100644
+index 680ec4d..e3cedf5 100644
 --- a/.gitignore
 +++ b/.gitignore
-@@ -88,4 +88,6 @@ app.*.map.json
+@@ -88,4 +88,8 @@ app.*.map.json
  !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
  
  # FVM Version Cache
@@ -11,6 +11,8 @@ index 680ec4d..bde3fef 100644
 +.fvm/
 +# Generated from CodeFest web sources by package-townpass-web.py
 +/assets/codefest_web.bundle
++
++/assets/gemma_release.json
 diff --git a/android/app/build.gradle b/android/app/build.gradle
 index c7f6b01..ce869de 100644
 --- a/android/app/build.gradle
@@ -64,10 +66,10 @@ index 771d33a..b4e8dbf 100644
              <action android:name="android.intent.action.VIEW" />
 diff --git a/android/app/src/main/kotlin/com/example/townpass/CodefestAI.kt b/android/app/src/main/kotlin/com/example/townpass/CodefestAI.kt
 new file mode 100644
-index 0000000..0a2169c
+index 0000000..c6f47bb
 --- /dev/null
 +++ b/android/app/src/main/kotlin/com/example/townpass/CodefestAI.kt
-@@ -0,0 +1,173 @@
+@@ -0,0 +1,177 @@
 +// SPDX-License-Identifier: AGPL-3.0-or-later
 +package com.example.townpass
 +
@@ -85,6 +87,10 @@ index 0000000..0a2169c
 +import android.speech.SpeechRecognizer
 +import com.google.ai.edge.litertlm.Backend
 +import com.google.ai.edge.litertlm.Conversation
++import com.google.ai.edge.litertlm.ConversationConfig
++import com.google.ai.edge.litertlm.SamplerConfig
++import com.google.ai.edge.litertlm.RepetitionPenaltyConfig
++import com.google.ai.edge.litertlm.NoRepeatNgramConfig
 +import com.google.ai.edge.litertlm.Engine
 +import com.google.ai.edge.litertlm.EngineConfig
 +import io.flutter.plugin.common.MethodCall
@@ -118,7 +124,7 @@ index 0000000..0a2169c
 +    private fun error(code: String) = mapOf("status" to "error", "code" to code)
 +    private fun receipt(): String? = try {
 +        val receipt = JSONObject(File(activity.filesDir, "CodefestAI/receipt.json").readText())
-+        receipt.getString("sha256").takeIf { receipt.getString("source") == source && it.matches(Regex("[a-f0-9]{64}")) && model.length() == 584417280L }
++        receipt.getString("sha256").takeIf { receipt.getString("source") == source && it == "1325ae366d31950f137c9c357b9fa89448b176d76998180c08ceaca78bba98be" && model.length() == 584417280L }
 +    } catch (_: Exception) { null }
 +    private fun verify(expected: String): Boolean {
 +        val digest = MessageDigest.getInstance("SHA-256")
@@ -163,10 +169,10 @@ index 0000000..0a2169c
 +                            try { loaded.initialize(); engine = loaded } catch (e: Exception) { loaded.close(); throw e }
 +                        }
 +                        check(!cancelled.get())
-+                        engine!!.createConversation().use { chat ->
++                        engine!!.createConversation(ConversationConfig(samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.2))).use { chat ->
 +                            check(!cancelled.get())
 +                            conversation = chat
-+                            val reply = chat.sendMessage(prompt, maxOutputToken = 256).toString()
++                            val reply = chat.sendMessage(prompt, repetitionPenaltyConfig = RepetitionPenaltyConfig(repetitionPenalty = 1.15f), noRepeatNgramConfig = NoRepeatNgramConfig(noRepeatNgramSize = 4), maxOutputToken = 256).toString()
 +                            response = if (cancelled.get()) error("cancelled") else mapOf("status" to "success", "text" to reply.take(6000))
 +                        }
 +                    } catch (_: Exception) { response = error(if (cancelled.get()) "cancelled" else "inference_failed") }
@@ -301,7 +307,7 @@ index 10b0ecf..1518ece 100644
 -COCOAPODS: 1.16.2
 +COCOAPODS: 1.17.0
 diff --git a/ios/Runner.xcodeproj/project.pbxproj b/ios/Runner.xcodeproj/project.pbxproj
-index 75fa361..a562ab9 100644
+index 75fa361..f4e8c66 100644
 --- a/ios/Runner.xcodeproj/project.pbxproj
 +++ b/ios/Runner.xcodeproj/project.pbxproj
 @@ -17,6 +17,8 @@
@@ -369,7 +375,31 @@ index 75fa361..a562ab9 100644
  				INFOPLIST_FILE = Runner/Info.plist;
  				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
  				LD_RUNPATH_SEARCH_PATHS = (
-@@ -666,6 +675,7 @@
+@@ -504,6 +513,7 @@
+ 				CODE_SIGN_STYLE = Automatic;
+ 				CURRENT_PROJECT_VERSION = 1;
+ 				GENERATE_INFOPLIST_FILE = YES;
++				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+ 				MARKETING_VERSION = 1.0;
+ 				PRODUCT_BUNDLE_IDENTIFIER = com.example.townpass.RunnerTests;
+ 				PRODUCT_NAME = "$(TARGET_NAME)";
+@@ -522,6 +532,7 @@
+ 				CODE_SIGN_STYLE = Automatic;
+ 				CURRENT_PROJECT_VERSION = 1;
+ 				GENERATE_INFOPLIST_FILE = YES;
++				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+ 				MARKETING_VERSION = 1.0;
+ 				PRODUCT_BUNDLE_IDENTIFIER = com.example.townpass.RunnerTests;
+ 				PRODUCT_NAME = "$(TARGET_NAME)";
+@@ -538,6 +549,7 @@
+ 				CODE_SIGN_STYLE = Automatic;
+ 				CURRENT_PROJECT_VERSION = 1;
+ 				GENERATE_INFOPLIST_FILE = YES;
++				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+ 				MARKETING_VERSION = 1.0;
+ 				PRODUCT_BUNDLE_IDENTIFIER = com.example.townpass.RunnerTests;
+ 				PRODUCT_NAME = "$(TARGET_NAME)";
+@@ -666,6 +678,7 @@
  				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
  				DEVELOPMENT_TEAM = ZLLDAN62HX;
  				ENABLE_BITCODE = NO;
@@ -377,7 +407,7 @@ index 75fa361..a562ab9 100644
  				INFOPLIST_FILE = Runner/Info.plist;
  				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
  				LD_RUNPATH_SEARCH_PATHS = (
-@@ -690,6 +700,7 @@
+@@ -690,6 +703,7 @@
  				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
  				DEVELOPMENT_TEAM = ZLLDAN62HX;
  				ENABLE_BITCODE = NO;
@@ -385,7 +415,7 @@ index 75fa361..a562ab9 100644
  				INFOPLIST_FILE = Runner/Info.plist;
  				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
  				LD_RUNPATH_SEARCH_PATHS = (
-@@ -746,11 +757,27 @@
+@@ -746,11 +760,27 @@
  		};
  /* End XCLocalSwiftPackageReference section */
  
@@ -468,10 +498,10 @@ index b509907..bb493eb 100644
  }
 diff --git a/ios/Runner/CodefestAI.swift b/ios/Runner/CodefestAI.swift
 new file mode 100644
-index 0000000..241a0de
+index 0000000..c8865ea
 --- /dev/null
 +++ b/ios/Runner/CodefestAI.swift
-@@ -0,0 +1,170 @@
+@@ -0,0 +1,171 @@
 +// SPDX-License-Identifier: AGPL-3.0-or-later
 +import Flutter
 +import UIKit
@@ -509,7 +539,7 @@ index 0000000..241a0de
 +    guard let data = try? Data(contentsOf: directory.appendingPathComponent("receipt.json")),
 +      let value = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
 +      value["source"] as? String == Self.source,
-+      let digest = value["sha256"] as? String, digest.range(of: "^[a-f0-9]{64}$", options: .regularExpression) != nil,
++      let digest = value["sha256"] as? String, digest == "1325ae366d31950f137c9c357b9fa89448b176d76998180c08ceaca78bba98be",
 +      let attributes = try? FileManager.default.attributesOfItem(atPath: model.path),
 +      (attributes[.size] as? NSNumber)?.int64Value == 584417280 else { return nil }
 +    return digest
@@ -541,10 +571,11 @@ index 0000000..241a0de
 +            engine = loaded
 +          }
 +          guard let current = engine else { throw NSError(domain:"model_missing",code:1) }
-+          let chat = try await current.createConversation()
++          let sampler = try SamplerConfig(topK: 40, topP: 0.9, temperature: 0.2)
++          let chat = try await current.createConversation(with: ConversationConfig(samplerConfig: sampler))
 +          try Task.checkCancellation()
 +          conversation = chat
-+          let reply = try await chat.sendMessage(Message(prompt), maxOutputTokens: 256)
++          let reply = try await chat.sendMessage(Message(prompt), repetitionPenaltyConfig: RepetitionPenaltyConfig(repetitionPenalty: 1.15), noRepeatNgramConfig: NoRepeatNgramConfig(noRepeatNgramSize: 4), maxOutputTokens: 256)
 +          try Task.checkCancellation()
 +          result(["status":"success", "text":String(reply.toString.prefix(6000))])
 +        } catch {
@@ -657,6 +688,40 @@ index 8a02575..d6b63a5 100644
  		<key>CADisableMinimumFrameDurationOnPhone</key>
  		<true/>
  		<key>CFBundleDevelopmentRegion</key>
+diff --git a/ios/RunnerTests/RunnerTests.swift b/ios/RunnerTests/RunnerTests.swift
+index 86a7c3b..438454a 100644
+--- a/ios/RunnerTests/RunnerTests.swift
++++ b/ios/RunnerTests/RunnerTests.swift
+@@ -1,6 +1,7 @@
+ import Flutter
+ import UIKit
+ import XCTest
++@testable import Runner
+ 
+ class RunnerTests: XCTestCase {
+ 
+@@ -9,4 +10,21 @@ class RunnerTests: XCTestCase {
+     // See https://developer.apple.com/documentation/xctest for more information about using XCTest.
+   }
+ 
++  @MainActor
++  func testCodefestGemmaFromPrivateContainer() async throws {
++    let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("CodefestAI")
++    guard FileManager.default.fileExists(atPath: directory.appendingPathComponent("receipt.json").path) else {
++      throw XCTSkip("Optional real-model test requires the verified developer model in the private App container.")
++    }
++    let completed = expectation(description: "Native Gemma returns local text")
++    let service = CodefestAI()
++    service.handle(FlutterMethodCall(methodName: "generate", arguments: ["requestId": String(repeating: "a", count: 32), "prompt": "Say hello in one short sentence."])) { value in
++      let reply = value as? [String: Any]
++      XCTAssertEqual(reply?["status"] as? String, "success")
++      XCTAssertFalse((reply?["text"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
++      completed.fulfill()
++    }
++    await fulfillment(of: [completed], timeout: 90)
++  }
++
+ }
 diff --git a/lib/page/city_service/model/my_service_model.dart b/lib/page/city_service/model/my_service_model.dart
 index 4f33a56..d3b4924 100644
 --- a/lib/page/city_service/model/my_service_model.dart
@@ -694,10 +759,10 @@ index 4f33a56..d3b4924 100644
            description: '播打網路語音通話',
 diff --git a/lib/page/codefest_ai/gemma_model_store.dart b/lib/page/codefest_ai/gemma_model_store.dart
 new file mode 100644
-index 0000000..1ead41b
+index 0000000..95692cb
 --- /dev/null
 +++ b/lib/page/codefest_ai/gemma_model_store.dart
-@@ -0,0 +1,137 @@
+@@ -0,0 +1,124 @@
 +// SPDX-License-Identifier: AGPL-3.0-or-later
 +import 'dart:convert';
 +import 'dart:io';
@@ -705,6 +770,7 @@ index 0000000..1ead41b
 +
 +import 'package:crypto/crypto.dart';
 +import 'package:path_provider/path_provider.dart';
++import 'package:town_pass/page/codefest_ai/gemma_release.dart';
 +
 +class GemmaModelStore {
 +  static const fileName = 'gemma3-1b-it-int4.litertlm';
@@ -712,34 +778,20 @@ index 0000000..1ead41b
 +  static const size = 584417280;
 +  static const source =
 +      'https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/$revision/$fileName';
-+  static const pointer =
-+      'https://huggingface.co/litert-community/Gemma3-1B-IT/raw/$revision/$fileName';
 +  final HttpClient _client = HttpClient()
 +    ..connectionTimeout = const Duration(seconds: 30);
 +  bool _cancelled = false;
 +  static bool approvedUri(Uri uri) =>
 +      uri.scheme == 'https' &&
 +      uri.userInfo.isEmpty &&
-+      (uri.port == 443) &&
-+      (uri.host == 'huggingface.co' ||
-+          uri.host.endsWith('.huggingface.co') ||
-+          uri.host.endsWith('.hf.co'));
-+  static String parsePointer(String value) {
-+    final match = RegExp(
-+      r'^version https://git-lfs.github.com/spec/v1\noid sha256:([a-f0-9]{64})\nsize 584417280\n?$',
-+    ).firstMatch(value);
-+    if (match == null) {
-+      throw const FormatException('Invalid pinned Google artifact pointer');
-+    }
-+    return match.group(1)!;
-+  }
-+
++      uri.port == 443 &&
++      uri.host == 'home.yoyo899843.com';
 +  void cancel() {
 +    _cancelled = true;
 +    _client.close(force: true);
 +  }
 +
-+  Future<HttpClientResponse> _open(String url, String token) async {
++  Future<HttpClientResponse> _open(String url) async {
 +    var uri = Uri.parse(url);
 +    for (var attempt = 0; attempt < 6; attempt++) {
 +      if (_cancelled || !approvedUri(uri)) {
@@ -747,9 +799,6 @@ index 0000000..1ead41b
 +      }
 +      final request = await _client.getUrl(uri);
 +      request.followRedirects = false;
-+      if (token.isNotEmpty && uri.host == 'huggingface.co') {
-+        request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
-+      }
 +      final response = await request.close().timeout(
 +        const Duration(seconds: 60),
 +      );
@@ -773,24 +822,22 @@ index 0000000..1ead41b
 +
 +  Future<void> install({
 +    required bool termsAccepted,
-+    required String token,
++    GemmaRelease? release,
 +    required void Function(double) onProgress,
 +  }) async {
 +    if (!termsAccepted) throw StateError('Gemma license acceptance required');
-+    final metadata = await _open(pointer, token);
-+    final bytes = <int>[];
-+    await for (final chunk in metadata.timeout(const Duration(seconds: 60))) {
-+      bytes.addAll(chunk);
-+      if (bytes.length > 1024) throw const FormatException('Oversized pointer');
++    final metadata = release ?? await GemmaRelease.load();
++    if (!metadata.available || metadata.digest == null) {
++      throw StateError('Model release not published');
 +    }
-+    final expected = parsePointer(utf8.decode(bytes));
++    final expected = metadata.digest!;
 +    final base = await getApplicationSupportDirectory();
 +    final directory = Directory('${base.path}/CodefestAI');
 +    await directory.create(recursive: true);
 +    final working = await directory.createTemp('.install-');
 +    final temporary = File('${working.path}/$fileName.part');
 +    try {
-+      final response = await _open(source, token);
++      final response = await _open(GemmaRelease.download);
 +      var count = 0;
 +      final output = await temporary.open(mode: FileMode.write);
 +      try {
@@ -828,6 +875,11 @@ index 0000000..1ead41b
 +        }),
 +        flush: true,
 +      );
++      await File('${directory.path}/GEMMA_TERMS.txt')
++          .writeAsString(metadata.agreement);
++      await File('${directory.path}/PROHIBITED_USE_POLICY.txt')
++          .writeAsString(metadata.policy);
++      await File('${directory.path}/NOTICE').writeAsString(metadata.notice);
 +      await receipt.rename('${directory.path}/receipt.json');
 +    } finally {
 +      if (await working.exists()) await working.delete(recursive: true);
@@ -835,16 +887,78 @@ index 0000000..1ead41b
 +    }
 +  }
 +}
+diff --git a/lib/page/codefest_ai/gemma_release.dart b/lib/page/codefest_ai/gemma_release.dart
+new file mode 100644
+index 0000000..f942fec
+--- /dev/null
++++ b/lib/page/codefest_ai/gemma_release.dart
+@@ -0,0 +1,56 @@
++// SPDX-License-Identifier: AGPL-3.0-or-later
++import 'dart:convert';
++
++import 'package:flutter/services.dart';
++
++/// Trusted metadata is compiled into the App; never fetched from a user URL.
++class GemmaRelease {
++  static const officialSource =
++      'https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/42d538a932e8d5b12e6b3b455f5572560bd60b2c/gemma3-1b-it-int4.litertlm';
++  static const revision = '42d538a932e8d5b12e6b3b455f5572560bd60b2c';
++  static const size = 584417280;
++  static const expectedDigest =
++      '1325ae366d31950f137c9c357b9fa89448b176d76998180c08ceaca78bba98be';
++  static const download =
++      'https://home.yoyo899843.com/models/gemma3-1b-it-int4.litertlm';
++  final bool available;
++  final String? digest;
++  final String agreement, policy, notice;
++  GemmaRelease._(
++    this.available,
++    this.digest,
++    this.agreement,
++    this.policy,
++    this.notice,
++  );
++  factory GemmaRelease.parse(Map<String, dynamic> value) {
++    if (value['schema'] != 1 ||
++        value['available'] is! bool ||
++        value['source'] != officialSource ||
++        value['revision'] != revision ||
++        value['size'] != size ||
++        value['download_url'] != download) {
++      throw const FormatException('Invalid approved model release');
++    }
++    for (final key in ['agreement', 'policy', 'notice']) {
++      if (value[key] is! String || (value[key] as String).isEmpty) {
++        throw const FormatException('Missing model terms');
++      }
++    }
++    final digest = value['sha256'];
++    if (value['available'] == true && (digest != expectedDigest)) {
++      throw const FormatException('Missing pinned model hash');
++    }
++    return GemmaRelease._(
++      value['available'],
++      digest is String ? digest : null,
++      value['agreement'],
++      value['policy'],
++      value['notice'],
++    );
++  }
++  static Future<GemmaRelease> load() async => GemmaRelease.parse(
++    jsonDecode(await rootBundle.loadString('assets/gemma_release.json'))
++        as Map<String, dynamic>,
++  );
++}
 diff --git a/lib/page/codefest_ai/gemma_setup_view.dart b/lib/page/codefest_ai/gemma_setup_view.dart
 new file mode 100644
-index 0000000..04f1812
+index 0000000..62e4796
 --- /dev/null
 +++ b/lib/page/codefest_ai/gemma_setup_view.dart
-@@ -0,0 +1,160 @@
+@@ -0,0 +1,166 @@
 +// SPDX-License-Identifier: AGPL-3.0-or-later
 +import 'package:flutter/material.dart';
-+import 'package:url_launcher/url_launcher.dart';
 +import 'package:town_pass/page/codefest_ai/gemma_model_store.dart';
++import 'package:town_pass/page/codefest_ai/gemma_release.dart';
 +
 +class GemmaSetupView extends StatefulWidget {
 +  const GemmaSetupView({super.key});
@@ -854,15 +968,22 @@ index 0000000..04f1812
 +
 +class _GemmaSetupState extends State<GemmaSetupView>
 +    with WidgetsBindingObserver {
-+  final token = TextEditingController();
 +  bool accepted = false, downloading = false, installed = false;
 +  double progress = 0;
 +  String? notice;
 +  GemmaModelStore? store;
++  GemmaRelease? release;
 +  @override
 +  void initState() {
 +    super.initState();
 +    WidgetsBinding.instance.addObserver(this);
++    GemmaRelease.load()
++        .then((value) {
++          if (mounted) setState(() => release = value);
++        })
++        .catchError((_) {
++          if (mounted) setState(() => notice = '模型下載資訊尚未準備好。請更新 App，導航功能仍可使用。');
++        });
 +  }
 +
 +  @override
@@ -874,13 +995,33 @@ index 0000000..04f1812
 +  void dispose() {
 +    WidgetsBinding.instance.removeObserver(this);
 +    store?.cancel();
-+    token.clear();
-+    token.dispose();
 +    super.dispose();
 +  }
 +
++  void showTerms() {
++    final current = release;
++    if (current == null) return;
++    showDialog<void>(
++      context: context,
++      builder: (context) => AlertDialog(
++        title: const Text('Gemma 模型條款'),
++        scrollable: true,
++        content: SelectableText(
++          '${current.agreement}\n\n${current.policy}\n\n${current.notice}',
++        ),
++        actions: [
++          TextButton(
++            onPressed: () => Navigator.of(context).pop(),
++            child: const Text('關閉'),
++          ),
++        ],
++      ),
++    );
++  }
++
 +  Future<void> install() async {
-+    if (!accepted || downloading) return;
++    final currentRelease = release;
++    if (!accepted || downloading || currentRelease?.available != true) return;
 +    setState(() {
 +      downloading = true;
 +      notice = null;
@@ -888,12 +1029,10 @@ index 0000000..04f1812
 +    });
 +    final current = GemmaModelStore();
 +    store = current;
-+    final credential = token.text.trim();
-+    token.clear();
 +    try {
 +      await current.install(
 +        termsAccepted: accepted,
-+        token: credential,
++        release: currentRelease,
 +        onProgress: (value) {
 +          if (mounted && (value - progress > .005 || value == 1)) {
 +            setState(() => progress = value);
@@ -903,14 +1042,12 @@ index 0000000..04f1812
 +      if (mounted) {
 +        setState(() {
 +          installed = true;
-+          notice = '已驗證並安裝 Google Gemma 3。回到聊天後即可使用。';
++          notice = '模型已下載並驗證完成。之後可離線聊天。';
 +        });
 +      }
 +    } catch (_) {
 +      if (mounted) {
-+        setState(
-+          () => notice = '安裝未完成。請確認已在 Hugging Face 接受模型授權、Token 有讀取權限、網路與可用儲存空間，再重試。未使用其他下載來源。',
-+        );
++        setState(() => notice = '下載尚未完成。請確認網路與可用儲存空間，再重試。未完成的檔案不會作為聊天模型使用。');
 +      }
 +    } finally {
 +      current.cancel();
@@ -920,71 +1057,54 @@ index 0000000..04f1812
 +
 +  @override
 +  Widget build(BuildContext context) => Scaffold(
-+    appBar: AppBar(title: const Text('安裝手機聊天模型')),
++    appBar: AppBar(title: const Text('啟用手機聊天')),
 +    body: SafeArea(
 +      child: ListView(
 +        padding: const EdgeInsets.all(24),
 +        children: [
 +          const Text(
-+            'Google Gemma 3 1B',
++            '下載一次，之後離線使用',
 +            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
 +          ),
 +          const SizedBox(height: 12),
 +          const Text(
-+            '首次安裝需要網路，下載約 584 MB。建議預留至少 2 GB 儲存空間、4 GB 以上記憶體；實際速度依手機而異。安裝後，對話在裝置端執行。',
++            'Google Gemma 3 1B 模型約 584 MB，建議連接 Wi-Fi，預留至少 2 GB 儲存空間。聊天在手機處理，不需要 Hugging Face 帳號、Token 或聊天 API Key。實際速度依手機而異。',
 +          ),
 +          const SizedBox(height: 16),
 +          TextButton(
-+            onPressed: downloading
-+                ? null
-+                : () => launchUrl(
-+                    Uri.parse(
-+                      'https://huggingface.co/litert-community/Gemma3-1B-IT',
-+                    ),
-+                    mode: LaunchMode.externalApplication,
-+                  ),
-+            child: const Text('用自己的帳號接受模型授權'),
-+          ),
-+          TextButton(
-+            onPressed: downloading
-+                ? null
-+                : () => launchUrl(
-+                    Uri.parse('https://ai.google.dev/gemma/terms'),
-+                    mode: LaunchMode.externalApplication,
-+                  ),
-+            child: const Text('閱讀 Gemma 授權條款'),
++            onPressed: release != null && !downloading ? showTerms : null,
++            child: const Text('閱讀模型條款與禁止用途政策'),
 +          ),
 +          CheckboxListTile(
 +            contentPadding: EdgeInsets.zero,
 +            value: accepted,
-+            onChanged: downloading
++            onChanged: downloading || installed
 +                ? null
 +                : (value) => setState(() => accepted = value ?? false),
-+            title: const Text('我已閱讀並接受 Gemma 條款，且有模型存取權限'),
++            title: const Text('我同意 Gemma 使用條款與禁止用途政策，並遵守模型使用限制'),
 +          ),
-+          TextField(
-+            controller: token,
-+            enabled: !downloading && !installed,
-+            obscureText: true,
-+            autocorrect: false,
-+            enableSuggestions: false,
-+            decoration: const InputDecoration(
-+              labelText: 'Hugging Face Read Token（僅本次下載）',
-+              helperText: '只傳送到 Hugging Face，不保存、不交給網頁或聊天模型。',
++          if (release != null && !release!.available)
++            const Padding(
++              padding: EdgeInsets.symmetric(vertical: 12),
++              child: Text('團隊正在準備模型安裝包，發布後即可一鍵下載。你仍可使用地圖與設施搜尋。'),
 +            ),
-+          ),
-+          const SizedBox(height: 20),
 +          if (downloading) ...[
 +            LinearProgressIndicator(value: progress),
 +            Text('下載／驗證中 ${(progress * 100).toStringAsFixed(0)}%'),
 +            TextButton(
 +              onPressed: () => store?.cancel(),
-+              child: const Text('取消安裝'),
++              child: const Text('取消下載'),
 +            ),
 +          ],
 +          FilledButton(
-+            onPressed: accepted && !downloading && !installed ? install : null,
-+            child: const Text('下載並驗證官方模型'),
++            onPressed:
++                accepted &&
++                    !downloading &&
++                    !installed &&
++                    release?.available == true
++                ? install
++                : null,
++            child: const Text('同意並下載模型（約 584 MB）'),
 +          ),
 +          if (notice != null)
 +            Padding(
@@ -994,7 +1114,7 @@ index 0000000..04f1812
 +          if (installed)
 +            FilledButton(
 +              onPressed: () => Navigator.of(context).pop(true),
-+              child: const Text('回到聊天'),
++              child: const Text('開始聊天'),
 +            ),
 +        ],
 +      ),
@@ -1328,10 +1448,10 @@ index 0000000..07cf472
 +}
 diff --git a/lib/util/codefest_bundle_server.dart b/lib/util/codefest_bundle_server.dart
 new file mode 100644
-index 0000000..28c1438
+index 0000000..53752b5
 --- /dev/null
 +++ b/lib/util/codefest_bundle_server.dart
-@@ -0,0 +1,114 @@
+@@ -0,0 +1,116 @@
 +// SPDX-License-Identifier: AGPL-3.0-or-later
 +import 'dart:convert';
 +import 'dart:io';
@@ -1355,10 +1475,12 @@ index 0000000..28c1438
 +    _server = null;
 +  }
 +
-+  static Future<void> start() async {
++  static String get listeningOrigin =>
++      'http://127.0.0.1:${_server?.port ?? 8766}';
++  static Future<void> start({int port = 8766}) async {
 +    if (_server != null) return;
 +    if (_starting != null) return _starting;
-+    _starting = _start();
++    _starting = _start(port);
 +    try {
 +      await _starting;
 +    } finally {
@@ -1393,14 +1515,14 @@ index 0000000..28c1438
 +    return files;
 +  }
 +
-+  static Future<void> _start() async {
++  static Future<void> _start(int port) async {
 +    final asset = await rootBundle.load('assets/codefest_web.bundle');
 +    final files = decode(
 +      asset.buffer.asUint8List(asset.offsetInBytes, asset.lengthInBytes),
 +    );
 +    final server = await HttpServer.bind(
 +      InternetAddress.loopbackIPv4,
-+      8766,
++      port,
 +      shared: false,
 +    );
 +    _server = server;
@@ -1624,10 +1746,10 @@ index 0000000..e6a967e
 +}
 diff --git a/lib/util/web_message_handler/codefest_scan_handler.dart b/lib/util/web_message_handler/codefest_scan_handler.dart
 new file mode 100644
-index 0000000..e49957e
+index 0000000..7f1b12b
 --- /dev/null
 +++ b/lib/util/web_message_handler/codefest_scan_handler.dart
-@@ -0,0 +1,82 @@
+@@ -0,0 +1,83 @@
 +// SPDX-License-Identifier: AGPL-3.0-or-later
 +import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 +import 'package:get/get.dart';
@@ -1644,6 +1766,7 @@ index 0000000..e49957e
 +    'http://127.0.0.1:8766',
 +    'http://localhost:8082',
 +    'http://home.yoyo899843.com:8000',
++    'https://home.yoyo899843.com',
 +  };
 +  @override
 +  Future<void> handle({
@@ -1782,7 +1905,7 @@ index 9f11d60..550f586 100644
        name: path_provider
        sha256: a7f4874f987173da295a61c181b8ee71dab59b332a486b391babf26a1b884825
 diff --git a/pubspec.yaml b/pubspec.yaml
-index 69f3c45..cc3dad8 100644
+index 69f3c45..5ee3aee 100644
 --- a/pubspec.yaml
 +++ b/pubspec.yaml
 @@ -28,6 +28,8 @@ environment:
@@ -1794,11 +1917,12 @@ index 69f3c45..cc3dad8 100644
    cached_network_image: ^4.0.4
    carousel_slider: ^5.1.2
    characters: ^1.4.1
-@@ -91,6 +93,7 @@ flutter:
+@@ -91,6 +93,8 @@ flutter:
    #   - images/a_dot_burr.jpeg
    #   - images/a_dot_ham.jpeg
    assets:
 +    - assets/codefest_web.bundle
++    - assets/gemma_release.json
      - assets/mock_data/
      - assets/image/
      - assets/svg/
@@ -1921,10 +2045,10 @@ index 0000000..fa57335
 +}
 diff --git a/test/codefest_bundle_server_test.dart b/test/codefest_bundle_server_test.dart
 new file mode 100644
-index 0000000..e493235
+index 0000000..dff549b
 --- /dev/null
 +++ b/test/codefest_bundle_server_test.dart
-@@ -0,0 +1,74 @@
+@@ -0,0 +1,76 @@
 +import 'dart:convert';
 +import 'dart:io';
 +
@@ -1967,11 +2091,11 @@ index 0000000..e493235
 +  test(
 +    'bundled mobile entry and JS are served from loopback without development computer',
 +    () => HttpOverrides.runWithHttpOverrides(() async {
-+      await CodefestBundleServer.start();
++      await CodefestBundleServer.start(port: 0);
 +      final client = HttpClient();
 +      try {
 +        final response = await (await client.getUrl(
-+          Uri.parse('${CodefestBundleServer.origin}/station-map'),
++          Uri.parse('${CodefestBundleServer.listeningOrigin}/station-map'),
 +        )).close();
 +        expect(response.statusCode, 200);
 +        expect(
@@ -1983,12 +2107,14 @@ index 0000000..e493235
 +        final script = RegExp(r'src="(/js/[^\"]+)"').firstMatch(html);
 +        expect(script, isNotNull);
 +        final asset = await (await client.getUrl(
-+          Uri.parse('${CodefestBundleServer.origin}${script!.group(1)}'),
++          Uri.parse(
++            '${CodefestBundleServer.listeningOrigin}${script!.group(1)}',
++          ),
 +        )).close();
 +        expect(asset.statusCode, 200);
 +        await asset.drain<void>();
 +        final post = await (await client.postUrl(
-+          Uri.parse('${CodefestBundleServer.origin}/'),
++          Uri.parse('${CodefestBundleServer.listeningOrigin}/'),
 +        )).close();
 +        expect(post.statusCode, 405);
 +        await post.drain<void>();
@@ -2079,58 +2205,126 @@ index 0000000..86d7082
 +}
 diff --git a/test/gemma_model_store_test.dart b/test/gemma_model_store_test.dart
 new file mode 100644
-index 0000000..920b0b2
+index 0000000..7667ca2
 --- /dev/null
 +++ b/test/gemma_model_store_test.dart
-@@ -0,0 +1,51 @@
+@@ -0,0 +1,39 @@
 +import 'package:flutter_test/flutter_test.dart';
 +import 'package:town_pass/page/codefest_ai/gemma_model_store.dart';
 +
 +void main() {
-+  test('only HTTPS official HF hosts and default TLS port are accepted', () {
++  test('only approved team HTTPS host and default TLS port are accepted', () {
 +    expect(
-+      GemmaModelStore.approvedUri(Uri.parse(GemmaModelStore.source)),
++      GemmaModelStore.approvedUri(
++        Uri.parse(
++          'https://home.yoyo899843.com/models/gemma3-1b-it-int4.litertlm',
++        ),
++      ),
 +      true,
 +    );
 +    expect(
 +      GemmaModelStore.approvedUri(
-+        Uri.parse('https://cas-bridge.xethub.hf.co/blob'),
++        Uri.parse('https://home.yoyo899843.com/models/receipt.json'),
 +      ),
 +      true,
 +    );
 +    for (final url in [
-+      'http://huggingface.co/blob',
++      'http://home.yoyo899843.com/blob',
++      'https://huggingface.co/blob',
 +      'https://huggingface.co.evil.example/blob',
 +      'https://mirror.example/blob',
-+      'https://user:secret@huggingface.co/blob',
-+      'https://huggingface.co:8000/blob',
++      'https://user:secret@home.yoyo899843.com/blob',
++      'https://home.yoyo899843.com:8000/blob',
 +    ]) {
 +      expect(GemmaModelStore.approvedUri(Uri.parse(url)), false);
-+    }
-+  });
-+  test('pointer binds exact model size and sha256, refuses unrelated content', () {
-+    final digest = 'a' * 64;
-+    final pointer =
-+        'version https://git-lfs.github.com/spec/v1\noid sha256:$digest\nsize 584417280\n';
-+    expect(GemmaModelStore.parsePointer(pointer), digest);
-+    for (final invalid in [
-+      pointer.replaceFirst('584417280', '10'),
-+      pointer.replaceFirst(digest, 'bad'),
-+      '<html>login</html>',
-+      '$pointer\nextra',
-+    ]) {
-+      expect(
-+        () => GemmaModelStore.parsePointer(invalid),
-+        throwsFormatException,
-+      );
 +    }
 +  });
 +  test('license gate runs before any download', () async {
 +    final store = GemmaModelStore();
 +    await expectLater(
-+      store.install(termsAccepted: false, token: '', onProgress: (_) {}),
++      store.install(termsAccepted: false, onProgress: (_) {}),
 +      throwsStateError,
 +    );
 +    store.cancel();
 +  });
++}
+diff --git a/test/gemma_release_test.dart b/test/gemma_release_test.dart
+new file mode 100644
+index 0000000..69265d0
+--- /dev/null
++++ b/test/gemma_release_test.dart
+@@ -0,0 +1,43 @@
++import 'package:flutter_test/flutter_test.dart';
++import 'package:town_pass/page/codefest_ai/gemma_release.dart';
++
++void main() {
++  Map<String, dynamic> fixture() => {
++    'schema': 1,
++    'available': true,
++    'source': GemmaRelease.officialSource,
++    'revision': GemmaRelease.revision,
++    'size': GemmaRelease.size,
++    'download_url': GemmaRelease.download,
++    'sha256': GemmaRelease.expectedDigest,
++    'agreement': 'test agreement',
++    'policy': 'test policy',
++    'notice': 'test notice',
++  };
++  test('pins original model, approved team HTTPS URL and embedded hash', () {
++    expect(GemmaRelease.parse(fixture()).available, true);
++    for (final entry in {
++      'source': 'https://mirror.example/model',
++      'revision': 'other',
++      'size': 1,
++      'download_url':
++          'http://home.yoyo899843.com/models/gemma3-1b-it-int4.litertlm',
++      'sha256': 'bad',
++      'policy': '',
++    }.entries) {
++      expect(
++        () => GemmaRelease.parse({...fixture(), entry.key: entry.value}),
++        throwsFormatException,
++      );
++    }
++  });
++  test('unpublished release stays unavailable without a fabricated hash', () {
++    final release = GemmaRelease.parse({
++      ...fixture(),
++      'available': false,
++      'sha256': null,
++    });
++    expect(release.available, false);
++    expect(release.digest, null);
++  });
++}
+diff --git a/test/gemma_setup_view_test.dart b/test/gemma_setup_view_test.dart
+new file mode 100644
+index 0000000..cce0ab8
+--- /dev/null
++++ b/test/gemma_setup_view_test.dart
+@@ -0,0 +1,25 @@
++import 'package:flutter/material.dart';
++import 'package:flutter_test/flutter_test.dart';
++import 'package:town_pass/page/codefest_ai/gemma_setup_view.dart';
++
++void main() {
++  testWidgets(
++    'one-tap setup has no account token field and unpublished release cannot download',
++    (tester) async {
++      await tester.pumpWidget(const MaterialApp(home: GemmaSetupView()));
++      await tester.pumpAndSettle();
++      expect(find.byType(TextField), findsNothing);
++      expect(find.text('下載一次，之後離線使用'), findsOneWidget);
++      final button = tester.widget<FilledButton>(
++        find.byType(FilledButton).first,
++      );
++      expect(button.onPressed, isNull);
++      await tester.tap(find.byType(Checkbox).first);
++      await tester.pumpAndSettle();
++      expect(
++        tester.widget<FilledButton>(find.byType(FilledButton).first).onPressed,
++        isNull,
++      );
++    },
++  );
 +}

@@ -1,0 +1,41 @@
+name: Model origin configuration
+on:
+  pull_request:
+    paths:
+      - app/nginx.conf
+      - compose.yml
+      - .github/workflows/model-origin-check.yml
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Validate Compose and build the existing origin image
+        run: |
+          docker compose config --quiet
+          docker build --target prod -t codefest-model-origin app
+          docker run --rm codefest-model-origin nginx -t
+      - name: Test static model allowlist and range responses
+        run: |
+          mkdir -p "$RUNNER_TEMP/model-fixture"
+          printf 'model-route-fixture' > "$RUNNER_TEMP/model-fixture/gemma3-1b-it-int4.litertlm"
+          printf '{"fixture":true}' > "$RUNNER_TEMP/model-fixture/receipt.json"
+          printf 'not-public' > "$RUNNER_TEMP/model-fixture/not-allowed.txt"
+          chmod -R a+rX "$RUNNER_TEMP/model-fixture"
+          docker run -d --name codefest-model-origin -p 127.0.0.1:18001:80 -v "$RUNNER_TEMP/model-fixture:/srv/models:ro" codefest-model-origin
+          for i in $(seq 1 15); do
+            if curl -fsS http://127.0.0.1:18001/ > /dev/null; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:18001/models/gemma3-1b-it-int4.litertlm -o "$RUNNER_TEMP/model-result"
+          cmp "$RUNNER_TEMP/model-fixture/gemma3-1b-it-int4.litertlm" "$RUNNER_TEMP/model-result"
+          curl -fsS http://127.0.0.1:18001/models/receipt.json > /dev/null
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Range: bytes=0-3' http://127.0.0.1:18001/models/gemma3-1b-it-int4.litertlm)" = 206
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:18001/models/not-allowed.txt)" = 404
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:18001/models/gemma3-1b-it-int4.litertlm)" = 403
+      - name: Clean up the test container
+        if: always()
+        run: docker rm -f codefest-model-origin || true
