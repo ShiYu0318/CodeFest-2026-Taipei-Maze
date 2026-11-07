@@ -5,3 +5,6 @@ Thumbs.db
 
 # Python tooling cache
 __pycache__/
+
+# Approved model release files live outside Git; source/manifest are tracked.
+.models/
