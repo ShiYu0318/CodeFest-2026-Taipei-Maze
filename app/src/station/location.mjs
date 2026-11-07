@@ -12,6 +12,7 @@ const knownFailures = new Set([
   "WaitingForDrain",
   "SendFailed",
   "InvalidReply",
+  "ScanFailed",
 ]);
 
 /** Framework-independent owner of one native scan and the last supplied position. */
@@ -55,6 +56,8 @@ export function createStationLocation({
   }
   return {
     snapshot,
+    // Republish availability when the unchanged TownPass host becomes ready.
+    refreshNative: publish,
     applyQuery(query) {
       if (disposed) return { type: "Unavailable" };
       const result = parseStationLocationQuery(query, data);
@@ -81,10 +84,15 @@ export function createStationLocation({
       active = true;
       noticeKey = "notice.waiting";
       publish();
-      const reply = await bridge.scan();
-      if (disposed || ticket !== generation) return { type: "Stale" };
-      const result =
-        reply.type === "success" ? session.scan(reply.payload) : reply;
+      let result;
+      try {
+        const reply = await bridge.scan();
+        if (disposed || ticket !== generation) return { type: "Stale" };
+        result = reply.type === "success" ? session.scan(reply.payload) : reply;
+      } catch {
+        if (disposed || ticket !== generation) return { type: "Stale" };
+        result = { type: "ScanFailed" };
+      }
       if (result.type === "success") {
         noticeKey = "notice.located";
         publish();

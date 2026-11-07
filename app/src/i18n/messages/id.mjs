@@ -150,6 +150,8 @@ export default {
     "Pemindai tidak bisa dibuka. Tutup lalu buka lagi layanan ini, kemudian coba lagi.",
   "notice.InvalidReply":
     "Aplikasi mengirim balasan yang tidak sesuai. Lokasi Anda tidak berubah.",
+  "notice.ScanFailed":
+    "Hasil pindaian tidak dapat diproses. Silakan pindai lagi.",
   "notice.unsupportedCode":
     "Kode ini bukan lokasi di peta ini. Lokasi dan tujuan Anda tidak berubah.",
   "notice.resetUrlFailed":

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+/* global globalThis */
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -194,6 +195,29 @@ test("scan remains serialized while its URL update is settling", async () => {
   assert.equal(n.messages.length, 1);
   finishNavigation();
   assert.equal((await pending).type, "success");
+  assert.equal(location.snapshot().active, false);
+  location.dispose();
+});
+
+test("a QR processing exception clears waiting, preserves position and allows retry", async () => {
+  const { n, location } = setup();
+  await scan(n, location, "b1-e4");
+  const before = location.snapshot().position;
+  const encoder = globalThis.TextEncoder;
+  try {
+    globalThis.TextEncoder = class {
+      constructor() {
+        throw new Error("decoder unavailable");
+      }
+    };
+    assert.equal((await scan(n, location, "m-e4")).type, "ScanFailed");
+    assert.equal(location.snapshot().active, false);
+    assert.equal(location.snapshot().noticeKey, "notice.ScanFailed");
+    assert.deepEqual(location.snapshot().position, before);
+  } finally {
+    globalThis.TextEncoder = encoder;
+  }
+  assert.equal((await scan(n, location, "m-e4")).type, "success");
   assert.equal(location.snapshot().active, false);
   location.dispose();
 });

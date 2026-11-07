@@ -150,6 +150,8 @@ export default {
     "スキャナーを起動できません。サービスを閉じて開き直してから、もう一度お試しください。",
   "notice.InvalidReply":
     "アプリからの応答が正しくありません。位置は変わっていません。",
+  "notice.ScanFailed":
+    "読み取り結果を処理できませんでした。もう一度読み取ってください。",
   "notice.unsupportedCode":
     "この地図の位置コードではありません。位置と目的地は変わっていません。",
   "notice.resetUrlFailed":

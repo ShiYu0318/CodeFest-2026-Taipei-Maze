@@ -148,6 +148,7 @@ export default {
     "Không mở được máy quét. Hãy đóng rồi mở lại dịch vụ và thử lại.",
   "notice.InvalidReply":
     "Ứng dụng trả về dữ liệu không đúng. Vị trí của bạn không thay đổi.",
+  "notice.ScanFailed": "Không xử lý được kết quả quét. Vui lòng quét lại.",
   "notice.unsupportedCode":
     "Mã này không phải vị trí trên bản đồ này. Vị trí và điểm đến không thay đổi.",
   "notice.resetUrlFailed":
