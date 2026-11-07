@@ -1,28 +1,11 @@
 <template>
   <main class="station-page" lang="zh-Hant">
     <div class="station-shell">
-      <!-- <header class="station-header">
-        <router-link class="brand" to="/" aria-label="回 TownPass 首頁">
-          <span class="brand-icon"><StationMapIcon name="map" /></span>
-          <span>TownPass</span>
-        </router-link>
-        <span class="preview-tag">站內導覽・試用版</span>
-      </header> -->
-
       <section class="station-heading" aria-labelledby="station-title">
-        <!-- <p class="eyebrow">TAIPEI MAIN STATION</p> -->
         <div class="station-title-row">
           <h1 id="station-title">台北車站</h1>
-          <!-- <span class="floor-tag" :style="floorStyle(level)">{{ level }}</span> -->
         </div>
-        <!-- <p>地下樓層站內地圖</p> -->
       </section>
-
-      <DestinationSearch
-        id="station-facility-search"
-        :catalog="searchCatalogEntries"
-        @select="selectSearchPoint"
-      />
 
       <div class="floor-controls">
         <div class="floor-switch" role="group" aria-label="選擇樓層">
@@ -51,16 +34,29 @@
         </button>
       </div>
 
-      <section
-        v-if="level === 'B2'"
-        class="b2-guide"
-        aria-labelledby="b2-guide-title"
+      <div class="facility-header">
+        <h2 id="facility-title">設施主題</h2>
+        <span>{{ floorPoints.length }} 個標點</span>
+      </div>
+
+      <div
+        class="theme-group"
+        role="group"
+        aria-label="設施主題，可左右滑動查看更多"
+        tabindex="0"
+        @wheel="scrollThemesWithWheel"
       >
-        <h2 id="b2-guide-title">B2 是北捷穿堂</h2>
-        <p class="b2-hint">
-          板南線月台在 B3，淡水信義線月台在 B4。可在地圖下方展開轉乘樓層。
-        </p>
-      </section>
+        <button
+          v-for="type in availableThemes"
+          :key="type"
+          type="button"
+          :aria-pressed="activeTheme === type"
+          :style="pointThemeStyle(type)"
+          @click="toggleTheme(type)"
+        >
+          <StationMapIcon :name="type" />{{ categories[type].name }}
+        </button>
+      </div>
 
       <div class="station-layout">
         <div class="station-map-column">
@@ -166,13 +162,6 @@
                 }}
                 處</span
               >
-              <!-- <span v-else>{{
-                zoom === 1 ? "選擇設施主題來顯示圖標" : "滑動地圖查看其他位置"
-              }}</span> -->
-              <!-- <span id="map-gesture-help" class="map-gesture-help">
-                <span class="map-gesture-touch">雙指捏合縮放</span>
-                <span class="map-gesture-wheel">滑鼠滾輪縮放</span>
-              </span> -->
             </div>
             <div
               v-if="backgroundLayers.length"
@@ -300,134 +289,28 @@
           </Transition>
         </div>
 
-        <section class="facility-card" aria-labelledby="facility-title">
-          <div class="facility-header">
-            <h2 id="facility-title">設施主題</h2>
-            <span>{{ floorPoints.length }} 個標點</span>
+        <footer class="station-footer">
+          <span>依公開站圖重繪。標點與樓層相對位置為示意，請依現場指標。</span>
+          <div>
+            <a
+              v-for="[label, url] in sources"
+              :key="url"
+              :href="url"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ label }}</a
+            >
           </div>
-
-          <div
-            class="theme-group"
-            role="group"
-            aria-label="設施主題，可左右滑動查看更多"
-            tabindex="0"
-            @wheel="scrollThemesWithWheel"
-          >
-            <button
-              v-for="type in availableThemes"
-              :key="type"
-              type="button"
-              :aria-pressed="activeTheme === type"
-              :style="pointThemeStyle(type)"
-              @click="toggleTheme(type)"
-            >
-              <StationMapIcon :name="type" />{{ categories[type].name }}
-            </button>
-          </div>
-          <!-- <div class="theme-feedback">
-            <p class="theme-hint" role="status">{{ themeHint }}</p>
-            <button
-              v-if="activeTheme"
-              type="button"
-              class="theme-map-link"
-              @click="revealMap"
-            >
-              查看地圖
-            </button>
-          </div> -->
-
-          <!-- <div
-            v-if="selected"
-            class="facility-detail"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            <div class="detail-heading">
-              <p class="eyebrow">
-                {{ level }}・{{ categories[selected.type].name }}
-              </p>
-              <button
-                type="button"
-                class="clear-selection"
-                @click="selected = null"
-              >
-                關閉明細
-              </button>
-            </div>
-            <h3>{{ selected.name }}</h3>
-            <p>{{ selected.description }}</p>
-            <p v-if="destination">
-              對應端點 {{ destination.to.floor }}・{{
-                destination.to.point.name
-              }}
-            </p>
-            <button
-              v-if="destination"
-              type="button"
-              class="floor-destination"
-              @click="followConnection"
-            >
-              展開 {{ destination.to.floor }} 端點
-              <StationMapIcon name="arrow" />
-            </button>
-            <p
-              v-if="destination && transferNote(destination)"
-              class="direction-note"
-            >
-              {{ transferNote(destination) }}
-            </p>
-          </div> -->
-
-          <!-- <ul class="facility-list" aria-label="標點明細">
-            <li v-for="point in listedPoints" :key="point.id">
-              <button
-                type="button"
-                :aria-pressed="point.id === selected?.id"
-                :style="pointThemeStyle(point.type)"
-                @click="togglePoint(point)"
-              >
-                <svg class="point-dot" viewBox="0 0 12 12" aria-hidden="true">
-                  <circle cx="6" cy="6" r="5" />
-                </svg>
-                <span
-                  >{{ point.name
-                  }}<small
-                    v-if="getDestination(point)"
-                    class="connector-type"
-                    >{{ categories[point.type].name }}</small
-                  ></span
-                >
-                <span v-if="getDestination(point)" class="floor-link-label">{{
-                  getDestination(point).to.floor
-                }}</span>
-                <StationMapIcon v-else class="list-arrow" name="arrow" />
-              </button>
-            </li>
-          </ul> -->
-        </section>
+        </footer>
       </div>
-
-      <footer class="station-footer">
-        <span>依公開站圖重繪。標點與樓層相對位置為示意，請依現場指標。</span>
-        <div>
-          <a
-            v-for="[label, url] in sources"
-            :key="url"
-            :href="url"
-            target="_blank"
-            rel="noopener noreferrer"
-            >{{ label }}</a
-          >
-        </div>
-      </footer>
     </div>
   </main>
 </template>
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
-import DestinationSearch from "../components/DestinationSearch.vue";
-import { stationCatalog } from "../search/catalog.mjs";
+// import DestinationSearch from "../components/DestinationSearch.vue";
+// import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import StationTransferMap from "../components/StationTransferMap.vue";
@@ -436,8 +319,8 @@ import stationData from "./station-points.json";
 import { zones, planFloorTransfer, transferFromPoint } from "./station-routing";
 
 const { categories, points } = stationData;
-const searchCatalogEntries = stationCatalog(stationData);
-let searchPointRevision = 0;
+// const searchCatalogEntries = stationCatalog(stationData);
+// let searchPointRevision = 0;
 const floorIds = Object.keys(floors);
 const floorPalette = {
   B1: {
@@ -616,7 +499,7 @@ function matchesTheme(point, type) {
 
 function transferNote(transfer) {
   if (transfer.typeStatus === "unverified")
-    return "這個連接點的通行方式與方向尚未確認，請依現場指標。";
+    return "平面圖顯示梯口，梯種及通行方向待確認。";
   if (transfer.typeStatus === "inferred")
     return "樓梯與電扶梯配置為推定，請依現場指標。";
   if (
@@ -648,13 +531,10 @@ function normalizedPoint(point) {
 
 function pinStyle(point) {
   const [x, y] = normalizedPoint(point);
-  const theme = matchesTheme(point, activeTheme.value)
-    ? activeTheme.value
-    : point.type;
   return {
     left: x * 100 + "%",
     top: y * 100 + "%",
-    ...pointThemeStyle(theme),
+    ...pointThemeStyle(point.type),
   };
 }
 
@@ -931,21 +811,21 @@ function toggleLayers() {
   resetZoom();
 }
 
-async function selectSearchPoint({ poiId }) {
-  const requestRevision = ++searchPointRevision;
-  const entry = searchCatalogEntries.find((p) => p.id === poiId);
-  if (!entry) return;
-  const point = points[entry.floorId].find((p) => p.id === poiId);
-  if (!point) return;
-  await showFloor(entry.floorId);
-  if (requestRevision !== searchPointRevision || level.value !== entry.floorId)
-    return;
-  activeTheme.value = null;
-  selected.value = point;
-  await nextTick();
-  if (zoom.value > 1) centerOn(...normalizedPoint(point));
-  mapSection.value?.scrollIntoView({ block: "start" });
-}
+// async function selectSearchPoint({ poiId }) {
+//   const requestRevision = ++searchPointRevision;
+//   const entry = searchCatalogEntries.find((p) => p.id === poiId);
+//   if (!entry) return;
+//   const point = points[entry.floorId].find((p) => p.id === poiId);
+//   if (!point) return;
+//   await showFloor(entry.floorId);
+//   if (requestRevision !== searchPointRevision || level.value !== entry.floorId)
+//     return;
+//   activeTheme.value = null;
+//   selected.value = point;
+//   await nextTick();
+//   if (zoom.value > 1) centerOn(...normalizedPoint(point));
+//   mapSection.value?.scrollIntoView({ block: "start" });
+// }
 
 function togglePoint(point) {
   selected.value = selected.value?.id === point.id ? null : point;

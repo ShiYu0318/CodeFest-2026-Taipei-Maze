@@ -498,6 +498,7 @@
   display: flex;
   flex-wrap: nowrap;
   gap: 6px;
+  margin-bottom: 20px;
   touch-action: pan-x;
   overflow-x: auto;
   overflow-y: hidden;
