@@ -43,26 +43,37 @@ function channelFor(bridge) {
   return channel;
 }
 /** Legacy replies have no request ID. Share ownership, serialize and drain before retrying. */
-export function createQrBridge(bridge, timeoutMs = 60_000) {
-  let closed = false;
-  const supported =
-    !!bridge &&
-    ["postMessage", "addEventListener", "removeEventListener"].every(
-      (k) => typeof bridge[k] === "function"
-    );
+export function createQrBridge(native, timeoutMs = 60_000) {
+  let closed = false,
+    bridge = null,
+    channel = null;
   const owner = Symbol("qr_owner");
-  const channel = supported ? channelFor(bridge) : null;
-  if (channel) {
+  function connect() {
+    if (closed) return false;
+    if (channel) return true;
+    // The host may inject flutterObject after the web page starts mounting.
+    const candidate = typeof native === "function" ? native() : native;
+    if (
+      !candidate ||
+      !["postMessage", "addEventListener", "removeEventListener"].every(
+        (key) => typeof candidate[key] === "function"
+      )
+    )
+      return false;
+    bridge = candidate;
+    channel = channelFor(bridge);
     if (!channel.users.size)
       bridge.addEventListener("message", channel.onReply);
     channel.users.add(owner);
+    return true;
   }
+  connect();
   return {
     get available() {
-      return supported && !closed;
+      return connect();
     },
     async scan() {
-      if (!supported || closed) return { type: "Unavailable" };
+      if (!connect()) return { type: "Unavailable" };
       if (channel.draining) return { type: "WaitingForDrain" };
       if (channel.pending) return { type: "Busy" };
       return new Promise((resolve) => {

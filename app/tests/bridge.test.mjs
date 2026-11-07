@@ -84,3 +84,48 @@ test("adapter remount on same native channel drains old reply before a fresh req
   second.dispose();
   assert.equal(n.listeners, 0);
 });
+
+test("late host injection enables the existing adapter and subscribes before sending", async () => {
+  let host;
+  const b = createQrBridge(() => host);
+  assert.equal(b.available, false);
+  assert.equal((await b.scan()).type, "Unavailable");
+  host = native();
+  host.postMessage = (message) => {
+    host.messages.push(JSON.parse(message));
+    host.reply(JSON.stringify({ name: "qr_code_scan", data: "anchor" }));
+  };
+  assert.deepEqual(await b.scan(), { type: "success", payload: "anchor" });
+  assert.deepEqual(host.messages, [{ name: "qr_code_scan", data: null }]);
+  assert.equal(host.listeners, 1);
+  b.dispose();
+  assert.equal(host.listeners, 0);
+});
+
+test("a connected request stays on its native channel until disposed", async () => {
+  const first = native(),
+    second = native();
+  let host = first;
+  const b = createQrBridge(() => host);
+  const pending = b.scan();
+  host = second;
+  assert.equal(b.available, true);
+  assert.equal((await b.scan()).type, "Busy");
+  assert.equal(second.listeners, 0);
+  first.reply(JSON.stringify({ name: "qr_code_scan", data: "first" }));
+  assert.equal((await pending).payload, "first");
+  b.dispose();
+  assert.equal(first.listeners, 0);
+  assert.equal(b.available, false);
+  assert.equal(second.listeners, 0);
+});
+
+test("disposed adapters never connect to a host injected later", async () => {
+  let host;
+  const b = createQrBridge(() => host);
+  b.dispose();
+  host = native();
+  assert.equal(b.available, false);
+  assert.equal((await b.scan()).type, "Unavailable");
+  assert.equal(host.listeners, 0);
+});

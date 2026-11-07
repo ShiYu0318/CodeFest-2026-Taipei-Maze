@@ -55,6 +55,8 @@ export function createStationLocation({
   }
   return {
     snapshot,
+    // Republish availability when the unchanged TownPass host becomes ready.
+    refreshNative: publish,
     applyQuery(query) {
       if (disposed) return { type: "Unavailable" };
       const result = parseStationLocationQuery(query, data);
