@@ -1,3 +1,244 @@
+diff --git a/android/app/build.gradle b/android/app/build.gradle
+index c7f6b01..bffcd8e 100644
+--- a/android/app/build.gradle
++++ b/android/app/build.gradle
+@@ -68,5 +68,6 @@ flutter {
+ }
+ 
+ dependencies {
++    implementation 'com.google.ai.edge.litertlm:litertlm-android:0.19.1'
+     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+ }
+diff --git a/android/app/src/main/AndroidManifest.xml b/android/app/src/main/AndroidManifest.xml
+index 771d33a..83a2459 100644
+--- a/android/app/src/main/AndroidManifest.xml
++++ b/android/app/src/main/AndroidManifest.xml
+@@ -1,4 +1,5 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android">
++    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+     <application
+@@ -47,6 +48,7 @@
+ 
+          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+     <queries>
++        <intent><action android:name="android.speech.RecognitionService" /></intent>
+         <intent>
+             <action android:name="android.intent.action.PROCESS_TEXT"/>
+             <data android:mimeType="text/plain"/>
+@@ -54,6 +56,7 @@
+     </queries>
+     <!-- Provide required visibility configuration for API level 30 and above -->
+     <queries>
++        <intent><action android:name="android.speech.RecognitionService" /></intent>
+         <!-- checks for Mail support -->
+         <intent>
+             <action android:name="android.intent.action.VIEW" />
+diff --git a/android/app/src/main/kotlin/com/example/townpass/CodefestAI.kt b/android/app/src/main/kotlin/com/example/townpass/CodefestAI.kt
+new file mode 100644
+index 0000000..8cdc19c
+--- /dev/null
++++ b/android/app/src/main/kotlin/com/example/townpass/CodefestAI.kt
+@@ -0,0 +1,172 @@
++// SPDX-License-Identifier: AGPL-3.0-or-later
++package com.example.townpass
++
++import android.Manifest
++import android.content.ComponentName
++import android.content.Intent
++import android.content.pm.ApplicationInfo
++import android.content.pm.PackageManager
++import android.os.Build
++import android.os.Bundle
++import android.os.Handler
++import android.os.Looper
++import android.speech.RecognitionListener
++import android.speech.RecognizerIntent
++import android.speech.SpeechRecognizer
++import com.google.ai.edge.litertlm.Backend
++import com.google.ai.edge.litertlm.Conversation
++import com.google.ai.edge.litertlm.Engine
++import com.google.ai.edge.litertlm.EngineConfig
++import io.flutter.plugin.common.MethodCall
++import io.flutter.plugin.common.MethodChannel
++import org.json.JSONObject
++import java.io.File
++import java.security.MessageDigest
++import java.util.concurrent.Executors
++import java.util.concurrent.atomic.AtomicBoolean
++
++class CodefestAI(private val activity: MainActivity) : MethodChannel.MethodCallHandler {
++    companion object {
++        const val permissionCode = 7321
++        const val source = "https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/42d538a932e8d5b12e6b3b455f5572560bd60b2c/gemma3-1b-it-int4.litertlm"
++    }
++    private val main = Handler(Looper.getMainLooper())
++    private val executor = Executors.newSingleThreadExecutor()
++    private val locales = setOf("zh-TW","en-US","vi-VN","id-ID","th-TH","ko-KR","ja-JP")
++    private var engine: Engine? = null
++    @Volatile private var conversation: Conversation? = null
++    private var generationId: String? = null
++    private val cancelled = AtomicBoolean(false)
++    private var voiceId: String? = null
++    private var voiceReply: MethodChannel.Result? = null
++    private var voiceLocale = "zh-TW"
++    private var recognizer: SpeechRecognizer? = null
++    private var transcript = ""
++    private var finishingVoice = false
++    private var timer: Runnable? = null
++    private val model get() = File(activity.filesDir, "CodefestAI/gemma3-1b-it-int4.litertlm")
++    private fun error(code: String) = mapOf("status" to "error", "code" to code)
++    private fun receipt(): String? = try {
++        val receipt = JSONObject(File(activity.filesDir, "CodefestAI/receipt.json").readText())
++        receipt.getString("sha256").takeIf { receipt.getString("source") == source && it.matches(Regex("[a-f0-9]{64}")) && model.length() == 584417280L }
++    } catch (_: Exception) { null }
++    private fun verify(expected: String): Boolean {
++        val digest = MessageDigest.getInstance("SHA-256")
++        model.inputStream().use { input ->
++            val buffer = ByteArray(1024 * 1024)
++            while (true) { val n = input.read(buffer); if (n < 0) break; digest.update(buffer, 0, n) }
++        }
++        return digest.digest().joinToString("") { "%02x".format(it) } == expected
++    }
++    // Android itself selects this on-device service. Refuse unknown OEM providers rather than falling back to cloud speech.
++    private fun voiceAvailable(): Boolean = try {
++        if (Build.VERSION.SDK_INT < 31 || !SpeechRecognizer.isOnDeviceRecognitionAvailable(activity)) false
++        else {
++            val resource = activity.resources.getIdentifier("config_defaultOnDeviceSpeechRecognitionService", "string", "android")
++            val component = if (resource != 0) ComponentName.unflattenFromString(activity.getString(resource)) else null
++            val packageName = component?.packageName
++            if (packageName !in setOf("com.google.android.tts", "com.google.android.googlequicksearchbox")) false
++            else {
++                val flags = activity.packageManager.getApplicationInfo(packageName!!, 0).flags
++                flags and (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0
++            }
++        }
++    } catch (_: Exception) { false }
++    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
++        val id = call.argument<String>("requestId") ?: ""
++        when (call.method) {
++            "status" -> result.success(mapOf("status" to "success", "modelReady" to (receipt() != null), "voiceAvailable" to voiceAvailable(), "model" to "Gemma 3 1B INT4"))
++            "generate" -> {
++                val prompt = call.argument<String>("prompt")
++                if (generationId != null || voiceId != null) { result.success(error("busy")); return }
++                if (prompt.isNullOrBlank() || prompt.length > 6000) { result.success(error("invalid_input")); return }
++                val hash = receipt()
++                if (hash == null) { result.success(error("model_missing")); return }
++                generationId = id; cancelled.set(false)
++                executor.execute {
++                    var response: Map<String, Any>
++                    try {
++                        if (engine == null) {
++                            check(verify(hash))
++                            check(!cancelled.get())
++                            val loaded = Engine(EngineConfig(modelPath = model.absolutePath, backend = Backend.CPU(), maxNumTokens = 4096, cacheDir = activity.cacheDir.path))
++                            try { loaded.initialize(); engine = loaded } catch (e: Exception) { loaded.close(); throw e }
++                        }
++                        check(!cancelled.get())
++                        engine!!.createConversation().use { chat ->
++                            conversation = chat
++                            val reply = chat.sendMessage(prompt, maxOutputToken = 256).toString()
++                            response = if (cancelled.get()) error("cancelled") else mapOf("status" to "success", "text" to reply.take(6000))
++                        }
++                    } catch (_: Exception) { response = error(if (cancelled.get()) "cancelled" else "inference_failed") }
++                    conversation = null
++                    main.post { generationId = null; result.success(response) }
++                }
++            }
++            "voice" -> {
++                if (voiceId != null || generationId != null) { result.success(error("busy")); return }
++                val locale = call.argument<String>("locale") ?: "zh-TW"
++                if (locale !in locales || !voiceAvailable()) { result.success(error("voice_unavailable")); return }
++                voiceId = id; voiceReply = result; voiceLocale = locale; transcript = ""; finishingVoice = false
++                if (activity.checkSelfPermission(Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) startVoice()
++                else activity.requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), permissionCode)
++            }
++            "stopVoice" -> { stopVoiceCapture(); result.success(mapOf("status" to "success")) }
++            "cancel" -> {
++                val target = call.argument<String>("targetRequestId")
++                if (target == generationId) cancelGeneration()
++                if (target == voiceId) finishVoice(false)
++                result.success(mapOf("status" to "success"))
++            }
++            "unload" -> { background(); result.success(mapOf("status" to "success")) }
++            else -> result.notImplemented()
++        }
++    }
++    fun permissionResult(granted: Boolean) {
++        if (voiceId == null) return
++        if (granted) startVoice() else finishVoice(false, "permission_denied")
++    }
++    private fun startVoice() {
++        if (voiceId == null || Build.VERSION.SDK_INT < 31) return
++        val id = voiceId
++        try {
++            if (!voiceAvailable()) { finishVoice(false, "voice_unavailable"); return }
++            val speech = SpeechRecognizer.createOnDeviceSpeechRecognizer(activity)
++            recognizer = speech
++            speech.setRecognitionListener(object: RecognitionListener {
++                override fun onReadyForSpeech(params: Bundle?) {}
++                override fun onBeginningOfSpeech() {}
++                override fun onRmsChanged(rmsdB: Float) {}
++                override fun onBufferReceived(buffer: ByteArray?) {}
++                override fun onEndOfSpeech() {}
++                override fun onError(error: Int) { if (voiceId == id) finishVoice(false, if (error == SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS) "permission_denied" else "voice_unavailable") }
++                override fun onResults(results: Bundle?) { if (voiceId == id) { transcript = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull().orEmpty().take(500); finishVoice(true) } }
++                override fun onPartialResults(results: Bundle?) { if (voiceId == id) transcript = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)?.firstOrNull().orEmpty().take(500) }
++                override fun onEvent(eventType: Int, params: Bundle?) {}
++            })
++            speech.startListening(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM).putExtra(RecognizerIntent.EXTRA_LANGUAGE, voiceLocale).putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS,true).putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE,true))
++            timer = Runnable { if (voiceId == id) stopVoiceCapture() }.also { main.postDelayed(it,30000) }
++        } catch (_: Exception) { finishVoice(false, "voice_unavailable") }
++    }
++    private fun stopVoiceCapture() {
++        if (voiceId == null || finishingVoice) return
++        finishingVoice = true
++        timer?.let { main.removeCallbacks(it) }
++        try { recognizer?.stopListening() } catch (_: Exception) { finishVoice(false, "voice_unavailable"); return }
++        timer = Runnable { finishVoice(transcript.isNotBlank(), "no_speech") }.also { main.postDelayed(it,3000) }
++    }
++    private fun finishVoice(success: Boolean, code: String = "cancelled") {
++        val reply = voiceReply ?: return
++        voiceReply = null; voiceId = null; finishingVoice = false
++        timer?.let { main.removeCallbacks(it) }; timer = null
++        recognizer?.cancel(); recognizer?.destroy(); recognizer = null
++        reply.success(if (success && transcript.isNotBlank()) mapOf("status" to "success", "text" to transcript) else error(if (success) "no_speech" else code))
++        transcript = ""
++    }
++    private fun cancelGeneration() { cancelled.set(true); try { conversation?.cancelProcess() } catch (_: Exception) {} }
++    fun background() {
++        cancelGeneration(); finishVoice(false)
++        executor.execute { engine?.close(); engine = null }
++    }
++    fun destroy() { background(); executor.shutdown() }
++}
+diff --git a/android/app/src/main/kotlin/com/example/townpass/MainActivity.kt b/android/app/src/main/kotlin/com/example/townpass/MainActivity.kt
+index 871556e..449c1eb 100644
+--- a/android/app/src/main/kotlin/com/example/townpass/MainActivity.kt
++++ b/android/app/src/main/kotlin/com/example/townpass/MainActivity.kt
+@@ -1,5 +1,20 @@
+ package com.example.townpass
+ 
+ import io.flutter.embedding.android.FlutterActivity
++import io.flutter.embedding.engine.FlutterEngine
++import io.flutter.plugin.common.MethodChannel
+ 
+-class MainActivity: FlutterActivity()
++class MainActivity: FlutterActivity() {
++    private var codefestAI: CodefestAI? = null
++    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
++        super.configureFlutterEngine(flutterEngine)
++        codefestAI = CodefestAI(this)
++        MethodChannel(flutterEngine.dartExecutor.binaryMessenger,"codefest/on_device_ai").setMethodCallHandler(codefestAI)
++    }
++    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
++        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
++        if (requestCode == CodefestAI.permissionCode) codefestAI?.permissionResult(grantResults.firstOrNull() == android.content.pm.PackageManager.PERMISSION_GRANTED)
++    }
++    override fun onStop() { codefestAI?.background(); super.onStop() }
++    override fun onDestroy() { codefestAI?.destroy(); super.onDestroy() }
++}
 diff --git a/ios/Podfile.lock b/ios/Podfile.lock
 index 10b0ecf..1518ece 100644
 --- a/ios/Podfile.lock
@@ -14,6 +255,362 @@ index 10b0ecf..1518ece 100644
  
 -COCOAPODS: 1.16.2
 +COCOAPODS: 1.17.0
+diff --git a/ios/Runner.xcodeproj/project.pbxproj b/ios/Runner.xcodeproj/project.pbxproj
+index 75fa361..a562ab9 100644
+--- a/ios/Runner.xcodeproj/project.pbxproj
++++ b/ios/Runner.xcodeproj/project.pbxproj
+@@ -17,6 +17,8 @@
+ 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
+ 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+ 		DB777C6FDD152D26941ABA3C /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FB974982AA32B555556F9ACB /* Pods_Runner.framework */; };
++		EB447444D6609148ABE84AED /* LiteRTLM in Frameworks */ = {isa = PBXBuildFile; productRef = BBA111754602F618056A5EC9 /* LiteRTLM */; };
++		F91E9D1C607D3BE9EB15C3E2 /* CodefestAI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806FB37632FEB4D3462398E7 /* CodefestAI.swift */; };
+ /* End PBXBuildFile section */
+ 
+ /* Begin PBXContainerItemProxy section */
+@@ -55,6 +57,7 @@
+ 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+ 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
+ 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
++		806FB37632FEB4D3462398E7 /* CodefestAI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CodefestAI.swift; sourceTree = "<group>"; };
+ 		8305A9A2D841269DC80CB81D /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+ 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
+ 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
+@@ -84,6 +87,7 @@
+ 			files = (
+ 				78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */,
+ 				DB777C6FDD152D26941ABA3C /* Pods_Runner.framework in Frameworks */,
++				EB447444D6609148ABE84AED /* LiteRTLM in Frameworks */,
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 		};
+@@ -164,6 +168,7 @@
+ 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
+ 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
+ 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
++				806FB37632FEB4D3462398E7 /* CodefestAI.swift */,
+ 			);
+ 			path = Runner;
+ 			sourceTree = "<group>";
+@@ -210,6 +215,7 @@
+ 			name = Runner;
+ 			packageProductDependencies = (
+ 				78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */,
++				BBA111754602F618056A5EC9 /* LiteRTLM */,
+ 			);
+ 			productName = Runner;
+ 			productReference = 97C146EE1CF9000F007C117D /* Runner.app */;
+@@ -246,6 +252,7 @@
+ 			mainGroup = 97C146E51CF9000F007C117D;
+ 			packageReferences = (
+ 				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */,
++				4338F90A154C5DEC29E85BFC /* XCRemoteSwiftPackageReference "LiteRT-LM" */,
+ 			);
+ 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
+ 			projectDirPath = "";
+@@ -388,6 +395,7 @@
+ 			files = (
+ 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+ 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
++				F91E9D1C607D3BE9EB15C3E2 /* CodefestAI.swift in Sources */,
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 		};
+@@ -482,6 +490,7 @@
+ 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+ 				DEVELOPMENT_TEAM = ZLLDAN62HX;
+ 				ENABLE_BITCODE = NO;
++				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+ 				INFOPLIST_FILE = Runner/Info.plist;
+ 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+ 				LD_RUNPATH_SEARCH_PATHS = (
+@@ -666,6 +675,7 @@
+ 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+ 				DEVELOPMENT_TEAM = ZLLDAN62HX;
+ 				ENABLE_BITCODE = NO;
++				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+ 				INFOPLIST_FILE = Runner/Info.plist;
+ 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+ 				LD_RUNPATH_SEARCH_PATHS = (
+@@ -690,6 +700,7 @@
+ 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+ 				DEVELOPMENT_TEAM = ZLLDAN62HX;
+ 				ENABLE_BITCODE = NO;
++				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
+ 				INFOPLIST_FILE = Runner/Info.plist;
+ 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
+ 				LD_RUNPATH_SEARCH_PATHS = (
+@@ -746,11 +757,27 @@
+ 		};
+ /* End XCLocalSwiftPackageReference section */
+ 
++/* Begin XCRemoteSwiftPackageReference section */
++		4338F90A154C5DEC29E85BFC /* XCRemoteSwiftPackageReference "LiteRT-LM" */ = {
++			isa = XCRemoteSwiftPackageReference;
++			repositoryURL = "https://github.com/google-ai-edge/LiteRT-LM.git";
++			requirement = {
++				kind = exactVersion;
++				version = 0.19.1;
++			};
++		};
++/* End XCRemoteSwiftPackageReference section */
++
+ /* Begin XCSwiftPackageProductDependency section */
+ 		78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */ = {
+ 			isa = XCSwiftPackageProductDependency;
+ 			productName = FlutterGeneratedPluginSwiftPackage;
+ 		};
++		BBA111754602F618056A5EC9 /* LiteRTLM */ = {
++			isa = XCSwiftPackageProductDependency;
++			package = 4338F90A154C5DEC29E85BFC /* XCRemoteSwiftPackageReference "LiteRT-LM" */;
++			productName = LiteRTLM;
++		};
+ /* End XCSwiftPackageProductDependency section */
+ 	};
+ 	rootObject = 97C146E61CF9000F007C117D /* Project object */;
+diff --git a/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved b/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+new file mode 100644
+index 0000000..d38521a
+--- /dev/null
++++ b/ios/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -0,0 +1,14 @@
++{
++  "pins" : [
++    {
++      "identity" : "litert-lm",
++      "kind" : "remoteSourceControl",
++      "location" : "https://github.com/google-ai-edge/LiteRT-LM.git",
++      "state" : {
++        "revision" : "7a03724cece417f1724c923b3d527b4319730841",
++        "version" : "0.19.1"
++      }
++    }
++  ],
++  "version" : 2
++}
+diff --git a/ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved b/ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved
+new file mode 100644
+index 0000000..d38521a
+--- /dev/null
++++ b/ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved
+@@ -0,0 +1,14 @@
++{
++  "pins" : [
++    {
++      "identity" : "litert-lm",
++      "kind" : "remoteSourceControl",
++      "location" : "https://github.com/google-ai-edge/LiteRT-LM.git",
++      "state" : {
++        "revision" : "7a03724cece417f1724c923b3d527b4319730841",
++        "version" : "0.19.1"
++      }
++    }
++  ],
++  "version" : 2
++}
+diff --git a/ios/Runner/AppDelegate.swift b/ios/Runner/AppDelegate.swift
+index b509907..bb493eb 100644
+--- a/ios/Runner/AppDelegate.swift
++++ b/ios/Runner/AppDelegate.swift
+@@ -21,5 +21,8 @@ import flutter_local_notifications
+     }
+ 
+     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
++    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "CodefestAI") {
++      CodefestAI.register(with: registrar)
++    }
+   }
+ }
+diff --git a/ios/Runner/CodefestAI.swift b/ios/Runner/CodefestAI.swift
+new file mode 100644
+index 0000000..c260ad0
+--- /dev/null
++++ b/ios/Runner/CodefestAI.swift
+@@ -0,0 +1,169 @@
++// SPDX-License-Identifier: AGPL-3.0-or-later
++import Flutter
++import UIKit
++import Speech
++import AVFoundation
++import CryptoKit
++import LiteRTLM
++
++final class CodefestAI: NSObject, FlutterPlugin {
++  static let source = "https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/42d538a932e8d5b12e6b3b455f5572560bd60b2c/gemma3-1b-it-int4.litertlm"
++  private var engine: Engine?
++  private var conversation: Conversation?
++  private var generation: Task<Void, Never>?
++  private var generationId: String?
++  private var voiceId: String?
++  private var voiceResult: FlutterResult?
++  private var audio: AVAudioEngine?
++  private var speechRequest: SFSpeechAudioBufferRecognitionRequest?
++  private var speechTask: SFSpeechRecognitionTask?
++  private var voiceTimer: Timer?
++  private var transcript = ""
++  private var finishingVoice = false
++  private var installedTap = false
++  private let locales: Set<String> = ["zh-TW","en-US","vi-VN","id-ID","th-TH","ko-KR","ja-JP"]
++  static func register(with registrar: FlutterPluginRegistrar) {
++    let instance = CodefestAI()
++    let channel = FlutterMethodChannel(name: "codefest/on_device_ai", binaryMessenger: registrar.messenger())
++    registrar.addMethodCallDelegate(instance, channel: channel)
++    NotificationCenter.default.addObserver(instance, selector: #selector(instance.background), name: UIApplication.didEnterBackgroundNotification, object: nil)
++    NotificationCenter.default.addObserver(instance, selector: #selector(instance.background), name: UIApplication.didReceiveMemoryWarningNotification, object: nil)
++  }
++  private var directory: URL { FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("CodefestAI") }
++  private var model: URL { directory.appendingPathComponent("gemma3-1b-it-int4.litertlm") }
++  private func receipt() -> String? {
++    guard let data = try? Data(contentsOf: directory.appendingPathComponent("receipt.json")),
++      let value = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any],
++      value["source"] as? String == Self.source,
++      let digest = value["sha256"] as? String, digest.range(of: "^[a-f0-9]{64}$", options: .regularExpression) != nil,
++      let attributes = try? FileManager.default.attributesOfItem(atPath: model.path),
++      (attributes[.size] as? NSNumber)?.int64Value == 584417280 else { return nil }
++    return digest
++  }
++  func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
++    let args = call.arguments as? [String: Any] ?? [:]
++    let id = args["requestId"] as? String ?? ""
++    let locale = args["locale"] as? String ?? "zh-TW"
++    switch call.method {
++    case "status":
++      let recognizer = locales.contains(locale) ? SFSpeechRecognizer(locale: Locale(identifier: locale)) : nil
++      result(["status":"success", "modelReady":receipt() != nil, "voiceAvailable":recognizer?.supportsOnDeviceRecognition == true, "model":"Gemma 3 1B INT4"])
++    case "generate":
++      guard generationId == nil else { result(error("busy")); return }
++      guard let prompt = args["prompt"] as? String, !prompt.isEmpty, prompt.utf16.count <= 6000 else { result(error("invalid_input")); return }
++      guard let expected = receipt() else { result(error("model_missing")); return }
++      generationId = id
++      let path = model.path
++      generation = Task { @MainActor [self] in
++        do {
++          if engine == nil {
++            let valid = await Task.detached(priority: .userInitiated) { Self.verify(path, expected) }.value
++            guard valid else { throw NSError(domain:"model_integrity", code:1) }
++            try Task.checkCancellation()
++            let config = try EngineConfig(modelPath: path, backend: .cpu(), maxNumTokens: 4096, cacheDir: NSTemporaryDirectory())
++            let loaded = Engine(engineConfig: config)
++            try await loaded.initialize()
++            try Task.checkCancellation()
++            engine = loaded
++          }
++          guard let current = engine else { throw NSError(domain:"model_missing",code:1) }
++          let chat = try await current.createConversation()
++          conversation = chat
++          let reply = try await chat.sendMessage(Message(prompt), maxOutputTokens: 256)
++          try Task.checkCancellation()
++          result(["status":"success", "text":String(reply.toString.prefix(6000))])
++        } catch {
++          result(self.error(Task.isCancelled ? "cancelled" : "inference_failed"))
++        }
++        if generationId == id { generationId = nil; generation = nil; conversation = nil }
++      }
++    case "voice": startVoice(id, locale, result)
++    case "stopVoice": stopVoiceCapture(); result(["status":"success"])
++    case "cancel":
++      let target = args["targetRequestId"] as? String
++      if target == generationId { cancelGeneration() }
++      if target == voiceId { finishVoice(success: false) }
++      result(["status":"success"])
++    case "unload": background(); result(["status":"success"])
++    default: result(FlutterMethodNotImplemented)
++    }
++  }
++  private static func verify(_ path: String, _ expected: String) -> Bool {
++    guard let stream = InputStream(fileAtPath:path) else { return false }
++    stream.open(); defer { stream.close() }
++    var digest = SHA256(), buffer = [UInt8](repeating:0, count:1024*1024)
++    while true {
++      let count = stream.read(&buffer, maxLength:buffer.count)
++      if count < 0 { return false }; if count == 0 { break }
++      digest.update(data:Data(buffer.prefix(count)))
++    }
++    return digest.finalize().map { String(format:"%02x",$0) }.joined() == expected
++  }
++  private func error(_ code: String) -> [String:Any] { ["status":"error","code":code] }
++  private func cancelGeneration() { generation?.cancel(); try? conversation?.cancel() }
++  @objc private func background() { cancelGeneration(); finishVoice(success:false); engine = nil }
++  private func startVoice(_ id: String, _ locale: String, _ result: @escaping FlutterResult) {
++    guard voiceId == nil, generationId == nil else { result(error("busy")); return }
++    guard locales.contains(locale), let recognizer = SFSpeechRecognizer(locale:Locale(identifier:locale)), recognizer.supportsOnDeviceRecognition else { result(error("voice_unavailable")); return }
++    voiceId = id; voiceResult = result; transcript = ""; finishingVoice = false
++    SFSpeechRecognizer.requestAuthorization { [weak self] status in
++      DispatchQueue.main.async {
++        guard let self, self.voiceId == id else { return }
++        guard status == .authorized else { self.finishVoice(success:false, code:"permission_denied"); return }
++        AVAudioSession.sharedInstance().requestRecordPermission { granted in
++          DispatchQueue.main.async {
++            guard self.voiceId == id else { return }
++            guard granted else { self.finishVoice(success:false, code:"permission_denied"); return }
++            do {
++              let session = AVAudioSession.sharedInstance()
++              try session.setCategory(.record, mode:.measurement, options:[])
++              try session.setActive(true)
++              let request = SFSpeechAudioBufferRecognitionRequest()
++              request.requiresOnDeviceRecognition = true
++              request.shouldReportPartialResults = true
++              let audio = AVAudioEngine()
++              self.audio = audio; self.speechRequest = request
++              let node = audio.inputNode, format = audio.inputNode.outputFormat(forBus:0)
++              guard format.sampleRate > 0, format.channelCount > 0 else { throw NSError(domain:"no_microphone",code:1) }
++              node.installTap(onBus:0, bufferSize:1024, format:format) { buffer, _ in request.append(buffer) }
++              self.installedTap = true
++              self.speechTask = recognizer.recognitionTask(with:request) { response, failure in
++                DispatchQueue.main.async {
++                  guard self.voiceId == id else { return }
++                  if let response { self.transcript = String(response.bestTranscription.formattedString.prefix(500)) }
++                  if response?.isFinal == true { self.finishVoice(success:true) }
++                  else if failure != nil { self.finishVoice(success:!self.transcript.isEmpty, code:"voice_unavailable") }
++                }
++              }
++              audio.prepare(); try audio.start()
++              self.voiceTimer = Timer.scheduledTimer(withTimeInterval:30, repeats:false) { [weak self] _ in self?.stopVoiceCapture() }
++            } catch { self.finishVoice(success:false, code:"voice_unavailable") }
++          }
++        }
++      }
++    }
++  }
++  private func stopVoiceCapture() {
++    guard voiceId != nil, !finishingVoice else { return }
++    finishingVoice = true
++    audio?.stop()
++    if installedTap { audio?.inputNode.removeTap(onBus:0); installedTap = false }
++    speechRequest?.endAudio()
++    voiceTimer?.invalidate()
++    voiceTimer = Timer.scheduledTimer(withTimeInterval:3, repeats:false) { [weak self] _ in
++      guard let self else { return }
++      self.finishVoice(success:!self.transcript.isEmpty, code:"no_speech")
++    }
++  }
++  private func finishVoice(success: Bool, code: String = "cancelled") {
++    guard voiceId != nil else { return }
++    let callback = voiceResult
++    voiceId = nil; voiceResult = nil; finishingVoice = false
++    voiceTimer?.invalidate(); voiceTimer = nil
++    audio?.stop(); if installedTap { audio?.inputNode.removeTap(onBus:0); installedTap = false }; audio = nil
++    speechRequest?.endAudio(); speechTask?.cancel(); speechTask = nil; speechRequest = nil
++    try? AVAudioSession.sharedInstance().setActive(false, options:.notifyOthersOnDeactivation)
++    callback?(success && !transcript.isEmpty ? ["status":"success","text":transcript] : error(success ? "no_speech" : code))
++    transcript = ""
++  }
++}
+diff --git a/ios/Runner/Info.plist b/ios/Runner/Info.plist
+index 8a02575..d6b63a5 100644
+--- a/ios/Runner/Info.plist
++++ b/ios/Runner/Info.plist
+@@ -2,6 +2,10 @@
+ <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ <plist version="1.0">
+ 	<dict>
++	<key>NSMicrophoneUsageDescription</key>
++	<string>按下語音輸入後，在裝置上將語音轉成可編輯草稿。</string>
++	<key>NSSpeechRecognitionUsageDescription</key>
++	<string>僅使用裝置端辨識將語音轉成草稿，不使用遠端辨識。</string>
+ 		<key>CADisableMinimumFrameDurationOnPhone</key>
+ 		<true/>
+ 		<key>CFBundleDevelopmentRegion</key>
 diff --git a/lib/page/city_service/model/my_service_model.dart b/lib/page/city_service/model/my_service_model.dart
 index 4f33a56..e4aaa52 100644
 --- a/lib/page/city_service/model/my_service_model.dart
@@ -40,6 +637,314 @@ index 4f33a56..e4aaa52 100644
        MyServiceItemId.dedicatedLine => MyServiceItem(
            title: '1999',
            description: '播打網路語音通話',
+diff --git a/lib/page/codefest_ai/gemma_model_store.dart b/lib/page/codefest_ai/gemma_model_store.dart
+new file mode 100644
+index 0000000..9cd8add
+--- /dev/null
++++ b/lib/page/codefest_ai/gemma_model_store.dart
+@@ -0,0 +1,136 @@
++// SPDX-License-Identifier: AGPL-3.0-or-later
++import 'dart:convert';
++import 'dart:io';
++import 'dart:isolate';
++
++import 'package:crypto/crypto.dart';
++import 'package:path_provider/path_provider.dart';
++
++class GemmaModelStore {
++  static const fileName = 'gemma3-1b-it-int4.litertlm';
++  static const revision = '42d538a932e8d5b12e6b3b455f5572560bd60b2c';
++  static const size = 584417280;
++  static const source =
++      'https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/$revision/$fileName';
++  static const pointer =
++      'https://huggingface.co/litert-community/Gemma3-1B-IT/raw/$revision/$fileName';
++  final HttpClient _client = HttpClient()
++    ..connectionTimeout = const Duration(seconds: 30);
++  bool _cancelled = false;
++  static bool approvedUri(Uri uri) =>
++      uri.scheme == 'https' &&
++      uri.userInfo.isEmpty &&
++      (uri.port == 443) &&
++      (uri.host == 'huggingface.co' ||
++          uri.host.endsWith('.huggingface.co') ||
++          uri.host.endsWith('.hf.co'));
++  static String parsePointer(String value) {
++    final match = RegExp(
++      r'^version https://git-lfs.github.com/spec/v1\noid sha256:([a-f0-9]{64})\nsize 584417280\n?$',
++    ).firstMatch(value);
++    if (match == null) {
++      throw const FormatException('Invalid pinned Google artifact pointer');
++    }
++    return match.group(1)!;
++  }
++
++  void cancel() {
++    _cancelled = true;
++    _client.close(force: true);
++  }
++
++  Future<HttpClientResponse> _open(String url, String token) async {
++    var uri = Uri.parse(url);
++    for (var attempt = 0; attempt < 6; attempt++) {
++      if (_cancelled || !approvedUri(uri)) {
++        throw const HttpException('Unapproved source or cancelled');
++      }
++      final request = await _client.getUrl(uri);
++      request.followRedirects = false;
++      if (token.isNotEmpty && uri.host == 'huggingface.co') {
++        request.headers.set(HttpHeaders.authorizationHeader, 'Bearer $token');
++      }
++      final response = await request.close().timeout(
++        const Duration(seconds: 60),
++      );
++      if ({301, 302, 303, 307, 308}.contains(response.statusCode)) {
++        final location = response.headers.value(HttpHeaders.locationHeader);
++        await response.drain<void>();
++        if (location == null) throw const HttpException('Missing redirect');
++        uri = uri.resolve(location);
++        continue;
++      }
++      if (response.statusCode != 200) {
++        await response.drain<void>();
++        throw HttpException(
++          'Official model access failed (${response.statusCode})',
++        );
++      }
++      return response;
++    }
++    throw const HttpException('Too many redirects');
++  }
++
++  Future<void> install({
++    required bool termsAccepted,
++    required String token,
++    required void Function(double) onProgress,
++  }) async {
++    if (!termsAccepted) throw StateError('Gemma license acceptance required');
++    final metadata = await _open(pointer, token);
++    final bytes = <int>[];
++    await for (final chunk in metadata.timeout(const Duration(seconds: 60))) {
++      bytes.addAll(chunk);
++      if (bytes.length > 1024) throw const FormatException('Oversized pointer');
++    }
++    final expected = parsePointer(utf8.decode(bytes));
++    final base = await getApplicationSupportDirectory();
++    final directory = Directory('${base.path}/CodefestAI');
++    await directory.create(recursive: true);
++    final temporary = File('${directory.path}/$fileName.part');
++    try {
++      final response = await _open(source, token);
++      var count = 0;
++      final output = await temporary.open(mode: FileMode.write);
++      try {
++        await for (final chunk in response.timeout(
++          const Duration(seconds: 60),
++        )) {
++          if (_cancelled) throw StateError('Cancelled');
++          count += chunk.length;
++          if (count > size) throw const FormatException('Oversized model');
++          await output.writeFrom(chunk);
++          onProgress(count / size);
++        }
++      } finally {
++        await output.close();
++      }
++      if (_cancelled || count != size) {
++        throw const FormatException('Incomplete model');
++      }
++      final path = temporary.path;
++      final digest = await Isolate.run(
++        () async => (await sha256.bind(File(path).openRead()).first).toString(),
++      );
++      if (_cancelled || digest != expected) {
++        throw const FormatException('Model digest mismatch');
++      }
++      await temporary.rename('${directory.path}/$fileName');
++      final receipt = File('${directory.path}/receipt.json.part');
++      await receipt.writeAsString(
++        jsonEncode({
++          'source': source,
++          'sha256': expected,
++          'size': size,
++          'revision': revision,
++          'license': 'Gemma Terms of Use',
++        }),
++        flush: true,
++      );
++      await receipt.rename('${directory.path}/receipt.json');
++    } finally {
++      if (await temporary.exists()) await temporary.delete();
++      _client.close(force: true);
++    }
++  }
++}
+diff --git a/lib/page/codefest_ai/gemma_setup_view.dart b/lib/page/codefest_ai/gemma_setup_view.dart
+new file mode 100644
+index 0000000..04f1812
+--- /dev/null
++++ b/lib/page/codefest_ai/gemma_setup_view.dart
+@@ -0,0 +1,160 @@
++// SPDX-License-Identifier: AGPL-3.0-or-later
++import 'package:flutter/material.dart';
++import 'package:url_launcher/url_launcher.dart';
++import 'package:town_pass/page/codefest_ai/gemma_model_store.dart';
++
++class GemmaSetupView extends StatefulWidget {
++  const GemmaSetupView({super.key});
++  @override
++  State<GemmaSetupView> createState() => _GemmaSetupState();
++}
++
++class _GemmaSetupState extends State<GemmaSetupView>
++    with WidgetsBindingObserver {
++  final token = TextEditingController();
++  bool accepted = false, downloading = false, installed = false;
++  double progress = 0;
++  String? notice;
++  GemmaModelStore? store;
++  @override
++  void initState() {
++    super.initState();
++    WidgetsBinding.instance.addObserver(this);
++  }
++
++  @override
++  void didChangeAppLifecycleState(AppLifecycleState state) {
++    if (state == AppLifecycleState.paused) store?.cancel();
++  }
++
++  @override
++  void dispose() {
++    WidgetsBinding.instance.removeObserver(this);
++    store?.cancel();
++    token.clear();
++    token.dispose();
++    super.dispose();
++  }
++
++  Future<void> install() async {
++    if (!accepted || downloading) return;
++    setState(() {
++      downloading = true;
++      notice = null;
++      progress = 0;
++    });
++    final current = GemmaModelStore();
++    store = current;
++    final credential = token.text.trim();
++    token.clear();
++    try {
++      await current.install(
++        termsAccepted: accepted,
++        token: credential,
++        onProgress: (value) {
++          if (mounted && (value - progress > .005 || value == 1)) {
++            setState(() => progress = value);
++          }
++        },
++      );
++      if (mounted) {
++        setState(() {
++          installed = true;
++          notice = '已驗證並安裝 Google Gemma 3。回到聊天後即可使用。';
++        });
++      }
++    } catch (_) {
++      if (mounted) {
++        setState(
++          () => notice = '安裝未完成。請確認已在 Hugging Face 接受模型授權、Token 有讀取權限、網路與可用儲存空間，再重試。未使用其他下載來源。',
++        );
++      }
++    } finally {
++      current.cancel();
++      if (mounted) setState(() => downloading = false);
++    }
++  }
++
++  @override
++  Widget build(BuildContext context) => Scaffold(
++    appBar: AppBar(title: const Text('安裝手機聊天模型')),
++    body: SafeArea(
++      child: ListView(
++        padding: const EdgeInsets.all(24),
++        children: [
++          const Text(
++            'Google Gemma 3 1B',
++            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
++          ),
++          const SizedBox(height: 12),
++          const Text(
++            '首次安裝需要網路，下載約 584 MB。建議預留至少 2 GB 儲存空間、4 GB 以上記憶體；實際速度依手機而異。安裝後，對話在裝置端執行。',
++          ),
++          const SizedBox(height: 16),
++          TextButton(
++            onPressed: downloading
++                ? null
++                : () => launchUrl(
++                    Uri.parse(
++                      'https://huggingface.co/litert-community/Gemma3-1B-IT',
++                    ),
++                    mode: LaunchMode.externalApplication,
++                  ),
++            child: const Text('用自己的帳號接受模型授權'),
++          ),
++          TextButton(
++            onPressed: downloading
++                ? null
++                : () => launchUrl(
++                    Uri.parse('https://ai.google.dev/gemma/terms'),
++                    mode: LaunchMode.externalApplication,
++                  ),
++            child: const Text('閱讀 Gemma 授權條款'),
++          ),
++          CheckboxListTile(
++            contentPadding: EdgeInsets.zero,
++            value: accepted,
++            onChanged: downloading
++                ? null
++                : (value) => setState(() => accepted = value ?? false),
++            title: const Text('我已閱讀並接受 Gemma 條款，且有模型存取權限'),
++          ),
++          TextField(
++            controller: token,
++            enabled: !downloading && !installed,
++            obscureText: true,
++            autocorrect: false,
++            enableSuggestions: false,
++            decoration: const InputDecoration(
++              labelText: 'Hugging Face Read Token（僅本次下載）',
++              helperText: '只傳送到 Hugging Face，不保存、不交給網頁或聊天模型。',
++            ),
++          ),
++          const SizedBox(height: 20),
++          if (downloading) ...[
++            LinearProgressIndicator(value: progress),
++            Text('下載／驗證中 ${(progress * 100).toStringAsFixed(0)}%'),
++            TextButton(
++              onPressed: () => store?.cancel(),
++              child: const Text('取消安裝'),
++            ),
++          ],
++          FilledButton(
++            onPressed: accepted && !downloading && !installed ? install : null,
++            child: const Text('下載並驗證官方模型'),
++          ),
++          if (notice != null)
++            Padding(
++              padding: const EdgeInsets.only(top: 16),
++              child: Text(notice!),
++            ),
++          if (installed)
++            FilledButton(
++              onPressed: () => Navigator.of(context).pop(true),
++              child: const Text('回到聊天'),
++            ),
++        ],
++      ),
++    ),
++  );
++}
 diff --git a/lib/page/codefest_scan/codefest_scan_session.dart b/lib/page/codefest_scan/codefest_scan_session.dart
 new file mode 100644
 index 0000000..da592f9
@@ -325,6 +1230,124 @@ index 0000000..52c29f2
 +    );
 +  }
 +}
+diff --git a/lib/util/web_message_handler/codefest_ai_handler.dart b/lib/util/web_message_handler/codefest_ai_handler.dart
+new file mode 100644
+index 0000000..8b497fd
+--- /dev/null
++++ b/lib/util/web_message_handler/codefest_ai_handler.dart
+@@ -0,0 +1,112 @@
++// SPDX-License-Identifier: AGPL-3.0-or-later
++import 'package:flutter/services.dart';
++import 'package:get/get.dart';
++import 'package:town_pass/page/codefest_ai/gemma_setup_view.dart';
++import 'package:flutter_inappwebview/flutter_inappwebview.dart';
++import 'package:town_pass/util/web_message_handler/tp_web_message_handler.dart';
++
++class CodefestAIMessageHandler extends TPWebMessageHandler {
++  @override
++  String get name => 'codefest_ai';
++  bool _settingUp = false;
++  static const channel = MethodChannel('codefest/on_device_ai');
++  static const origins = {
++    'http://127.0.0.1:8082',
++    'http://localhost:8082',
++    'https://home.yoyo899843.com',
++  };
++  static const locales = {
++    'zh-TW',
++    'en-US',
++    'vi-VN',
++    'id-ID',
++    'th-TH',
++    'ko-KR',
++    'ja-JP',
++  };
++  static bool validId(Object? value) =>
++      value is String && RegExp(r'^[a-f0-9]{32}$').hasMatch(value);
++  @override
++  Future<void> handle({
++    required Object? message,
++    required WebUri? sourceOrigin,
++    required bool isMainFrame,
++    required Function(WebMessage replyWebMessage)? onReply,
++  }) async {
++    final origin = Uri.tryParse(sourceOrigin?.toString() ?? '');
++    if (!isMainFrame ||
++        origin == null ||
++        !origin.hasAuthority ||
++        !origins.contains(origin.origin) ||
++        message is! Map ||
++        !validId(message['requestId'])) {
++      return;
++    }
++    final id = message['requestId'];
++    final action = message['action'];
++    if (!{
++      'status',
++      'setup',
++      'generate',
++      'voice',
++      'stopVoice',
++      'cancel',
++      'unload',
++    }.contains(action)) {
++      return;
++    }
++    final prompt = message['prompt'];
++    if (action == 'generate' &&
++        (prompt is! String || prompt.trim().isEmpty || prompt.length > 6000)) {
++      return;
++    }
++    if (action == 'cancel' && !validId(message['targetRequestId'])) return;
++    if ({'status', 'voice'}.contains(action) &&
++        !locales.contains(message['locale'])) {
++      return;
++    }
++    Map result;
++    if (action == 'setup') {
++      if (_settingUp) {
++        onReply?.call(
++          replyWebMessage(
++            data: {'requestId': id, 'status': 'error', 'code': 'busy'},
++          ),
++        );
++        return;
++      }
++      _settingUp = true;
++      try {
++        await channel.invokeMethod('unload');
++        await Get.to(() => const GemmaSetupView());
++        onReply?.call(
++          replyWebMessage(data: {'requestId': id, 'status': 'success'}),
++        );
++      } finally {
++        _settingUp = false;
++      }
++      return;
++    }
++    try {
++      result =
++          await channel.invokeMapMethod<String, Object?>(action as String, {
++            'requestId': id,
++            if (action == 'generate') 'prompt': prompt,
++            if (action == 'cancel')
++              'targetRequestId': message['targetRequestId'],
++            if ({'status', 'voice'}.contains(action))
++              'locale': message['locale'],
++          }) ??
++          {'status': 'error', 'code': 'unavailable'};
++    } on PlatformException catch (e) {
++      result = {'status': 'error', 'code': e.code};
++    } on MissingPluginException {
++      result = {'status': 'error', 'code': 'unavailable'};
++    }
++    try {
++      onReply?.call(replyWebMessage(data: {...result, 'requestId': id}));
++    } catch (_) {
++      await channel.invokeMethod('cancel', {'targetRequestId': id});
++    }
++  }
++}
 diff --git a/lib/util/web_message_handler/codefest_scan_handler.dart b/lib/util/web_message_handler/codefest_scan_handler.dart
 new file mode 100644
 index 0000000..8637aa8
@@ -413,23 +1436,155 @@ index 0000000..8637aa8
 +  }
 +}
 diff --git a/lib/util/web_message_handler/tp_web_message_listener.dart b/lib/util/web_message_handler/tp_web_message_listener.dart
-index 47cf6ee..ded8bd6 100644
+index 47cf6ee..6bbde0d 100644
 --- a/lib/util/web_message_handler/tp_web_message_listener.dart
 +++ b/lib/util/web_message_handler/tp_web_message_listener.dart
-@@ -1,4 +1,5 @@
+@@ -1,5 +1,8 @@
  import 'dart:convert';
-+import 'package:town_pass/util/web_message_handler/codefest_scan_handler.dart';
  
++import 'package:town_pass/util/web_message_handler/codefest_ai_handler.dart';
++import 'package:town_pass/util/web_message_handler/codefest_scan_handler.dart';
++
  import 'package:town_pass/util/web_message_handler/tp_web_message_handler.dart';
  import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-@@ -16,6 +17,7 @@ abstract class TPWebMessageListener {
-         OpenLinkMessageHandler(),
-         NotifyMessageHandler(),
-         QRCodeScanMessageHandler(),
-+        CodefestScanMessageHandler(),
-       ];
+ 
+@@ -7,16 +10,18 @@ abstract class TPWebMessageListener {
+   // 將訊息處理器列表快取起來，避免每次訪問時都重複建立新的實例。
+   // 這樣做可以提升應用程式的啟動效能，因為這些處理器通常是無狀態的。
+   static final List<TPWebMessageHandler> _cachedMessageHandlers = [
+-        UserinfoWebMessageHandler(),
+-        LaunchMapWebMessageHandler(),
+-        PhoneCallMessageHandler(),
+-        Agree1999MessageHandler(),
+-        LocationMessageHandler(),
+-        DeviceInfoMessageHandler(),
+-        OpenLinkMessageHandler(),
+-        NotifyMessageHandler(),
+-        QRCodeScanMessageHandler(),
+-      ];
++    UserinfoWebMessageHandler(),
++    LaunchMapWebMessageHandler(),
++    PhoneCallMessageHandler(),
++    Agree1999MessageHandler(),
++    LocationMessageHandler(),
++    DeviceInfoMessageHandler(),
++    OpenLinkMessageHandler(),
++    NotifyMessageHandler(),
++    QRCodeScanMessageHandler(),
++    CodefestScanMessageHandler(),
++    CodefestAIMessageHandler(),
++  ];
  
    static List<TPWebMessageHandler> get messageHandler => _cachedMessageHandlers;
+ 
+@@ -42,4 +47,4 @@ abstract class TPWebMessageListener {
+       },
+     );
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/pubspec.lock b/pubspec.lock
+index 9f11d60..550f586 100644
+--- a/pubspec.lock
++++ b/pubspec.lock
+@@ -202,7 +202,7 @@ packages:
+     source: hosted
+     version: "0.3.5+5"
+   crypto:
+-    dependency: transitive
++    dependency: "direct main"
+     description:
+       name: crypto
+       sha256: c8ea0233063ba03258fbcf2ca4d6dadfefe14f02fab57702265467a19f27fadf
+@@ -974,7 +974,7 @@ packages:
+     source: hosted
+     version: "1.1.0"
+   path_provider:
+-    dependency: transitive
++    dependency: "direct main"
+     description:
+       name: path_provider
+       sha256: a7f4874f987173da295a61c181b8ee71dab59b332a486b391babf26a1b884825
+diff --git a/pubspec.yaml b/pubspec.yaml
+index 69f3c45..5235973 100644
+--- a/pubspec.yaml
++++ b/pubspec.yaml
+@@ -28,6 +28,8 @@ environment:
+ # the latest version available on pub.dev. To see which dependencies have newer
+ # versions available, run `flutter pub outdated`.
+ dependencies:
++  crypto: 3.0.7
++  path_provider: 2.1.6
+   cached_network_image: ^4.0.4
+   carousel_slider: ^5.1.2
+   characters: ^1.4.1
+diff --git a/test/codefest_ai_handler_test.dart b/test/codefest_ai_handler_test.dart
+new file mode 100644
+index 0000000..4c9a16f
+--- /dev/null
++++ b/test/codefest_ai_handler_test.dart
+@@ -0,0 +1,60 @@
++import 'package:flutter/services.dart';
++import 'package:flutter_test/flutter_test.dart';
++import 'package:flutter_inappwebview/flutter_inappwebview.dart';
++import 'package:town_pass/util/web_message_handler/codefest_ai_handler.dart';
++
++void main() {
++  TestWidgetsFlutterBinding.ensureInitialized();
++  const channel = MethodChannel('codefest/on_device_ai');
++  late List<MethodCall> calls;
++  setUp(() {
++    calls = [];
++    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
++        .setMockMethodCallHandler(channel, (call) async {
++          calls.add(call);
++          return {'status': 'success', 'modelReady': false};
++        });
++  });
++  tearDown(
++    () => TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
++        .setMockMethodCallHandler(channel, null),
++  );
++  final id = 'a' * 32;
++  test(
++    'approved main-frame status is correlated and never asks permission',
++    () async {
++      final replies = <WebMessage>[];
++      await CodefestAIMessageHandler().handle(
++        message: {'requestId': id, 'action': 'status', 'locale': 'zh-TW'},
++        sourceOrigin: WebUri('http://127.0.0.1:8082'),
++        isMainFrame: true,
++        onReply: replies.add,
++      );
++      expect(calls.single.method, 'status');
++      expect(replies, hasLength(1));
++      expect(replies.single.data, contains(id));
++    },
++  );
++  test('reject iframe, foreign origin, invalid IDs, locale and oversized prompt before native channel', () async {
++    final handler = CodefestAIMessageHandler();
++    Future<void> send(
++      Map message, {
++      String origin = 'http://127.0.0.1:8082',
++      bool main = true,
++    }) => handler.handle(
++      message: message,
++      sourceOrigin: WebUri(origin),
++      isMainFrame: main,
++      onReply: null,
++    );
++    final status = {'requestId': id, 'action': 'status', 'locale': 'zh-TW'};
++    await send(status, main: false);
++    await send(status, origin: 'https://evil.example');
++    await send(status, origin: 'http://home.yoyo899843.com:8000');
++    await send({...status, 'requestId': 'bad'});
++    await send({...status, 'locale': 'unsupported'});
++    await send({'requestId': id, 'action': 'generate', 'prompt': 'x' * 6001});
++    await send({'requestId': id, 'action': 'cancel', 'targetRequestId': 'bad'});
++    expect(calls, isEmpty);
++  });
++}
 diff --git a/test/codefest_scan_session_test.dart b/test/codefest_scan_session_test.dart
 new file mode 100644
 index 0000000..86d7082
@@ -506,5 +1661,62 @@ index 0000000..86d7082
 +      ['old', 'after_qr'],
 +    );
 +    session.dispose();
++  });
++}
+diff --git a/test/gemma_model_store_test.dart b/test/gemma_model_store_test.dart
+new file mode 100644
+index 0000000..920b0b2
+--- /dev/null
++++ b/test/gemma_model_store_test.dart
+@@ -0,0 +1,51 @@
++import 'package:flutter_test/flutter_test.dart';
++import 'package:town_pass/page/codefest_ai/gemma_model_store.dart';
++
++void main() {
++  test('only HTTPS official HF hosts and default TLS port are accepted', () {
++    expect(
++      GemmaModelStore.approvedUri(Uri.parse(GemmaModelStore.source)),
++      true,
++    );
++    expect(
++      GemmaModelStore.approvedUri(
++        Uri.parse('https://cas-bridge.xethub.hf.co/blob'),
++      ),
++      true,
++    );
++    for (final url in [
++      'http://huggingface.co/blob',
++      'https://huggingface.co.evil.example/blob',
++      'https://mirror.example/blob',
++      'https://user:secret@huggingface.co/blob',
++      'https://huggingface.co:8000/blob',
++    ]) {
++      expect(GemmaModelStore.approvedUri(Uri.parse(url)), false);
++    }
++  });
++  test('pointer binds exact model size and sha256, refuses unrelated content', () {
++    final digest = 'a' * 64;
++    final pointer =
++        'version https://git-lfs.github.com/spec/v1\noid sha256:$digest\nsize 584417280\n';
++    expect(GemmaModelStore.parsePointer(pointer), digest);
++    for (final invalid in [
++      pointer.replaceFirst('584417280', '10'),
++      pointer.replaceFirst(digest, 'bad'),
++      '<html>login</html>',
++      '$pointer\nextra',
++    ]) {
++      expect(
++        () => GemmaModelStore.parsePointer(invalid),
++        throwsFormatException,
++      );
++    }
++  });
++  test('license gate runs before any download', () async {
++    final store = GemmaModelStore();
++    await expectLater(
++      store.install(termsAccepted: false, token: '', onProgress: (_) {}),
++      throwsStateError,
++    );
++    store.cancel();
 +  });
 +}

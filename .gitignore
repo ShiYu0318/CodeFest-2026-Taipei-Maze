@@ -2,3 +2,6 @@
 .DS_Store
 Thumbs.db
 /.local/
+
+# Python tooling cache
+__pycache__/
