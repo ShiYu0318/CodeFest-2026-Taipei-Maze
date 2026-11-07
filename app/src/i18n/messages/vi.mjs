@@ -359,4 +359,5 @@ export default {
     "Muốn hỏi câu mở hơn? Bạn có thể cài thêm mô hình AI trên điện thoại (không bắt buộc, khoảng 584 MB).",
   "chat.welcome2":
     "Xin chào! Tôi là trợ lý nhà ga. Hãy hỏi “Nhà vệ sinh ở đâu?”, “Thang máy ở đâu?” hoặc cách quét vị trí. Câu trả lời lấy từ dữ liệu nhà ga, không cần mạng.",
+  "map.goHere": "Đưa tôi đến đây",
 };

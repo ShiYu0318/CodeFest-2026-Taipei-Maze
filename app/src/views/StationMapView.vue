@@ -329,6 +329,15 @@
                 <ZhuyinText :text="t('help.' + pointHelpType(selected))" />
               </p>
               <p><ZhuyinText :text="pointDescription(selected)" /></p>
+              <button
+                v-if="selected.id !== targetPoint?.id"
+                type="button"
+                class="facility-go"
+                @click="goHere(selected)"
+              >
+                <StationMapIcon name="arrow" />
+                <ZhuyinText :text="t('map.goHere')" />
+              </button>
             </div>
           </section>
         </div>
@@ -1267,6 +1276,11 @@ function chooseEndpoint(start, destination, point, role) {
   const saved = saveEndpoints(start, destination);
   if (role === "destination" && destination) openTripDialog();
   return saved;
+}
+
+// One tap from a facility card to trip guidance.
+function goHere(point) {
+  return chooseEndpoint(currentPoint.value?.id, point.id, point, "destination");
 }
 
 function planDestination(destination) {

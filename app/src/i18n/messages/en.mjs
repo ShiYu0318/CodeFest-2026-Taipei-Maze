@@ -360,4 +360,5 @@ export default {
     "Want to ask open questions? You can also install the on-device AI model (optional, about 584 MB).",
   "chat.welcome2":
     "Hi! I'm the station helper. Ask “Where is the toilet?”, “Where is the elevator?” or how to scan your location. Answers come from the station data and need no internet.",
+  "map.goHere": "Go here",
 };

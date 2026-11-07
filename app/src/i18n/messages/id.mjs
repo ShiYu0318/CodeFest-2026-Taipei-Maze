@@ -367,4 +367,5 @@ export default {
     "Ingin bertanya lebih bebas? Anda juga bisa memasang model AI di ponsel (opsional, sekitar 584 MB).",
   "chat.welcome2":
     "Halo! Saya asisten stasiun. Tanyakan “Di mana toilet?”, “Di mana lift?”, atau cara memindai lokasi. Jawaban berasal dari data stasiun dan tidak perlu internet.",
+  "map.goHere": "Antar saya ke sini",
 };
