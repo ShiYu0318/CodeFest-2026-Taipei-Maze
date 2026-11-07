@@ -484,12 +484,13 @@ function focusVisiblePin(point, event) {
 }
 
 function constrainZoom(scale) {
-  return Math.min(mobileZoomQuery.matches ? 1.5 : 3, Math.max(1, scale));
+  const minZoom = mobileZoomQuery.matches ? 1.5 : 1;
+  return Math.min(3, Math.max(minZoom, scale));
 }
 
 function enforceZoomLimit() {
-  const maxZoom = constrainZoom(zoom.value);
-  if (maxZoom !== zoom.value) zoomAt(maxZoom, viewportCenter());
+  const constrainedZoom = constrainZoom(zoom.value);
+  if (constrainedZoom !== zoom.value) zoomAt(constrainedZoom, viewportCenter());
 }
 
 function viewportPoint(clientX, clientY) {
