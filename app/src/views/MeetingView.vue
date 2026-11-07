@@ -11,7 +11,7 @@
         to="/station-map"
         class="meeting-back"
         :aria-label="t('meeting.back')"
-        :title="t('meeting.back')"
+        :title="displayPlainZhuyin(t('meeting.back'), displayMode, locale)"
         ><svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             d="m15 5-7 7 7 7"
@@ -64,6 +64,7 @@
   </main>
 </template>
 <script setup>
+import { displayPlainZhuyin } from "../display/zhuyin.mjs";
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import DisplayControls from "../components/DisplayControls.vue";

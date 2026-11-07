@@ -13,9 +13,12 @@
     <g v-if="!outlineOnly">
       <!-- Context only, not new walkable areas. North is at the top. -->
       <g class="rail-platforms">
-        <text class="rail-caption" x="-755" y="-795"
-          >B2・台鐵／高鐵月台示意</text
-        >
+        <ZhuyinSvgText
+          class="rail-caption"
+          x="-755"
+          y="-795"
+          :text="'B2・台鐵／高鐵月台示意'"
+        />
         <g
           v-for="platform in railPlatforms"
           :key="platform.id"
@@ -25,9 +28,12 @@
           <path class="rail-track" d="M0-14l1900-140M0 174l1900-140" />
           <path class="rail-sleepers" d="M0-14l1900-140M0 174l1900-140" />
           <path class="rail-deck" d="M0 0l1900-140v160L0 160Z" />
-          <text x="950" y="30" transform="rotate(-4.21 950 30)">{{
-            platform.label
-          }}</text>
+          <ZhuyinSvgText
+            x="950"
+            y="30"
+            transform="rotate(-4.21 950 30)"
+            :text="platform.label"
+          />
         </g>
       </g>
       <path
@@ -44,27 +50,34 @@
         d="M191 498v31m10-31v31m10-31v31m899 17 38-43m-29 48 38-43m-29 48 38-43M704 461l-3 22m80-22-3 22m79-22-3 22"
       />
       <g class="map-label exit-label">
-        <text x="700" y="-940">↑ 市民大道方向（北）</text>
-        <text x="118" y="727">← M5</text>
-        <text x="340" y="727">M4・M6 ↗</text>
-        <text x="1006" y="727">↖ M3・M8</text>
-        <text x="1269" y="558">M7 ↗</text>
+        <ZhuyinSvgText
+          x="700"
+          y="-940"
+          :text="'↑ 市民大道方向（北）'"
+          :reading-inset="64"
+        />
+        <ZhuyinSvgText x="118" y="727" :text="'← M5'" />
+        <ZhuyinSvgText x="340" y="727" :text="'M4・M6 ↗'" />
+        <ZhuyinSvgText x="1006" y="727" :text="'↖ M3・M8'" />
+        <ZhuyinSvgText x="1269" y="558" :text="'M7 ↗'" />
       </g>
       <g class="map-label line-label">
         <rect x="397" y="508" width="40" height="35" rx="6" fill="#0072c6" />
-        <text class="line-code" x="417" y="533">BL</text>
-        <text x="448" y="535">板南線大廳</text>
+        <ZhuyinSvgText class="line-code" x="417" y="533" :text="'BL'" />
+        <ZhuyinSvgText x="448" y="535" :text="'板南線大廳'" />
         <rect x="785" y="381" width="35" height="35" rx="6" fill="#d12d33" />
-        <text class="line-code" x="802.5" y="406">R</text>
-        <text x="778" y="446">往淡水信義線</text>
+        <ZhuyinSvgText class="line-code" x="802.5" y="406" :text="'R'" />
+        <ZhuyinSvgText x="778" y="446" :text="'往淡水信義線'" />
       </g>
     </g>
   </g>
 </template>
 
 <script>
+import ZhuyinSvgText from "./ZhuyinSvgText.vue";
 import { b2Outline, b2RailPlatforms } from "../views/station-floor-plans.mjs";
 export default {
+  components: { ZhuyinSvgText },
   props: { outlineOnly: Boolean },
   setup: () => ({
     b2Outline,
