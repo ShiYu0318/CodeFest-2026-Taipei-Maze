@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createQrBridge } from "../src/navigation/bridge.mjs";
+import { iosWebMessageData } from "./helpers/ios-web-message.mjs";
 function native() {
   const listeners = new Set(),
     messages = [];
@@ -214,4 +215,39 @@ test("shared owners keep the callback until the last user closes and preserve a 
   second.dispose();
   assert.equal(n.onmessage, replacement);
   assert.equal(n.listeners, 0);
+});
+
+test("iOS injected JSON QR replies complete instead of being silently discarded", async () => {
+  const payload = JSON.stringify({
+    type: "taipei_maze_anchor",
+    v: 1,
+    site_id: "taipei-main-map-preview",
+    graph_major: 1,
+    anchor_id: "station_b1-e4",
+  });
+  const n = native(),
+    b = createQrBridge(n, 20);
+  const pending = b.scan();
+  const delivered = iosWebMessageData({ name: "qr_code_scan", data: payload });
+  assert.throws(() => JSON.parse(delivered), SyntaxError);
+  n.reply(delivered);
+  assert.deepEqual(await pending, { type: "success", payload });
+  const cancelled = b.scan();
+  n.reply(iosWebMessageData({ name: "qr_code_scan", data: null }));
+  assert.equal((await cancelled).type, "Cancelled");
+  b.dispose();
+});
+
+test("legacy envelope recovery is QR-specific and leaves valid escaped replies alone", async () => {
+  const n = native(),
+    b = createQrBridge(n, 20);
+  const pending = b.scan();
+  n.reply(
+    iosWebMessageData({ name: "codefest_ai", data: '{"text":"unrelated"}' })
+  );
+  assert.equal((await b.scan()).type, "Busy");
+  const payload = '{"label":"a\\nb"}';
+  n.reply(JSON.stringify({ name: "qr_code_scan", data: payload }));
+  assert.deepEqual(await pending, { type: "success", payload });
+  b.dispose();
 });

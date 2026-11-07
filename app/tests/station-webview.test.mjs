@@ -7,6 +7,7 @@ import { createRenderer, h, nextTick } from "vue";
 import { createRouter, createMemoryHistory, RouterView } from "vue-router";
 import { useStationLocation } from "../src/station/useStationLocation.js";
 import { stationQrPayload } from "../src/station/scan.mjs";
+import { iosWebMessageData } from "./helpers/ios-web-message.mjs";
 
 const data = JSON.parse(
   readFileSync(new URL("../src/views/station-points.json", import.meta.url))
@@ -88,7 +89,7 @@ for (const readyEvent of ["flutterInAppWebViewPlatformReady", "pageshow"]) {
     const reply = (payload) => {
       for (const listener of replies)
         listener({
-          data: JSON.stringify({ name: "qr_code_scan", data: payload }),
+          data: iosWebMessageData({ name: "qr_code_scan", data: payload }),
         });
     };
     try {

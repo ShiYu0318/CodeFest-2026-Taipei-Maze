@@ -4,7 +4,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createStationLocation } from "../src/station/location.mjs";
-import { stationQrPayload } from "../src/station/scan.mjs";
+import { stationPoints, stationQrPayload } from "../src/station/scan.mjs";
+import { iosWebMessageData } from "./helpers/ios-web-message.mjs";
 const data = JSON.parse(
   readFileSync(new URL("../src/views/station-points.json", import.meta.url))
 );
@@ -21,9 +22,9 @@ function native() {
     postMessage: (text) => messages.push(JSON.parse(text)),
     addEventListener: (_, listener) => listeners.add(listener),
     removeEventListener: (_, listener) => listeners.delete(listener),
-    reply(data) {
+    reply(data, serialize = JSON.stringify) {
       for (const listener of listeners)
-        listener({ data: JSON.stringify({ name: "qr_code_scan", data }) });
+        listener({ data: serialize({ name: "qr_code_scan", data }) });
     },
     get listeners() {
       return listeners.size;
@@ -220,4 +221,41 @@ test("a QR processing exception clears waiting, preserves position and allows re
   assert.equal((await scan(n, location, "m-e4")).type, "success");
   assert.equal(location.snapshot().active, false);
   location.dispose();
+});
+
+test("all station JSON codes locate through the real iOS injection format; bad codes stop waiting safely", async () => {
+  const { n, location } = setup();
+  try {
+    location.choose("m-e4");
+    location.setStepFree(true);
+    for (const point of stationPoints(data)) {
+      const pending = location.scan();
+      n.reply(stationQrPayload(point.id, data), iosWebMessageData);
+      assert.equal((await pending).type, "success");
+      const state = location.snapshot();
+      assert.equal(state.active, false);
+      assert.equal(state.position.pointId, point.id);
+      assert.equal(state.position.floor, point.floor);
+      assert.equal(state.position.source, "qr");
+      assert.equal(state.destinationId, "m-e4");
+      assert.equal(state.stepFree, true);
+    }
+    const before = location.snapshot().position;
+    for (const payload of [
+      '{"type":broken}',
+      JSON.stringify({
+        ...JSON.parse(stationQrPayload("b1-e4", data)),
+        site_id: "foreign",
+      }),
+      "https://untrusted.example/",
+    ]) {
+      const pending = location.scan();
+      n.reply(payload, iosWebMessageData);
+      assert.notEqual((await pending).type, "success");
+      assert.equal(location.snapshot().active, false);
+      assert.deepEqual(location.snapshot().position, before);
+    }
+  } finally {
+    location.dispose();
+  }
 });
