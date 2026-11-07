@@ -1,10 +1,27 @@
 // Coordinates follow the corresponding pages of the Taipei Metro PDF at 1349 px wide.
 // The two lower pages are offset to align their reference footprints with page 2.
+// Centers are the area centroids of the solid outlines in shared map coordinates.
 export const floors = {
-  B1: { name: "站內通道與出口", bounds: [14, 375, 1190, 1000] },
-  B2: { name: "板南線大廳與轉乘通道", bounds: [495, 921, 733, 413] },
-  B3: { name: "板南線月台・淡水信義線大廳", bounds: [248, 237, 1260, 1120] },
-  B4: { name: "淡水信義線月台", bounds: [590, 397, 822, 732] },
+  B1: {
+    name: "站內通道與出口",
+    bounds: [14, 375, 1190, 1000],
+    center: [693.87, 884.2],
+  },
+  B2: {
+    name: "板南線大廳與轉乘通道",
+    bounds: [495, 921, 733, 413],
+    center: [877.32, 1207.9],
+  },
+  B3: {
+    name: "板南線月台・淡水信義線大廳",
+    bounds: [248, 237, 1260, 1120],
+    center: [950.32, 880.75],
+  },
+  B4: {
+    name: "淡水信義線月台",
+    bounds: [590, 397, 822, 732],
+    center: [1006.41, 769.23],
+  },
 };
 
 export const stackBounds = [-65, 235, 1385, 1190];
