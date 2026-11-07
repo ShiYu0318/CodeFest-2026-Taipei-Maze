@@ -153,26 +153,21 @@
 .station-heading > p:last-child {
   color: var(--muted);
 }
-.facility-title-group {
-  display: flex;
-  min-width: 0;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 12px;
-}
-
 .floor-controls {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
+  overflow-x: auto;
+}
+.floor-controls button:focus-visible {
+  outline-offset: -4px;
 }
 .floor-switch {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
-  flex: 1 1 174px;
+  flex: 1 0 172px;
   max-width: 244px;
 }
 .floor-switch button {
@@ -223,42 +218,6 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
-.layer-toggle {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
-  background: var(--surface);
-  font-size: 0.75rem;
-  font-weight: 750;
-  white-space: nowrap;
-}
-.layer-toggle svg {
-  width: 15px;
-}
-.switch-track {
-  width: 28px;
-  height: 17px;
-  display: grid;
-  align-items: center;
-  padding: 2px;
-  border-radius: 10px;
-  background: var(--tp-gray-500);
-}
-.switch-track::after {
-  content: "";
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: var(--tp-surface);
-}
-.layer-toggle[aria-checked="true"] .switch-track {
-  background: var(--accent);
-  justify-items: end;
-}
 .station-layout {
   display: grid;
   gap: 14px;
@@ -277,22 +236,18 @@
   background: var(--surface);
 }
 .map-header,
-.map-tools,
-.facility-header {
+.map-tools {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   padding: 12px;
 }
-.map-header h2,
-.facility-header h2 {
+.map-header h2 {
+  margin-top: 4px;
   font-size: 1rem;
   line-height: 1.35;
   font-weight: 800;
-}
-.map-header h2 {
-  margin-top: 4px;
 }
 .map-stage {
   position: relative;
@@ -574,17 +529,6 @@
 .facility-card {
   padding: 0 12px 12px;
 }
-.facility-header {
-  padding-inline: 0;
-  flex-wrap: wrap;
-}
-.location-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-inline-start: auto;
-}
-.location-link,
 .map-pick-instructions button {
   min-height: var(--display-control-height);
   padding-inline: 12px;
@@ -594,10 +538,6 @@
   color: var(--tp-primary-800);
   font-size: var(--display-control-size);
   font-weight: 750;
-}
-.location-link svg {
-  width: 18px;
-  height: 18px;
 }
 .map-pick-instructions {
   display: flex;
@@ -845,7 +785,6 @@
   }
   .theme-group button:hover,
   .theme-map-link:hover,
-  .layer-toggle:hover,
   .map-return:hover,
   .floor-destination:hover,
   .facility-list button:hover {
@@ -949,9 +888,6 @@
 .station-page[data-theme="dark"] .floor-switch button[aria-pressed="true"] {
   color: #1a1306;
 }
-.station-page[data-theme="dark"] .switch-track::after {
-  background: #fff;
-}
 
 /* Reading presets change controls and details, not map geometry or idle pins. */
 .station-page:not([data-display-mode="standard"]) .floor-controls,
@@ -966,7 +902,6 @@
 .station-page:not([data-display-mode="standard"])
   :is(
     .floor-switch button,
-    .layer-toggle,
     .theme-group button,
     .floor-destination,
     .map-return
@@ -978,20 +913,12 @@
   line-height: 1.5;
 }
 .station-page:not([data-display-mode="standard"])
-  :is(.theme-group svg, .layer-toggle svg, .floor-destination svg) {
+  :is(.theme-group svg, .floor-destination svg) {
   width: 24px;
   height: 24px;
   flex-shrink: 0;
 }
-.station-page:not([data-display-mode="standard"]) .facility-header {
-  flex-wrap: wrap;
-  padding-block: 14px;
-}
-.station-page:not([data-display-mode="standard"]) .facility-header h2 {
-  font-size: var(--display-main-size);
-}
-.station-page:not([data-display-mode="standard"])
-  :is(.facility-header > span, .station-footer) {
+.station-page:not([data-display-mode="standard"]) .station-footer {
   font-size: var(--display-secondary-size);
   line-height: 1.65;
 }

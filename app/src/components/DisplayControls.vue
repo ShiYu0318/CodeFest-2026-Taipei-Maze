@@ -34,7 +34,7 @@
       </select>
     </label>
     <button
-      class="display-theme-switch"
+      class="display-icon-button"
       type="button"
       role="switch"
       :aria-checked="theme === 'dark'"
