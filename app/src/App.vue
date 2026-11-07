@@ -15,11 +15,14 @@
 import { onMounted, watch } from "vue";
 import FloatingChat from "./components/FloatingChat.vue";
 import { useDisplayPreferences } from "./display/preferences.mjs";
+import { useRoute } from "vue-router";
 import { htmlLang, useI18n } from "./i18n/index.mjs";
+import { pageTitle } from "./router";
 import "./display/display-preferences.css";
 
 const { theme } = useDisplayPreferences();
 const { locale } = useI18n();
+const route = useRoute();
 onMounted(() => {
   watch(
     theme,
@@ -32,6 +35,8 @@ onMounted(() => {
     locale,
     (value) => {
       document.documentElement.lang = htmlLang(value);
+      // The native TownPass app bar shows this title.
+      document.title = pageTitle(route);
     },
     { immediate: true }
   );
