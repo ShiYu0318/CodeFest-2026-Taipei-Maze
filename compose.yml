@@ -1,9 +1,7 @@
-# for production: docker compose -f compose.yml up --build
 services:
   codefest:
     build:
       context: ./app
-      target: prod
     ports:
       - "8000:80"
     restart: unless-stopped
