@@ -54,11 +54,11 @@ case "$command_name" in
   doctor) exec fvm flutter doctor -v ;;
   deps)
     fvm flutter pub get
-    exec fvm dart run build_runner build --delete-conflicting-outputs
+    exec fvm dart run build_runner build
     ;;
-  analyze) exec fvm flutter analyze ;;
-  test) exec fvm flutter test ;;
-  build-ios) exec fvm flutter build ios --simulator --debug ;;
+  analyze) exec fvm flutter analyze "$@" ;;
+  test) exec fvm flutter test "$@" ;;
+  build-ios) exec fvm flutter build ios --simulator --debug "$@" ;;
   run-ios)
     if [[ $# -lt 1 ]]; then
       printf 'Specify an ID from: xcrun simctl list devices available\n' >&2

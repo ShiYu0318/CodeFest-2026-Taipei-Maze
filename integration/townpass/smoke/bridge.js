@@ -71,4 +71,8 @@ if (!bridge || typeof bridge.postMessage !== 'function' || typeof bridge.addEven
     waitingForDrain = true;
     setEnabled(false);
   }, { once: true });
+  window.addEventListener('pageshow', (event) => {
+    // A BFCache restore does not rerun this module. Start a new document/session.
+    if (event.persisted) window.location.reload();
+  });
 }
