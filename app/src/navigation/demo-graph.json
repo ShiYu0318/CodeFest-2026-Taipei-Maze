@@ -1,0 +1,706 @@
+{
+  "schema_version": "1.0.0",
+  "site_id": "synthetic_lab",
+  "graph_version": "1.0.0",
+  "validation_mode": "synthetic_demo",
+  "routing_unit": "relative",
+  "floors": [
+    {
+      "id": "b1",
+      "label_key": "floor_b1",
+      "order": 0,
+      "map_asset": "inline_synthetic_svg",
+      "view_box": {
+        "x": 0,
+        "y": 0,
+        "width": 560,
+        "height": 340
+      },
+      "source_ids": ["src_fixture"],
+      "coverage_key": "coverage"
+    },
+    {
+      "id": "b2",
+      "label_key": "floor_b2",
+      "order": 1,
+      "map_asset": "inline_synthetic_svg",
+      "view_box": {
+        "x": 0,
+        "y": 0,
+        "width": 560,
+        "height": 340
+      },
+      "source_ids": ["src_fixture"],
+      "coverage_key": "coverage"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "b1_a",
+      "floor_id": "b1",
+      "x": 80,
+      "y": 100,
+      "type": "qr_anchor",
+      "label_key": "node_b1_a",
+      "zone_id": "public_demo",
+      "landmark_ids": ["lm_b1_a"],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "b1_j",
+      "floor_id": "b1",
+      "x": 220,
+      "y": 100,
+      "type": "junction",
+      "label_key": "node_b1_j",
+      "zone_id": "public_demo",
+      "landmark_ids": ["lm_b1_j"],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "b1_stairs",
+      "floor_id": "b1",
+      "x": 360,
+      "y": 100,
+      "type": "connector_landing",
+      "label_key": "node_b1_stairs",
+      "zone_id": "public_demo",
+      "landmark_ids": ["lm_b1_stairs"],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "b1_lift",
+      "floor_id": "b1",
+      "x": 220,
+      "y": 240,
+      "type": "connector_landing",
+      "label_key": "node_b1_lift",
+      "zone_id": "public_demo",
+      "landmark_ids": ["lm_b1_lift"],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "b2_stairs",
+      "floor_id": "b2",
+      "x": 360,
+      "y": 100,
+      "type": "connector_landing",
+      "label_key": "node_b2_stairs",
+      "zone_id": "public_demo",
+      "landmark_ids": ["lm_b2_stairs"],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "b2_lift",
+      "floor_id": "b2",
+      "x": 220,
+      "y": 240,
+      "type": "connector_landing",
+      "label_key": "node_b2_lift",
+      "zone_id": "public_demo",
+      "landmark_ids": ["lm_b2_lift"],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "b2_dest",
+      "floor_id": "b2",
+      "x": 480,
+      "y": 100,
+      "type": "facility",
+      "label_key": "node_b2_dest",
+      "zone_id": "public_demo",
+      "landmark_ids": ["lm_b2_dest"],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "b1_island",
+      "floor_id": "b1",
+      "x": 480,
+      "y": 240,
+      "type": "qr_anchor",
+      "label_key": "node_b1_island",
+      "zone_id": "public_demo",
+      "landmark_ids": ["lm_b1_island"],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_a_j",
+      "from_node_id": "b1_a",
+      "to_node_id": "b1_j",
+      "type": "walkway",
+      "routing_cost": 3,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": null,
+      "geometry": [
+        [80, 100],
+        [220, 100]
+      ],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_j_a",
+      "from_node_id": "b1_j",
+      "to_node_id": "b1_a",
+      "type": "walkway",
+      "routing_cost": 3,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": null,
+      "geometry": [
+        [220, 100],
+        [80, 100]
+      ],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_j_stairs",
+      "from_node_id": "b1_j",
+      "to_node_id": "b1_stairs",
+      "type": "walkway",
+      "routing_cost": 2,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": null,
+      "geometry": [
+        [220, 100],
+        [360, 100]
+      ],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_j_stairs_reverse",
+      "from_node_id": "b1_stairs",
+      "to_node_id": "b1_j",
+      "type": "walkway",
+      "routing_cost": 2,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": null,
+      "geometry": [
+        [360, 100],
+        [220, 100]
+      ],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_stairs_up",
+      "from_node_id": "b1_stairs",
+      "to_node_id": "b2_stairs",
+      "type": "stairs",
+      "routing_cost": 2,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "no",
+      "wheelchair_passable": "no",
+      "zone_id": "public_demo",
+      "connector_id": "stairs_1",
+      "geometry": [],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_stairs_up_reverse",
+      "from_node_id": "b2_stairs",
+      "to_node_id": "b1_stairs",
+      "type": "stairs",
+      "routing_cost": 2,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "no",
+      "wheelchair_passable": "no",
+      "zone_id": "public_demo",
+      "connector_id": "stairs_1",
+      "geometry": [],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_stairs_dest",
+      "from_node_id": "b2_stairs",
+      "to_node_id": "b2_dest",
+      "type": "walkway",
+      "routing_cost": 2,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": null,
+      "geometry": [
+        [360, 100],
+        [480, 100]
+      ],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_stairs_dest_reverse",
+      "from_node_id": "b2_dest",
+      "to_node_id": "b2_stairs",
+      "type": "walkway",
+      "routing_cost": 2,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": null,
+      "geometry": [
+        [480, 100],
+        [360, 100]
+      ],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_j_lift",
+      "from_node_id": "b1_j",
+      "to_node_id": "b1_lift",
+      "type": "walkway",
+      "routing_cost": 4,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": null,
+      "geometry": [
+        [220, 100],
+        [220, 240]
+      ],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_j_lift_reverse",
+      "from_node_id": "b1_lift",
+      "to_node_id": "b1_j",
+      "type": "walkway",
+      "routing_cost": 4,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": null,
+      "geometry": [
+        [220, 240],
+        [220, 100]
+      ],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_lift_up",
+      "from_node_id": "b1_lift",
+      "to_node_id": "b2_lift",
+      "type": "elevator",
+      "routing_cost": 4,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": "lift_1",
+      "geometry": [],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_lift_up_reverse",
+      "from_node_id": "b2_lift",
+      "to_node_id": "b1_lift",
+      "type": "elevator",
+      "routing_cost": 4,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": "lift_1",
+      "geometry": [],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_lift_dest",
+      "from_node_id": "b2_lift",
+      "to_node_id": "b2_dest",
+      "type": "walkway",
+      "routing_cost": 4,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": null,
+      "geometry": [
+        [220, 240],
+        [480, 100]
+      ],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "e_lift_dest_reverse",
+      "from_node_id": "b2_dest",
+      "to_node_id": "b2_lift",
+      "type": "walkway",
+      "routing_cost": 4,
+      "distance_m": null,
+      "status": "open",
+      "step_free": "yes",
+      "wheelchair_passable": "yes",
+      "zone_id": "public_demo",
+      "connector_id": null,
+      "geometry": [
+        [480, 100],
+        [220, 240]
+      ],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    }
+  ],
+  "connectors": [
+    {
+      "id": "lift_1",
+      "type": "elevator",
+      "landing_node_ids": ["b1_lift", "b2_lift"],
+      "label_key": "lift",
+      "verification_status": "synthetic",
+      "status_observed_at": null,
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "stairs_1",
+      "type": "stairs",
+      "landing_node_ids": ["b1_stairs", "b2_stairs"],
+      "label_key": "stairs",
+      "verification_status": "synthetic",
+      "status_observed_at": null,
+      "source_ids": ["src_fixture"]
+    }
+  ],
+  "pois": [
+    {
+      "id": "poi_restroom",
+      "node_id": "b2_dest",
+      "category": "restroom",
+      "name_key": "node_b2_dest",
+      "original_signage": "測試廁所",
+      "enabled": true,
+      "source_ids": ["src_fixture"],
+      "accessible_facility": true
+    },
+    {
+      "id": "poi_entry",
+      "node_id": "b1_a",
+      "category": "exit",
+      "name_key": "node_b1_a",
+      "original_signage": "測試起點 A",
+      "enabled": true,
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "poi_island",
+      "node_id": "b1_island",
+      "category": "exit",
+      "name_key": "node_b1_island",
+      "original_signage": "未連通測試點",
+      "enabled": true,
+      "source_ids": ["src_fixture"]
+    }
+  ],
+  "qr_anchors": [
+    {
+      "id": "qr_a",
+      "node_id": "b1_a",
+      "enabled": true,
+      "face_landmark_id": "lm_b1_a",
+      "departure_edge_ids": ["e_a_j"],
+      "signage_code": "TEST-A",
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "qr_b2_lift",
+      "node_id": "b2_lift",
+      "enabled": true,
+      "face_landmark_id": "lm_b2_lift",
+      "departure_edge_ids": ["e_lift_up_reverse", "e_lift_dest"],
+      "signage_code": "TEST-B",
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "qr_island",
+      "node_id": "b1_island",
+      "enabled": true,
+      "face_landmark_id": "lm_b1_island",
+      "departure_edge_ids": [],
+      "signage_code": "TEST-X",
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    }
+  ],
+  "landmarks": [
+    {
+      "id": "lm_b1_a",
+      "node_id": "b1_a",
+      "name_key": "node_b1_a",
+      "original_signage": "測試起點 A",
+      "visibility_context": {
+        "incoming_edge_ids": ["e_j_a"]
+      },
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "lm_b1_j",
+      "node_id": "b1_j",
+      "name_key": "node_b1_j",
+      "original_signage": "交會點",
+      "visibility_context": {
+        "incoming_edge_ids": ["e_a_j", "e_j_stairs_reverse", "e_j_lift_reverse"]
+      },
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "lm_b1_stairs",
+      "node_id": "b1_stairs",
+      "name_key": "node_b1_stairs",
+      "original_signage": "B1 樓梯口",
+      "visibility_context": {
+        "incoming_edge_ids": ["e_j_stairs", "e_stairs_up_reverse"]
+      },
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "lm_b1_lift",
+      "node_id": "b1_lift",
+      "name_key": "node_b1_lift",
+      "original_signage": "B1 電梯口",
+      "visibility_context": {
+        "incoming_edge_ids": ["e_j_lift", "e_lift_up_reverse"]
+      },
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "lm_b2_stairs",
+      "node_id": "b2_stairs",
+      "name_key": "node_b2_stairs",
+      "original_signage": "B2 樓梯口",
+      "visibility_context": {
+        "incoming_edge_ids": ["e_stairs_up", "e_stairs_dest_reverse"]
+      },
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "lm_b2_lift",
+      "node_id": "b2_lift",
+      "name_key": "node_b2_lift",
+      "original_signage": "B2 電梯口",
+      "visibility_context": {
+        "incoming_edge_ids": ["e_lift_up", "e_lift_dest_reverse"]
+      },
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "lm_b2_dest",
+      "node_id": "b2_dest",
+      "name_key": "node_b2_dest",
+      "original_signage": "測試廁所",
+      "visibility_context": {
+        "incoming_edge_ids": ["e_stairs_dest", "e_lift_dest"]
+      },
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "lm_b1_island",
+      "node_id": "b1_island",
+      "name_key": "node_b1_island",
+      "original_signage": "未連通測試點",
+      "visibility_context": {
+        "incoming_edge_ids": []
+      },
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    }
+  ],
+  "orientation_guides": [
+    {
+      "id": "guide_qr_a_e_a_j",
+      "context_type": "anchor_departure",
+      "anchor_id": "qr_a",
+      "incoming_connector_id": null,
+      "node_id": "b1_a",
+      "outgoing_edge_id": "e_a_j",
+      "face_landmark_id": "lm_b1_a",
+      "text_key": "guide_qr_a_e_a_j",
+      "params": {},
+      "icon_id": "forward",
+      "voice_sentence_ids": [],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "guide_qr_b2_lift_e_lift_up_reverse",
+      "context_type": "anchor_departure",
+      "anchor_id": "qr_b2_lift",
+      "incoming_connector_id": null,
+      "node_id": "b2_lift",
+      "outgoing_edge_id": "e_lift_up_reverse",
+      "face_landmark_id": "lm_b2_lift",
+      "text_key": "guide_qr_b2_lift_e_lift_up_reverse",
+      "params": {},
+      "icon_id": "forward",
+      "voice_sentence_ids": [],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "guide_qr_b2_lift_e_lift_dest",
+      "context_type": "anchor_departure",
+      "anchor_id": "qr_b2_lift",
+      "incoming_connector_id": null,
+      "node_id": "b2_lift",
+      "outgoing_edge_id": "e_lift_dest",
+      "face_landmark_id": "lm_b2_lift",
+      "text_key": "guide_qr_b2_lift_e_lift_dest",
+      "params": {},
+      "icon_id": "forward",
+      "voice_sentence_ids": [],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "guide_lift_1_e_j_lift_reverse",
+      "context_type": "connector_exit",
+      "anchor_id": null,
+      "incoming_connector_id": "lift_1",
+      "node_id": "b1_lift",
+      "outgoing_edge_id": "e_j_lift_reverse",
+      "face_landmark_id": "lm_b1_lift",
+      "text_key": "guide_lift_1_e_j_lift_reverse",
+      "params": {},
+      "icon_id": "forward",
+      "voice_sentence_ids": [],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "guide_lift_1_e_lift_dest",
+      "context_type": "connector_exit",
+      "anchor_id": null,
+      "incoming_connector_id": "lift_1",
+      "node_id": "b2_lift",
+      "outgoing_edge_id": "e_lift_dest",
+      "face_landmark_id": "lm_b2_lift",
+      "text_key": "guide_lift_1_e_lift_dest",
+      "params": {},
+      "icon_id": "forward",
+      "voice_sentence_ids": [],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "guide_stairs_1_e_j_stairs_reverse",
+      "context_type": "connector_exit",
+      "anchor_id": null,
+      "incoming_connector_id": "stairs_1",
+      "node_id": "b1_stairs",
+      "outgoing_edge_id": "e_j_stairs_reverse",
+      "face_landmark_id": "lm_b1_stairs",
+      "text_key": "guide_stairs_1_e_j_stairs_reverse",
+      "params": {},
+      "icon_id": "forward",
+      "voice_sentence_ids": [],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    },
+    {
+      "id": "guide_stairs_1_e_stairs_dest",
+      "context_type": "connector_exit",
+      "anchor_id": null,
+      "incoming_connector_id": "stairs_1",
+      "node_id": "b2_stairs",
+      "outgoing_edge_id": "e_stairs_dest",
+      "face_landmark_id": "lm_b2_stairs",
+      "text_key": "guide_stairs_1_e_stairs_dest",
+      "params": {},
+      "icon_id": "forward",
+      "voice_sentence_ids": [],
+      "verification_status": "synthetic",
+      "source_ids": ["src_fixture"]
+    }
+  ],
+  "messages": {
+    "node_b1_a": "測試起點 A",
+    "node_b1_j": "交會點",
+    "node_b1_stairs": "B1 樓梯口",
+    "node_b1_lift": "B1 電梯口",
+    "node_b2_stairs": "B2 樓梯口",
+    "node_b2_lift": "B2 電梯口",
+    "node_b2_dest": "測試廁所",
+    "node_b1_island": "未連通測試點",
+    "floor_b1": "B1 測試層",
+    "floor_b2": "B2 測試層",
+    "coverage": "合成測試區域",
+    "lift": "測試電梯",
+    "stairs": "測試樓梯",
+    "guide_qr_a_e_a_j": "面向「測試起點 A」測試標誌，再依路線前進。",
+    "guide_qr_b2_lift_e_lift_up_reverse": "面向「B2 電梯口」測試標誌，再依路線前進。",
+    "guide_qr_b2_lift_e_lift_dest": "面向「B2 電梯口」測試標誌，再依路線前進。",
+    "guide_lift_1_e_j_lift_reverse": "到層後先確認「B1 電梯口」測試標誌，再前往下一個點。",
+    "guide_lift_1_e_lift_dest": "到層後先確認「B2 電梯口」測試標誌，再前往下一個點。",
+    "guide_stairs_1_e_j_stairs_reverse": "到層後先確認「B1 樓梯口」測試標誌，再前往下一個點。",
+    "guide_stairs_1_e_stairs_dest": "到層後先確認「B2 樓梯口」測試標誌，再前往下一個點。"
+  },
+  "sources": [
+    {
+      "id": "src_fixture",
+      "title": "Original synthetic navigation fixture; not a station survey",
+      "publisher": "Taipei Maze project",
+      "url": null,
+      "retrieved_at": "2026-11-07T00:00:00Z",
+      "source_updated_at": null,
+      "license_reference": "AGPL-3.0-or-later",
+      "redistribution_status": "original",
+      "verification_method": "synthetic",
+      "reviewer": "development fixture"
+    }
+  ]
+}

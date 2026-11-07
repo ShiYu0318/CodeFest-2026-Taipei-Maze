@@ -4,6 +4,8 @@ Taipei Maze 北車不迷路：QR 定位、局部跨樓層路網、圖像指引�
 
 ## 開發文件
 
+- [離線 AI 功能規劃與實作狀態](./docs/Taipei_Maze_AI_Features.md)：規則式多語搜尋、易讀模式，以及手機聊天／語音候選與限制。
+- [導航核心測試指南](./docs/導航核心測試指南.md)：合成路網、一般／無階梯選路、逐步導航、重定位與測試劇本。
 - [本地測試環境](./docs/測試環境.md)：已安裝工具、實測結果、宿主位置及啟動指令。
 - [城市通開發指南](./docs/城市通開發指南.md)：環境、宿主／網頁整合、橋接、Mock、部署及授權檢查。
 - [2026 城市通入門指引 PDF](<./docs/2026 城市通入門指引.pdf>)：使用者提供的原始參考文件，保留原有權利。
@@ -23,7 +25,11 @@ npm ci
 npm run serve -- --port 8082
 ```
 
-開啟 `http://localhost:8082/station-map`。原型提供 B1–B4 平面圖、設施主題、梯口端點與跨樓層預覽。站圖座標與轉乘資料存於 `app/src/views/`，目前為示意位置。`backend/` 保留原 Webview 的本機 Flask 測試 API，地圖以本地 JSON 載入。
+開啟 `http://localhost:8082/station-map`。導航核心測試另在 `http://localhost:8082/navigation-demo`，使用清楚標示的合成圖，可在真實走道資料完成前測試流程。原型提供 B1–B4 平面圖、設施主題、梯口端點與跨樓層預覽。站圖座標與轉乘資料存於 `app/src/views/`，目前為示意位置。`backend/` 保留原 Webview 的本機 Flask 測試 API，地圖以本地 JSON 載入。
+
+## 部署站
+
+正式部署入口：[Taipei Maze](http://home.yoyo899843.com:8000/)，地圖路徑為 `/station-map`。`main` push 觸發既有部署 workflow；應以對應 workflow 結果及站點資源核對發布成功，未合併分支的功能不代表已在正式站提供。
 
 ## 授權與原始碼
 

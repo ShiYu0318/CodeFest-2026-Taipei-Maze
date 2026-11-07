@@ -15,7 +15,7 @@
 
 ## 實際依賴與素材登錄
 
-目前 repository 包含文件、研究資料工具、本地環境 helper 與橋接診斷頁；診斷伺服器只使用 Node.js built-ins，未新增 npm 依賴。`integration/townpass/test-env.patch` 含 TownPass 原檔脈絡，保留上游 GPL 與著作權；宿主完整 checkout、SDK 與套件快取均未納入本 repo。尚無可據以產生完整產品依賴清單的前端 package／lockfile。實作時每項新增依賴或素材必須補上：
+目前 repository 包含文件、研究資料工具、本地環境 helper 與橋接診斷頁；診斷伺服器只使用 Node.js built-ins，未新增 npm 依賴。`integration/townpass/test-env.patch` 含 TownPass 原檔脈絡，保留上游 GPL 與著作權；宿主完整 checkout、SDK 與套件快取均未納入本 repo。前端既有依賴及鎖定資訊現已位於 app/package.json 與 app/package-lock.json；完整產品來源與發行審查仍待完成。實作時每項新增依賴或素材必須補上：
 
 - 名稱、版本、檔案或 package 路徑、上游來源與實際提供者。
 - SPDX 授權或條款連結、應保留的 Copyright／NOTICE。
@@ -40,3 +40,17 @@ MIT、常見 BSD-2-Clause／BSD-3-Clause、Apache-2.0 可作優先候選，但�
 - `app/` 地圖原型和 `backend/` 本機診斷 API 來自 [Team10 Webview 快照 `d88e71e`](https://github.com/Clare0808/team10_townpass_webview/commit/d88e71e)。匯入版本保留程式來源紀錄，原倉庫無獨立授權檔，公開交付前須釐清各部分的再散布權利。
 - 地圖 SVG 與 JSON 為依 [臺北捷運站圖](https://web.metro.taipei/img/ALL/INFOPDF/051.pdf) 和 [臺北捷運剖面圖](https://web.metro.taipei/pages2026/WebStation/051/4) 重繪的示意原型。官方原圖及原 Webview 的示範圖片、favicon、環境檔與 Python 快取未匯入。站圖和衍生資料的公開交付權利仍待核對。
 - npm 直接依賴見 `app/package.json`，鎖定版本、下載來源、完整性摘要及上游宣告授權見 `app/package-lock.json`。目前 lockfile 的下載來源為 `registry.npmjs.org`。`backend/requirements.txt` 為原有 Flask 診斷工具依賴，與地圖執行分開。以上均為 private 原型，供應鏈及發行授權審查仍待完成。
+
+
+## 2026-11-07 合成導航核心
+
+- `app/src/navigation/` 的核心模組、合成 fixture，以及 NavigationDemoView／NavigationDemoMap 與 `app/tests/` 為本專案新增原創內容，依根目錄 AGPL-3.0-or-later；不改寫匯入 Webview 各部分的權利狀態。
+- 合成地圖為程式繪製的簡單線段與節點，座標、文案與來源紀錄皆為測試用自製內容，沒有新增第三方圖資、照片、字型、模型、音檔、生成服務或 npm 依賴。
+- 新測試只使用 Node.js built-in test runner；Vue CLI 與既有依賴仍沿用現有 lockfile，未宣稱完成整棵供應鏈或匯入原型的發行審查。
+
+
+## 2026-11-07 規則式多語搜尋
+
+- `app/src/search/`、DestinationSearch 元件與新增測試為原創程式，依 AGPL-3.0-or-later，未新增 npm 依賴或模型。
+- `dictionary.json` 為團隊撰寫的七語原型種子詞及意圖，不含下載詞庫或外部翻譯服務產出；全部 alias／規則保留 draft、來源與待語言校對狀態。原型頁面明示草稿，正式詞典發布仍需逐語審查。
+- 真實設施名稱沿用已記錄的站圖原型資料，不將搜尋命中當成場站或權利驗證。合成廁所可及性是測試假設，不是實地認證。

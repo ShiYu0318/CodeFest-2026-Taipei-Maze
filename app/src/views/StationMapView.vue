@@ -18,6 +18,16 @@
         <!-- <p>地下樓層站內地圖</p> -->
       </section>
 
+      <p>
+        <router-link to="/navigation-demo">測試導航流程（合成圖）</router-link>
+      </p>
+
+      <DestinationSearch
+        id="station-facility-search"
+        :catalog="searchCatalogEntries"
+        @select="selectSearchPoint"
+      />
+
       <div class="floor-controls">
         <div class="floor-switch" role="group" aria-label="選擇樓層">
           <button
@@ -215,7 +225,7 @@
               <button type="submit">展開轉乘圖</button>
             </form>
             <p class="transfer-hint">
-              預覽會列出已確認可通行的跨樓層接點。樓層內步行與驗票請依站內指標。
+              預覽依示意資料列出跨樓層接點，尚未完成現場通行核對。樓層內步行與驗票請依站內指標。
             </p>
             <p v-if="routeMessage" class="transfer-message" role="status">
               {{ routeMessage }}
@@ -407,6 +417,8 @@
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import DestinationSearch from "../components/DestinationSearch.vue";
+import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import StationTransferMap from "../components/StationTransferMap.vue";
@@ -415,6 +427,8 @@ import stationData from "./station-points.json";
 import { zones, planFloorTransfer, transferFromPoint } from "./station-routing";
 
 const { categories, points } = stationData;
+const searchCatalogEntries = stationCatalog(stationData);
+let searchPointRevision = 0;
 const floorIds = Object.keys(floors);
 const floorPalette = {
   B1: {
@@ -876,6 +890,22 @@ async function showFloor(floor) {
 function toggleLayers() {
   showLayers.value = !showLayers.value;
   resetZoom();
+}
+
+async function selectSearchPoint({ poiId }) {
+  const requestRevision = ++searchPointRevision;
+  const entry = searchCatalogEntries.find((p) => p.id === poiId);
+  if (!entry) return;
+  const point = points[entry.floorId].find((p) => p.id === poiId);
+  if (!point) return;
+  await showFloor(entry.floorId);
+  if (requestRevision !== searchPointRevision || level.value !== entry.floorId)
+    return;
+  activeTheme.value = null;
+  selected.value = point;
+  await nextTick();
+  if (zoom.value > 1) centerOn(...normalizedPoint(point));
+  mapSection.value?.scrollIntoView({ block: "start" });
 }
 
 function togglePoint(point) {
