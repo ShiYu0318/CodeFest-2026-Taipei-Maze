@@ -3,29 +3,35 @@
   <section class="station-scan-panel" aria-labelledby="station-scan-heading">
     <div class="scan-heading">
       <h2 id="station-scan-heading">
-        {{ view.mode === "navigation" ? "導航模式" : "瀏覽模式" }}
+        {{
+          view.mode === "navigation" ? t("scan.navigation") : t("scan.browsing")
+        }}
       </h2>
-      <label><input v-model="easyRead" type="checkbox" />簡明模式</label>
+      <label
+        ><input v-model="easyRead" type="checkbox" />{{
+          t("scan.easyRead")
+        }}</label
+      >
     </div>
     <p class="scan-caveat">
-      定位碼尚未現地布設；目前提供設施與樓層關係，完整步行路網待補。
+      {{ t("scan.caveat") }}
     </p>
     <p v-if="view.mode === 'browsing'">
-      掃描點位 QR，進入導航模式並顯示「您在這裡」。
+      {{ t("scan.browseHint") }}
     </p>
     <template
       v-if="view.mode === 'navigation' && (!easyRead || !view.destinationId)"
     >
-      <label for="station-destination">選擇目的地</label>
+      <label for="station-destination">{{ t("scan.chooseDestination") }}</label>
       <select
         id="station-destination"
         :value="view.destinationId ?? ''"
         :disabled="active"
         @change="choose($event.target.value)"
       >
-        <option disabled value="">請選擇要去的設施</option>
+        <option disabled value="">{{ t("scan.choosePlaceholder") }}</option>
         <option v-for="point in catalog" :key="point.id" :value="point.id">
-          {{ point.floor }} · {{ point.name }}
+          {{ point.floor }} · {{ label(point) }}
         </option>
       </select>
       <button
@@ -33,10 +39,10 @@
         :disabled="active"
         @click="choose(props.selectedPoint.id)"
       >
-        將地圖上選取的「{{ props.selectedPoint.name }}」設為終點
+        {{ t("scan.useSelected", { name: name(props.selectedPoint) }) }}
       </button>
       <details ref="searchDetails">
-        <summary>用名稱搜尋（七語詞典原型）</summary>
+        <summary>{{ t("scan.searchByName") }}</summary>
         <DestinationSearch
           id="station-navigation-search"
           :catalog="searchEntries"
@@ -52,31 +58,38 @@
           type="checkbox"
           :disabled="active"
           @change="changeStepFree($event.target.checked)"
-        />只參考無階梯連結</label
+        />{{ t("scan.stepFree") }}</label
       >
     </template>
     <p v-if="destination" class="scan-target">
-      <strong>終點：{{ destination.floor }} · {{ destination.name }}</strong>
+      <strong>{{
+        t("scan.destination", { place: place(destination) })
+      }}</strong>
     </p>
     <p role="status">
       {{
         position
-          ? `您在這裡：${position.floor} · ${position.name}`
-          : "目前尚未定位，可先掃描所在點位。"
+          ? t("scan.youAreHere", { place: place(position) })
+          : t("scan.notLocated")
       }}
     </p>
     <p v-if="view.position?.source === 'qr'" class="scan-time">
-      {{ confirmedTime }}
-      掃碼定位；位置不會隨走動自動更新。
+      {{ t("scan.scannedAt", { time: confirmedTime }) }}
     </p>
     <p v-else-if="view.position" class="scan-time">
-      由定位連結帶入，請核對現場位置；不是即時追蹤。
+      {{ t("scan.fromLink") }}
     </p>
     <button class="scan-start" :disabled="!available || active" @click="start">
-      {{ active ? "等待掃碼結果…" : position ? "重新掃描定位" : "掃描定位" }}
+      {{
+        active
+          ? t("scan.waiting")
+          : position
+          ? t("scan.rescan")
+          : t("scan.scan")
+      }}
     </button>
     <p v-if="!available" class="scan-note">
-      請由城市通 App 開啟以使用原生掃碼；瀏覽器可查看點位連結。
+      {{ t("scan.needApp") }}
     </p>
     <p v-if="notice" role="status">{{ notice }}</p>
     <div
@@ -84,13 +97,15 @@
       class="scan-overview"
       aria-live="polite"
     >
-      <h3>{{ view.arrived ? "你已確認抵達" : "目前提示" }}</h3>
+      <h3>
+        {{ view.arrived ? t("scan.arrivedTitle") : t("scan.currentHint") }}
+      </h3>
       <p>{{ instruction }}</p>
       <ol v-if="!easyRead && view.relation.steps.length">
         <li v-for="step in view.relation.steps" :key="step.id">
           {{ stopLabel(step.from) }} ↔ {{ stopLabel(step.to)
           }}<button :disabled="active" @click="unavailable(step.id)">
-            此設備無法使用
+            {{ t("scan.unavailable") }}
           </button>
         </li>
       </ol>
@@ -99,16 +114,18 @@
         :disabled="active"
         @click="confirm(view.token)"
       >
-        現場名稱與樓層相符，確認已抵達
+        {{ t("scan.confirmArrival") }}
       </button>
       <p v-if="view.excludedEdgeTypes.length">
-        搜尋帶入的排除條件：{{
-          view.excludedEdgeTypes.join("、")
-        }}（重新開始可清除）
+        {{
+          t("scan.excluded", {
+            list: view.excludedEdgeTypes.join(t("scan.listSeparator")),
+          })
+        }}
       </p>
     </div>
     <button v-if="view.mode === 'navigation'" :disabled="active" @click="reset">
-      退出導航，返回瀏覽模式
+      {{ t("scan.exit") }}
     </button>
   </section>
 </template>
@@ -120,6 +137,8 @@ import DestinationSearch from "./DestinationSearch.vue";
 import { stationCatalog } from "../search/catalog.mjs";
 import { stationPoints } from "../station/scan.mjs";
 import data from "../views/station-points.json";
+import { htmlLang, useI18n } from "../i18n/index.mjs";
+import { placeLabel, placeName } from "../i18n/places.mjs";
 const props = defineProps({
   selectedPoint: { type: Object, default: null },
   location: { type: Object, required: true },
@@ -129,15 +148,21 @@ const catalog = stationPoints(data),
   searchEntries = stationCatalog(data);
 const byId = new Map(catalog.map((p) => [p.id, p]));
 const { displayMode } = useDisplayPreferences();
+const i18n = useI18n();
+const { locale, t } = i18n;
 const searchDetails = ref(null),
   easyRead = ref(displayMode.value !== "standard");
 const active = computed(() => view.value.active);
 const available = computed(() => view.value.available);
-const notice = computed(() => view.value.notice);
+const notice = computed(() =>
+  view.value.noticeKey ? t(view.value.noticeKey) : ""
+);
 const destination = computed(() => byId.get(view.value.destinationId));
 const confirmedTime = computed(() =>
   view.value.position?.confirmedAt
-    ? new Date(view.value.position.confirmedAt).toLocaleTimeString()
+    ? new Date(view.value.position.confirmedAt).toLocaleTimeString(
+        htmlLang(locale.value)
+      )
     : ""
 );
 const position = computed(() => byId.get(view.value.position?.pointId));
@@ -146,20 +171,30 @@ const options = computed(() => ({
   excludedEdgeTypes: view.value.excludedEdgeTypes,
   unavailableConnectorIds: view.value.unavailableConnectorIds,
 }));
-const stopLabel = (stop) =>
-  `${stop.floor} ${byId.get(stop.pointId)?.name ?? stop.pointId}`;
+const name = (point) => placeName(point, i18n);
+const label = (point) => placeLabel(point, i18n);
+const place = (point) => `${point.floor} · ${label(point)}`;
+const stopLabel = (stop) => {
+  const point = byId.get(stop.pointId);
+  return `${stop.floor} ${point ? name(point) : stop.pointId}`;
+};
 const instruction = computed(() => {
-  if (view.value.arrived)
-    return "已由你確認抵達。可退出導航，或選擇下一個目的地。";
-  if (view.value.relation.status === "at_destination")
-    return "目前定位點與目的地相同。請確認現場名稱與樓層是否相符，再確認已抵達。";
-  if (view.value.relation.status === "same_zone")
-    return "目前與終點在同一區域。尚無可驗證的走廊指引，請依現場標示確認，沿途掃碼更新。";
-  if (view.value.relation.status === "connections")
-    return `可參考的樓層連結：${view.value.relation.steps
-      .map((step) => `${stopLabel(step.from)} 到 ${stopLabel(step.to)}`)
-      .join("；")}。這是樓層關係，不是完整步行路線，請依現場標示確認。`;
-  return "沒有符合目前條件的已知跨區連結。請洽詢站務，不會用樓梯或未知設備替代無階梯需求。";
+  if (view.value.arrived) return t("scan.instr.arrived");
+  const status = view.value.relation.status;
+  if (status === "at_destination") return t("scan.instr.atDestination");
+  if (status === "same_zone") return t("scan.instr.sameZone");
+  if (status === "connections")
+    return t("scan.instr.connections", {
+      steps: view.value.relation.steps
+        .map((step) =>
+          t("scan.stepPair", {
+            from: stopLabel(step.from),
+            to: stopLabel(step.to),
+          })
+        )
+        .join(t("scan.listSeparator")),
+    });
+  return t("scan.instr.none");
 });
 function choose(id) {
   props.location.choose(id);

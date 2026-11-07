@@ -1,27 +1,31 @@
 <template>
   <main
     class="station-page display-page"
-    lang="zh-Hant"
+    :lang="htmlLang(locale)"
     :data-theme="theme"
     :data-display-mode="displayMode"
   >
     <div class="station-shell">
-      <section class="station-heading" aria-label="顯示設定">
+      <section class="station-heading" :aria-label="t('display.group')">
         <div class="station-title-row">
           <!-- <h1 id="station-title"><ZhuyinText text="台北車站" /></h1> -->
           <DisplayControls />
         </div>
         <p v-if="displayMode !== 'standard'" class="display-floor-label">
-          {{ level }}・<ZhuyinText :text="floorNames[level]" />
+          {{ level }}・<ZhuyinText :text="t('floor.' + level)" />
         </p>
         <p v-if="displayMode === 'child'" class="display-hint">
-          <ZhuyinText text="先選要找的設施，再點地圖上的圖示。" />
+          <ZhuyinText :text="t('map.childHint')" />
         </p>
       </section>
 
       <StationScanPanel :location="location" :selected-point="selected" />
       <div class="floor-controls">
-        <div class="floor-switch" role="group" aria-label="選擇樓層">
+        <div
+          class="floor-switch"
+          role="group"
+          :aria-label="t('map.floorGroup')"
+        >
           <button
             v-for="floor in floorIds"
             :key="floor"
@@ -39,29 +43,33 @@
           type="button"
           role="switch"
           :aria-checked="showLayers"
-          aria-label="透視其他樓層"
+          :aria-label="t('map.layersAria')"
           :disabled="floorChanging"
           @click="toggleLayers"
         >
           <StationMapIcon name="layers" />
-          <span><ZhuyinText text="透視樓層" /></span>
+          <span><ZhuyinText :text="t('map.layers')" /></span>
           <span class="switch-track" aria-hidden="true"></span>
         </button>
       </div>
 
       <div class="facility-header">
         <div class="facility-title-group">
-          <h2 id="facility-title"><ZhuyinText text="設施主題" /></h2>
+          <h2 id="facility-title">
+            <ZhuyinText :text="t('map.facilities')" />
+          </h2>
         </div>
         <span>
-          {{ visibleFloorPoints.length }} <ZhuyinText text="個標點" />
+          <ZhuyinText
+            :text="t('map.pointCount', { count: visibleFloorPoints.length })"
+          />
         </span>
       </div>
 
       <div
         class="theme-group"
         role="group"
-        aria-label="設施主題，可左右滑動查看更多"
+        :aria-label="t('map.themesAria')"
         tabindex="0"
         @wheel="scrollThemesWithWheel"
       >
@@ -73,14 +81,18 @@
           @click="toggleTheme(type)"
         >
           <StationMapIcon :name="type" /><ZhuyinText
-            :text="categories[type].name"
+            :text="t('type.' + type)"
           />
         </button>
       </div>
 
       <div class="station-layout">
         <div class="station-map-column">
-          <section ref="mapSection" class="map-card" aria-label="車站地圖">
+          <section
+            ref="mapSection"
+            class="map-card"
+            :aria-label="t('map.mapAria')"
+          >
             <div
               ref="mapStage"
               class="map-stage"
@@ -88,7 +100,7 @@
               @keydown.esc="closeConnectorDetails"
             >
               <div class="map-corner">
-                <div class="compass" aria-label="北方朝上略偏左" role="img">
+                <div class="compass" :aria-label="t('map.compass')" role="img">
                   <span>N</span>
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M12 3 20 21l-8-4-8 4Z" />
@@ -101,7 +113,9 @@
                   :disabled="floorChanging"
                   @click="returnToOrigin"
                 >
-                  <ZhuyinText text="回到起點" />・{{ originView.floor }}
+                  <ZhuyinText :text="t('map.backToStart')" />・{{
+                    originView.floor
+                  }}
                 </button>
               </div>
               <div class="map-window" :inert="floorChanging ? '' : null">
@@ -115,7 +129,7 @@
                       bounds[2] + ' / ' + bounds[3] * 1.5,
                   }"
                   role="region"
-                  :aria-label="level + ' 互動地圖，可用加減鍵縮放，0 鍵重設'"
+                  :aria-label="t('map.interactiveAria', { floor: level })"
                   tabindex="0"
                   @scroll.passive="placeConnectorPanel"
                   @wheel="zoomWithWheel"
@@ -133,7 +147,7 @@
                       class="floor-plan"
                       :viewBox="bounds.join(' ')"
                       role="img"
-                      :aria-label="level + ' 平面示意圖'"
+                      :aria-label="t('map.planAria', { floor: level })"
                     >
                       <g
                         v-for="layer in backgroundLayers"
@@ -167,9 +181,13 @@
                       type="button"
                       :style="pinStyle(point)"
                       :aria-label="
-                        point.name +
-                        (point.id === scanPositionId ? '，您在這裡' : '') +
-                        (point.id === scanTargetId ? '，目的地' : '')
+                        pointName(point) +
+                        (point.id === scanPositionId
+                          ? t('map.ariaYouAreHere')
+                          : '') +
+                        (point.id === scanTargetId
+                          ? t('map.ariaDestination')
+                          : '')
                       "
                       :aria-pressed="point.id === selected?.id"
                       :aria-hidden="!isPointVisible(point)"
@@ -197,9 +215,9 @@
                         v-if="point.id === scanPositionId"
                         class="location-badge"
                       >
-                        <ZhuyinText text="您在這裡" />
+                        <ZhuyinText :text="t('map.youAreHere')" />
                         <span class="location-name"
-                          ><ZhuyinText :text="point.name"
+                          ><ZhuyinText :text="pointName(point)"
                         /></span>
                       </span>
                     </button>
@@ -216,10 +234,10 @@
                 aria-labelledby="connector-title"
               >
                 <h3 id="connector-title" ref="connectorHeading" tabindex="-1">
-                  <ZhuyinText :text="selected.name" />
+                  <ZhuyinText :text="pointName(selected)" />
                 </h3>
-                <p v-if="displayMode === 'child'" class="display-hint">
-                  <ZhuyinText :text="facilityHelp[pointHelpType(selected)]" />
+                <p v-if="showHelp" class="display-hint">
+                  <ZhuyinText :text="t('help.' + pointHelpType(selected))" />
                 </p>
                 <template v-if="destinations.length">
                   <div v-for="transfer in destinations" :key="transfer.id">
@@ -239,7 +257,7 @@
                     </p>
                   </div>
                 </template>
-                <p v-else><ZhuyinText :text="selected.description" /></p>
+                <p v-else><ZhuyinText :text="pointDescription(selected)" /></p>
               </section>
             </div>
             <div
@@ -249,17 +267,17 @@
               class="display-facility-detail"
               role="status"
             >
-              <h3><ZhuyinText :text="selected.name" /></h3>
-              <p v-if="displayMode === 'child'" class="display-hint">
-                <ZhuyinText :text="facilityHelp[pointHelpType(selected)]" />
+              <h3><ZhuyinText :text="pointName(selected)" /></h3>
+              <p v-if="showHelp" class="display-hint">
+                <ZhuyinText :text="t('help.' + pointHelpType(selected))" />
               </p>
-              <p><ZhuyinText :text="selected.description" /></p>
+              <p><ZhuyinText :text="pointDescription(selected)" /></p>
             </div>
           </section>
         </div>
 
         <footer class="station-footer">
-          <span>依公開站圖重繪。標點與樓層相對位置為示意，請依現場指標。</span>
+          <span>{{ t("map.footerNote") }}</span>
           <div>
             <a
               v-for="[label, url] in sources"
@@ -271,15 +289,17 @@
             >
           </div>
           <p class="station-data-status">
-            資料狀態：{{ dataStatus.points }} 個標點、{{
-              dataStatus.connections
+            {{
+              t("map.dataStatus", {
+                points: dataStatus.points,
+                connections: dataStatus.connections,
+                unverified: dataStatus.unverifiedConnections,
+              })
             }}
-            條樓層連接（{{ dataStatus.unverifiedConnections }}
-            條待現場核對），尚無步行路網。
           </p>
-          <router-link to="/about" class="station-about-link"
-            >原始碼與授權 · 版本 {{ buildInfo.short }}</router-link
-          >
+          <router-link to="/about" class="station-about-link">{{
+            t("map.about", { version: buildInfo.short })
+          }}</router-link>
         </footer>
       </div>
     </div>
@@ -306,6 +326,8 @@ import { useDisplayPreferences } from "../display/preferences.mjs";
 import { useStationLocation } from "../station/useStationLocation";
 import { stationPoints } from "../station/scan.mjs";
 import { buildInfo, summarizeStationData } from "../about/about.mjs";
+import { htmlLang, useI18n } from "../i18n/index.mjs";
+import { placeName } from "../i18n/places.mjs";
 import { floors, stackBounds } from "./station-floor-plans";
 import stationData from "./station-points.json";
 import stationConnections from "./station-connections.json";
@@ -313,28 +335,17 @@ import { zones, transfersFromPoint } from "./station-routing";
 
 const { categories, points } = stationData;
 const { theme, displayMode } = useDisplayPreferences();
-const floorNames = {
-  B1: "地下一樓",
-  B2: "地下二樓",
-  B3: "地下三樓",
-  B4: "地下四樓",
-};
-const facilityHelp = {
-  elevator: "電梯：可以換樓層，不用走樓梯。",
-  stairs: "樓梯：一步一步走，可以到別的樓層。",
-  escalator: "電扶梯：會移動的樓梯，搭乘前請確認方向。",
-  "stairs-escalator": "這裡有換樓層的通道，請依現場標示確認樓梯或電扶梯。",
-  stairway: "這裡有換樓層的通道，種類和方向請看現場標示。",
-  restroom: "廁所：上廁所、洗手的地方。",
-  nursing: "哺集乳室：照顧寶寶、哺乳或集乳的地方。",
-  info: "詢問處：有問題時，可以向工作人員詢問。",
-  ticket: "售票處：詢問或購買車票的地方。",
-  aed: "AED：急救設備，有人需要急救時請找工作人員協助。",
-  phone: "公用電話：可以打電話的地方。",
-  water: "飲水設施：依設備標示取用飲水。",
-  locker: "置物櫃：暫時寄放行李的地方。",
-  accessible: "輪椅候車區：提供輪椅使用者候車的空間。",
-};
+const i18n = useI18n();
+const { locale, t } = i18n;
+const pointName = (point) => placeName(point, i18n);
+// Visitors who do not read Chinese get the plain-language help instead.
+const showHelp = computed(
+  () => displayMode.value === "child" || locale.value !== "zh-TW"
+);
+const pointDescription = (point) =>
+  locale.value === "zh-TW"
+    ? point.description
+    : t("map.originalName", { name: point.name });
 // const searchCatalogEntries = stationCatalog(stationData);
 // let searchPointRevision = 0;
 const mobileZoomQuery = window.matchMedia(
@@ -531,12 +542,18 @@ const backgroundLayers = computed(() => {
 const dataStatus = summarizeStationData(stationData, stationConnections);
 const sources = computed(() => [
   [
-    "台北捷運 " + level.value + " 資訊圖",
+    t("map.sourceInfo", { floor: level.value }),
     "https://web.metro.taipei/img/ALL/INFOPDF/051.pdf#page=" +
       (floorIds.indexOf(level.value) + 1),
   ],
-  ["台北捷運車站設施", "https://web.metro.taipei/pages2026/WebStation/051/1"],
-  ["台北捷運剖面圖", "https://web.metro.taipei/pages2026/WebStation/051/4"],
+  [
+    t("map.sourceFacilities"),
+    "https://web.metro.taipei/pages2026/WebStation/051/1",
+  ],
+  [
+    t("map.sourceSection"),
+    "https://web.metro.taipei/pages2026/WebStation/051/4",
+  ],
 ]);
 
 function isConnector(point) {
@@ -559,7 +576,9 @@ function pointHelpType(point) {
 }
 
 function zoneName(id) {
-  return zones.find((zone) => zone.id === id)?.name;
+  const key = `zone.${id}`;
+  const name = t(key);
+  return name === key ? zones.find((zone) => zone.id === id)?.name : name;
 }
 
 function scrollThemesWithWheel(event) {
@@ -597,15 +616,13 @@ function isPointVisible(point) {
 }
 
 function transferNote(transfer) {
-  if (transfer.typeStatus === "unverified")
-    return "平面圖顯示梯口，梯種及通行方向待確認。";
-  if (transfer.typeStatus === "inferred")
-    return "樓梯與電扶梯配置為推定，請依現場指標。";
+  if (transfer.typeStatus === "unverified") return t("map.connectorUnknown");
+  if (transfer.typeStatus === "inferred") return t("map.connectorInferred");
   if (
     transfer.escalatorDirection === "unverified" ||
     transfer.direction === "unverified"
   )
-    return "電扶梯運轉方向請依現場指標。";
+    return t("map.escalatorDirection");
   return "";
 }
 
