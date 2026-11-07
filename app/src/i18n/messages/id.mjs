@@ -283,8 +283,7 @@ export default {
   "search.title": "Cari fasilitas dengan nama",
   "search.note":
     "Prototipe kamus tujuh bahasa; kata-kata belum ditinjau. Hanya mencari fasilitas di halaman ini, tanpa AI daring.",
-  "search.label":
-    "Nama fasilitas atau permintaan sederhana (maks. 80 karakter)",
+  "search.label": "Nama fasilitas atau kebutuhan",
   "search.placeholder": "廁所、restroom、nhà vệ sinh…",
   "search.submit": "Cari",
   "search.clear": "Hapus pencarian",
@@ -541,7 +540,7 @@ export default {
   "demo.blocked": "Batas aksesibilitas",
   "demo.reset": "Atur ulang",
   "demo.exit": "Keluar demo",
-  "demo.advance": "Simulasi bergerak",
+  "demo.advance": "Simulasi ke penanda",
   "demo.arrive": "Simulasi tiba",
   "demo.noElevator": "Nonaktifkan lift (demo)",
   "demo.error": "Gagal memuat. Coba lagi.",

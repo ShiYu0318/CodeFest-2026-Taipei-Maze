@@ -279,7 +279,7 @@ export default {
   "search.title": "Tìm tiện ích theo tên",
   "search.note":
     "Bản thử từ điển bảy ngôn ngữ, từ ngữ chưa được duyệt. Chỉ tìm các tiện ích trên trang này, không dùng AI trực tuyến.",
-  "search.label": "Tên tiện ích hoặc yêu cầu đơn giản (tối đa 80 ký tự)",
+  "search.label": "Tên tiện ích hoặc yêu cầu",
   "search.placeholder": "廁所、restroom、nhà vệ sinh…",
   "search.submit": "Tìm",
   "search.clear": "Xóa tìm kiếm",
@@ -531,7 +531,7 @@ export default {
   "demo.blocked": "Giới hạn tiếp cận",
   "demo.reset": "Đặt lại",
   "demo.exit": "Thoát demo",
-  "demo.advance": "Mô phỏng di chuyển",
+  "demo.advance": "Mô phỏng tới mốc",
   "demo.arrive": "Mô phỏng đến nơi",
   "demo.noElevator": "Tắt thang máy (demo)",
   "demo.error": "Không thể tải. Hãy thử lại.",

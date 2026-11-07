@@ -10,9 +10,6 @@
         "
       />
     </h2>
-    <p class="search-hint">
-      <ZhuyinText :text="t('search.note')" />
-    </p>
     <form @submit.prevent="submit">
       <label :for="id + '-query'"
         ><ZhuyinText :text="t('search.label')"
@@ -42,9 +39,6 @@
         <ZhuyinText :text="t('search.clear')" />
       </button>
     </form>
-    <p v-if="!navigation" class="search-hint">
-      <ZhuyinText :text="t('search.scope')" />
-    </p>
     <div v-if="result" role="status" aria-live="polite">
       <p><ZhuyinText :text="statusText" /></p>
       <p v-if="result.unparsedTerms?.length" class="search-hint">

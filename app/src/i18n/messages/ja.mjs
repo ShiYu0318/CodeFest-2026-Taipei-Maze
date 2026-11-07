@@ -283,7 +283,7 @@ export default {
   "search.title": "名前で設備を探す",
   "search.note":
     "7言語の辞書の試作で、語句はまだ確認中です。このページの設備だけを検索し、オンラインのAIは使いません。",
-  "search.label": "設備名やかんたんな希望（80文字まで）",
+  "search.label": "施設名や希望",
   "search.placeholder": "廁所、restroom、nhà vệ sinh…",
   "search.submit": "検索",
   "search.clear": "検索をクリア",
@@ -533,7 +533,7 @@ export default {
   "demo.blocked": "バリアフリー制限",
   "demo.reset": "リセット",
   "demo.exit": "デモ終了",
-  "demo.advance": "移動を模擬",
+  "demo.advance": "目印へ移動（模擬）",
   "demo.arrive": "到着を模擬",
   "demo.noElevator": "エレベーター停止（デモ）",
   "demo.error": "読み込めません。再試行してください。",

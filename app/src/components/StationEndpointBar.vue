@@ -15,27 +15,25 @@
         class="endpoint-bar-value"
         data-endpoint-bar="start"
         :data-empty="!startPoint || null"
+        :disabled="busy"
         aria-haspopup="dialog"
         :aria-label="t('endpoint.start') + '：' + describe(startPoint, 'start')"
         @click="emit('open', 'start', $event)"
       >
         <ZhuyinText :text="describe(startPoint, 'start')" />
       </button>
-      <!-- Locating by QR belongs to the start: the scan sets where you are. -->
-      <slot name="start" />
+      <button
+        type="button"
+        class="endpoint-bar-scan"
+        :disabled="busy || !scanAvailable"
+        :aria-label="startPoint ? t('scan.rescan') : t('scan.scan')"
+        :title="startPoint ? t('scan.rescan') : t('scan.scan')"
+        @click="emit('scan')"
+      >
+        <StationMapIcon name="qrcode" />
+      </button>
     </div>
-    <button
-      type="button"
-      class="endpoint-bar-swap"
-      :aria-label="t('endpoint.swap')"
-      :title="t('endpoint.swap')"
-      :disabled="!startPoint && !targetPoint"
-      @click="emit('swap')"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M8 4v15M4 8l4-4 4 4M16 20V5M12 16l4 4 4-4" />
-      </svg>
-    </button>
+
     <div class="endpoint-bar-field">
       <span class="endpoint-bar-label" aria-hidden="true">
         <span class="endpoint-bar-dot" data-role="destination"></span>
@@ -46,6 +44,7 @@
         class="endpoint-bar-value"
         data-endpoint-bar="destination"
         :data-empty="!targetPoint || null"
+        :disabled="busy"
         aria-haspopup="dialog"
         :aria-label="
           t('endpoint.destination') +
@@ -56,12 +55,25 @@
       >
         <ZhuyinText :text="describe(targetPoint, 'destination')" />
       </button>
+      <button
+        type="button"
+        class="endpoint-bar-swap"
+        :aria-label="t('endpoint.swap')"
+        :title="t('endpoint.swap')"
+        :disabled="busy || (!startPoint && !targetPoint)"
+        @click="emit('swap')"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 4v15M4 8l4-4 4 4M16 20V5M12 16l4 4 4-4" />
+        </svg>
+      </button>
     </div>
   </section>
 </template>
 
 <script setup>
 /* global defineProps, defineEmits */
+import StationMapIcon from "./StationMapIcon.vue";
 import ZhuyinText from "./ZhuyinText.vue";
 import { useI18n } from "../i18n/index.mjs";
 import { placeName } from "../i18n/places.mjs";
@@ -69,8 +81,10 @@ import { placeName } from "../i18n/places.mjs";
 defineProps({
   startPoint: { type: Object, default: null },
   targetPoint: { type: Object, default: null },
+  scanAvailable: { type: Boolean, default: false },
+  busy: { type: Boolean, default: false },
 });
-const emit = defineEmits(["open", "swap"]);
+const emit = defineEmits(["open", "swap", "scan"]);
 const i18n = useI18n();
 const { t } = i18n;
 const describe = (point, role) =>
@@ -95,12 +109,18 @@ const describe = (point, role) =>
 }
 .endpoint-bar-field {
   display: grid;
-  gap: 4px;
+  grid-template-columns: 4.5em minmax(0, 1fr) var(
+      --display-control-height,
+      44px
+    );
+  align-items: center;
+  gap: 8px;
   min-width: 0;
 }
 .endpoint-bar-label {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 6px;
   color: var(--muted);
   font-size: var(--display-secondary-size, 0.8125rem);
@@ -142,9 +162,9 @@ const describe = (point, role) =>
   display: grid;
   place-items: center;
   justify-self: center;
-  width: 44px;
-  height: 44px;
-  margin: 2px 0 -2px;
+  width: var(--display-control-height, 44px);
+  height: var(--display-control-height, 44px);
+  margin: 0;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -177,5 +197,34 @@ const describe = (point, role) =>
   .endpoint-bar-swap {
     transition: none;
   }
+}
+.endpoint-bar-label {
+  white-space: nowrap;
+}
+.endpoint-bar-dot {
+  flex: none;
+}
+.endpoint-bar-value {
+  min-width: 0;
+}
+.endpoint-bar-scan {
+  display: grid;
+  place-items: center;
+  width: var(--display-control-height, 44px);
+  height: var(--display-control-height, 44px);
+  padding: 8px;
+  border: 1px solid var(--tp-primary-500);
+  border-radius: 10px;
+  color: var(--tp-primary-700);
+  background: var(--surface);
+  cursor: pointer;
+}
+.endpoint-bar-scan svg {
+  width: 24px;
+  height: 24px;
+}
+.endpoint-bar button:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 </style>

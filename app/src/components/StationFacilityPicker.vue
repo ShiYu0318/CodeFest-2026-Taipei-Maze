@@ -24,9 +24,9 @@
         ><input v-model="nearest" type="checkbox" :disabled="busy" /><ZhuyinText
           :text="t('facility.nearest')"
       /></label>
-      <label v-if="!nearest" class="facility-destination">
+      <label v-if="!nearest && category" class="facility-destination">
         <ZhuyinText :text="t('scan.chooseDestination')" />
-        <select v-model="pointId" :disabled="busy || !category">
+        <select v-model="chosenPointId" :disabled="busy || !category">
           <option value="" disabled>{{ t("scan.choosePlaceholder") }}</option>
           <option
             v-for="point in matchingPoints"
@@ -40,8 +40,8 @@
       <button
         type="button"
         class="facility-category-go"
-        :disabled="busy || !category || (!nearest && !pointId)"
-        @click="emit('go', { category, nearest, pointId })"
+        :disabled="busy || (nearest ? !category : !chosenPointId)"
+        @click="emit('go', { category, nearest, pointId: chosenPointId })"
       >
         <ZhuyinText :text="t('map.goHere')" />
       </button>
@@ -60,11 +60,12 @@ const props = defineProps({
   category: { type: String, default: null },
   points: { type: Array, required: true },
   busy: { type: Boolean, default: false },
+  destinationId: { type: String, default: null },
 });
 const emit = defineEmits(["category", "go"]);
 const i18n = useI18n();
 const { t } = i18n;
-const nearest = ref(true),
+const nearest = ref(!props.destinationId),
   pointId = ref("");
 const matchingPoints = computed(() =>
   props.points.filter((point) => {
@@ -76,6 +77,24 @@ const matchingPoints = computed(() =>
           ["stairs", "escalator"].includes(props.category)))
     );
   })
+);
+const chosenPointId = computed({
+  get: () =>
+    pointId.value ||
+    (!props.category ||
+    matchingPoints.value.some((point) => point.id === props.destinationId)
+      ? props.destinationId
+      : null),
+  set: (value) => {
+    pointId.value = value;
+  },
+});
+watch(
+  () => props.destinationId,
+  () => {
+    nearest.value = false;
+    pointId.value = "";
+  }
 );
 watch(
   () => props.category,

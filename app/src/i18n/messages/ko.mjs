@@ -275,7 +275,7 @@ export default {
   "search.title": "이름으로 편의시설 찾기",
   "search.note":
     "7개 언어 사전 시제품이며 단어는 아직 검토 전입니다. 이 페이지에 있는 편의시설만 찾으며 온라인 AI를 쓰지 않습니다.",
-  "search.label": "편의시설 이름이나 간단한 요청(최대 80자)",
+  "search.label": "시설 이름 또는 요청",
   "search.placeholder": "廁所、restroom、nhà vệ sinh…",
   "search.submit": "검색",
   "search.clear": "검색어 지우기",
@@ -522,7 +522,7 @@ export default {
   "demo.blocked": "접근성 제한",
   "demo.reset": "초기화",
   "demo.exit": "데모 종료",
-  "demo.advance": "이동 시뮬레이션",
+  "demo.advance": "이정표로 모의 이동",
   "demo.arrive": "도착 시뮬레이션",
   "demo.noElevator": "엘리베이터 중지 (데모)",
   "demo.error": "불러올 수 없습니다. 다시 시도하세요.",

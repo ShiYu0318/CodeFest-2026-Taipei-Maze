@@ -108,8 +108,8 @@ const bearing = (from, to) =>
 
 /**
  * Split a route into steps a visitor can page through:
- *   walk   — one floor, from a place to the next floor change or the end,
- *            with the named checkpoints passed on the way
+ *   walk   — one diagram turn or named landmark at a time, on one floor;
+ *            instructions refer to the next real named checkpoint
  *   floor  — change floors by elevator, stairs or escalator
  *   arrive — the destination
  * Directions remain map bearings; nothing here claims left or right.
@@ -122,25 +122,50 @@ export function routeSteps(route) {
   const named = (id) => !helper(id);
   const closeWalk = () => {
     if (!walk) return;
-    const last = walk.ids.at(-1);
-    const first = nodes.get(walk.ids[0]);
-    // The first move long enough to show a direction.
-    let angle = null;
-    for (let i = 1; i < walk.ids.length && angle === null; i++) {
-      const to = nodes.get(walk.ids[i]);
-      if (Math.hypot(to.x - first.x, to.y - first.y) >= 2)
-        angle = bearing(first, to);
+    const ids = walk.ids;
+    const boundaries = [0];
+    for (let i = 1; i < ids.length - 1; i++) {
+      const before = nodes.get(ids[i - 1]),
+        here = nodes.get(ids[i]),
+        after = nodes.get(ids[i + 1]);
+      const delta = Math.abs(bearing(before, here) - bearing(here, after));
+      const turn = Math.min(delta, 360 - delta);
+      const longEnough =
+        Math.hypot(here.x - before.x, here.y - before.y) >= 2 &&
+        Math.hypot(after.x - here.x, after.y - here.y) >= 2;
+      if (named(ids[i]) || (longEnough && turn >= 35)) boundaries.push(i);
     }
-    if (walk.ids.length >= 2 && angle !== null)
-      steps.push({
-        kind: "walk",
-        floor: walk.floor,
-        fromId: walk.ids.find(named) ?? walk.ids[0],
-        toId: [...walk.ids].reverse().find(named) ?? last,
-        viaIds: walk.ids.slice(1, -1).filter(named),
-        line: walk.ids.map((id) => [nodes.get(id).x, nodes.get(id).y]),
-        angle,
-      });
+    boundaries.push(ids.length - 1);
+    for (let part = 1; part < boundaries.length; part++) {
+      const start = boundaries[part - 1],
+        end = boundaries[part];
+      const section = ids.slice(start, end + 1);
+      const first = nodes.get(section[0]);
+      let angle = null;
+      for (let i = 1; i < section.length && angle === null; i++) {
+        const to = nodes.get(section[i]);
+        if (Math.hypot(to.x - first.x, to.y - first.y) >= 2)
+          angle = bearing(first, to);
+      }
+      // Display real named landmarks, while the highlighted geometry ends at
+      // the actual diagram turn. Never expose helper IDs as public QR points.
+      const fromId =
+        ids
+          .slice(0, start + 1)
+          .reverse()
+          .find(named) ?? ids.find(named);
+      const toId = ids.slice(end).find(named) ?? [...ids].reverse().find(named);
+      if (angle !== null && fromId && toId)
+        steps.push({
+          kind: "walk",
+          floor: walk.floor,
+          fromId,
+          toId,
+          viaIds: section.slice(1, -1).filter(named),
+          line: section.map((id) => [nodes.get(id).x, nodes.get(id).y]),
+          angle,
+        });
+    }
     walk = null;
   };
   for (const edge of route.edges) {

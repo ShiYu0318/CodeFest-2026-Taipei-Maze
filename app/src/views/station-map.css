@@ -1267,3 +1267,44 @@
 [data-theme="dark"] .endpoint-go {
   color: var(--tp-primary-950);
 }
+
+.scan-app-hint {
+  margin: -4px 0 10px;
+  color: var(--muted);
+  font-size: var(--display-secondary-size, 0.8125rem);
+}
+.route-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.route-tools button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--display-control-height, 44px);
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+.route-tools svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Keep the path and inline direction controls together while navigating. */
+.station-page[data-guiding="true"] .map-viewport {
+  --map-height: clamp(180px, 32svh, 320px);
+  min-height: 0;
+  height: var(--map-height);
+  aspect-ratio: auto;
+}
+.station-page[data-guiding="true"] .map-board {
+  max-width: calc(
+    (var(--map-height) - 2px) * (var(--map-aspect)) * var(--map-zoom)
+  );
+  margin-inline: auto;
+}

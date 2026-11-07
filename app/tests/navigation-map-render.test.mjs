@@ -59,7 +59,7 @@ const realComponents = new Set([
   "DisplayControls",
   "StationTripDialog",
   "StationRouteSteps",
-  "StationNavigationGuide",
+  "StationRouteGuide",
   "ZhuyinText",
   "ZhuyinSvgText",
 ]);
@@ -190,7 +190,7 @@ test("navigation prompts annotate only Traditional Chinese child mode", async ()
           ["StationTripDialog", { direction: language.t("map.faceChoose") }],
           ["StationTripDialog", { direction: "", cancelOnly: true }],
           [
-            "StationNavigationGuide",
+            "StationRouteGuide",
             {
               steps: [],
               index: 0,
@@ -254,13 +254,19 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
     assert.equal(browsing.includes('class="navigation-rescan-bar"'), false);
     const trip = await render({ start: "b1-e4", destination: "m-e4" });
     assert.equal((trip.match(/class="map-pin\b/g) ?? []).length, 9);
-    assert.ok(trip.includes('class="navigation-rescan-bar"'));
+    assert.ok(trip.includes('class="endpoint-bar-scan"'));
     assert.equal(trip.includes('class="theme-group'), true);
     assert.ok(trip.includes('class="facility-nearest-option"'));
     assert.equal(trip.includes('class="plan-stairs"'), false);
-    assert.ok(trip.includes('class="station-scan-panel'));
+    assert.ok(trip.includes('class="endpoint-bar-scan"'));
+    assert.equal((trip.match(/class="facility-category-go"/g) ?? []).length, 1);
+    assert.equal(trip.includes('class="navigation-guide"'), false);
     assert.ok(
-      trip.includes('class="endpoint-go"'),
+      trip.indexOf('class="walk-panel"') >
+        trip.indexOf('class="station-layout"')
+    );
+    assert.ok(
+      trip.includes('class="facility-category-go"'),
       "manual endpoints expose a direct go button without a scan prerequisite"
     );
     assert.ok(trip.includes("重新掃描定位"));
@@ -682,7 +688,7 @@ test("navigation actions keep one scan control followed by staff help and trip c
   }
 });
 
-test("full-screen guidance shares real route steps, with no arrow before a route exists", async () => {
+test("inline guidance shares route steps, with no arrow before a route exists or while scanning", async () => {
   const language = i18n.useI18n();
   const previous = language.locale.value;
   language.setLocale("en");
@@ -706,7 +712,7 @@ test("full-screen guidance shares real route steps, with no arrow before a route
     );
     const render = (extra) =>
       renderToString(
-        Vue.createSSRApp(component("StationNavigationGuide"), {
+        Vue.createSSRApp(component("StationRouteGuide"), {
           steps,
           index: 0,
           pointsById,
@@ -714,7 +720,8 @@ test("full-screen guidance shares real route steps, with no arrow before a route
         })
       );
     const first = await render({});
-    assert.match(first, /<dialog/);
+    assert.doesNotMatch(first, /<dialog/);
+    assert.match(first, /station-route-guide/);
     assert.match(first, /route-step-arrow/);
     assert.match(first, /Previous/);
     assert.match(first, /Next/);

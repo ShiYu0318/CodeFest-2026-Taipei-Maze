@@ -148,3 +148,56 @@ test("planning and nearest lookup preserve hard route restrictions", () => {
     assert.equal(request.allowFareGates, false);
   }
 });
+
+test("each diagram turn has its own arrow while labels remain named landmarks", () => {
+  const nodes = [
+    { id: "start", floor: "B1", x: 0, y: 0 },
+    { id: "b1-corner-1", floor: "B1", x: 10, y: 0 },
+    { id: "b1-corner-2", floor: "B1", x: 10, y: 10 },
+    { id: "restroom", floor: "B1", x: 20, y: 10 },
+  ];
+  const edges = nodes.slice(1).map((to, index) => ({
+    from: nodes[index].id,
+    to: to.id,
+    type: "walkway",
+  }));
+  const steps = routeSteps({
+    nodes,
+    edges,
+    nodeIds: nodes.map((node) => node.id),
+  });
+  const walking = steps.filter((step) => step.kind === "walk");
+  assert.equal(walking.length, 3);
+  assert.deepEqual(
+    walking.map((step) => step.angle),
+    [90, 180, 90]
+  );
+  for (const step of walking) {
+    assert.equal(step.fromId, "start");
+    assert.equal(step.toId, "restroom");
+  }
+  for (let i = 1; i < walking.length; i++)
+    assert.deepEqual(walking[i - 1].line.at(-1), walking[i].line[0]);
+});
+test("named facilities and QR points on the route become distinct checkpoints", () => {
+  const nodes = ["start", "b1-qr-02", "water", "end"].map((id, index) => ({
+    id,
+    floor: "B1",
+    x: index * 10,
+    y: 0,
+  }));
+  const edges = nodes.slice(1).map((to, index) => ({
+    from: nodes[index].id,
+    to: to.id,
+    type: "walkway",
+  }));
+  const steps = routeSteps({
+    nodes,
+    edges,
+    nodeIds: nodes.map((node) => node.id),
+  });
+  assert.deepEqual(
+    steps.filter((step) => step.kind === "walk").map((step) => step.toId),
+    ["b1-qr-02", "water", "end"]
+  );
+});

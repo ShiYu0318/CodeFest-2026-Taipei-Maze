@@ -135,8 +135,8 @@ function go(next) {
   align-items: center;
 }
 .route-step-arrow {
-  width: 72px;
-  height: 72px;
+  width: 96px;
+  height: 96px;
   fill: none;
   stroke: var(--tp-primary-600);
   stroke-width: 12;
@@ -248,9 +248,11 @@ function go(next) {
 }
 @media (max-width: 420px) {
   .route-step-card {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 80px minmax(0, 1fr);
   }
   .route-step-arrow {
+    width: 80px;
+    height: 80px;
     justify-self: center;
   }
 }

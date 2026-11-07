@@ -282,7 +282,7 @@ export default {
   "search.title": "Find a facility by name",
   "search.note":
     "Seven-language dictionary prototype; words are not yet reviewed. Searches only the facilities on this page, without any online AI.",
-  "search.label": "Facility name or a simple request (up to 80 characters)",
+  "search.label": "Facility name or request",
   "search.placeholder": "廁所、restroom、nhà vệ sinh…",
   "search.submit": "Search",
   "search.clear": "Clear search",
@@ -532,7 +532,7 @@ export default {
   "demo.blocked": "Accessibility limit",
   "demo.reset": "Reset",
   "demo.exit": "Exit demo",
-  "demo.advance": "Simulate move",
+  "demo.advance": "Jump to landmark (demo)",
   "demo.arrive": "Simulate arrival",
   "demo.noElevator": "Disable lifts (demo)",
   "demo.error": "Unable to load. Try again.",

@@ -5,15 +5,12 @@
     :lang="htmlLang(locale)"
     :data-theme="theme"
     :data-display-mode="displayMode"
+    :data-guiding="walkStart && walkDestination ? 'true' : null"
   >
     <div
       class="station-shell"
       :inert="
-        endpointPickerOpen ||
-        tripDialog ||
-        informationOpen ||
-        guideOpen ||
-        rescanOpen
+        endpointPickerOpen || tripDialog || informationOpen || rescanOpen
           ? ''
           : null
       "
@@ -73,34 +70,20 @@
       <StationEndpointBar
         :start-point="currentPoint"
         :target-point="targetPoint"
+        :scan-available="location.view.value.available"
+        :busy="location.view.value.active || demoBusy"
         @open="(role, event) => openEndpointPicker(event, role)"
         @swap="swapEndpoints"
-      >
-        <template #start>
-          <StationScanPanel
-            embedded
-            :location="location"
-            :selected-point="selected"
-            :persistent-scan="navigationMap.active"
-            @destination="planDestination"
-            @scanned="onQrScanned"
-            @cancel-trip="openTripDialog('cancel')"
-          />
-        </template>
-      </StationEndpointBar>
-      <button
-        v-if="walkStart && walkDestination"
-        type="button"
-        class="endpoint-go"
-        :disabled="location.view.value.active"
-        @click="openGuide"
-      >
-        <ZhuyinText :text="t('map.goHere')" />
-      </button>
+        @scan="scanGuide"
+      />
+      <p v-if="!location.view.value.available" class="scan-app-hint">
+        {{ t("scan.needAppShort") }}
+      </p>
       <StationFacilityPicker
         :categories="availableThemes"
         :category="activeTheme"
         :points="stationCatalogPoints"
+        :destination-id="walkDestination"
         :busy="location.view.value.active || nearestBusy"
         @category="toggleTheme"
         @go="goFacilityCategory"
@@ -113,47 +96,7 @@
       >
         <ZhuyinText :text="nearestNotice" />
       </p>
-      <section class="walk-panel" :aria-label="t('walk.routeTitle')">
-        <p v-if="sharedPlace" class="walk-status" data-state="ok" role="status">
-          {{
-            t("share.received", {
-              name: placeLabel(sharedPlace, i18n),
-              floor: sharedPlace.floor,
-            })
-          }}
-        </p>
-        <p
-          v-if="walkStatus"
-          class="walk-status"
-          :data-state="walk.type === 'success' ? 'ok' : 'warn'"
-          role="status"
-        >
-          <ZhuyinText :text="walkStatus" />
-        </p>
-        <button
-          v-if="walkSteps.length"
-          type="button"
-          class="walk-share"
-          @click="openGuide"
-        >
-          <ZhuyinText :text="t('guide.open')" />
-        </button>
-        <StationRouteSteps
-          v-if="walkSteps.length"
-          :steps="walkSteps"
-          :index="walkStepIndex"
-          :points-by-id="stationById"
-          @update:index="goWalkStep"
-        />
-        <button
-          v-if="walkDestinationPoint"
-          type="button"
-          class="walk-share"
-          @click="sharePoint = walkDestinationPoint"
-        >
-          {{ t("share.destination") }}
-        </button>
-      </section>
+
       <div
         ref="floorControls"
         class="floor-controls horizontal-scroll"
@@ -568,6 +511,53 @@
           </section>
         </div>
       </div>
+      <section class="walk-panel" :aria-label="t('walk.routeTitle')">
+        <p v-if="sharedPlace" class="walk-status" data-state="ok" role="status">
+          {{
+            t("share.received", {
+              name: placeLabel(sharedPlace, i18n),
+              floor: sharedPlace.floor,
+            })
+          }}
+        </p>
+        <StationRouteGuide
+          v-if="walkDestination"
+          :steps="walkSteps"
+          :index="walkStepIndex"
+          :points-by-id="stationById"
+          :status="guideStatus"
+          :available="location.view.value.available"
+          :active="location.view.value.active"
+          :demo="demoEnabled"
+          :demo-busy="demoBusy"
+          @update:index="goWalkStep"
+          @scan="scanGuide"
+          @demo-advance="advanceDemo"
+          @demo-arrive="arriveDemo"
+        />
+        <button
+          v-if="walkDestinationPoint"
+          type="button"
+          class="walk-share"
+          @click="sharePoint = walkDestinationPoint"
+        >
+          {{ t("share.destination") }}
+        </button>
+        <div v-if="walkDestinationPoint" class="route-tools">
+          <button type="button" @click="staffPoint = walkDestinationPoint">
+            <StationMapIcon name="help" /><ZhuyinText
+              :text="t('staff.short')"
+            />
+          </button>
+          <button
+            type="button"
+            :disabled="location.view.value.active"
+            @click="openTripDialog('cancel')"
+          >
+            <ZhuyinText :text="t('map.cancel')" />
+          </button>
+        </div>
+      </section>
     </div>
     <StationInformationDialog
       v-if="informationOpen"
@@ -592,27 +582,6 @@
       v-if="sharePoint"
       :point="sharePoint"
       @close="sharePoint = null"
-    />
-    <StationNavigationGuide
-      v-if="guideOpen"
-      :steps="walkSteps"
-      :index="walkStepIndex"
-      :points-by-id="stationById"
-      :status="guideStatus"
-      :notice="
-        location.view.value.noticeKey ? t(location.view.value.noticeKey) : ''
-      "
-      :available="location.view.value.available"
-      :active="location.view.value.active"
-      :has-destination="!!walkDestination"
-      :demo="demoEnabled"
-      :demo-busy="demoBusy"
-      @demo-advance="advanceDemo"
-      @demo-arrive="arriveDemo"
-      @close="closeGuide"
-      @scan="scanGuide"
-      @destination="chooseGuideDestination"
-      @update:index="goWalkStep"
     />
     <StationRescanDialog
       v-if="rescanOpen"
@@ -650,7 +619,6 @@ import { useRoute, useRouter } from "vue-router";
 // import DestinationSearch from "../components/DestinationSearch.vue";
 // import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
-import StationScanPanel from "../components/StationScanPanel.vue";
 import StaffCard from "../components/StaffCard.vue";
 import PlaceShareSheet from "../components/PlaceShareSheet.vue";
 import { readSharedPlace } from "../station/place-share.mjs";
@@ -667,9 +635,8 @@ import {
   demoNextPoint,
 } from "../station/demo-scenarios.mjs";
 import StationRescanDialog from "../components/StationRescanDialog.vue";
-import StationNavigationGuide from "../components/StationNavigationGuide.vue";
+import StationRouteGuide from "../components/StationRouteGuide.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
-import StationRouteSteps from "../components/StationRouteSteps.vue";
 import StationMapTour from "../components/StationMapTour.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import DisplayControls from "../components/DisplayControls.vue";
@@ -789,7 +756,6 @@ const activeTheme = ref(null);
 const selected = ref(null);
 const endpointPickerOpen = ref(false);
 const tripDialog = ref(null);
-const guideOpen = ref(false);
 const rescanOpen = ref(false);
 const nearestBusy = ref(false);
 let tripTrigger = null;
@@ -884,8 +850,7 @@ const walk = computed(() =>
 const walkLines = computed(() =>
   walk.value.type === "success" ? routeLines(walk.value.route, level.value) : []
 );
-// Step-by-step view of the whole route: one walk per floor with the named
-// checkpoints passed, each floor change, then arrival.
+// Shared map/guide steps: diagram turns, named facilities, floor changes, arrival.
 const walkSteps = computed(() =>
   walk.value.type === "success" ? routeSteps(walk.value.route) : []
 );
@@ -988,11 +953,14 @@ async function goNearest(category) {
   }
 }
 async function goFacilityCategory({ category, nearest, pointId }) {
-  if (!Object.hasOwn(categories, category) || location.view.value.active)
-    return;
+  if (location.view.value.active) return;
   if (nearest) return goNearest(category);
   const point = stationById.get(pointId);
-  if (!point || point.enabled === false || !matchesTheme(point, category))
+  if (
+    !point ||
+    point.enabled === false ||
+    (category && !matchesTheme(point, category))
+  )
     return;
   return chooseEndpoint(walkStart.value, point.id, point, "destination");
 }
@@ -1758,6 +1726,7 @@ async function chooseEndpoint(
 
 // Endpoint selection stays on the map until the explicit Go action.
 async function selectEndpoints(start, destination, point, role, options) {
+  if (role === "destination") activeTheme.value = null;
   await chooseEndpoint(start, destination, point, role, options, false);
   if (start && destination) await closeEndpointPicker();
 }
@@ -1765,6 +1734,7 @@ async function selectEndpoints(start, destination, point, role, options) {
 // Swap start and destination without opening the trip dialog.
 function swapEndpoints() {
   if (location.view.value.active) return;
+  activeTheme.value = null;
   const start = currentPoint.value?.id ?? null,
     destination = targetPoint.value?.id ?? null;
   if (!start && !destination) return;
@@ -1778,21 +1748,12 @@ function goHere(point) {
   return chooseEndpoint(currentPoint.value?.id, point.id, point, "destination");
 }
 
-function planDestination(destination) {
-  return chooseEndpoint(
-    walkStart.value,
-    destination,
-    stationById.get(destination),
-    "destination"
-  );
-}
-
 function onQrScanned({ rescan = false } = {}) {
   const destination = targetPoint.value?.id;
   if (destination && !location.view.value.destinationId)
     location.choose(destination);
   if (!rescan) openGuide();
-  else if (guideOpen.value && walkSteps.value.length) goWalkStep(0);
+  else if (walkSteps.value.length) goWalkStep(0);
 }
 
 async function loadDemoScenario(id) {
@@ -1804,8 +1765,8 @@ async function loadDemoScenario(id) {
   demoBusy.value = true;
   demoNotice.value = "";
   try {
-    guideOpen.value = false;
     await location.reset();
+    activeTheme.value = null;
     location.setStepFree(scenario.stepFree);
     await router.replace({ name: "station-map", query });
     await nextTick();
@@ -1868,7 +1829,6 @@ async function exitDemo() {
   demoBusy.value = true;
   demoNotice.value = "";
   try {
-    guideOpen.value = false;
     await location.reset();
     location.setStepFree(false);
     await router.replace({
@@ -1882,7 +1842,7 @@ async function exitDemo() {
   }
 }
 
-function openGuide() {
+async function openGuide() {
   if (tripDialog.value || !viewport.value?.isConnected) return;
   endpointPickerOpen.value = false;
   endpointTrigger = null;
@@ -1890,22 +1850,14 @@ function openGuide() {
   selected.value = null;
   mapPickStep.value = null;
   draftStart.value = null;
-  guideOpen.value = true;
-  if (walkSteps.value.length) goWalkStep(walkStepIndex.value);
-}
-async function closeGuide() {
-  guideOpen.value = false;
+  if (walkSteps.value.length) await goWalkStep(walkStepIndex.value);
   await nextTick();
+  mapSection.value?.scrollIntoView({ block: "start" });
   viewport.value?.focus({ preventScroll: true });
 }
 function scanGuide() {
   if (!location.view.value.active) rescanOpen.value = true;
 }
-async function chooseGuideDestination() {
-  await closeGuide();
-  openEndpointPicker(null, "destination");
-}
-
 function openTripDialog(mode = "orientation") {
   if (tripDialog.value || !viewport.value?.isConnected) return;
   tripTrigger = endpointTrigger ?? document.activeElement;
@@ -1929,7 +1881,6 @@ async function closeTripDialog() {
 }
 
 async function cancelTrip() {
-  guideOpen.value = false;
   originView.value = null;
   arrivalPointId.value = null;
   try {

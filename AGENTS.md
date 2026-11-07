@@ -34,7 +34,7 @@
 - 將完成且可檢查的變更以有意義的小段 commit 保存，不等到整個任務結束；只 stage 當次範圍，不把使用者的其他檔案一併提交。
 - 保留使用者未提交工作，僅提交當次範圍；不改寫遠端歷史、不 force push。
 - commit message 使用英文 Conventional Commits，PR title／description 使用繁體中文並保留英文專有名詞。本競賽專案採 `.github/PULL_REQUEST_TEMPLATE.md` 的開源專案格式（問題與目的、變更內容、測試方式與結果、相容性與部署影響、已知限制與後續工作），不要使用課堂作業的三段式格式。
-- 使用者已授權：完成並推送後，測試、建置及審查沒有實質問題即可 merge，不需再次確認；保留原開發 branch，不 force push，merge 後同步並核對本地 main 與 origin/main。
+- 2026-11-08 最新 Git 指示：測試、建置及審查通過後，直接 push 到 main，不再開 PR；既有 PR 完成收尾即可。推送前先同步最新 origin/main，保護未提交工作，不 force push；已合併且沒有用途的 branch 可清理，未合併的他人工作不可擅刪。推送後核對本地 main 與 origin/main，並確認部署結果。
 - 課堂作業專案才適用使用者另訂的 `work/hwN`、作業 PR 格式與審閱流程。
 - 不得將 key、token、`.env`、簽章私鑰、真實個資或未核准素材提交到 repo。
 - repo visibility 變更會公開全部已追蹤內容及歷史，須先完成檢查並取得明確的公開授權；不能當成增加 LICENSE 的附帶動作。
