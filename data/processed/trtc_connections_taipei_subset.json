@@ -1,0 +1,22 @@
+{
+  "source_id": "D09",
+  "source_file": "raw/trtc_connections.csv",
+  "source_encoding": "cp950",
+  "filter": "station-name match",
+  "bbox_wsen": null,
+  "verification_status": "desk_checked",
+  "release_approved": false,
+  "records": [
+    {
+      "source_record": 4,
+      "fields": {
+        "項次": "3",
+        "案件名稱": "凱撒飯店與捷運臺北車站6號出口連通案",
+        "移設連通位置": "捷運臺北車站6號出入口",
+        "廠商": "國裕開發股份有限公司",
+        "案件進度": "已啟用",
+        "更新日期": "20250617"
+      }
+    }
+  ]
+}

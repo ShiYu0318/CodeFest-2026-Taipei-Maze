@@ -1,0 +1,181 @@
+[
+  {
+    "source_id": "D01",
+    "file": "trtc_facilities.csv",
+    "encoding": "cp950",
+    "total_records": 120,
+    "subset_records": 1,
+    "fields": [
+      "序號/編號",
+      "縣市別代碼",
+      "地址-行政區域代碼",
+      "車站名稱",
+      "電梯",
+      "電扶梯",
+      "銀行ATM",
+      "哺集乳室",
+      "嬰兒尿布台",
+      "飲水機/飲水臺",
+      "充電站",
+      "自動售票機",
+      "廁所"
+    ]
+  },
+  {
+    "source_id": "D02",
+    "file": "trtc_accessibility.csv",
+    "encoding": "cp950",
+    "total_records": 119,
+    "subset_records": 1,
+    "fields": [
+      "Line",
+      "Station_Number",
+      "Station_Name",
+      "Station_Form",
+      "PAO",
+      "Elevator_and_Wheelchair_Ramps",
+      "Ticket_Gates_for_the_Disabled",
+      "Toilet_Facilities_for_Disabled",
+      "Reserved_Spaces_for_Wheelchairs",
+      "Doors_Open_Side",
+      "Elevator",
+      "Anti_slip_Strips",
+      "Train_Destination_Announcements",
+      "Public_Address_System",
+      "Priority_Seats_for_Visually_Impaired_Passengers",
+      "Tactile_Guide_Paths_quantity",
+      "Passenger_Information_Display_Systems_count",
+      "door_indicator_light_count",
+      "Train_Passenger_Information_Systems_quantity",
+      "1999_Sign_Language_Service_quantity"
+    ]
+  },
+  {
+    "source_id": "D03",
+    "file": "trtc_exits.csv",
+    "encoding": "cp950",
+    "total_records": 390,
+    "subset_records": 8,
+    "fields": [
+      "項次",
+      "出入口名稱",
+      "出入口編號",
+      "經度",
+      "緯度",
+      "是否為無障礙用"
+    ]
+  },
+  {
+    "source_id": "D04",
+    "file": "taipei_toilets.csv",
+    "encoding": "utf-8-sig",
+    "total_records": 1531,
+    "subset_records": 41,
+    "fields": [
+      "行政區",
+      "公廁類別",
+      "公廁名稱",
+      "公廁地址",
+      "經度",
+      "緯度",
+      "管理單位",
+      "座數",
+      "特優級",
+      "優等級",
+      "普通級",
+      "改善級",
+      "無障礙廁座數",
+      "親子廁座數",
+      "其他設施",
+      "照護床位置",
+      "污物盆位置"
+    ]
+  },
+  {
+    "source_id": "D05",
+    "file": "trtc_lift_locations.csv",
+    "encoding": "cp950",
+    "total_records": 136,
+    "subset_records": 2,
+    "fields": [
+      "路線別",
+      "車站名稱",
+      "車站編號",
+      "電梯位置",
+      "更新日期"
+    ]
+  },
+  {
+    "source_id": "D06",
+    "file": "trtc_exit_lifts_ramps.csv",
+    "encoding": "cp950",
+    "total_records": 193,
+    "subset_records": 2,
+    "fields": [
+      "項次",
+      "出入口電梯/無障礙坡道名稱",
+      "出入口編號",
+      "經度",
+      "緯度"
+    ]
+  },
+  {
+    "source_id": "D07",
+    "file": "trtc_accessibility_anomalies.csv",
+    "encoding": "cp950",
+    "total_records": 1,
+    "subset_records": 0,
+    "fields": [
+      "項次",
+      "日期時間",
+      "路線",
+      "車站",
+      "說明"
+    ]
+  },
+  {
+    "source_id": "D08",
+    "file": "trtc_lift_maintenance_11511.csv",
+    "encoding": "cp950",
+    "total_records": 337,
+    "subset_records": 7,
+    "fields": [
+      "民國年月日",
+      "線別",
+      "車站",
+      "電梯位置",
+      "編號",
+      "保養週期",
+      "保養時段"
+    ]
+  },
+  {
+    "source_id": "D09",
+    "file": "trtc_connections.csv",
+    "encoding": "cp950",
+    "total_records": 10,
+    "subset_records": 1,
+    "fields": [
+      "項次",
+      "案件名稱",
+      "移設連通位置",
+      "廠商",
+      "案件進度",
+      "更新日期"
+    ]
+  },
+  {
+    "source_id": "D10",
+    "file": "trtc_transfer_walk_times.csv",
+    "encoding": "cp950",
+    "total_records": 21,
+    "subset_records": 1,
+    "fields": [
+      "sno",
+      "station",
+      "Time",
+      "UpdateTime",
+      "EffectiveDate"
+    ]
+  }
+]

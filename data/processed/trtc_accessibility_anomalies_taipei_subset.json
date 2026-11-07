@@ -1,0 +1,10 @@
+{
+  "source_id": "D07",
+  "source_file": "raw/trtc_accessibility_anomalies.csv",
+  "source_encoding": "cp950",
+  "filter": "station-name match",
+  "bbox_wsen": null,
+  "verification_status": "desk_checked",
+  "release_approved": false,
+  "records": []
+}

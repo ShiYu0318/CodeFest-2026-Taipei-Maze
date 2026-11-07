@@ -1,0 +1,36 @@
+{
+  "source_id": "D02",
+  "source_file": "raw/trtc_accessibility.csv",
+  "source_encoding": "cp950",
+  "filter": "station-name match",
+  "bbox_wsen": null,
+  "verification_status": "desk_checked",
+  "release_approved": false,
+  "records": [
+    {
+      "source_record": 43,
+      "fields": {
+        "Line": "淡水信義線/板南線",
+        "Station_Number": "BL12/R10",
+        "Station_Name": "台北車站",
+        "Station_Form": "【淡水信義線】/【板南線】地下",
+        "PAO": "【淡水信義線】大廳層(B3)，近台鐵/高鐵轉乘區。【板南線】大廳層(B2)，近出口M4、M5、M6；大廳層(B2)，近出口M3、M7、M8。",
+        "Elevator_and_Wheelchair_Ramps": "【淡水信義線】出口M2。【板南線】出口M4。",
+        "Ticket_Gates_for_the_Disabled": "主詢問處旁",
+        "Toilet_Facilities_for_Disabled": "【淡水信義線】非付費區(B1)，近出口M1、M2；非付費區(B3)，近詢問處；付費區(B3)，往板南線樓梯。【板南線】非付費區(B1)，近出口M5；付費區(B2)，近往淡水信義線樓梯。",
+        "Reserved_Spaces_for_Wheelchairs": "第1節、第6節車廂",
+        "Doors_Open_Side": "【淡水信義線】左側開門。【板南線】左側開門。",
+        "Elevator": "有",
+        "Anti_slip_Strips": "有",
+        "Train_Destination_Announcements": "有",
+        "Public_Address_System": "有",
+        "Priority_Seats_for_Visually_Impaired_Passengers": "【淡水信義線】一月臺前端。【板南線】無。",
+        "Tactile_Guide_Paths_quantity": "【淡水信義線】/【板南線】出口電梯--大廳無障礙閘門--月臺電梯--月臺",
+        "Passenger_Information_Display_Systems_count": "1",
+        "door_indicator_light_count": "1",
+        "Train_Passenger_Information_Systems_quantity": "1",
+        "1999_Sign_Language_Service_quantity": "1"
+      }
+    }
+  ]
+}

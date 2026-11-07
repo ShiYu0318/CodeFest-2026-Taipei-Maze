@@ -1,0 +1,31 @@
+{
+  "source_id": "D06",
+  "source_file": "raw/trtc_exit_lifts_ramps.csv",
+  "source_encoding": "cp950",
+  "filter": "station-name match",
+  "bbox_wsen": null,
+  "verification_status": "desk_checked",
+  "release_approved": false,
+  "records": [
+    {
+      "source_record": 42,
+      "fields": {
+        "項次": "41",
+        "出入口電梯/無障礙坡道名稱": "台北車站出口電梯1",
+        "出入口編號": "M2",
+        "經度": "121.5186428",
+        "緯度": "25.0482356"
+      }
+    },
+    {
+      "source_record": 43,
+      "fields": {
+        "項次": "42",
+        "出入口電梯/無障礙坡道名稱": "台北車站出口電梯2",
+        "出入口編號": "M4",
+        "經度": "121.5172729",
+        "緯度": "25.0463906"
+      }
+    }
+  ]
+}

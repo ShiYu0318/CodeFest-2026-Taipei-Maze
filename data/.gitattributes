@@ -1,0 +1,3 @@
+# CSV fields and source CRLF bytes must not be rewritten or whitespace-trimmed.
+raw/*.csv -text -whitespace
+processed/*.csv -text -whitespace

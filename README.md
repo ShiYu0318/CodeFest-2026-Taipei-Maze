@@ -9,8 +9,9 @@ Taipei Maze 北車不迷路：QR 定位、局部跨樓層路網、圖像指引�
 - [產品與技術 SPEC](./docs/SPEC.md)：功能、資料契約、七語、離線及驗收。
 - [提案企劃書](./docs/提案企劃書.md)：構想與決策歷程，架構以最新版 SPEC 為準。
 - [競賽完整指南](./docs/2026-fall-competition-guide.md)：時程、規則與賽後義務；工作坊補充見開發指南。
+- [研究資料包](./data/README.md)：48 項來源索引、10 份官方 CSV、UTF-8／北車子集、地圖入口與處理方法；尚非已驗證的產品路網。
 
-目前尚未建立可執行產品、前端 package／lockfile 或 TownPass fork；文件中的建置、測試及部署指令是接續開發步驟，不代表已執行。既有 `compose.yml` 為 hello-world 設定，不是本產品服務。
+目前已整理研究資料與標準函式庫處理工具，尚未建立可執行產品、前端 package／lockfile 或 TownPass fork；產品文件中的建置、測試及部署指令是接續開發步驟，不代表已執行。既有 `compose.yml` 為 hello-world 設定，不是本產品服務。
 
 ## 授權與原始碼
 

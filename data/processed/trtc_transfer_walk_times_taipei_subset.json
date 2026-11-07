@@ -1,0 +1,21 @@
+{
+  "source_id": "D10",
+  "source_file": "raw/trtc_transfer_walk_times.csv",
+  "source_encoding": "cp950",
+  "filter": "station-name match",
+  "bbox_wsen": null,
+  "verification_status": "desk_checked",
+  "release_approved": false,
+  "records": [
+    {
+      "source_record": 6,
+      "fields": {
+        "sno": "5",
+        "station": "捷運台北車站",
+        "Time": "4",
+        "UpdateTime": "20250529",
+        "EffectiveDate": "20250529"
+      }
+    }
+  ]
+}

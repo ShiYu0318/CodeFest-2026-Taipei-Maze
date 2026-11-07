@@ -1,0 +1,106 @@
+{
+  "bbox_wsen": [
+    121.51,
+    25.043,
+    121.522,
+    25.051
+  ],
+  "base_metadata": {
+    "timestamp_osm_base": "2026-11-07T06:19:50Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": 850,
+  "element_types": {
+    "node": 586,
+    "way": 261,
+    "relation": 3
+  },
+  "geojson_features": 847,
+  "relations_not_flattened": 3,
+  "tag_counts": {
+    "indoor": {
+      "yes": 202,
+      "room": 5,
+      "area": 8,
+      "no": 1
+    },
+    "level": {
+      "-2": 86,
+      "0": 194,
+      "3": 18,
+      "2": 24,
+      "1": 97,
+      "4": 24,
+      "5": 4,
+      "0;1": 11,
+      "-1": 195,
+      "-1-2": 1,
+      "6": 4,
+      "-1;0;1": 1,
+      "11": 1,
+      "-3": 41,
+      "8": 2,
+      "18": 1,
+      "10": 2,
+      "16": 1,
+      "17": 1,
+      "-1;0": 21,
+      "-2;0": 7,
+      "12": 3,
+      "0;-1;-2": 1,
+      "-3;-2;-1;0": 1,
+      "-3;-2;0": 1,
+      "-2;-1": 9,
+      "0;-1": 1,
+      "-4": 3,
+      "-2--0": 10,
+      "-3--1": 2,
+      "-1-4": 2,
+      "-2--1": 20,
+      "-1-0": 5,
+      "-2-0": 3
+    },
+    "highway": {
+      "bus_stop": 35,
+      "street_lamp": 1,
+      "elevator": 22,
+      "trunk_link": 1,
+      "footway": 21,
+      "corridor": 82,
+      "steps": 93,
+      "pedestrian": 6
+    },
+    "railway": {
+      "stop": 8,
+      "subway_entrance": 44,
+      "milestone": 1,
+      "rail": 12,
+      "platform": 8,
+      "subway": 3
+    },
+    "wheelchair": {
+      "limited": 8,
+      "yes": 74,
+      "no": 41,
+      "designated": 3
+    },
+    "conveying": {
+      "reversible": 4,
+      "yes": 16,
+      "no": 7
+    },
+    "access": {
+      "yes": 40,
+      "no": 3,
+      "permissive": 2,
+      "private": 1,
+      "permit": 1
+    }
+  },
+  "limitations": [
+    "BBox includes other buildings; not all records belong to the station.",
+    "Preserve raw level tags; no automatic B1/B2 mapping, routing, connectivity, or accessibility certification.",
+    "Ways are candidate geometry; relations are preserved only in raw OSM JSON.",
+    "No field verification or provenance approval has been performed."
+  ]
+}

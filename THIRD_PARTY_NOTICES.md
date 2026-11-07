@@ -15,7 +15,7 @@
 
 ## 實際依賴與素材登錄
 
-目前 repository 只有規格、文件、授權及既有部署設定，尚無可據以產生完整產品依賴清單的前端 package／lockfile。實作時每項新增依賴或素材必須補上：
+目前 repository 已包含研究資料及 Python standard library 處理工具，尚無可據以產生完整產品依賴清單的前端 package／lockfile。實作時每項新增依賴或素材必須補上：
 
 - 名稱、版本、檔案或 package 路徑、上游來源與實際提供者。
 - SPDX 授權或條款連結、應保留的 Copyright／NOTICE。
@@ -26,3 +26,11 @@
 MIT、常見 BSD-2-Clause／BSD-3-Clause、Apache-2.0 可作優先候選，但仍須保留適用通知及個別義務；「BSD」不能一概包含不相容的舊變體。「僅供個人使用」「不得再散布」、來源不明或不能符合交付權利者不得納入正式版本。
 
 授權相容不等於符合來源限制。即使為 MIT，仍須遵守使用者「不得使用中國相關資源」的要求。
+
+## 2026-11-07 研究資料副本
+
+- `data/raw/` 收錄 10 份直接取自 `data.taipei` 的官方 CSV，提供者為臺北捷運公司與臺北市政府環境保護局。已逐項核對官方 metadata 的 `license_name` 為「依政府資料開放授權條款-第1版」，並核對平台條款；來源、取得時間、hash、審查範圍及顯名見 [data/ATTRIBUTION.md](./data/ATTRIBUTION.md) 與 [data/manifest.json](./data/manifest.json)。
+- `data/processed/` 是上述 CSV 的編碼整理、北車／周邊篩選及候選點位，保留資料授權與來源，不改標 AGPL。這些是研究副本，並非完成現地驗證的導航資產。
+- 地圖、站圖照片與 OSM 原始幾何沒有納入本次資料副本；`data/maps/` 只含連結，`data/queries/` 只含查詢文字與研究統計。日後選用另行核對來源、權利及資料授權。
+- `tools/data/` 為本專案原創處理程式，依根目錄 `AGPL-3.0-or-later` 聲明；僅使用 Python standard library，未加入第三方套件或任何服務憑證。
+- 研究副本獲准納入版本管理不代表產品 release gate 通過；`product_release_approved`／`release_approved` 仍為 false。

@@ -1,0 +1,1 @@
+[out:json][timeout:25];(nwr["indoor"](25.043,121.510,25.051,121.522);nwr["level"](25.043,121.510,25.051,121.522);nwr["railway"="subway_entrance"](25.043,121.510,25.051,121.522);nwr["highway"="elevator"](25.043,121.510,25.051,121.522););out body geom;
