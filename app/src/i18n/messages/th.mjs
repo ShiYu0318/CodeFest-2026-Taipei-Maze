@@ -131,6 +131,15 @@ export default {
     "ตำแหน่งมาจากลิงก์ โปรดตรวจสอบว่าคุณอยู่ที่ไหน นี่ไม่ใช่การติดตามแบบเรียลไทม์",
   "scan.waiting": "กำลังรอผลการสแกน…",
   "scan.rescan": "สแกนอีกครั้ง",
+  "transfer.goTo": "ใช้{kind}ไปยัง {floor}",
+  "transfer.checkFloor": "เมื่อถึงแล้ว ตรวจสอบป้ายชั้นก่อนกดยืนยัน",
+  "transfer.checkDirection": "ตรวจสอบทิศทางบันไดเลื่อนจากป้ายก่อนใช้งาน",
+  "transfer.confirmUp": "ฉันขึ้นชั้นแล้ว",
+  "transfer.confirmDown": "ฉันลงชั้นแล้ว",
+  "transfer.manualFloor":
+    "คุณยืนยันว่าถึง {floor} แล้ว (ยืนยันด้วยตนเอง สแกน QR เพื่ออัปเดตตำแหน่งได้)",
+  "transfer.previousLocation": "ตำแหน่งก่อนหน้า: {place}",
+  "transfer.manualPositionBadge": "ตำแหน่งที่ยืนยันด้วยตนเอง",
   "scan.relocateHint":
     "หลงทางหรือไม่แน่ใจ? สแกน QR ใกล้ตัวเพื่ออัปเดตตำแหน่ง โดยจุดหมายยังคงเดิม",
   "scan.scan": "สแกนตำแหน่ง",

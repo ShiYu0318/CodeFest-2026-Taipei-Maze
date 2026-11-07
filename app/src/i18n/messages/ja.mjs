@@ -137,6 +137,16 @@ export default {
     "リンクから位置を読み込みました。今いる場所を確認してください。リアルタイム追跡ではありません。",
   "scan.waiting": "読み取り結果を待っています…",
   "scan.rescan": "もう一度読み取る",
+  "transfer.goTo": "{kind}で {floor} へ",
+  "transfer.checkFloor": "到着したら現地の階表示を確認して押してください。",
+  "transfer.checkDirection":
+    "先に案内表示でエスカレーターの進行方向を確認してください。",
+  "transfer.confirmUp": "上の階に到着しました",
+  "transfer.confirmDown": "下の階に到着しました",
+  "transfer.manualFloor":
+    "{floor} への到着を手動で確認しました。QRを読み取ると位置を更新できます。",
+  "transfer.previousLocation": "以前の位置：{place}",
+  "transfer.manualPositionBadge": "手動で確認した位置",
   "scan.relocateHint":
     "道に迷ったり不安なときは、近くのQRを読み取って位置を更新できます。目的地はそのままです。",
   "scan.scan": "位置を読み取る",

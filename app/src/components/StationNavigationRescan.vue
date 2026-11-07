@@ -1,7 +1,12 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
   <section class="navigation-rescan-bar" :aria-label="t('scan.rescan')">
-    <p class="navigation-rescan-hint">{{ t("scan.relocateHint") }}</p>
+    <div class="navigation-guidance-scroll">
+      <StationTransferStep :location="location" />
+      <p class="navigation-rescan-hint">{{ t("scan.relocateHint") }}</p>
+      <p v-if="!view.available">{{ t("scan.needApp") }}</p>
+      <p v-if="view.noticeKey" role="status">{{ t(view.noticeKey) }}</p>
+    </div>
     <button
       type="button"
       data-tour-target="scan"
@@ -12,14 +17,13 @@
       <StationMapIcon name="qrcode" />
       {{ view.active ? t("scan.waiting") : t("scan.rescan") }}
     </button>
-    <p v-if="!view.available">{{ t("scan.needApp") }}</p>
-    <p v-if="view.noticeKey" role="status">{{ t(view.noticeKey) }}</p>
   </section>
 </template>
 <script setup>
 /* global defineProps, defineEmits */
 import { computed } from "vue";
 import StationMapIcon from "./StationMapIcon.vue";
+import StationTransferStep from "./StationTransferStep.vue";
 import { useI18n } from "../i18n/index.mjs";
 const props = defineProps({ location: { type: Object, required: true } });
 const emit = defineEmits(["scanned"]);
@@ -32,6 +36,8 @@ async function scan() {
 </script>
 <style scoped>
 .navigation-rescan-bar {
+  display: flex;
+  flex-direction: column;
   position: fixed;
   left: max(16px, env(safe-area-inset-left));
   right: max(16px, env(safe-area-inset-right));
@@ -40,7 +46,6 @@ async function scan() {
   max-width: 640px;
   max-height: 40vh;
   max-height: 40dvh;
-  overflow: auto;
   margin: 0 auto;
   padding: 12px;
   border: 1px solid var(--border);
@@ -50,11 +55,16 @@ async function scan() {
   font: var(--display-main-size, 15px) / 1.5 var(--tp-font);
   box-shadow: 0 4px 24px rgb(0 0 0 / 16%);
 }
+.navigation-guidance-scroll {
+  min-height: 0;
+  overflow: auto;
+}
 .navigation-rescan-bar p {
   font-size: var(--display-secondary-size, 13px);
   line-height: 1.5;
 }
 .navigation-rescan-bar button {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;

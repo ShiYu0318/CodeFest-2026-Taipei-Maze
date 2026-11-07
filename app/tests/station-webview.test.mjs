@@ -136,6 +136,19 @@ for (const { readyEvent, query = {} } of [
       assert.ok(location.view.value.position.confirmedAt);
       assert.equal(button.disabled, false);
       if (query.destination) {
+        const qrPosition = location.view.value.position;
+        const originalQuery = { ...router.currentRoute.value.query };
+        const transferToken = location.view.value.transfer.token;
+        assert.equal(location.confirmTransfer(transferToken).type, "success");
+        await nextTick();
+        assert.equal(location.view.value.navigationPosition.floor, "B2");
+        assert.equal(
+          location.view.value.manualPosition.source,
+          "manual_transfer"
+        );
+        assert.deepEqual(location.view.value.position, qrPosition);
+        assert.deepEqual(router.currentRoute.value.query, originalQuery);
+        assert.equal(location.confirmTransfer(transferToken), false);
         const before = { ...router.currentRoute.value.query };
         for (const payload of [null, "wrong QR"]) {
           const rescan = button.onClick();
@@ -156,6 +169,7 @@ for (const { readyEvent, query = {} } of [
         );
         assert.equal(location.view.value.destinationId, query.destination);
         assert.equal(location.view.value.stepFree, true);
+        assert.equal(location.view.value.manualPosition, null);
       }
       const stale = button.onClick();
       await router.push("/other");

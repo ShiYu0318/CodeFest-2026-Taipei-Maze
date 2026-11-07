@@ -60,6 +60,7 @@ export function useStationLocation(data, connections) {
     searchSelect: (selection) => controller.searchSelect(selection),
     setStepFree: (value) => controller.setStepFree(value),
     markUnavailable: (id) => controller.markUnavailable(id),
+    confirmTransfer: (token) => controller.confirmTransfer(token),
     confirmArrival: (token) => controller.confirmArrival(token),
     reset: () => controller.reset(),
   };

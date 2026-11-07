@@ -36,13 +36,14 @@ export function createStationScanSession(data, graph) {
   const state = {
     destinationId: null,
     position: null,
+    manualPosition: null,
     stepFree: false,
     excludedEdgeTypes: [],
     unavailableConnectorIds: [],
     arrived: false,
   };
   function overview() {
-    const origin = byId.get(state.position?.pointId),
+    const origin = byId.get((state.manualPosition ?? state.position)?.pointId),
       target = byId.get(state.destinationId);
     if (!target || !origin) return { status: "waiting", steps: [] };
     if (origin.id === target.id) return { status: "at_destination", steps: [] };
@@ -96,13 +97,39 @@ export function createStationScanSession(data, graph) {
     }
     return { status: "unavailable", steps: [] };
   }
+  function currentTransfer(relation) {
+    if (relation.status !== "connections") return null;
+    const edge = relation.steps[0];
+    if (
+      !edge ||
+      ![
+        "elevator",
+        "escalator",
+        "stairs",
+        "stairs-escalator",
+        "stairway",
+      ].includes(edge.type)
+    )
+      return null;
+    const from = /^B(\d+)$/.exec(edge.from.floor);
+    const to = /^B(\d+)$/.exec(edge.to.floor);
+    if (!from || !to || Number(from[1]) === Number(to[1])) return null;
+    return {
+      ...edge,
+      movement: Number(to[1]) < Number(from[1]) ? "up" : "down",
+      token: `station:${revision}:transfer:${edge.id}:${edge.from.pointId}:${edge.to.pointId}`,
+    };
+  }
   return {
     snapshot() {
+      const relation = overview();
       return JSON.parse(
         JSON.stringify({
           ...state,
+          navigationPosition: state.manualPosition ?? state.position,
           token: `station:${revision}`,
-          relation: overview(),
+          relation,
+          transfer: currentTransfer(relation),
         })
       );
     },
@@ -156,15 +183,32 @@ export function createStationScanSession(data, graph) {
         source,
         confirmedAt: source === "qr" ? new Date().toISOString() : null,
       };
+      state.manualPosition = null;
       state.arrived = false;
       revision++;
       return { type: "success", point };
+    },
+    confirmTransfer(token) {
+      const step = currentTransfer(overview());
+      if (!step || token !== step.token || state.arrived) return false;
+      const point = byId.get(step.to.pointId);
+      state.manualPosition = {
+        pointId: point.id,
+        floor: point.floor,
+        source: "manual_transfer",
+        confirmedAt: new Date().toISOString(),
+        transferId: step.id,
+      };
+      state.arrived = false;
+      revision++;
+      return { type: "success", point, movement: step.movement };
     },
     confirmArrival(token) {
       if (
         token !== `station:${revision}` ||
         !state.destinationId ||
-        state.position?.pointId !== state.destinationId ||
+        (state.manualPosition ?? state.position)?.pointId !==
+          state.destinationId ||
         state.arrived
       )
         return false;
@@ -175,6 +219,7 @@ export function createStationScanSession(data, graph) {
     reset() {
       state.destinationId = null;
       state.position = null;
+      state.manualPosition = null;
       state.arrived = false;
       state.unavailableConnectorIds = [];
       state.excludedEdgeTypes = [];

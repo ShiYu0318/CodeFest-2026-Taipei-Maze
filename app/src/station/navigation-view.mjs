@@ -4,7 +4,8 @@ export function navigationMapState(
   session,
   { startId = null, targetId = null, picking = false } = {}
 ) {
-  const origin = session.position?.pointId ?? startId;
+  const origin =
+    (session.navigationPosition ?? session.position)?.pointId ?? startId;
   const destination = session.destinationId ?? targetId;
   const active = !!origin && !!destination && !picking;
   const ids = new Set([origin, destination].filter(Boolean));

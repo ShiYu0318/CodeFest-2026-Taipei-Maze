@@ -136,6 +136,16 @@ export default {
     "링크로 위치를 불러왔습니다. 현재 위치를 확인하세요. 실시간 추적이 아닙니다.",
   "scan.waiting": "스캔 결과를 기다리는 중…",
   "scan.rescan": "다시 스캔",
+  "transfer.goTo": "{kind} 이용 → {floor}",
+  "transfer.checkFloor": "도착하면 층 안내를 확인한 뒤 눌러 주세요.",
+  "transfer.checkDirection":
+    "먼저 표지판에서 에스컬레이터 진행 방향을 확인하세요.",
+  "transfer.confirmUp": "위층에 도착했어요",
+  "transfer.confirmDown": "아래층에 도착했어요",
+  "transfer.manualFloor":
+    "{floor} 도착을 직접 확인했습니다. QR을 스캔하면 위치를 갱신할 수 있어요.",
+  "transfer.previousLocation": "이전 위치: {place}",
+  "transfer.manualPositionBadge": "직접 확인한 위치",
   "scan.relocateHint":
     "길을 잃었거나 잘 모르겠나요? 가까운 QR을 스캔하면 목적지를 유지하며 위치를 갱신합니다.",
   "scan.scan": "위치 스캔",
