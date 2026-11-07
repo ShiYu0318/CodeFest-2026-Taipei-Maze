@@ -129,6 +129,7 @@ export function validateGraph(graph) {
     if (!["stairs", "elevator", "escalator"].includes(connector.type))
       fail(`${connector.id}: invalid connector type`);
   }
+  if (errors.length) return errors;
   for (const edge of graph.edges) {
     const from = maps.nodes.get(edge.from_node_id),
       to = maps.nodes.get(edge.to_node_id);
@@ -232,10 +233,12 @@ export function validateGraph(graph) {
     refs("edges", anchor.departure_edge_ids, anchor.id);
     if (typeof anchor.enabled !== "boolean")
       fail(`${anchor.id}: invalid enabled`);
+    if (!Array.isArray(anchor.departure_edge_ids)) continue;
     for (const id of anchor.departure_edge_ids ?? [])
       if (maps.edges.get(id)?.from_node_id !== anchor.node_id)
         fail(`${anchor.id}: departure mismatch`);
   }
+  if (errors.length) return errors;
   const contexts = new Set();
   for (const guide of graph.orientation_guides) {
     verified(guide);

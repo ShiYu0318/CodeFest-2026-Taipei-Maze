@@ -139,3 +139,17 @@ test("rejects malformed graphs before routing, including finite values and floor
   for (const graph of [null, {}, { nodes: null }])
     assert.equal(planRoute(graph, request()).type, "InvalidGraph");
 });
+
+test("malformed nested arrays never throw at the graph boundary", () => {
+  for (const mutate of [
+    (g) => (g.connectors[0].landing_node_ids = 42),
+    (g) => (g.qr_anchors[0].departure_edge_ids = 42),
+    (g) => (g.nodes[0].landmark_ids = null),
+    (g) => (g.floors[0].view_box = null),
+  ]) {
+    const graph = fixture();
+    mutate(graph);
+    assert.doesNotThrow(() => validateGraph(graph));
+    assert.equal(planRoute(graph, request()).type, "InvalidGraph");
+  }
+});
