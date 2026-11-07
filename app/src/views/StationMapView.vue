@@ -63,22 +63,23 @@
       <div class="station-layout">
         <div class="station-map-column">
           <section ref="mapSection" class="map-card" aria-label="車站地圖">
-            <div v-if="originView" class="map-return-bar">
-              <button
-                type="button"
-                class="map-return"
-                :disabled="floorChanging"
-                @click="returnToOrigin"
-              >
-                回到起點・{{ originView.floor }}
-              </button>
-            </div>
             <div class="map-stage" @keydown.esc="closeConnectorDetails">
-              <div class="compass" aria-label="北方朝上略偏左" role="img">
-                <span>N</span>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 3 20 21l-8-4-8 4Z" />
-                </svg>
+              <div class="map-corner">
+                <div class="compass" aria-label="北方朝上略偏左" role="img">
+                  <span>N</span>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 3 20 21l-8-4-8 4Z" />
+                  </svg>
+                </div>
+                <button
+                  v-if="originView"
+                  type="button"
+                  class="map-return"
+                  :disabled="floorChanging"
+                  @click="returnToOrigin"
+                >
+                  回到起點・{{ originView.floor }}
+                </button>
               </div>
               <div class="map-window" :inert="floorChanging ? '' : null">
                 <div
@@ -171,19 +172,9 @@
                 :style="connectorPosition || { visibility: 'hidden' }"
                 aria-labelledby="connector-title"
               >
-                <div class="connector-heading">
-                  <h3 id="connector-title" ref="connectorHeading" tabindex="-1">
-                    {{ selected.name }}
-                  </h3>
-                  <button
-                    type="button"
-                    class="connector-close"
-                    aria-label="關閉樓層選擇"
-                    @click="closeConnectorDetails"
-                  >
-                    ×
-                  </button>
-                </div>
+                <h3 id="connector-title" ref="connectorHeading" tabindex="-1">
+                  {{ selected.name }}
+                </h3>
                 <template v-if="destinations.length">
                   <div v-for="transfer in destinations" :key="transfer.id">
                     <button
@@ -337,6 +328,7 @@ watch([selected, zoom, showLayers, floorChanging], placeConnectorPanel, {
 
 onMounted(() => {
   window.addEventListener("resize", placeConnectorPanel);
+  document.addEventListener("click", dismissConnectorOutside, true);
   document.addEventListener("touchstart", startPinch, captureGesture);
   document.addEventListener("touchend", endPinch, captureGesture);
   document.addEventListener("touchcancel", endPinch, captureGesture);
@@ -347,6 +339,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", placeConnectorPanel);
+  document.removeEventListener("click", dismissConnectorOutside, true);
   floorAnimation?.cancel();
   clearMapDrag();
   clearPinch();
@@ -906,6 +899,17 @@ function closeConnectorDetails() {
   const trigger = viewport.value.querySelector('.map-pin[aria-pressed="true"]');
   selected.value = null;
   trigger?.focus({ preventScroll: true });
+}
+
+function dismissConnectorOutside(event) {
+  const panel = connectorPanel.value;
+  if (!panel || panel.contains(event.target)) return;
+  if (viewport.value.contains(event.target)) {
+    // Marker clicks handle selection, and a click following a drag is ignored.
+    const dragClick = ignoreMouseClick && event.detail !== 0;
+    if (event.target.closest?.(".map-pin") || dragClick) return;
+  }
+  selected.value = null;
 }
 
 function viewportCenter() {
