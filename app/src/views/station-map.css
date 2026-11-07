@@ -108,46 +108,62 @@
   font-weight: 800;
   letter-spacing: 0.13em;
 }
-/* Toolbar: on phones always two even rows — language and mode first, then
-   the four icon actions — so large child/senior controls never leave a
-   lonely button on a third line. Wide screens keep one row. */
+/* Toolbar: always one row. It is app chrome, so controls stay 44px in
+   every display mode (child/senior enlarge the content, not the toolbar);
+   the mode menu takes the remaining width and truncates long names. */
 .station-title-row {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
+  display: flex;
+  flex-wrap: nowrap;
   align-items: center;
+  gap: 6px;
   min-height: 44px;
+  --toolbar-control: 44px;
 }
 .station-title-row .display-controls,
 .station-utility-actions {
   display: contents;
 }
+.station-title-row :deep(.display-language),
+.station-title-row :deep(.display-icon-button),
+.station-title-row :deep(.display-mode-label select) {
+  height: var(--toolbar-control);
+  min-height: var(--toolbar-control);
+  font-size: 0.875rem;
+}
 .station-title-row :deep(.display-language) {
-  grid-column: span 1;
-  width: 100%;
-  min-width: 0;
+  flex: none;
+  min-width: var(--toolbar-control);
+  padding: 0 8px;
+}
+.station-title-row :deep(.display-icon-button) {
+  flex: none;
+  width: var(--toolbar-control);
+}
+.station-title-row :deep(.display-icon-button > svg) {
+  width: 22px;
+  height: 22px;
 }
 .station-title-row :deep(.display-mode-label) {
-  grid-column: span 3;
-  min-width: 0;
+  flex: 1 1 auto;
+  min-width: 56px;
 }
 .station-title-row :deep(.display-mode-label select) {
   width: 100%;
-  max-width: none;
+  min-width: 0;
+  max-width: 14em;
+  padding: 0 22px 0 8px;
+  background-position: calc(100% - 13px) 52%, calc(100% - 8px) 52%;
 }
-.station-title-row :deep(.display-icon-button) {
-  width: 100%;
-}
-@media (min-width: 560px) {
+/* Narrow phones: the language code alone ("VI", "中") is enough. */
+@media (max-width: 399px) {
   .station-title-row {
-    grid-template-columns: auto minmax(8em, 14em) repeat(4, auto);
-    justify-content: start;
+    gap: 4px;
   }
-  .station-title-row :deep(.display-mode-label) {
-    grid-column: auto;
+  .station-title-row :deep(.display-language > svg) {
+    display: none;
   }
-  .station-title-row :deep(.display-icon-button) {
-    width: var(--display-control-height);
+  .station-title-row :deep(.display-language) {
+    padding: 0 6px;
   }
 }
 .station-heading h1 {
