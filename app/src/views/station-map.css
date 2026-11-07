@@ -340,7 +340,11 @@
 }
 .map-viewport {
   position: relative;
-  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: calc(100vh - 10rem);
+  min-height: calc(100svh - 10rem);
   aspect-ratio: var(--map-aspect);
   overflow: hidden;
   overflow: clip;
@@ -359,6 +363,9 @@
 }
 .map-board {
   position: relative;
+  flex: none;
+  width: calc(100% * var(--map-zoom));
+  margin-block: auto;
   aspect-ratio: var(--map-aspect);
   user-select: none;
 }
@@ -725,6 +732,31 @@
   }
 }
 
+@media (max-width: 719px) {
+  .map-viewport {
+    --map-height: max(
+      10rem,
+      calc(var(--map-screen-height, 100vh) - var(--map-top) - 20px)
+    );
+    min-height: 0;
+    height: var(--map-height);
+  }
+  @supports (height: 100svh) {
+    .map-viewport {
+      --map-screen-height: 100svh;
+    }
+  }
+  .map-board {
+    max-width: calc(
+      (var(--map-height) - 2px) * (var(--map-aspect)) * var(--map-zoom)
+    );
+    margin-inline: auto;
+  }
+  .map-tools {
+    padding-top: 20px;
+  }
+}
+
 @media (min-width: 720px) {
   .station-page {
     padding-inline: 24px;
@@ -750,10 +782,6 @@
 }
 
 @media (min-width: 920px) {
-  .station-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(290px, 0.43fr);
-    gap: 16px;
-  }
   .facility-card {
     padding-inline: 16px;
   }
