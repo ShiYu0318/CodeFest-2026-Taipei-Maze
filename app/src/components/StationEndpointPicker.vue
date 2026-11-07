@@ -1,6 +1,11 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
-  <div class="endpoint-backdrop" @click.self="emit('close')">
+  <div
+    class="endpoint-backdrop"
+    @click.self="emit('close')"
+    @touchmove.prevent
+    @wheel.prevent
+  >
     <section
       ref="panel"
       class="endpoint-dialog"
@@ -46,6 +51,8 @@
         ref="list"
         class="endpoint-list"
         :aria-label="labels[activeRole] + '標點'"
+        @touchmove.stop
+        @wheel.stop
       >
         <section v-for="(floorPoints, floor) in points" :key="floor">
           <h3>{{ floor }}</h3>
@@ -253,5 +260,15 @@ function keepFocus(event) {
   border-color: var(--tp-primary-500);
   background: var(--wash);
   font-weight: 700;
+}
+@media (max-height: 420px) {
+  .endpoint-dialog {
+    height: calc(100vh - 24px);
+    height: calc(100svh - 24px);
+  }
+  .endpoint-dialog header,
+  .endpoint-dialog footer {
+    padding-block: 4px;
+  }
 }
 </style>
