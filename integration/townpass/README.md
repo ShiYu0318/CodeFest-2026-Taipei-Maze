@@ -1,5 +1,23 @@
 # TownPass 本地測試整合
 
+## 從 TownPass 首頁掃碼開啟地圖
+
+`qr-entry.patch` 在首頁右上角加入「掃描 QR Code」，呼叫既有原生掃描器。掃到現有 Codefest 定位 JSON 後，宿主驗證場域、版本及本地點位白名單，再開啟 `/station-map?point=<id>&v=1`。既有 89 張 QR 不需更換。相片掃碼也走相同結果處理；取消回首頁，未知／其他 QR 顯示提示。網頁呼叫 `qr_code_scan` 仍只收到原始文字，不會另開地圖或清掉原行程。
+
+此 patch 可獨立套用上游基準，也可在 `test-env.patch` 之後套用。請先檢查宿主工作目錄並保護現有修改；不要把整份舊測試環境 patch 強套進已自訂的宿主。
+
+```bash
+git -C ../TownPass apply --check "$PWD/integration/townpass/qr-entry.patch"
+git -C ../TownPass apply "$PWD/integration/townpass/qr-entry.patch"
+python3 tools/generate-townpass-qr-catalog.py --check ../TownPass
+```
+
+預設開啟目前部署站 `http://home.yoyo899843.com:8000/station-map`；可用 Flutter `--dart-define=CODEFEST_MAP_URL=https://<部署站>/station-map` 指定受信任的部署入口。QR 本身不能指定 URL、座標、樓層或額外參數。透過網址進入時沿用網頁既有 `source=url`、無掃碼時間的標示，不假造 WebView 內的 QR 回覆。
+
+此變更在 Flutter 宿主，**需要重新建置並安裝 TownPass**，只更新網站不會讓現有官方 App 多出首頁入口。Android／iOS 真機相機、相簿、取消與返回驗收仍待執行。原生點位清單由 `app/src/views/station-points.json` 產生；新增／停用點位後執行 `python3 tools/generate-townpass-qr-catalog.py ../TownPass` 並更新 patch，CI 會檢查兩邊一致。
+
+## 既有測試宿主
+
 宿主獨立放在相鄰 `../TownPass` checkout，不將它的 `.git`、SDK、pub cache 或 build 產物加入本 repo。基準上游 commit 為 `c8e5d4d3f8f699f3d9d6cd68e129ed4da12037b3`，本地分支 `work/codefest-test-env`。
 
 目前宿主的「CodeFest 測試環境」入口指向 `http://127.0.0.1:8082/station-map`。先在 `app/` 執行 `npm run serve -- --host 127.0.0.1 --port 8082`，再開啟 App 服務。Vue 變更由開發伺服器提供更新；WebView 未更新時退出服務再進入，HMR 在 App 內仍待人工驗證。
