@@ -84,7 +84,7 @@ export default {
   "scan.easyRead": "簡明模式",
   "scan.caveat":
     "定位碼尚未現地布設；目前提供設施與樓層關係，完整步行路網待補。",
-  "scan.browseHint": "掃描點位 QR，進入導航模式並顯示「您在這裡」。",
+  "scan.browseHint": "掃描附近的定位 QR，就能知道你在哪裡。",
   "scan.chooseDestination": "選擇目的地",
   "scan.choosePlaceholder": "請選擇要去的設施",
   "scan.useSelected": "將地圖上選取的「{name}」設為終點",

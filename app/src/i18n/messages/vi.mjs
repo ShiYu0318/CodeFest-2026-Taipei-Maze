@@ -94,8 +94,7 @@ export default {
   "scan.easyRead": "Dễ đọc",
   "scan.caveat":
     "Mã định vị chưa được lắp đặt trong ga. Hiện chỉ có tiện ích và lối nối giữa các tầng; mạng lưới đường đi bộ đầy đủ vẫn chưa có.",
-  "scan.browseHint":
-    "Quét mã QR định vị để bắt đầu chỉ đường và hiện “Bạn đang ở đây”.",
+  "scan.browseHint": "Quét mã QR định vị gần bạn để biết bạn đang ở đâu.",
   "scan.chooseDestination": "Chọn điểm đến",
   "scan.choosePlaceholder": "Bạn muốn đi đâu?",
   "scan.useSelected": "Đặt “{name}” đã chọn trên bản đồ làm điểm đến",

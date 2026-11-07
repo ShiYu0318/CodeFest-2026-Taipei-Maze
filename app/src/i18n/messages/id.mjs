@@ -93,8 +93,7 @@ export default {
   "scan.easyRead": "Mudah dibaca",
   "scan.caveat":
     "Kode lokasi belum dipasang di stasiun. Saat ini hanya ada fasilitas dan penghubung antarlantai; jaringan jalan kaki lengkap belum tersedia.",
-  "scan.browseHint":
-    "Pindai kode QR lokasi untuk memulai navigasi dan menampilkan “Anda di sini”.",
+  "scan.browseHint": "Pindai kode QR lokasi terdekat untuk tahu posisi Anda.",
   "scan.chooseDestination": "Pilih tujuan",
   "scan.choosePlaceholder": "Mau ke mana?",
   "scan.useSelected": "Jadikan “{name}” yang dipilih di peta sebagai tujuan",

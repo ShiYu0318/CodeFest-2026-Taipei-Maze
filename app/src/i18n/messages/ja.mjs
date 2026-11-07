@@ -92,8 +92,7 @@ export default {
   "scan.easyRead": "やさしい表示",
   "scan.caveat":
     "位置コードはまだ駅に設置されていません。今は設備と階のつながりだけを表示しており、歩行ネットワークは未整備です。",
-  "scan.browseHint":
-    "位置QRコードを読み取るとナビが始まり、「現在地」が表示されます。",
+  "scan.browseHint": "近くの位置QRコードを読み取ると、今いる場所がわかります。",
   "scan.chooseDestination": "目的地を選ぶ",
   "scan.choosePlaceholder": "どこへ行きますか？",
   "scan.useSelected": "地図で選んだ「{name}」を目的地にする",

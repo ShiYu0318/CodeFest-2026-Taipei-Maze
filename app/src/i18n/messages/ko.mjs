@@ -93,8 +93,7 @@ export default {
   "scan.easyRead": "쉬운 글",
   "scan.caveat":
     "위치 코드는 아직 역에 설치되지 않았습니다. 지금은 편의시설과 층간 연결만 보여 주며, 전체 보행 경로망은 아직 없습니다.",
-  "scan.browseHint":
-    "위치 QR 코드를 스캔하면 길 안내가 시작되고 “현재 위치”가 표시됩니다.",
+  "scan.browseHint": "가까운 위치 QR 코드를 스캔하면 지금 위치를 알 수 있어요.",
   "scan.chooseDestination": "목적지 선택",
   "scan.choosePlaceholder": "어디로 가시나요?",
   "scan.useSelected": "지도에서 선택한 “{name}”을(를) 목적지로 설정",

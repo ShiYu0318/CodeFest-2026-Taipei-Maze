@@ -94,8 +94,7 @@ export default {
   "scan.easyRead": "Easy read",
   "scan.caveat":
     "Location codes are not installed in the station yet. For now we show facilities and floor links; a full walking network is still missing.",
-  "scan.browseHint":
-    "Scan a location QR code to start navigation and show “You are here”.",
+  "scan.browseHint": "Scan a nearby location QR code to see where you are.",
   "scan.chooseDestination": "Choose a destination",
   "scan.choosePlaceholder": "Where do you want to go?",
   "scan.useSelected": "Set “{name}” selected on the map as the destination",

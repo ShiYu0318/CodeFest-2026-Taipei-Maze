@@ -98,7 +98,7 @@
       :step-free="view.stepFree"
       @close="closeStaffCard"
     />
-    <p role="status">
+    <p v-if="position || view.mode !== 'browsing'" role="status">
       {{
         position
           ? t("scan.youAreHere", { place: place(position) })
