@@ -119,3 +119,42 @@ test("prompt names the reply language and carries app facts within the byte budg
   assert.ok(new TextEncoder().encode(long).length <= 3500);
   assert.match(long, /ไทย/);
 });
+
+test("partial replies stream to the caller and keep a busy request alive", async () => {
+  const h = host(),
+    b = createChatBridge(h, { idFactory, timeoutMs: 40 });
+  const parts = [];
+  const p = b.request(
+    "generate",
+    { prompt: "hi" },
+    { onPartial: (text) => parts.push(text) }
+  );
+  const id = h.sent.at(-1).data.requestId;
+  for (const text of ["Hel", "lo ", "there"]) {
+    await new Promise((r) => setTimeout(r, 25));
+    h.reply({ requestId: id, status: "partial", text });
+  }
+  h.reply({ requestId: id, status: "success", text: "Hello there" });
+  const result = await p;
+  assert.equal(result.status, "success");
+  assert.deepEqual(parts, ["Hel", "lo ", "there"]);
+  b.dispose();
+});
+
+test("partials after cancel are ignored and oversized streams are cut off", async () => {
+  const h = host(),
+    b = createChatBridge(h, { idFactory });
+  const parts = [];
+  const p = b.request(
+    "generate",
+    { prompt: "hi" },
+    { onPartial: (t) => parts.push(t) }
+  );
+  const id = h.sent.at(-1).data.requestId;
+  h.reply({ requestId: id, status: "partial", text: "x".repeat(7000) });
+  h.reply({ requestId: id, status: "partial", text: "x".repeat(7000) });
+  assert.equal((await p).code, "invalid_reply");
+  h.reply({ requestId: id, status: "partial", text: "late" });
+  assert.equal(parts.length, 1);
+  b.dispose();
+});
