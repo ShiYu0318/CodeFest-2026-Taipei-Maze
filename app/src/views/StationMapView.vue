@@ -184,10 +184,13 @@
                       @focus="focusVisiblePin(point, $event)"
                     >
                       <span v-if="point.id === selected?.id" class="pin-icon">
-                        <StationMapIcon :name="point.type" />
+                        <StationMapIcon :name="pointIconType(point)" />
                       </span>
                       <span v-else class="point-pin">
-                        <StationMapIcon class="point-icon" :name="point.type" />
+                        <StationMapIcon
+                          class="point-icon"
+                          :name="pointIconType(point)"
+                        />
                       </span>
                     </button>
                   </div>
@@ -206,7 +209,7 @@
                   <ZhuyinText :text="selected.name" />
                 </h3>
                 <p v-if="displayMode === 'child'" class="display-hint">
-                  <ZhuyinText :text="facilityHelp[selected.type]" />
+                  <ZhuyinText :text="facilityHelp[pointHelpType(selected)]" />
                 </p>
                 <template v-if="destinations.length">
                   <div v-for="transfer in destinations" :key="transfer.id">
@@ -238,7 +241,7 @@
             >
               <h3><ZhuyinText :text="selected.name" /></h3>
               <p v-if="displayMode === 'child'" class="display-hint">
-                <ZhuyinText :text="facilityHelp[selected.type]" />
+                <ZhuyinText :text="facilityHelp[pointHelpType(selected)]" />
               </p>
               <p><ZhuyinText :text="selected.description" /></p>
             </div>
@@ -490,7 +493,22 @@ const sources = computed(() => [
 ]);
 
 function isConnector(point) {
-  return connectorTypes.has(point?.type);
+  return pointTypes(point).some((type) => connectorTypes.has(type));
+}
+
+function pointTypes(point) {
+  return Array.isArray(point?.type) ? point.type : [point?.type];
+}
+
+function pointIconType(point) {
+  return pointTypes(point)[0];
+}
+
+function pointHelpType(point) {
+  const types = pointTypes(point);
+  return types.includes("stairs") && types.includes("escalator")
+    ? "stairs-escalator"
+    : pointIconType(point);
 }
 
 function zoneName(id) {
@@ -519,9 +537,10 @@ function scrollThemesWithWheel(event) {
 }
 
 function matchesTheme(point, type) {
+  const types = pointTypes(point);
   return (
-    point.type === type ||
-    (point.type === "stairs-escalator" &&
+    types.includes(type) ||
+    (types.includes("stairs-escalator") &&
       (type === "stairs" || type === "escalator"))
   );
 }
@@ -569,7 +588,8 @@ function pinStyle(point) {
 }
 
 function pointThemeStyle(type) {
-  const category = categories[type];
+  const primaryType = Array.isArray(type) ? type[0] : type;
+  const category = categories[primaryType];
   const colorToken = category?.colorToken || "gray-700";
   const iconColor = category?.iconColor;
   return {

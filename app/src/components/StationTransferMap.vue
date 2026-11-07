@@ -18,12 +18,12 @@
         :style="markerStyle(marker.stop.point)"
         aria-hidden="true"
       >
-        <StationMapIcon :name="marker.stop.point.type" />
+        <StationMapIcon :name="markerIconType(marker.stop.point)" />
       </span>
     </div>
     <ul class="landing-list">
       <li v-for="marker in markers" :key="marker.stop.pointId">
-        <StationMapIcon :name="marker.stop.point.type" />
+        <StationMapIcon :name="markerIconType(marker.stop.point)" />
         <span
           ><strong>{{ marker.label }}</strong>
           {{ marker.stop.point.name }}</span
@@ -53,6 +53,9 @@ export default {
     },
   },
   methods: {
+    markerIconType(point) {
+      return Array.isArray(point.type) ? point.type[0] : point.type;
+    },
     markerStyle(point) {
       const [left, top, width, height] = this.bounds;
       return {

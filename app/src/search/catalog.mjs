@@ -5,7 +5,7 @@ export function stationCatalog(data) {
     points.map((point) => ({
       id: point.id,
       name: point.name,
-      category: point.type,
+      category: Array.isArray(point.type) ? point.type[0] : point.type,
       floorId,
       enabled: true,
       accessibleFacility: null,

@@ -42,11 +42,17 @@
       >
         <rect x="-15" y="-10" width="30" height="20" rx="2" />
         <path
-          v-if="point.type !== 'escalator'"
+          v-if="
+            !pointTypes(point).includes('escalator') ||
+            pointTypes(point).includes('stairs')
+          "
           d="M-9-10v20m6-20v20m6-20v20m6-20v20"
         />
         <path
-          v-if="point.type === 'escalator' || point.type === 'stairs-escalator'"
+          v-if="
+            pointTypes(point).includes('escalator') ||
+            pointTypes(point).includes('stairs-escalator')
+          "
           d="M-15 0h30"
         />
       </g>
@@ -75,8 +81,13 @@ export default {
     },
     stairways() {
       return stationData.points[this.floor].filter((point) =>
-        stairwayTypes.has(point.type)
+        this.pointTypes(point).some((type) => stairwayTypes.has(type))
       );
+    },
+  },
+  methods: {
+    pointTypes(point) {
+      return Array.isArray(point.type) ? point.type : [point.type];
     },
   },
 };

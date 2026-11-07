@@ -163,12 +163,19 @@ test("catalog adapters keep source IDs; do not infer facility accessibility from
     points: {
       B1: [
         { id: "x", type: "restroom", name: "無障礙廁所", description: "示意" },
+        {
+          id: "mixed-stairs",
+          type: ["escalator", "stairs"],
+          name: "梯口",
+          description: "示意",
+        },
       ],
     },
   });
   assert.equal(entries[0].id, "x");
   assert.equal(entries[0].accessibleFacility, null);
   assert.equal(entries[0].floorId, "B1");
+  assert.equal(entries[1].category, "escalator");
   const nav = navigationCatalog(graph);
   assert.ok(nav.some((p) => p.id === "poi_restroom"));
   assert.equal(nav.find((p) => p.id === "poi_restroom").name, "測試廁所");

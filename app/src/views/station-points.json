@@ -164,7 +164,7 @@
       },
       {
         "id": "b1-m5-lower",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "M5 方向梯口",
         "x": 576,
         "y": 1235,
@@ -174,7 +174,7 @@
       },
       {
         "id": "b1-m4-m6-lower",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "M4／M6 方向梯口",
         "x": 706,
         "y": 1233,
@@ -184,7 +184,7 @@
       },
       {
         "id": "b1-m3-m8-lower",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "M3／M8 方向梯口",
         "x": 922,
         "y": 1236,
@@ -194,7 +194,7 @@
       },
       {
         "id": "b1-m7-lower",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "M7 方向梯口",
         "x": 1040,
         "y": 1190,
@@ -214,7 +214,7 @@
       },
       {
         "id": "b1-civic-west",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "市民大道側西邊短梯",
         "x": 956,
         "y": 478,
@@ -224,7 +224,7 @@
       },
       {
         "id": "b1-civic-east",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "市民大道側東邊短梯",
         "x": 1009,
         "y": 493,
@@ -234,7 +234,7 @@
       },
       {
         "id": "b1-north-gate-west",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "北一門西側短梯",
         "x": 934,
         "y": 571,
@@ -244,7 +244,7 @@
       },
       {
         "id": "b1-north-gate-east",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "北一門東側短梯",
         "x": 990,
         "y": 564,
@@ -254,7 +254,7 @@
       },
       {
         "id": "b1-k-upper-a",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "K 區方向北側梯口",
         "x": 778,
         "y": 950,
@@ -264,7 +264,7 @@
       },
       {
         "id": "b1-k-upper-b",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "K 區方向第二梯口",
         "x": 777,
         "y": 970,
@@ -274,7 +274,7 @@
       },
       {
         "id": "b1-east-passage-stair",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "東側連通處梯口",
         "x": 892,
         "y": 950,
@@ -284,7 +284,7 @@
       },
       {
         "id": "b1-k-lower-a",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "K 區入口梯口（北）",
         "x": 755,
         "y": 1027,
@@ -294,7 +294,7 @@
       },
       {
         "id": "b1-k-lower-b",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "K 區入口梯口（中）",
         "x": 757,
         "y": 1048,
@@ -304,7 +304,7 @@
       },
       {
         "id": "b1-k-lower-c",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "K 區入口梯口（南）",
         "x": 759,
         "y": 1067,
@@ -314,7 +314,7 @@
       },
       {
         "id": "b1-k-lower-d",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "K 區南側通道短梯",
         "x": 762,
         "y": 1113,
@@ -324,7 +324,7 @@
       },
       {
         "id": "b1-south-gate",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "臺鐵／高鐵南一門梯口",
         "x": 688,
         "y": 1121,
@@ -523,7 +523,7 @@
       },
       {
         "id": "b2-m5-upper",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "M5 方向梯口",
         "x": 552,
         "y": 1290,
@@ -533,7 +533,7 @@
       },
       {
         "id": "b2-m4-m6-upper",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "M4／M6 方向梯口",
         "x": 698,
         "y": 1289,
@@ -543,7 +543,7 @@
       },
       {
         "id": "b2-m3-m8-upper",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "M3／M8 方向梯口",
         "x": 1039,
         "y": 1289,
@@ -553,7 +553,7 @@
       },
       {
         "id": "b2-m7-upper",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "M7 方向梯口",
         "x": 1170,
         "y": 1220,
@@ -563,7 +563,7 @@
       },
       {
         "id": "b2-civic-branch",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "市民大道方向梯口",
         "x": 946,
         "y": 1054,
@@ -782,7 +782,7 @@
       },
       {
         "id": "b3-red-extra-south",
-        "type": "stairway",
+        "type": ["escalator", "stairs"],
         "name": "淡水信義線大廳南端短梯",
         "x": 959,
         "y": 1012,
