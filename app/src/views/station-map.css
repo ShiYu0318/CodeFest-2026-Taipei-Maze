@@ -364,6 +364,7 @@
 .map-board {
   position: relative;
   flex: none;
+  width: calc(100% * var(--map-zoom));
   margin-block: auto;
   aspect-ratio: var(--map-aspect);
   user-select: none;
@@ -728,6 +729,31 @@
   .floor-destination:hover,
   .facility-list button:hover {
     background: var(--wash);
+  }
+}
+
+@media (max-width: 719px) {
+  .map-viewport {
+    --map-height: max(
+      10rem,
+      calc(var(--map-screen-height, 100vh) - var(--map-top) - 20px)
+    );
+    min-height: 0;
+    height: var(--map-height);
+  }
+  @supports (height: 100svh) {
+    .map-viewport {
+      --map-screen-height: 100svh;
+    }
+  }
+  .map-board {
+    max-width: calc(
+      (var(--map-height) - 2px) * (var(--map-aspect)) * var(--map-zoom)
+    );
+    margin-inline: auto;
+  }
+  .map-tools {
+    padding-top: 20px;
   }
 }
 

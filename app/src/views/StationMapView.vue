@@ -63,7 +63,12 @@
       <div class="station-layout">
         <div class="station-map-column">
           <section ref="mapSection" class="map-card" aria-label="車站地圖">
-            <div class="map-stage" @keydown.esc="closeConnectorDetails">
+            <div
+              ref="mapStage"
+              class="map-stage"
+              :style="{ '--map-top': mapTop + 'px' }"
+              @keydown.esc="closeConnectorDetails"
+            >
               <div class="map-corner">
                 <div class="compass" aria-label="北方朝上略偏左" role="img">
                   <span>N</span>
@@ -101,7 +106,7 @@
                   @lostpointercapture="endMapDrag"
                   @click.capture="ignoreDragClick"
                 >
-                  <div class="map-board" :style="{ width: zoom * 100 + '%' }">
+                  <div class="map-board" :style="{ '--map-zoom': zoom }">
                     <svg
                       class="floor-plan"
                       :viewBox="bounds.join(' ')"
@@ -322,12 +327,16 @@ let zoomRevision = 0;
 const captureGesture = { capture: true, passive: false };
 const webkitGestures = ["gesturestart", "gesturechange", "gestureend"];
 const mapSection = ref(null);
+const mapStage = ref(null);
+const mapTop = ref(0);
+watch(level, updateMapLayout, { flush: "post" });
 watch([selected, zoom, showLayers, floorChanging], placeConnectorPanel, {
   flush: "post",
 });
 
 onMounted(() => {
-  window.addEventListener("resize", placeConnectorPanel);
+  updateMapLayout();
+  window.addEventListener("resize", updateMapLayout);
   document.addEventListener("click", dismissConnectorOutside, true);
   document.addEventListener("touchstart", startPinch, captureGesture);
   document.addEventListener("touchend", endPinch, captureGesture);
@@ -338,7 +347,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener("resize", placeConnectorPanel);
+  window.removeEventListener("resize", updateMapLayout);
   document.removeEventListener("click", dismissConnectorOutside, true);
   floorAnimation?.cancel();
   clearMapDrag();
@@ -503,7 +512,8 @@ function pointThemeStyle(type) {
 function centerOn(x, y) {
   const frame = viewport.value;
   const board = frame.firstElementChild;
-  frame.scrollLeft = x * board.clientWidth - frame.clientWidth / 2;
+  frame.scrollLeft =
+    board.offsetLeft + x * board.clientWidth - frame.clientWidth / 2;
   frame.scrollTop =
     board.offsetTop + y * board.clientHeight - frame.clientHeight / 2;
 }
@@ -531,7 +541,7 @@ function zoomAnchor([x, y]) {
   const frame = viewport.value;
   const board = frame.firstElementChild;
   return [
-    (frame.scrollLeft + x) / board.clientWidth,
+    (frame.scrollLeft + x - board.offsetLeft) / board.clientWidth,
     (frame.scrollTop + y - board.offsetTop) / board.clientHeight,
   ];
 }
@@ -547,7 +557,7 @@ async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
   if (scale === 1) frame.scrollTo(0, 0);
   else
     frame.scrollTo(
-      anchor[0] * board.clientWidth - x,
+      board.offsetLeft + anchor[0] * board.clientWidth - x,
       board.offsetTop + anchor[1] * board.clientHeight - y
     );
 }
@@ -833,6 +843,11 @@ function toggleLayers() {
 //   mapSection.value?.scrollIntoView({ block: "start" });
 // }
 
+function updateMapLayout() {
+  mapTop.value = mapStage.value.getBoundingClientRect().top + window.scrollY;
+  nextTick(placeConnectorPanel);
+}
+
 function placeConnectorPanel() {
   const panel = connectorPanel.value;
   if (!panel || !selected.value || floorChanging.value) {
@@ -843,7 +858,7 @@ function placeConnectorPanel() {
   const frame = viewport.value;
   const board = frame.firstElementChild;
   const [pointX, pointY] = normalizedPoint(selected.value);
-  const x = pointX * board.clientWidth - frame.scrollLeft;
+  const x = board.offsetLeft + pointX * board.clientWidth - frame.scrollLeft;
   const y = board.offsetTop + pointY * board.clientHeight - frame.scrollTop;
   const width = frame.clientWidth;
   const height = frame.clientHeight;
