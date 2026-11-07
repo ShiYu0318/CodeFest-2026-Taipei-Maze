@@ -18,12 +18,12 @@
 
 ## Tasks
 
-- [ ] Tests first: whitelist/mapping, invalid point/state, preserved timestamp, exact URL/parser, duplicate/unknown params, bad origin/version/date/size and advisory time.
-- [ ] Implement pure meeting module and two synthetic points/POIs, retain source/verification metadata; run tests and commit.
-- [ ] Tests first: confirmed meeting selection requires B's new location and preserves restrictive preferences; zero-edge/NoRoute; sharing URL rejected as anchor.
-- [ ] Implement session meeting-destination transition and recipient staged confirmation; no implicit overwrite on link arrival.
-- [ ] Add share card with explicit waiting acknowledgement, user-triggered share/copy and manual fallback, /meet read-only receiver, navigation import and route-leave confirmation.
-- [ ] Docs: implementation vs proposal, origin/time choices, synthetic/field limits, manual two-device cases and not_run evidence.
+- [x] Tests first: whitelist/mapping, invalid point/state, preserved timestamp, exact URL/parser, duplicate/unknown params, bad origin/version/date/size and advisory time.
+- [x] Implement pure meeting module and two synthetic points/POIs, retain source/verification metadata; run tests and commit.
+- [x] Tests first: confirmed meeting selection requires B's new location and preserves restrictive preferences; zero-edge/NoRoute; sharing URL rejected as anchor.
+- [x] Implement session meeting-destination transition and recipient staged confirmation; no implicit overwrite on link arrival.
+- [x] Add share card with explicit waiting acknowledgement, user-triggered share/copy and manual fallback, /meet read-only receiver, navigation import and route-leave confirmation.
+- [x] Docs: implementation vs proposal, origin/time choices, synthetic/field limits, manual two-device cases and not_run evidence.
 - [ ] Full tests/lint/build/HTTP checks, fresh review, commits/push/PR and merge after material issues fixed (user authorized); preserve feature branch/private visibility and sync main.
 
 ## Active work queue
@@ -31,3 +31,10 @@
 - Navigation + search milestone merged as PR #1 at 8004849; deployment workflow succeeded and deployed entry JS was verified.
 - Meeting sharing: this plan.
 - Gemma 3 chatbot + on-device voice for iPhone and Android: separate native integration milestone remains active after this dependency-light feature; no fake chatbot/model/ASR success claims.
+
+## Latest user steering and implementation
+
+- User explicitly requires destination-first persistent camera, valid QR automatically updates origin/reroutes without reopening. Implemented a new versioned native bridge and single scanner view (no new dependency).
+- New web/session and native state tests cover streamed scans, dedup/explicit same-code rescan, stale IDs/sequence, heading identity and single-use native advancement.
+- Review identified stale native Next race; fixed using semantic guidanceToken plus monotonic guidanceVersion and native consume-on-click/QR gate. Reviewer recheck reports no remaining material issue.
+- iOS build and native tests executed; final verification and Android/physical camera limitations recorded in delivery guide.
