@@ -28,7 +28,7 @@ export default {
   "tour.language": "選擇你想使用的介面語言。",
   "tour.theme": "在深色與淺色介面之間切換。",
   "tour.contrast": "開啟高對比後，文字和外框更容易辨識。",
-  "tour.mode": "選擇標準、兒童或長者模式，調整文字大小與顯示方式。",
+  "tour.mode": "選擇預設、兒童或長輩模式，調整文字大小與顯示方式。",
   "lang.label": "語言",
   "display.group": "顯示設定",
   "display.dark": "深色模式",
@@ -36,9 +36,9 @@ export default {
   "display.toDark": "切換為深色模式",
   "display.contrast": "高對比",
   "display.mode": "介面模式",
-  "display.standard": "標準",
+  "display.standard": "預設",
   "display.child": "兒童",
-  "display.senior": "長者",
+  "display.senior": "長輩",
 
   "floor.B1": "地下一樓",
   "floor.B2": "地下二樓",
@@ -97,6 +97,8 @@ export default {
   "map.ariaYouAreHere": "，您在這裡",
   "map.ariaDestination": "，目的地",
   "map.youAreHere": "您在這裡",
+  "map.information": "地圖說明、資料來源與授權",
+  "about.mapNotes": "地圖說明與參考資料",
   "map.footerNote": "依公開站圖重繪。標點與樓層相對位置為示意，請依現場指標。",
   "map.dataStatus":
     "資料狀態：{points} 個標點、{connections} 條樓層連接（{unverified} 條待現場核對），尚無步行路網。",
@@ -118,7 +120,7 @@ export default {
   "scan.choosePlaceholder": "請選擇要去的設施",
   "scan.useSelected": "將地圖上選取的「{name}」設為終點",
   "scan.searchByName": "用名稱搜尋（七語詞典原型）",
-  "scan.stepFree": "只參考無階梯連結",
+  "scan.stepFree": "無障礙路線",
   "scan.destination": "終點：{place}",
   "scan.youAreHere": "您在這裡：{place}",
   "scan.notLocated": "目前尚未定位，可先掃描所在點位。",
@@ -230,6 +232,11 @@ export default {
   "chat.listeningNotice": "正在聆聽，最長 30 秒。",
   "chat.drafted": "已轉成草稿，請確認後送出。",
   "chat.cleared": "對話已清除。",
+  "search.startTitle": "搜尋起點",
+  "search.destinationTitle": "搜尋終點",
+  "search.useStart": "設為起點",
+  "search.useDestination": "設為終點",
+  "search.selectedStart": "已選擇起點。",
   "search.title": "用名稱找設施",
   "search.note":
     "七語詞典原型，詞彙尚待校對。只搜尋本頁已載入的設施，不使用遠端 AI。",
@@ -335,7 +342,7 @@ export default {
   "chat.answer.staff":
     "選好目的地後，按「給站務人員看」，畫面會出現大字中文，把手機拿給站務人員或附近的人看就可以。",
   "chat.answer.stepFree":
-    "選好目的地後，勾選「只參考無階梯連結」。我們只會建議電梯這類不用走樓梯的方式，不會用樓梯代替；找不到時會請你詢問站務人員。",
+    "選好目的地後，勾選「無障礙路線」。我們只會建議電梯這類不用走樓梯的方式，不會用樓梯代替；找不到時會請你詢問站務人員。",
   "chat.answer.scan":
     "找到柱子或牆上的定位 QR，按「掃描定位」對準它。地圖會跳到你的位置，顯示「您在這裡」。走到新地方時再掃一次就會更新。",
   "chat.answer.language":

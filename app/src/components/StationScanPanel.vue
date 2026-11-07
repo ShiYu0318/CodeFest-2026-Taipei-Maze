@@ -19,23 +19,34 @@
       <ZhuyinText :text="t('scan.browseHint')" />
     </p>
     <template v-if="view.mode === 'navigation'">
-      <label for="station-destination"
-        ><ZhuyinText :text="t('scan.chooseDestination')"
-      /></label>
-      <select
-        id="station-destination"
-        :value="view.destinationId ?? ''"
+      <DestinationSearch
+        id="station-navigation-search"
+        :catalog="searchEntries"
+        navigation
         :disabled="active"
-        @change="choose($event.target.value)"
-      >
-        <option disabled value="">
-          <ZhuyinText :text="t('scan.choosePlaceholder')" plain />
-        </option>
-        <option v-for="point in catalog" :key="point.id" :value="point.id">
-          <ZhuyinText :text="point.floor" plain /> ·
-          <ZhuyinText :text="label(point)" plain />
-        </option>
-      </select>
+        :current-options="options"
+        @select="searchSelect"
+      />
+      <details class="scan-destination-list">
+        <summary><ZhuyinText :text="t('scan.chooseDestination')" /></summary>
+        <label for="station-destination"
+          ><ZhuyinText :text="t('scan.chooseDestination')"
+        /></label>
+        <select
+          id="station-destination"
+          :value="view.destinationId ?? ''"
+          :disabled="active"
+          @change="choose($event.target.value)"
+        >
+          <option disabled value="">
+            <ZhuyinText :text="t('scan.choosePlaceholder')" plain />
+          </option>
+          <option v-for="point in catalog" :key="point.id" :value="point.id">
+            <ZhuyinText :text="point.floor" plain /> ·
+            <ZhuyinText :text="label(point)" plain />
+          </option>
+        </select>
+      </details>
       <button
         v-if="props.selectedPoint"
         :disabled="active"
@@ -45,17 +56,6 @@
           :text="t('scan.useSelected', { name: name(props.selectedPoint) })"
         />
       </button>
-      <details ref="searchDetails">
-        <summary><ZhuyinText :text="t('scan.searchByName')" /></summary>
-        <DestinationSearch
-          id="station-navigation-search"
-          :catalog="searchEntries"
-          navigation
-          :disabled="active"
-          :current-options="options"
-          @select="searchSelect"
-        />
-      </details>
       <label
         ><input
           :checked="view.stepFree"
@@ -221,7 +221,6 @@ const catalog = stationPoints(data),
 const byId = new Map(catalog.map((p) => [p.id, p]));
 const i18n = useI18n();
 const { locale, t } = i18n;
-const searchDetails = ref(null);
 const active = computed(() => view.value.active);
 const available = computed(() => view.value.available);
 const notice = computed(() =>
@@ -278,7 +277,6 @@ function choose(id) {
 }
 function searchSelect(selection) {
   if (!props.location.searchSelect(selection)) return;
-  if (searchDetails.value) searchDetails.value.open = false;
   emit("destination", selection.poiId);
 }
 function changeStepFree(value) {

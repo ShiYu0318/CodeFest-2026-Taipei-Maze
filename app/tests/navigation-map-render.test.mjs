@@ -18,6 +18,12 @@ import * as scan from "../src/station/scan.mjs";
 import * as mapFocus from "../src/station/map-focus.mjs";
 import * as mapTour from "../src/station/map-tour.mjs";
 import * as about from "../src/about/about.mjs";
+import * as searchCatalog from "../src/search/catalog.mjs";
+import * as searchEngine from "../src/search/search.mjs";
+import * as searchFallback from "../src/search/fallback.mjs";
+const dictionary = JSON.parse(
+  readFileSync(new URL("../src/search/dictionary.json", import.meta.url))
+);
 import * as boundary from "../src/station/boundary.mjs";
 import * as locationHook from "../src/station/useStationLocation.js";
 import { createStationLocation } from "../src/station/location.mjs";
@@ -39,13 +45,14 @@ const realComponents = new Set([
   "StationMapIcon",
   "StationNavigationRescan",
   "StationTransferStep",
+  "DestinationSearch",
   "StationTripDialog",
   "ZhuyinText",
   "ZhuyinSvgText",
 ]);
 function component(name) {
   if (components.has(name)) return components.get(name);
-  const directory = name === "StationMapView" ? "views" : "components";
+  const directory = name.endsWith("View") ? "views" : "components";
   const source = readFileSync(
     new URL(`../src/${directory}/${name}.vue`, import.meta.url),
     "utf8"
@@ -90,6 +97,10 @@ function component(name) {
     "map-focus.mjs": mapFocus,
     "map-tour.mjs": mapTour,
     "about.mjs": about,
+    "catalog.mjs": searchCatalog,
+    "search.mjs": searchEngine,
+    "fallback.mjs": searchFallback,
+    "dictionary.json": dictionary,
     "boundary.mjs": boundary,
     useStationLocation: locationHook,
     "station-routing": {
@@ -411,5 +422,130 @@ test("the rendered floor action names its target, rejects a repeated old click a
     app.unmount();
     controller.dispose();
     language.setLocale(previousLocale);
+  }
+});
+
+test("navigation exposes destination search before the secondary destination list", async () => {
+  const location = createStationLocation({ data, connections, native: null });
+  try {
+    location.applyQuery({ point: "b1-e4", v: "1" });
+    const html = await renderToString(
+      Vue.createSSRApp(component("StationScanPanel"), {
+        location: { view: Vue.ref(location.snapshot()) },
+      })
+    );
+    const search = html.indexOf('type="search"');
+    const list = html.indexOf("<details");
+    assert.ok(search >= 0, "a search input is visible in navigation");
+    assert.ok(
+      list > search,
+      "search is outside and before the secondary collapsed list"
+    );
+    assert.ok(html.indexOf('id="station-destination"') > list);
+  } finally {
+    location.dispose();
+  }
+});
+
+test("endpoint picker exposes search with the active start or destination role", async () => {
+  const language = i18n.useI18n(),
+    previous = language.locale.value;
+  language.setLocale("zh-TW");
+  try {
+    for (const [startPoint, role, title, action] of [
+      [null, "start", "搜尋起點", "設為起點"],
+      [
+        { ...data.points.B1[0], floor: "B1" },
+        "destination",
+        "搜尋終點",
+        "設為終點",
+      ],
+    ]) {
+      const html = await renderToString(
+        Vue.createSSRApp(component("StationEndpointPicker"), { startPoint })
+      );
+      assert.ok(html.includes('id="endpoint-' + role + '-search-query"'));
+      assert.ok(html.includes(title));
+      const form = html.indexOf('type="search"');
+      const list = html.indexOf('class="endpoint-list"');
+      assert.ok(form >= 0 && list > form, action);
+    }
+  } finally {
+    language.setLocale(previous);
+  }
+});
+
+test("map sources stay behind an information entry rather than consuming map footer space", async () => {
+  const previousWindow = globalThis.window;
+  globalThis.window = { matchMedia: () => ({ matches: false }) };
+  const router = VueRouter.createRouter({
+    history: VueRouter.createMemoryHistory(),
+    routes: [{ path: "/station-map", component: component("StationMapView") }],
+  });
+  try {
+    await router.push("/station-map");
+    await router.isReady();
+    const app = Vue.createSSRApp({ render: () => Vue.h(VueRouter.RouterView) });
+    app.use(router);
+    const html = await renderToString(app);
+    assert.equal(html.includes('class="station-footer"'), false);
+    assert.equal(
+      html.includes("https://web.metro.taipei/img/ALL/INFOPDF/051.pdf"),
+      false
+    );
+    assert.ok(html.includes('aria-haspopup="dialog"'));
+    assert.ok(html.includes('class="map-information-button"'));
+  } finally {
+    globalThis.window = previousWindow;
+  }
+});
+
+test("information page retains the floor reference, map notes, source links and licensing", async () => {
+  const language = i18n.useI18n(),
+    previous = language.locale.value;
+  language.setLocale("zh-TW");
+  try {
+    const app = Vue.createSSRApp(component("AboutView"), {
+      embedded: true,
+      floor: "B3",
+    });
+    app.use(
+      VueRouter.createRouter({
+        history: VueRouter.createMemoryHistory(),
+        routes: [],
+      })
+    );
+    const html = await renderToString(app);
+    assert.ok(html.includes("051.pdf#page=3"));
+    assert.ok(html.includes("WebStation/051/1"));
+    assert.ok(html.includes("WebStation/051/4"));
+    assert.ok(html.includes(language.t("map.footerNote")));
+    assert.ok(html.includes("AGPL-3.0-or-later"));
+    assert.ok(html.includes("about-version"));
+  } finally {
+    language.setLocale(previous);
+  }
+});
+
+test("first-floor information uses its own source note rather than a metro basement page", async () => {
+  const language = i18n.useI18n(),
+    previous = language.locale.value;
+  language.setLocale("zh-TW");
+  try {
+    const app = Vue.createSSRApp(component("AboutView"), {
+      embedded: true,
+      floor: "1F",
+    });
+    app.use(
+      VueRouter.createRouter({
+        history: VueRouter.createMemoryHistory(),
+        routes: [],
+      })
+    );
+    const html = await renderToString(app);
+    assert.ok(html.includes(language.t("map.firstFloorNote")));
+    assert.equal(html.includes("051.pdf#page="), false);
+  } finally {
+    language.setLocale(previous);
   }
 });

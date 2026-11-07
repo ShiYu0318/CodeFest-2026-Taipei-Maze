@@ -8,7 +8,7 @@
   >
     <div
       class="station-shell"
-      :inert="endpointPickerOpen || tripDialog ? '' : null"
+      :inert="endpointPickerOpen || tripDialog || informationOpen ? '' : null"
     >
       <section class="station-heading" :aria-label="t('display.group')">
         <div class="station-title-row">
@@ -148,6 +148,17 @@
               class="map-stage"
               :style="{ '--map-top': mapTop * 1.5 + 'px' }"
             >
+              <button
+                ref="informationButton"
+                type="button"
+                class="map-information-button"
+                aria-haspopup="dialog"
+                :aria-label="t('map.information')"
+                :title="t('map.information')"
+                @click="informationOpen = true"
+              >
+                <StationMapIcon name="info" />
+              </button>
               <div class="map-corner">
                 <button
                   v-if="originView"
@@ -411,46 +422,19 @@
             </section>
           </section>
         </div>
-
-        <footer class="station-footer">
-          <span
-            ><ZhuyinText
-              :enabled="false"
-              :text="
-                t(level === '1F' ? 'map.firstFloorNote' : 'map.footerNote')
-              "
-          /></span>
-          <div v-if="sources.length">
-            <a
-              v-for="[label, url] in sources"
-              :key="url"
-              :href="url"
-              target="_blank"
-              rel="noopener noreferrer"
-              ><ZhuyinText :text="label" :enabled="false"
-            /></a>
-          </div>
-          <p class="station-data-status">
-            <ZhuyinText
-              :enabled="false"
-              :text="
-                t('map.dataStatus', {
-                  points: dataStatus.points,
-                  connections: dataStatus.connections,
-                  unverified: dataStatus.unverifiedConnections,
-                })
-              "
-            />
-          </p>
-          <router-link to="/about" class="station-about-link"
-            ><ZhuyinText
-              :text="t('map.about', { version: buildInfo.short })"
-              :enabled="false"
-          /></router-link>
-        </footer>
       </div>
     </div>
+    <StationInformationDialog
+      v-if="informationOpen"
+      :floor="level"
+      @close="closeInformation"
+    />
     <StationEndpointPicker
+      :current-options="{
+        mobilityProfile: location.view.value.stepFree ? 'stepFree' : 'standard',
+        excludedEdgeTypes: location.view.value.excludedEdgeTypes,
+        unavailableConnectorIds: location.view.value.unavailableConnectorIds,
+      }"
       v-if="endpointPickerOpen"
       :start-point="currentPoint"
       :target-point="targetPoint"
@@ -492,6 +476,7 @@ import StationScanPanel from "../components/StationScanPanel.vue";
 import StationNavigationRescan from "../components/StationNavigationRescan.vue";
 import StaffCard from "../components/StaffCard.vue";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
+import StationInformationDialog from "../components/StationInformationDialog.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
 import StationMapTour from "../components/StationMapTour.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
@@ -500,7 +485,6 @@ import ZhuyinText from "../components/ZhuyinText.vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { useStationLocation } from "../station/useStationLocation";
 import { stationPoints } from "../station/scan.mjs";
-import { buildInfo, summarizeStationData } from "../about/about.mjs";
 import { htmlLang, useI18n } from "../i18n/index.mjs";
 import { placeName } from "../i18n/places.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
@@ -828,26 +812,13 @@ const backgroundLayers = computed(() => {
     ];
   });
 });
-const dataStatus = summarizeStationData(stationData, stationConnections);
-const sources = computed(() =>
-  level.value === "1F"
-    ? []
-    : [
-        [
-          t("map.sourceInfo", { floor: level.value }),
-          "https://web.metro.taipei/img/ALL/INFOPDF/051.pdf#page=" +
-            Number(level.value.slice(1)),
-        ],
-        [
-          t("map.sourceFacilities"),
-          "https://web.metro.taipei/pages2026/WebStation/051/1",
-        ],
-        [
-          t("map.sourceSection"),
-          "https://web.metro.taipei/pages2026/WebStation/051/4",
-        ],
-      ]
-);
+const informationOpen = ref(false);
+const informationButton = ref(null);
+async function closeInformation() {
+  informationOpen.value = false;
+  await nextTick();
+  informationButton.value?.focus({ preventScroll: true });
+}
 
 function isConnector(point) {
   return pointTypes(point).some((type) => connectorTypes.has(type));
@@ -1399,8 +1370,14 @@ function saveEndpoints(start, destination) {
   });
 }
 
-function chooseEndpoint(start, destination, point, role) {
-  if (role === "destination" && !location.choose(destination ?? null)) return;
+function chooseEndpoint(start, destination, point, role, proposedOptions) {
+  if (role === "destination") {
+    const selected =
+      proposedOptions && destination
+        ? location.searchSelect({ poiId: destination, proposedOptions })
+        : location.choose(destination ?? null);
+    if (!selected) return;
+  }
   pickerFocusPoint = point;
   const saved = saveEndpoints(start, destination);
   if (role === "destination" && destination) openTripDialog();

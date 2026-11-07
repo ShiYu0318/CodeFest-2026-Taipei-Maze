@@ -34,7 +34,7 @@ export default {
   "tour.theme": "ライト表示とダーク表示を切り替えます。",
   "tour.contrast": "ハイコントラストにすると、文字や枠線が見やすくなります。",
   "tour.mode":
-    "標準、子ども、シニアからモードを選び、文字の大きさや表示を調整します。",
+    "デフォルト、子ども、シニアからモードを選び、文字の大きさや表示を調整します。",
   "lang.label": "言語",
   "display.group": "表示設定",
   "display.dark": "ダークモード",
@@ -42,7 +42,7 @@ export default {
   "display.toDark": "ダークモードに切り替え",
   "display.contrast": "ハイコントラスト",
   "display.mode": "表示モード",
-  "display.standard": "標準",
+  "display.standard": "デフォルト",
   "display.child": "こども",
   "display.senior": "シニア",
 
@@ -108,6 +108,8 @@ export default {
   "map.ariaYouAreHere": "、現在地",
   "map.ariaDestination": "、目的地",
   "map.youAreHere": "現在地",
+  "map.information": "地図の説明・出典・ライセンス",
+  "about.mapNotes": "地図の説明と参考資料",
   "map.footerNote":
     "公開されている駅構内図をもとに描き直しました。位置はおおよそです。現地の案内表示に従ってください。",
   "map.dataStatus":
@@ -133,7 +135,7 @@ export default {
   "scan.choosePlaceholder": "どこへ行きますか？",
   "scan.useSelected": "地図で選んだ「{name}」を目的地にする",
   "scan.searchByName": "名前で探す（7言語の試作）",
-  "scan.stepFree": "段差のない経路だけ",
+  "scan.stepFree": "バリアフリールート",
   "scan.destination": "目的地：{place}",
   "scan.youAreHere": "現在地：{place}",
   "scan.notLocated":
@@ -271,6 +273,11 @@ export default {
   "chat.listeningNotice": "最大30秒聞き取ります。",
   "chat.drafted": "下書きにしました。確認してから送信してください。",
   "chat.cleared": "会話を消去しました。",
+  "search.startTitle": "出発地を検索",
+  "search.destinationTitle": "目的地を検索",
+  "search.useStart": "出発地に設定",
+  "search.useDestination": "目的地に設定",
+  "search.selectedStart": "出発地を選択しました。",
   "search.title": "名前で設備を探す",
   "search.note":
     "7言語の辞書の試作で、語句はまだ確認中です。このページの設備だけを検索し、オンラインのAIは使いません。",
@@ -392,7 +399,7 @@ export default {
   "chat.answer.staff":
     "目的地を選んでから「係員に見せる」をタップしてください。大きな中国語が表示されるので、駅の係員や近くの人にスマホを見せるだけです。",
   "chat.answer.stepFree":
-    "目的地を選んだあと「段差のない経路だけ」にチェックを入れてください。エレベーターなど階段を使わない方法だけを案内し、階段で代用することはありません。ない場合は係員に確認するよう案内します。",
+    "目的地を選んだあと「バリアフリールート」にチェックを入れてください。エレベーターなど階段を使わない方法だけを案内し、階段で代用することはありません。ない場合は係員に確認するよう案内します。",
   "chat.answer.scan":
     "柱や壁にある位置QRコードを見つけて「位置を読み取る」をタップしてください。地図に「現在地」が表示されます。新しい場所に着いたら、もう一度読み取ってください。",
   "chat.answer.language":

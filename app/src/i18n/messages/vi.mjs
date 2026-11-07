@@ -36,7 +36,7 @@ export default {
   "tour.contrast":
     "Bật độ tương phản cao để dễ phân biệt chữ và đường viền hơn.",
   "tour.mode":
-    "Chọn chế độ Tiêu chuẩn, Trẻ em hoặc Người cao tuổi để điều chỉnh cỡ chữ và hiển thị.",
+    "Chọn chế độ Mặc định, Trẻ em hoặc Người cao tuổi để điều chỉnh cỡ chữ và hiển thị.",
   "lang.label": "Ngôn ngữ",
   "display.group": "Cài đặt hiển thị",
   "display.dark": "Chế độ tối",
@@ -44,7 +44,7 @@ export default {
   "display.toDark": "Chuyển sang chế độ tối",
   "display.contrast": "Tương phản cao",
   "display.mode": "Chế độ giao diện",
-  "display.standard": "Tiêu chuẩn",
+  "display.standard": "Mặc định",
   "display.child": "Trẻ em",
   "display.senior": "Người cao tuổi",
 
@@ -112,6 +112,8 @@ export default {
   "map.ariaYouAreHere": ", bạn đang ở đây",
   "map.ariaDestination": ", điểm đến",
   "map.youAreHere": "Bạn đang ở đây",
+  "map.information": "Thông tin bản đồ, nguồn và giấy phép",
+  "about.mapNotes": "Ghi chú và tài liệu bản đồ",
   "map.footerNote":
     "Vẽ lại từ bản đồ nhà ga công khai. Vị trí chỉ mang tính minh họa; hãy theo biển chỉ dẫn tại chỗ.",
   "map.dataStatus":
@@ -137,7 +139,7 @@ export default {
   "scan.choosePlaceholder": "Bạn muốn đi đâu?",
   "scan.useSelected": "Đặt “{name}” đã chọn trên bản đồ làm điểm đến",
   "scan.searchByName": "Tìm theo tên (bản thử bảy ngôn ngữ)",
-  "scan.stepFree": "Chỉ dùng lối không có bậc thang",
+  "scan.stepFree": "Lộ trình tiếp cận",
   "scan.destination": "Điểm đến: {place}",
   "scan.youAreHere": "Bạn đang ở đây: {place}",
   "scan.notLocated": "Chưa có vị trí. Hãy quét mã tại nơi bạn đứng.",
@@ -268,6 +270,11 @@ export default {
   "chat.listeningNotice": "Đang nghe, tối đa 30 giây.",
   "chat.drafted": "Đã thành bản nháp. Hãy kiểm tra rồi gửi.",
   "chat.cleared": "Đã xóa cuộc trò chuyện.",
+  "search.startTitle": "Tìm điểm xuất phát",
+  "search.destinationTitle": "Tìm điểm đến",
+  "search.useStart": "Đặt làm điểm xuất phát",
+  "search.useDestination": "Đặt làm điểm đến",
+  "search.selectedStart": "Đã chọn điểm xuất phát.",
   "search.title": "Tìm tiện ích theo tên",
   "search.note":
     "Bản thử từ điển bảy ngôn ngữ, từ ngữ chưa được duyệt. Chỉ tìm các tiện ích trên trang này, không dùng AI trực tuyến.",
@@ -389,7 +396,7 @@ export default {
   "chat.answer.staff":
     "Chọn điểm đến rồi chạm “Đưa cho nhân viên xem”. Màn hình sẽ hiện chữ Trung lớn, chỉ cần đưa điện thoại cho nhân viên hoặc người gần đó.",
   "chat.answer.stepFree":
-    "Sau khi chọn điểm đến, hãy đánh dấu “Chỉ dùng lối không có bậc thang”. Chúng tôi chỉ gợi ý cách không cần đi cầu thang như thang máy, không bao giờ thay bằng cầu thang. Nếu không có, hãy hỏi nhân viên.",
+    "Sau khi chọn điểm đến, hãy đánh dấu “Lộ trình tiếp cận”. Chúng tôi chỉ gợi ý cách không cần đi cầu thang như thang máy, không bao giờ thay bằng cầu thang. Nếu không có, hãy hỏi nhân viên.",
   "chat.answer.scan":
     "Tìm mã QR định vị trên cột hoặc tường và chạm “Quét vị trí”. Bản đồ sẽ hiện “Bạn đang ở đây”. Đến chỗ mới thì quét lại.",
   "chat.answer.language":

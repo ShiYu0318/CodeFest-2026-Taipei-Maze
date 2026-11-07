@@ -36,7 +36,7 @@ export default {
   "tour.contrast":
     "Aktifkan kontras tinggi agar teks dan garis tepi lebih mudah terlihat.",
   "tour.mode":
-    "Pilih Standar, Anak, atau Lansia untuk menyesuaikan ukuran teks dan tampilan.",
+    "Pilih Default, Anak, atau Lansia untuk menyesuaikan ukuran teks dan tampilan.",
   "lang.label": "Bahasa",
   "display.group": "Pengaturan tampilan",
   "display.dark": "Mode gelap",
@@ -44,7 +44,7 @@ export default {
   "display.toDark": "Beralih ke mode gelap",
   "display.contrast": "Kontras tinggi",
   "display.mode": "Mode tampilan",
-  "display.standard": "Standar",
+  "display.standard": "Default",
   "display.child": "Anak",
   "display.senior": "Lansia",
 
@@ -112,6 +112,8 @@ export default {
   "map.ariaYouAreHere": ", Anda di sini",
   "map.ariaDestination": ", tujuan",
   "map.youAreHere": "Anda di sini",
+  "map.information": "Informasi peta, sumber, dan lisensi",
+  "about.mapNotes": "Catatan dan referensi peta",
   "map.footerNote":
     "Digambar ulang dari peta stasiun publik. Posisi hanya perkiraan; ikuti papan petunjuk di lokasi.",
   "map.dataStatus":
@@ -136,7 +138,7 @@ export default {
   "scan.choosePlaceholder": "Mau ke mana?",
   "scan.useSelected": "Jadikan “{name}” yang dipilih di peta sebagai tujuan",
   "scan.searchByName": "Cari dengan nama (prototipe tujuh bahasa)",
-  "scan.stepFree": "Hanya penghubung tanpa anak tangga",
+  "scan.stepFree": "Rute aksesibel",
   "scan.destination": "Tujuan: {place}",
   "scan.youAreHere": "Anda di sini: {place}",
   "scan.notLocated": "Lokasi belum diatur. Pindai kode di tempat Anda berada.",
@@ -272,6 +274,11 @@ export default {
   "chat.listeningNotice": "Mendengarkan hingga 30 detik.",
   "chat.drafted": "Sudah menjadi draf. Periksa lalu kirim.",
   "chat.cleared": "Obrolan dihapus.",
+  "search.startTitle": "Cari titik awal",
+  "search.destinationTitle": "Cari tujuan",
+  "search.useStart": "Jadikan titik awal",
+  "search.useDestination": "Jadikan tujuan",
+  "search.selectedStart": "Titik awal dipilih.",
   "search.title": "Cari fasilitas dengan nama",
   "search.note":
     "Prototipe kamus tujuh bahasa; kata-kata belum ditinjau. Hanya mencari fasilitas di halaman ini, tanpa AI daring.",
@@ -398,7 +405,7 @@ export default {
   "chat.answer.staff":
     "Pilih tujuan, lalu ketuk “Tunjukkan ke petugas”. Akan muncul tulisan Mandarin besar, tinggal tunjukkan ponsel ke petugas atau orang di dekat Anda.",
   "chat.answer.stepFree":
-    "Setelah memilih tujuan, centang “Hanya penghubung tanpa anak tangga”. Kami hanya menyarankan cara tanpa tangga seperti lift, tidak pernah tangga. Jika tidak ada, silakan tanya petugas.",
+    "Setelah memilih tujuan, centang “Rute aksesibel”. Kami hanya menyarankan cara tanpa tangga seperti lift, tidak pernah tangga. Jika tidak ada, silakan tanya petugas.",
   "chat.answer.scan":
     "Cari kode QR lokasi di tiang atau dinding, lalu ketuk “Pindai lokasi”. Peta akan menampilkan “Anda di sini”. Pindai lagi saat tiba di tempat baru.",
   "chat.answer.language":

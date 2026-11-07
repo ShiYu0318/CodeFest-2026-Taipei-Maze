@@ -61,25 +61,38 @@
       </div>
       <div
         ref="list"
-        class="endpoint-list"
-        :aria-label="t('endpoint.pointsAria', { role: labels[activeRole] })"
+        class="endpoint-selection-body"
         @touchmove.stop
         @wheel.stop
       >
-        <section v-for="(floorPoints, floor) in points" :key="floor">
-          <h3>{{ floor }}</h3>
-          <ul>
-            <li v-for="point in floorPoints" :key="point.id">
-              <button
-                type="button"
-                :aria-pressed="point.id === choices[activeRole]?.id"
-                @click="choosePoint({ ...point, floor })"
-              >
-                <ZhuyinText :text="placeLabel(point, i18n)" />
-              </button>
-            </li>
-          </ul>
-        </section>
+        <DestinationSearch
+          :key="activeRole"
+          :id="'endpoint-' + activeRole + '-search'"
+          :catalog="searchEntries"
+          :selection-role="activeRole"
+          :current-options="currentOptions"
+          navigation
+          @select="chooseSearch"
+        />
+        <div
+          class="endpoint-list"
+          :aria-label="t('endpoint.pointsAria', { role: labels[activeRole] })"
+        >
+          <section v-for="(floorPoints, floor) in points" :key="floor">
+            <h3>{{ floor }}</h3>
+            <ul>
+              <li v-for="point in floorPoints" :key="point.id">
+                <button
+                  type="button"
+                  :aria-pressed="point.id === choices[activeRole]?.id"
+                  @click="choosePoint({ ...point, floor })"
+                >
+                  <ZhuyinText :text="placeLabel(point, i18n)" />
+                </button>
+              </li>
+            </ul>
+          </section>
+        </div>
       </div>
       <footer>
         <button
@@ -111,13 +124,24 @@ import { useI18n } from "../i18n/index.mjs";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { placeLabel, placeName } from "../i18n/places.mjs";
 import stationData from "../views/station-points.json";
+import DestinationSearch from "./DestinationSearch.vue";
+import { stationCatalog } from "../search/catalog.mjs";
 
 const props = defineProps({
   startPoint: { type: Object, default: null },
   targetPoint: { type: Object, default: null },
+  currentOptions: {
+    type: Object,
+    default: () => ({
+      mobilityProfile: "standard",
+      excludedEdgeTypes: [],
+      unavailableConnectorIds: [],
+    }),
+  },
 });
 const emit = defineEmits(["select", "close", "map-pick"]);
 const { points } = stationData;
+const searchEntries = stationCatalog(stationData);
 const i18n = useI18n();
 const { t } = i18n;
 const { displayMode } = useDisplayPreferences();
@@ -143,14 +167,26 @@ function showRole(role) {
   list.value.scrollTop = 0;
 }
 
-async function choosePoint(point) {
+function chooseSearch(selection) {
+  if (selection.role !== activeRole.value) return;
+  const point = Object.entries(points)
+    .flatMap(([floor, list]) => list.map((point) => ({ ...point, floor })))
+    .find((point) => point.id === selection.poiId);
+  if (point)
+    choosePoint(
+      point,
+      activeRole.value === "destination" ? selection.proposedOptions : undefined
+    );
+}
+async function choosePoint(point, proposedOptions) {
   choices[activeRole.value] = point;
   emit(
     "select",
     choices.start?.id,
     choices.destination?.id,
     point,
-    activeRole.value
+    activeRole.value,
+    proposedOptions
   );
   if (point && activeRole.value === "start" && !choices.destination) {
     showRole("destination");
@@ -162,7 +198,9 @@ async function choosePoint(point) {
 }
 
 function keepFocus(event) {
-  const buttons = panel.value.querySelectorAll("button:not(:disabled)");
+  const buttons = panel.value.querySelectorAll(
+    "button:not(:disabled), input:not(:disabled), select:not(:disabled)"
+  );
   const first = buttons[0];
   const last = buttons[buttons.length - 1];
   if (document.activeElement !== (event.shiftKey ? first : last)) return;
@@ -228,6 +266,11 @@ function keepFocus(event) {
   font-size: 1.5rem;
   line-height: 1;
 }
+.endpoint-dialog :deep(.destination-search) {
+  margin: 0 12px 8px;
+  padding: 10px;
+  overscroll-behavior: contain;
+}
 .endpoint-roles {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -256,11 +299,18 @@ function keepFocus(event) {
   opacity: 0.55;
   cursor: default;
 }
-.endpoint-list {
+.endpoint-dialog header,
+.endpoint-dialog footer,
+.endpoint-roles {
+  flex: none;
+}
+.endpoint-selection-body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+.endpoint-list {
   padding-inline: 12px;
 }
 .endpoint-list h3 {

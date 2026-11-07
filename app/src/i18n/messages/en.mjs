@@ -36,7 +36,7 @@ export default {
   "tour.contrast":
     "Turn on high contrast to make text and borders easier to distinguish.",
   "tour.mode":
-    "Choose Standard, Child, or Senior to adjust text size and appearance.",
+    "Choose Default, Child, or Older adults to adjust text size and appearance.",
   "lang.label": "Language",
   "display.group": "Display settings",
   "display.dark": "Dark mode",
@@ -44,9 +44,9 @@ export default {
   "display.toDark": "Switch to dark mode",
   "display.contrast": "High contrast",
   "display.mode": "Interface mode",
-  "display.standard": "Standard",
+  "display.standard": "Default",
   "display.child": "Kids",
-  "display.senior": "Senior",
+  "display.senior": "Older adults",
 
   "floor.B1": "Basement 1",
   "floor.B2": "Basement 2",
@@ -113,6 +113,8 @@ export default {
   "map.ariaYouAreHere": ", you are here",
   "map.ariaDestination": ", destination",
   "map.youAreHere": "You are here",
+  "map.information": "Map information, sources and licensing",
+  "about.mapNotes": "Map notes and references",
   "map.footerNote":
     "Redrawn from public station maps. Positions are approximate; follow the signs on site.",
   "map.dataStatus":
@@ -137,7 +139,7 @@ export default {
   "scan.choosePlaceholder": "Where do you want to go?",
   "scan.useSelected": "Set “{name}” selected on the map as the destination",
   "scan.searchByName": "Search by name (seven-language prototype)",
-  "scan.stepFree": "Step-free links only",
+  "scan.stepFree": "Accessible route",
   "scan.destination": "Destination: {place}",
   "scan.youAreHere": "You are here: {place}",
   "scan.notLocated": "Location not set yet. Scan the code where you are.",
@@ -271,6 +273,11 @@ export default {
   "chat.listeningNotice": "Listening for up to 30 seconds.",
   "chat.drafted": "Turned into a draft. Check it, then send.",
   "chat.cleared": "Chat cleared.",
+  "search.startTitle": "Search for a starting point",
+  "search.destinationTitle": "Search for a destination",
+  "search.useStart": "Set as start",
+  "search.useDestination": "Set as destination",
+  "search.selectedStart": "Starting point selected.",
   "search.title": "Find a facility by name",
   "search.note":
     "Seven-language dictionary prototype; words are not yet reviewed. Searches only the facilities on this page, without any online AI.",
@@ -390,7 +397,7 @@ export default {
   "chat.answer.staff":
     "Choose a destination, then tap “Show to staff”. Large Chinese text appears — just show your phone to station staff or someone nearby.",
   "chat.answer.stepFree":
-    "After choosing a destination, tick “Step-free links only”. We only suggest ways without stairs, such as elevators, never stairs. If there is none, we will ask you to check with staff.",
+    "After choosing a destination, tick “Accessible route”. We only suggest ways without stairs, such as elevators, never stairs. If there is none, we will ask you to check with staff.",
   "chat.answer.scan":
     "Find the location QR code on a pillar or wall and tap “Scan location”. The map jumps to “You are here”. Scan again when you reach a new spot.",
   "chat.answer.language":

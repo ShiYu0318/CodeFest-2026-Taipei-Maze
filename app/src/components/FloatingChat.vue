@@ -233,7 +233,7 @@
           <ZhuyinText :text="notice" />
         </p>
         <div
-          v-if="!messages.length && !busy"
+          v-if="starters.length"
           class="maze-chat-tray"
           :aria-label="t('chat.starters')"
         >
@@ -242,7 +242,7 @@
             :key="starter"
             type="button"
             :style="{ '--i': index }"
-            :disabled="listening"
+            :disabled="busy || listening"
             @click="ask(starter)"
           >
             <ZhuyinText :text="starter" />
@@ -479,11 +479,14 @@ const languages = [
   ["ko-KR", "한국어"],
   ["ja-JP", "日本語"],
 ];
-const starters = computed(() => [
-  t("chat.starter1"),
-  t("chat.starter2"),
-  t("chat.starter3"),
-]);
+const starterKeys = ["chat.starter1", "chat.starter2", "chat.starter3"];
+const usedStarterKeys = ref([]);
+const starters = computed(() =>
+  starterKeys
+    .filter((key) => !usedStarterKeys.value.includes(key))
+    .map((key) => t(key))
+);
+
 const bridge = createChatBridge(window.flutterObject);
 const route = useRoute();
 const { theme, displayMode } = useDisplayPreferences();
@@ -575,6 +578,9 @@ function grow() {
 }
 function ask(text) {
   if (busy.value || listening.value) return;
+  const key = starterKeys.find((key) => t(key) === text);
+  if (key && !usedStarterKeys.value.includes(key))
+    usedStarterKeys.value = [...usedStarterKeys.value, key];
   draft.value = text;
   // Offline answers work without the model, so a suggestion always sends.
   send();
@@ -805,6 +811,7 @@ function stopVoice() {
 }
 function clear() {
   messages.value = [];
+  usedStarterKeys.value = [];
   notice.value = t("chat.cleared");
 }
 function handleKeys(event) {

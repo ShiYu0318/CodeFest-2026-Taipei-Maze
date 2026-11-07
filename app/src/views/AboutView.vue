@@ -7,7 +7,27 @@
     :data-display-mode="displayMode"
   >
     <div class="about-toolbar">
+      <button
+        v-if="embedded"
+        class="about-back"
+        type="button"
+        :aria-label="t('meeting.back')"
+        :title="t('meeting.back')"
+        @click="emit('close')"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="m15 5-7 7 7 7"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
       <router-link
+        v-else
         to="/station-map"
         class="about-back"
         :aria-label="t('meeting.back')"
@@ -25,7 +45,25 @@
       <DisplayControls />
     </div>
 
-    <h1><ZhuyinText :text="t('title.about')" /></h1>
+    <h1 id="about-page-title">
+      <ZhuyinText :text="t(embedded ? 'map.information' : 'title.about')" />
+    </h1>
+
+    <section class="about-card" aria-labelledby="about-map-notes">
+      <h2 id="about-map-notes"><ZhuyinText :text="t('about.mapNotes')" /></h2>
+      <p>
+        <ZhuyinText
+          :text="t(floor === '1F' ? 'map.firstFloorNote' : 'map.footerNote')"
+        />
+      </p>
+      <ul v-if="mapSources.length" class="about-links">
+        <li v-for="source in mapSources" :key="source.url">
+          <a :href="source.url" target="_blank" rel="noopener noreferrer">{{
+            source.label
+          }}</a>
+        </li>
+      </ul>
+    </section>
 
     <section class="about-card" aria-labelledby="about-version">
       <h2 id="about-version"><ZhuyinText :text="t('about.version')" /></h2>
@@ -143,6 +181,7 @@
 </template>
 
 <script setup>
+/* global defineProps, defineEmits */
 import { displayPlainZhuyin } from "../display/zhuyin.mjs";
 import ZhuyinText from "../components/ZhuyinText.vue";
 import { computed } from "vue";
@@ -153,8 +192,34 @@ import { buildInfo, summarizeStationData } from "../about/about.mjs";
 import points from "./station-points.json";
 import connections from "./station-connections.json";
 
+const props = defineProps({
+  embedded: { type: Boolean, default: false },
+  floor: { type: String, default: "B2" },
+});
+const emit = defineEmits(["close"]);
 const { theme, displayMode } = useDisplayPreferences();
 const { locale, t } = useI18n();
+const mapSources = computed(() => {
+  if (props.floor === "1F") return [];
+  const floors = ["B1", "B2", "B3", "B4"];
+  const floor = floors.includes(props.floor) ? props.floor : "B2";
+  return [
+    {
+      label: t("map.sourceInfo", { floor }),
+      url:
+        "https://web.metro.taipei/img/ALL/INFOPDF/051.pdf#page=" +
+        (floors.indexOf(floor) + 1),
+    },
+    {
+      label: t("map.sourceFacilities"),
+      url: "https://web.metro.taipei/pages2026/WebStation/051/1",
+    },
+    {
+      label: t("map.sourceSection"),
+      url: "https://web.metro.taipei/pages2026/WebStation/051/4",
+    },
+  ];
+});
 const build = buildInfo;
 const data = summarizeStationData(points, connections);
 const repository = "github.com/yoyo899843/Taipei-Codefest-2026-Big-Dumb";
@@ -219,6 +284,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.`;
   box-shadow: 0 1px 0 var(--tp-gray-100);
 }
 .about-back {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
   display: inline-grid;
   flex: none;
   place-items: center;

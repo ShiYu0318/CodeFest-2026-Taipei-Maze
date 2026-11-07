@@ -33,7 +33,7 @@ export default {
   "tour.theme": "밝은 화면과 어두운 화면을 전환하세요.",
   "tour.contrast": "고대비를 켜면 글자와 테두리가 더 뚜렷해져요.",
   "tour.mode":
-    "표준, 어린이, 시니어 모드를 골라 글자 크기와 표시 방식을 조정하세요.",
+    "기본, 어린이, 시니어 모드를 골라 글자 크기와 표시 방식을 조정하세요.",
   "lang.label": "언어",
   "display.group": "화면 설정",
   "display.dark": "다크 모드",
@@ -41,7 +41,7 @@ export default {
   "display.toDark": "다크 모드로 전환",
   "display.contrast": "고대비",
   "display.mode": "화면 모드",
-  "display.standard": "표준",
+  "display.standard": "기본",
   "display.child": "어린이",
   "display.senior": "어르신",
 
@@ -108,6 +108,8 @@ export default {
   "map.ariaYouAreHere": ", 현재 위치",
   "map.ariaDestination": ", 목적지",
   "map.youAreHere": "현재 위치",
+  "map.information": "지도 안내, 출처 및 라이선스",
+  "about.mapNotes": "지도 설명 및 참고 자료",
   "map.footerNote":
     "공개된 역 지도를 바탕으로 다시 그렸습니다. 위치는 대략적이니 현장 안내판을 따르세요.",
   "map.dataStatus":
@@ -133,7 +135,7 @@ export default {
   "scan.choosePlaceholder": "어디로 가시나요?",
   "scan.useSelected": "지도에서 선택한 “{name}”을(를) 목적지로 설정",
   "scan.searchByName": "이름으로 검색(7개 언어 시제품)",
-  "scan.stepFree": "계단 없는 연결만",
+  "scan.stepFree": "접근 가능한 경로",
   "scan.destination": "목적지: {place}",
   "scan.youAreHere": "현재 위치: {place}",
   "scan.notLocated": "아직 위치가 없습니다. 지금 있는 곳의 코드를 스캔하세요.",
@@ -263,6 +265,11 @@ export default {
   "chat.listeningNotice": "최대 30초 동안 듣는 중이에요.",
   "chat.drafted": "초안으로 바꿨어요. 확인한 뒤 보내세요.",
   "chat.cleared": "대화를 지웠어요.",
+  "search.startTitle": "출발지 검색",
+  "search.destinationTitle": "목적지 검색",
+  "search.useStart": "출발지로 설정",
+  "search.useDestination": "목적지로 설정",
+  "search.selectedStart": "출발지를 선택했습니다.",
   "search.title": "이름으로 편의시설 찾기",
   "search.note":
     "7개 언어 사전 시제품이며 단어는 아직 검토 전입니다. 이 페이지에 있는 편의시설만 찾으며 온라인 AI를 쓰지 않습니다.",
@@ -380,7 +387,7 @@ export default {
   "chat.answer.staff":
     "목적지를 고른 뒤 “직원에게 보여주기”를 누르세요. 큰 중국어 글씨가 나오니 역 직원이나 근처 사람에게 휴대폰을 보여 주면 돼요.",
   "chat.answer.stepFree":
-    "목적지를 고른 뒤 “계단 없는 연결만”을 체크하세요. 엘리베이터처럼 계단 없는 방법만 알려 드리고 계단으로 대신하지 않아요. 없으면 직원에게 문의하도록 안내해요.",
+    "목적지를 고른 뒤 “접근 가능한 경로”을 체크하세요. 엘리베이터처럼 계단 없는 방법만 알려 드리고 계단으로 대신하지 않아요. 없으면 직원에게 문의하도록 안내해요.",
   "chat.answer.scan":
     "기둥이나 벽의 위치 QR 코드를 찾아 “위치 스캔”을 누르세요. 지도에 “현재 위치”가 나와요. 새 장소에 가면 다시 스캔하세요.",
   "chat.answer.language":
