@@ -472,6 +472,7 @@ export function answerLocally(question, points, i18n, { nearFloor } = {}) {
       places: matches.slice(0, MAX_PLACES).map((point) => ({
         id: point.id,
         floor: point.floor,
+        icon: [point.type].flat()[0],
         label: placeLabel(point, i18n),
       })),
     };
@@ -496,6 +497,7 @@ export function answerLocally(question, points, i18n, { nearFloor } = {}) {
         places: toward.slice(0, MAX_PLACES).map((point) => ({
           id: point.id,
           floor: point.floor,
+          icon: [point.type].flat()[0],
           label: placeLabel(point, i18n),
         })),
       };

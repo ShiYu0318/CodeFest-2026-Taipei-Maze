@@ -167,7 +167,12 @@
                 <li v-for="place in message.places" :key="place.id">
                   <button type="button" @click="showPlace(place.id)">
                     <span class="maze-chat-floor">{{ place.floor }}</span>
-                    <span class="maze-chat-place-name">{{ place.label }}</span>
+                    <span class="maze-chat-place-name"
+                      ><StationMapIcon
+                        class="maze-chat-place-icon"
+                        :name="place.icon"
+                      />{{ place.label }}</span
+                    >
                     <span class="maze-chat-place-action">{{
                       t("chat.showOnMap")
                     }}</span>
@@ -374,6 +379,7 @@ import {
   shouldSendOnEnter,
   isUsableChatReply,
 } from "../chat/bridge.mjs";
+import StationMapIcon from "./StationMapIcon.vue";
 import { LOCALES, useI18n } from "../i18n/index.mjs";
 import { answerLocally } from "../chat/answers.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
@@ -927,6 +933,13 @@ onBeforeUnmount(() => {
   font-weight: 600;
   line-height: 1.35;
   overflow-wrap: anywhere;
+}
+.maze-chat-place-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  color: var(--tp-primary-700);
 }
 .maze-chat-place-action {
   grid-area: action;
