@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "tour.helper":
+    "右下のヘルパーをタップすると、駅の施設や地図の使い方について質問できます。",
+  "tour.reopen":
+    "左上の丸い「？」をタップすると、このガイドを最初から見直せます。",
   "tour.step": "ガイド {step}/{total}",
   "tour.skip": "ガイドをスキップ",
   "tour.tapOutside": "暗い部分をタップして次へ",

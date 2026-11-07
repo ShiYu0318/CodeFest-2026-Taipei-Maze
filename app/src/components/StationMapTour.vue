@@ -69,9 +69,9 @@ let startScroll;
 let controlScrollPositions;
 
 function findTarget() {
-  const element = props.root.querySelector(
-    `[data-tour-target="${targetId.value}"]`
-  );
+  // The floating helper is teleported to the document body.
+  const root = targetId.value === "helper" ? document : props.root;
+  const element = root.querySelector(`[data-tour-target="${targetId.value}"]`);
   if (targetId.value !== "marker" || !element) return element;
 
   const frame = element.getBoundingClientRect();
@@ -142,8 +142,9 @@ function positionTour() {
 
 function revealTarget() {
   target = findTarget();
-  target?.scrollIntoView({ block: "nearest", inline: "nearest" });
-  if (target && !target.closest(".station-heading, .navigation-rescan-bar")) {
+  const inMap = target && props.root.contains(target);
+  if (inMap) target.scrollIntoView({ block: "nearest", inline: "nearest" });
+  if (inMap && !target.closest(".station-heading, .navigation-rescan-bar")) {
     const rect = target.getBoundingClientRect();
     const height = dialog.value.clientHeight;
     const anchorY = height * (height <= 420 ? 0.4 : 0.5);

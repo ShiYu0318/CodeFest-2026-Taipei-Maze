@@ -7,6 +7,7 @@
       v-if="!opened"
       ref="launcher"
       class="maze-chat-launcher"
+      data-tour-target="helper"
       :data-theme="theme"
       :aria-label="t('chat.open')"
       aria-haspopup="dialog"

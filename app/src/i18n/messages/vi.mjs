@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "tour.helper":
+    "Chạm vào trợ lý ở góc dưới bên phải để hỏi về tiện ích trong ga hoặc cách dùng bản đồ.",
+  "tour.reopen":
+    "Chạm vào dấu hỏi trong vòng tròn ở góc trên bên trái để xem lại hướng dẫn từ đầu.",
   "tour.step": "Hướng dẫn {step}/{total}",
   "tour.skip": "Bỏ qua",
   "tour.tapOutside": "Chạm vùng tối để tiếp tục",

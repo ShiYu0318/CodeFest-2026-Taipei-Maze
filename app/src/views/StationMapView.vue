@@ -15,6 +15,7 @@
         <div class="station-title-row">
           <button
             class="display-icon-button"
+            data-tour-target="reopen"
             type="button"
             aria-haspopup="dialog"
             :aria-label="t('tour.replay')"

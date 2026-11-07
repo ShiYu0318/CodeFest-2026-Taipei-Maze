@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "tour.helper":
+    "Tap the helper in the bottom-right corner to ask about station facilities or how to use the map.",
+  "tour.reopen":
+    "Tap the circled question mark in the top-left corner to restart this tour from step one.",
   "tour.step": "Tour {step} of {total}",
   "tour.skip": "Skip tour",
   "tour.tapOutside": "Tap the shaded area to continue",

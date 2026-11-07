@@ -10,6 +10,8 @@ export const mapTourSteps = [
   ["theme", "tour.themeTitle"],
   ["contrast", "display.contrast"],
   ["mode", "display.mode"],
+  ["helper", "chat.launcher"],
+  ["reopen", "tour.replay"],
 ];
 
 const storageKey = "taipei-maze.map-tour.v1";

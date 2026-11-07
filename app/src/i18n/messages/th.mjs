@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "tour.helper":
+    "แตะผู้ช่วยที่มุมขวาล่างเพื่อถามเรื่องสิ่งอำนวยความสะดวกในสถานีหรือวิธีใช้แผนที่",
+  "tour.reopen":
+    "แตะเครื่องหมายคำถามในวงกลมที่มุมซ้ายบนเพื่อเริ่มดูการแนะนำใหม่ตั้งแต่ขั้นแรก",
   "tour.step": "แนะนำการใช้งาน {step}/{total}",
   "tour.skip": "ข้ามการแนะนำ",
   "tour.tapOutside": "แตะพื้นที่มืดเพื่อไปต่อ",

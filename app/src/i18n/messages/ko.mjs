@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "tour.helper":
+    "오른쪽 아래의 도우미를 눌러 역 시설이나 지도 사용 방법을 물어보세요.",
+  "tour.reopen":
+    "왼쪽 위의 원 안 물음표를 누르면 안내를 처음부터 다시 볼 수 있어요.",
   "tour.step": "안내 {step}/{total}",
   "tour.skip": "안내 건너뛰기",
   "tour.tapOutside": "어두운 영역을 눌러 계속",
