@@ -455,4 +455,7 @@ export default {
   "map.zoomOut": "縮小地圖",
   "map.zoomReset": "點一下回到整層地圖",
   "map.zoomControls": "地圖縮放",
+  "guide.title": "全螢幕導引",
+  "guide.map": "查看地圖",
+  "guide.open": "開啟大箭頭導引",
 };

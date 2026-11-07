@@ -518,4 +518,7 @@ export default {
   "map.zoomOut": "Thu nhỏ",
   "map.zoomReset": "Chạm để xem cả tầng",
   "map.zoomControls": "Thu phóng bản đồ",
+  "guide.title": "Hướng dẫn toàn màn hình",
+  "guide.map": "Xem bản đồ",
+  "guide.open": "Mở hướng dẫn bằng mũi tên",
 };

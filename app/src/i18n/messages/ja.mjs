@@ -520,4 +520,7 @@ export default {
   "map.zoomOut": "縮小",
   "map.zoomReset": "タップでフロア全体を表示",
   "map.zoomControls": "地図の拡大・縮小",
+  "guide.title": "全画面ガイド",
+  "guide.map": "地図を見る",
+  "guide.open": "矢印ガイドを開く",
 };

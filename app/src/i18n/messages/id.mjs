@@ -528,4 +528,7 @@ export default {
   "map.zoomOut": "Perkecil",
   "map.zoomReset": "Ketuk untuk melihat seluruh lantai",
   "map.zoomControls": "Zoom peta",
+  "guide.title": "Panduan layar penuh",
+  "guide.map": "Lihat peta",
+  "guide.open": "Buka panduan panah",
 };

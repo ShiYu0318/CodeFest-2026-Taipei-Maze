@@ -519,4 +519,7 @@ export default {
   "map.zoomOut": "Zoom out",
   "map.zoomReset": "Tap to see the whole floor",
   "map.zoomControls": "Map zoom",
+  "guide.title": "Full-screen guidance",
+  "guide.map": "View map",
+  "guide.open": "Open arrow guidance",
 };

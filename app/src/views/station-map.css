@@ -1160,22 +1160,16 @@
   background: var(--warning-bg);
   color: var(--tp-secondary-800);
 }
-/* One row that scrolls sideways, like the facility chips. */
+/* Prominent facility shortcuts wrap rather than clipping enlarged text. */
 .walk-nearest {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
-  margin: 0 -16px;
-  padding: 2px 16px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    #000 calc(100% - 32px),
-    transparent
-  );
-  mask-image: linear-gradient(90deg, #000 calc(100% - 32px), transparent);
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 12px;
+  background: var(--surface);
+  border-radius: var(--tp-radius-card, 12px);
 }
 .walk-nearest::-webkit-scrollbar {
   display: none;
@@ -1234,4 +1228,17 @@
   background: var(--surface);
   color: var(--tp-primary-700);
   font-weight: 600;
+}
+
+.walk-nearest-label {
+  flex-basis: 100%;
+}
+.walk-nearest-button {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.walk-nearest-button:disabled {
+  opacity: 0.5;
+  cursor: default;
 }

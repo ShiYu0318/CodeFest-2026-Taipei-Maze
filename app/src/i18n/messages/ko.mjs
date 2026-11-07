@@ -509,4 +509,7 @@ export default {
   "map.zoomOut": "축소",
   "map.zoomReset": "눌러서 층 전체 보기",
   "map.zoomControls": "지도 확대·축소",
+  "guide.title": "전체 화면 안내",
+  "guide.map": "지도 보기",
+  "guide.open": "화살표 안내 열기",
 };

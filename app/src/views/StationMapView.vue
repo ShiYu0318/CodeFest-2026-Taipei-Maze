@@ -8,7 +8,11 @@
   >
     <div
       class="station-shell"
-      :inert="endpointPickerOpen || tripDialog || informationOpen ? '' : null"
+      :inert="
+        endpointPickerOpen || tripDialog || informationOpen || guideOpen
+          ? ''
+          : null
+      "
     >
       <section class="station-heading" :aria-label="t('map.toolbar')">
         <div class="station-title-row">
@@ -64,6 +68,30 @@
           />
         </template>
       </StationEndpointBar>
+      <div class="walk-nearest" role="group" :aria-label="t('walk.nearest')">
+        <span class="walk-nearest-label"
+          ><ZhuyinText :text="t('walk.nearest')"
+        /></span>
+        <button
+          v-for="category in nearestCategories"
+          :key="category"
+          type="button"
+          class="walk-nearest-button"
+          :disabled="location.view.value.active || nearestBusy"
+          @click="goNearest(category)"
+        >
+          <StationMapIcon :name="category" />
+          <ZhuyinText :text="t('type.' + category)" />
+        </button>
+      </div>
+      <p
+        v-if="nearestNotice"
+        class="walk-status"
+        data-state="warn"
+        role="status"
+      >
+        <ZhuyinText :text="nearestNotice" />
+      </p>
       <section class="walk-panel" :aria-label="t('walk.routeTitle')">
         <p v-if="sharedPlace" class="walk-status" data-state="ok" role="status">
           {{
@@ -81,6 +109,14 @@
         >
           <ZhuyinText :text="walkStatus" />
         </p>
+        <button
+          v-if="walkSteps.length"
+          type="button"
+          class="walk-share"
+          @click="openGuide"
+        >
+          <ZhuyinText :text="t('guide.open')" />
+        </button>
         <StationRouteSteps
           v-if="walkSteps.length"
           :steps="walkSteps"
@@ -96,29 +132,6 @@
         >
           {{ t("share.destination") }}
         </button>
-        <div v-if="walkStart" class="walk-nearest" role="group">
-          <span class="walk-nearest-label"
-            ><ZhuyinText :text="t('walk.nearest')"
-          /></span>
-          <button
-            v-for="category in nearestCategories"
-            :key="category"
-            type="button"
-            class="walk-nearest-button"
-            @click="goNearest(category)"
-          >
-            <StationMapIcon :name="category" />
-            <ZhuyinText :text="t('type.' + category)" />
-          </button>
-        </div>
-        <p
-          v-if="nearestNotice"
-          class="walk-status"
-          data-state="warn"
-          role="status"
-        >
-          <ZhuyinText :text="nearestNotice" />
-        </p>
       </section>
       <div
         ref="floorControls"
@@ -581,11 +594,27 @@
       :point="sharePoint"
       @close="sharePoint = null"
     />
+    <StationNavigationGuide
+      v-if="guideOpen"
+      :steps="walkSteps"
+      :index="walkStepIndex"
+      :points-by-id="stationById"
+      :status="guideStatus"
+      :notice="
+        location.view.value.noticeKey ? t(location.view.value.noticeKey) : ''
+      "
+      :available="location.view.value.available"
+      :active="location.view.value.active"
+      :has-destination="!!walkDestination"
+      @close="closeGuide"
+      @scan="scanGuide"
+      @destination="chooseGuideDestination"
+      @update:index="goWalkStep"
+    />
     <StationTripDialog
       v-if="tripDialog"
       :key="tripDialog"
       :direction="tripDirection"
-      :arrow="tripArrow"
       :cancel-only="tripDialog === 'cancel'"
       @continue="closeTripDialog"
       @cancel="cancelTrip"
@@ -619,6 +648,7 @@ import { readSharedPlace } from "../station/place-share.mjs";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
 import StationEndpointBar from "../components/StationEndpointBar.vue";
 import StationInformationDialog from "../components/StationInformationDialog.vue";
+import StationNavigationGuide from "../components/StationNavigationGuide.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
 import StationRouteSteps from "../components/StationRouteSteps.vue";
 import StationMapTour from "../components/StationMapTour.vue";
@@ -631,10 +661,9 @@ import { stationPoints } from "../station/scan.mjs";
 import { htmlLang, useI18n } from "../i18n/index.mjs";
 import { placeLabel, placeName } from "../i18n/places.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
+import { findNearestFacility } from "../station/nearest-action.mjs";
 import walkingNetwork from "../station/walking-network.json";
 import {
-  nearestPlace,
-  nextArrow,
   routeSteps,
   planWalk,
   routeLines,
@@ -677,7 +706,10 @@ const router = useRouter();
 const stationById = new Map(
   stationPoints(stationData).map((point) => [point.id, point])
 );
-const currentPoint = computed(() => stationById.get(route.query.start));
+const location = useStationLocation(stationData, stationConnections);
+const currentPoint = computed(() =>
+  stationById.get(route.query.start ?? location.view.value.position?.pointId)
+);
 const targetPoint = computed(() => stationById.get(route.query.destination));
 // const searchCatalogEntries = stationCatalog(stationData);
 // let searchPointRevision = 0;
@@ -733,6 +765,8 @@ const activeTheme = ref(null);
 const selected = ref(null);
 const endpointPickerOpen = ref(false);
 const tripDialog = ref(null);
+const guideOpen = ref(false);
+const nearestBusy = ref(false);
 let tripTrigger = null;
 const mapPickStep = ref(null);
 const draftStart = ref(null);
@@ -802,7 +836,7 @@ const mapTop = ref(0);
 const mapBoard = ref(null);
 const mapBoardWidth = ref(0);
 let mapBoardObserver;
-const location = useStationLocation(stationData, stationConnections);
+
 // Walking network: routes, nearest facilities and the first-step arrow.
 const walkRouter = walkingRouter(walkingNetwork);
 const nearestCategories = ["restroom", "elevator", "info", "water", "nursing"];
@@ -817,6 +851,7 @@ const walk = computed(() =>
     ? planWalk(walkRouter, {
         startId: walkStart.value,
         destinationId: walkDestination.value,
+        excludedEdgeTypes: location.view.value.excludedEdgeTypes,
         stepFree: location.view.value.stepFree,
         unavailableConnectorIds: location.view.value.unavailableConnectorIds,
       })
@@ -845,12 +880,17 @@ const walkCheckpoints = computed(() => {
   return ids.map((id) => stationById.get(id)).filter(Boolean);
 });
 async function goWalkStep(index) {
-  walkStepIndex.value = index;
   const step = walkSteps.value[index];
-  if (!step) return;
+  if (!Number.isInteger(index) || !step) return;
+  walkStepIndex.value = index;
   if (step.floor !== level.value) await showFloor(step.floor);
   await nextTick();
-  if (walkStepIndex.value !== index || level.value !== step.floor) return;
+  if (
+    walkSteps.value[index] !== step ||
+    walkStepIndex.value !== index ||
+    level.value !== step.floor
+  )
+    return;
   // Bring this step's stretch of the route (or its lift/stairs) into view.
   const anchor = stationById.get(step.fromId) ?? stationById.get(step.toId);
   const line = step.line ?? (anchor ? [[anchor.x, anchor.y]] : []);
@@ -875,40 +915,53 @@ const walkStatus = computed(() => {
       : t("walk.noRoute");
   return "";
 });
-const tripArrow = computed(() => {
-  if (walk.value.type !== "success") return null;
-  const arrow = nextArrow(walk.value.route);
-  if (arrow.kind === "none") return null;
-  const point = stationById.get(arrow.toward);
-  const name = point ? placeName(point, i18n) : "";
-  return {
-    ...arrow,
-    text:
-      arrow.kind === "map"
-        ? t("walk.arrowMap", { name })
-        : t(arrow.kind === "up" ? "walk.arrowUp" : "walk.arrowDown", {
-            via: t(`type.${arrow.via}`),
-            floor: arrow.floor,
-          }),
-    note: t("walk.arrowNote"),
-  };
-});
-function goNearest(category) {
-  const found = nearestPlace(walkRouter, {
-    startId: walkStart.value,
-    category,
-    stepFree: location.view.value.stepFree,
-    unavailableConnectorIds: location.view.value.unavailableConnectorIds,
-  });
-  const point = found.type === "success" && stationById.get(found.pointId);
-  if (!point) {
-    nearestNotice.value = t("walk.nearestNone", {
-      type: t(`type.${category}`),
+const guideStatus = computed(() => {
+  if (walk.value.type === "Arrived")
+    return t("route.arrive", {
+      name: walkDestinationPoint.value
+        ? placeName(walkDestinationPoint.value, i18n)
+        : "",
     });
+  return walkStatus.value || t("scan.chooseDestination");
+});
+async function goNearest(category) {
+  if (
+    location.view.value.active ||
+    nearestBusy.value ||
+    !nearestCategories.includes(category)
+  )
     return;
-  }
+  nearestBusy.value = true;
   nearestNotice.value = "";
-  chooseEndpoint(walkStart.value, point.id, point, "destination");
+  try {
+    nearestNotice.value = !walkStart.value ? t("walk.noStart") : "";
+    const found = await findNearestFacility(location, walkRouter, {
+      startId: walkStart.value,
+      category,
+    });
+    if (found.type === "NoStart") {
+      nearestNotice.value = t("walk.noStart") + " " + t("scan.needApp");
+      return;
+    }
+    if (!found.startId) {
+      nearestNotice.value = location.view.value.noticeKey
+        ? t(location.view.value.noticeKey)
+        : t("walk.noStart");
+      return;
+    }
+    const point = found.type === "success" && stationById.get(found.pointId);
+    if (!point) {
+      nearestNotice.value =
+        found.type === "UnknownStart"
+          ? t("walk.unknownStart")
+          : t("walk.nearestNone", { type: t(`type.${category}`) });
+      return;
+    }
+    nearestNotice.value = "";
+    await chooseEndpoint(found.startId, point.id, point, "destination");
+  } finally {
+    nearestBusy.value = false;
+  }
 }
 const nearestNotice = ref("");
 // Place sharing: a fixed place for a friend, never a live position.
@@ -1604,6 +1657,7 @@ function updateMapLayout() {
 
 const pickerRole = ref(null);
 function openEndpointPicker(event, role = null) {
+  if (location.view.value.active) return;
   if (event) endpointTrigger = event.currentTarget;
   pickerRole.value = role;
   selected.value = null;
@@ -1638,7 +1692,14 @@ function saveEndpoints(start, destination) {
   });
 }
 
-function chooseEndpoint(start, destination, point, role, proposedOptions) {
+async function chooseEndpoint(
+  start,
+  destination,
+  point,
+  role,
+  proposedOptions
+) {
+  if (location.view.value.active) return;
   if (role === "destination") {
     const selected =
       proposedOptions && destination
@@ -1647,13 +1708,19 @@ function chooseEndpoint(start, destination, point, role, proposedOptions) {
     if (!selected) return;
   }
   pickerFocusPoint = point;
-  const saved = saveEndpoints(start, destination);
-  if (role === "destination" && destination) openTripDialog();
-  return saved;
+  await saveEndpoints(start, destination);
+  await nextTick();
+  if (
+    role === "destination" &&
+    destination &&
+    walkDestination.value === destination
+  )
+    openGuide();
 }
 
 // Swap start and destination without opening the trip dialog.
 function swapEndpoints() {
+  if (location.view.value.active) return;
   const start = currentPoint.value?.id ?? null,
     destination = targetPoint.value?.id ?? null;
   if (!start && !destination) return;
@@ -1668,16 +1735,45 @@ function goHere(point) {
 }
 
 function planDestination(destination) {
-  const saved = saveEndpoints(currentPoint.value?.id, destination);
-  openTripDialog();
-  return saved;
+  return chooseEndpoint(
+    walkStart.value,
+    destination,
+    stationById.get(destination),
+    "destination"
+  );
 }
 
 function onQrScanned() {
   const destination = targetPoint.value?.id;
   if (destination && !location.view.value.destinationId)
     location.choose(destination);
-  openTripDialog();
+  openGuide();
+}
+
+function openGuide() {
+  if (tripDialog.value || !viewport.value?.isConnected) return;
+  endpointPickerOpen.value = false;
+  endpointTrigger = null;
+  pickerFocusPoint = null;
+  selected.value = null;
+  mapPickStep.value = null;
+  draftStart.value = null;
+  guideOpen.value = true;
+  if (walkSteps.value.length) goWalkStep(walkStepIndex.value);
+}
+async function closeGuide() {
+  guideOpen.value = false;
+  await nextTick();
+  viewport.value?.focus({ preventScroll: true });
+}
+async function scanGuide() {
+  if (location.view.value.active) return;
+  const result = await location.scan();
+  if (result.type === "success" && guideOpen.value) onQrScanned();
+}
+async function chooseGuideDestination() {
+  await closeGuide();
+  openEndpointPicker(null, "destination");
 }
 
 function openTripDialog(mode = "orientation") {
@@ -1703,6 +1799,7 @@ async function closeTripDialog() {
 }
 
 async function cancelTrip() {
+  guideOpen.value = false;
   originView.value = null;
   arrivalPointId.value = null;
   try {

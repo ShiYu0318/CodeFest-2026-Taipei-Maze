@@ -496,4 +496,7 @@ export default {
   "map.zoomOut": "ย่อ",
   "map.zoomReset": "แตะเพื่อดูทั้งชั้น",
   "map.zoomControls": "ซูมแผนที่",
+  "guide.title": "คำแนะนำแบบเต็มหน้าจอ",
+  "guide.map": "ดูแผนที่",
+  "guide.open": "เปิดคำแนะนำลูกศร",
 };
