@@ -9,7 +9,7 @@
 | AGPL 完整條款 | [GNU 官方純文字](https://www.gnu.org/licenses/agpl-3.0.txt)，存為根目錄 LICENSE | 原文逐字複製；授權文本本身之版權聲明保留 |
 | TownPass | [taipei-doit/TownPass](https://github.com/taipei-doit/TownPass)，宿主與橋接參考 | 上游 LICENSE 為 GPL 第 3 版；目前未將上游專案複製進本 repo |
 | TownPass-Services | [官方微服務範例](https://github.com/taipei-doit/TownPass-Services)，協定與結構參考 | 實際複製程式前逐檔核對 LICENSE、版權與來源；不假設與宿主同授權 |
-| 2026 城市通入門指引 PDF | 使用者提供，作為開發文件來源 | 不是本專案原創作品；保留原文件，不套用本專案 AGPL；公開再散布權利尚未確認，不納入本次 commit |
+| 2026 城市通入門指引 PDF | [使用者提供的原檔](<./docs/2026 城市通入門指引.pdf>)，作為開發文件來源 | 依使用者明確指示納入 private repo；不是本專案原創作品，不套用本專案 AGPL，公開再散布權利仍須另行確認 |
 | 官方站圖、設施資料 | 見開發指南與 SPEC 的資料來源 | 尚未納入產品資產；使用及再散布前逐項核對 |
 | 翻譯、語音、字型及模型候選 | 見 SPEC 第 13–16 節 | 尚無已生成音檔或已核准模型；不得將候選列成已安裝／已授權 |
 
