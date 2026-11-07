@@ -1,6 +1,6 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
-  <span v-if="displayMode === 'child'" class="zhuyin-text">
+  <span v-if="annotate" class="zhuyin-text">
     <span class="zhuyin-readable">{{ text }}</span>
     <span aria-hidden="true">
       <template v-for="(part, index) in parts" :key="index">
@@ -28,11 +28,17 @@
 import { computed } from "vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { annotateZhuyin, splitZhuyin } from "../display/zhuyin.mjs";
+import { useI18n } from "../i18n/index.mjs";
 
 const props = defineProps({ text: { type: String, default: "" } });
 const { displayMode } = useDisplayPreferences();
+const { locale } = useI18n();
+// Zhuyin only helps children reading Traditional Chinese.
+const annotate = computed(
+  () => displayMode.value === "child" && locale.value === "zh-TW"
+);
 const parts = computed(() =>
-  displayMode.value === "child"
+  annotate.value
     ? annotateZhuyin(props.text).map((part) => ({
         ...part,
         ...(part.reading ? splitZhuyin(part.reading) : {}),

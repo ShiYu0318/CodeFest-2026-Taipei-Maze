@@ -15,14 +15,23 @@
 import { onMounted, watch } from "vue";
 import FloatingChat from "./components/FloatingChat.vue";
 import { useDisplayPreferences } from "./display/preferences.mjs";
+import { htmlLang, useI18n } from "./i18n/index.mjs";
 import "./display/display-preferences.css";
 
 const { theme } = useDisplayPreferences();
+const { locale } = useI18n();
 onMounted(() => {
   watch(
     theme,
     (value) => {
       document.documentElement.dataset.mazeTheme = value;
+    },
+    { immediate: true }
+  );
+  watch(
+    locale,
+    (value) => {
+      document.documentElement.lang = htmlLang(value);
     },
     { immediate: true }
   );
