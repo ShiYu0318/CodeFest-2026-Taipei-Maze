@@ -357,4 +357,37 @@ export default {
     "출구는 아직 지도에 없어요. 아래는 {code} 출구 방향의 장소예요. 도착하면 {code} 출구 안내판을 따라가세요:",
   "chat.answer.otherFloors":
     "{floor}에는 {type}이(가) 없지만 다른 층에 있어요. 누르면 지도에서 볼 수 있어요:",
+  "about.version": "배포 버전",
+  "about.versionLabel": "버전",
+  "about.builtOn": "({date} 빌드)",
+  "about.fullCommit": "전체 commit",
+  "about.unknownBuild":
+    "이 빌드는 git commit을 기록하지 않아 소스 버전과 맞춰 볼 수 없어요.",
+  "about.source": "소스 코드",
+  "about.licenseIntro":
+    "직접 만든 코드는 아래 라이선스를 따르며, 조건에 따라 사용·수정·재배포할 수 있어요:",
+  "about.repository": "소스 저장소: ",
+  "about.privateRepo":
+    "저장소는 아직 비공개라 익명으로 내려받을 수 없어요. 공개되면 위 버전으로 이 화면과 같은 소스와 빌드 안내를 찾을 수 있어요.",
+  "about.noticeSummary": "라이선스 고지 전문",
+  "about.data": "데이터 출처와 검증 상태",
+  "about.points": "{floors}의 편의시설 {count}곳",
+  "about.connections":
+    "층간 연결 {count}개, 그중 {unverified}개는 종류나 방향을 현장에서 아직 확인하지 않음",
+  "about.networkYes": "현장에서 확인한 보행 경로망이 있어요.",
+  "about.networkNo":
+    "현장에서 확인한 보행 경로망이 아직 없어요. 지도는 구역과 층간 연결만 보여 주며 단계별 거리는 없어요.",
+  "about.mapSource":
+    "역 지도는 타이베이 지하철의 공개 정보를 바탕으로 다시 그렸어요. 위치는 대략적이니 현장 안내판을 따르세요:",
+  "about.linkFacilities": "역 편의시설",
+  "about.linkInfo": "역 안내도",
+  "about.openData":
+    "연구용 공공데이터는 타이베이시 공공데이터 플랫폼(타이베이 지하철공사, 환경보호국)에서 가져왔으며 아래 조건으로 사용해요. 이 프로젝트에 포함되어도 AGPL이 되지 않아요:",
+  "about.openDataLicense": "정부 공공데이터 이용허락 조건 제1판",
+  "about.thirdParty": "서드파티 구성요소",
+  "about.gemmaNote":
+    "Gemma 모델은 앱에서 Gemma 이용약관에 동의한 뒤에만 내려받아요. 모델 가중치는 이 프로젝트의 AGPL 라이선스에 포함되지 않아요.",
+  "about.compLitert": "Google LiteRT-LM(앱 내)",
+  "about.compGemma": "Google Gemma 3 1B(선택 다운로드)",
+  "about.compTownpass": "TownPass 호스트 앱",
 };

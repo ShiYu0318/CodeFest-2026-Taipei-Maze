@@ -7,7 +7,11 @@
     :data-display-mode="displayMode"
   >
     <div class="meeting-toolbar">
-      <router-link to="/station-map" class="meeting-back"
+      <router-link
+        to="/station-map"
+        class="meeting-back"
+        :aria-label="t('meeting.back')"
+        :title="t('meeting.back')"
         ><svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             d="m15 5-7 7 7 7"
@@ -17,8 +21,7 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           /></svg
-        ><ZhuyinText :text="t('meeting.back')"
-      /></router-link>
+      ></router-link>
       <DisplayControls />
     </div>
     <h1><ZhuyinText :text="t('meeting.title')" /></h1>
@@ -114,11 +117,12 @@ const timeText = computed(() => {
   box-shadow: 0 1px 0 var(--tp-gray-100);
 }
 .meeting-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
   min-height: 44px;
+  border-radius: 10px;
   font-weight: 600;
   text-decoration: none;
 }

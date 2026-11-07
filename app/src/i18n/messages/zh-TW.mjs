@@ -321,4 +321,35 @@ export default {
     "出口本身還沒畫進地圖。這些是往 {code} 出口方向的地點，到了之後請看現場的 {code} 出口指標：",
   "chat.answer.otherFloors":
     "{floor} 沒有{type}，其他樓層有，點一下就能在地圖上看到：",
+  "about.version": "部署版本",
+  "about.versionLabel": "版本",
+  "about.builtOn": "（建置於 {date}）",
+  "about.fullCommit": "完整 commit",
+  "about.unknownBuild": "此建置未記錄 git commit，無法對應到特定原始碼版本。",
+  "about.source": "原始碼",
+  "about.licenseIntro":
+    "原創程式碼採以下授權，你可以依條款使用、修改與再散布：",
+  "about.repository": "原始碼儲存庫：",
+  "about.privateRepo":
+    "儲存庫目前仍為私人狀態，尚未開放匿名下載。公開後，可依上方版本號取得與此畫面相符的原始碼與建置說明。",
+  "about.noticeSummary": "授權聲明全文",
+  "about.data": "資料來源與驗證狀態",
+  "about.points": "{count} 個設施標點，涵蓋 {floors}",
+  "about.connections":
+    "{count} 條樓層連接，其中 {unverified} 條的種類或方向仍待現場核對",
+  "about.networkYes": "已提供現場核對過的步行路網。",
+  "about.networkNo":
+    "尚未建立經現場核對的步行路網，地圖只顯示區域與樓層關係，不提供逐步步行距離。",
+  "about.mapSource": "站內圖依台北捷運公開資料重繪，位置為示意，請依現場指標：",
+  "about.linkFacilities": "車站設施",
+  "about.linkInfo": "車站資訊圖",
+  "about.openData":
+    "研究用開放資料來自臺北市資料大平臺（臺北捷運公司、臺北市環保局），依以下條款使用，不因收錄於本專案而改為 AGPL：",
+  "about.openDataLicense": "政府資料開放授權條款－第 1 版",
+  "about.thirdParty": "第三方元件",
+  "about.gemmaNote":
+    "Gemma 模型只在你於 App 內同意 Gemma 使用條款後才下載，模型權重不屬於本專案的 AGPL 授權範圍。",
+  "about.compLitert": "Google LiteRT-LM（App 端）",
+  "about.compGemma": "Google Gemma 3 1B（選配下載）",
+  "about.compTownpass": "台北通 TownPass 宿主",
 };

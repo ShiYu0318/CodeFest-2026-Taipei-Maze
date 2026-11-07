@@ -368,4 +368,37 @@ export default {
     "出口はまだ地図にありません。{code}出口の方向にある場所です。着いたら{code}出口の案内表示に従ってください：",
   "chat.answer.otherFloors":
     "{floor}には{type}がありませんが、ほかの階にあります。タップすると地図で見られます：",
+  "about.version": "公開中のバージョン",
+  "about.versionLabel": "バージョン",
+  "about.builtOn": "（{date} ビルド）",
+  "about.fullCommit": "完全な commit",
+  "about.unknownBuild":
+    "このビルドには git commit が記録されていないため、ソースのバージョンと対応づけられません。",
+  "about.source": "ソースコード",
+  "about.licenseIntro":
+    "オリジナルのコードは次のライセンスです。条件に従って利用・改変・再配布できます：",
+  "about.repository": "ソースリポジトリ：",
+  "about.privateRepo":
+    "リポジトリはまだ非公開で、匿名ではダウンロードできません。公開後は、上のバージョンからこの画面と一致するソースとビルド手順を入手できます。",
+  "about.noticeSummary": "ライセンス表示の全文",
+  "about.data": "データの出典と確認状況",
+  "about.points": "{floors} の設備 {count} か所",
+  "about.connections":
+    "階をつなぐ経路 {count} 本（うち {unverified} 本は種類や向きを現地で未確認）",
+  "about.networkYes": "現地で確認した歩行ネットワークがあります。",
+  "about.networkNo":
+    "現地で確認した歩行ネットワークはまだありません。地図はエリアと階のつながりだけを示し、一歩ずつの距離は出しません。",
+  "about.mapSource":
+    "駅の地図は台北メトロの公開情報をもとに描き直しました。位置はおおよそです。現地の案内表示に従ってください：",
+  "about.linkFacilities": "駅の設備",
+  "about.linkInfo": "駅の案内図",
+  "about.openData":
+    "研究用のオープンデータは台北市オープンデータプラットフォーム（台北捷運公司、環境保護局）のもので、次の条件で利用しています。本プロジェクトに含めても AGPL にはなりません：",
+  "about.openDataLicense": "政府オープンデータ利用規約 第1版",
+  "about.thirdParty": "サードパーティのコンポーネント",
+  "about.gemmaNote":
+    "Gemma モデルは、アプリで Gemma 利用規約に同意したあとにだけダウンロードされます。モデルの重みは本プロジェクトの AGPL ライセンスの対象外です。",
+  "about.compLitert": "Google LiteRT-LM（アプリ内）",
+  "about.compGemma": "Google Gemma 3 1B（任意ダウンロード）",
+  "about.compTownpass": "TownPass ホストアプリ",
 };
