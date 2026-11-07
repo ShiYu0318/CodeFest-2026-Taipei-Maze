@@ -318,6 +318,7 @@
   min-height: 0;
   aspect-ratio: var(--map-aspect);
   overflow: hidden;
+  overflow: clip;
   touch-action: pan-x pan-y;
   border-block: 1px solid var(--border);
   background: var(--station-map-background);
@@ -326,10 +327,16 @@
   overflow: auto;
   overscroll-behavior: none;
   scrollbar-color: var(--tp-primary-400) var(--tp-primary-50);
+  cursor: grab;
+}
+.map-dragging,
+.map-dragging .map-pin {
+  cursor: grabbing;
 }
 .map-board {
   position: relative;
   aspect-ratio: var(--map-aspect);
+  user-select: none;
 }
 .floor-plan {
   position: absolute;
