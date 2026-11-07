@@ -40,16 +40,16 @@
           {{ t("demo.arrive") }}
         </button>
       </template>
+      <InfoDisclosure :label="t('guide.help')">
+        <p><ZhuyinText :text="t('walk.arrowNote')" /></p>
+        <p><ZhuyinText :text="t('scan.caveat')" /></p>
+      </InfoDisclosure>
     </div>
-    <details class="inline-route-help">
-      <summary>{{ t("guide.help") }}</summary>
-      <p>{{ t("walk.arrowNote") }}</p>
-      <p>{{ t("scan.caveat") }}</p>
-    </details>
   </section>
 </template>
 <script setup>
 /* global defineProps, defineEmits */
+import InfoDisclosure from "./InfoDisclosure.vue";
 import StationRouteSteps from "./StationRouteSteps.vue";
 import StationMapIcon from "./StationMapIcon.vue";
 import ZhuyinText from "./ZhuyinText.vue";
@@ -111,12 +111,6 @@ const { t } = useI18n();
 }
 .inline-route-actions button:disabled {
   opacity: 0.5;
-}
-.inline-route-help summary {
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
 }
 .inline-route-actions :focus-visible {
   outline: 3px solid var(--tp-primary-600);

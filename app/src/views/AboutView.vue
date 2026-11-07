@@ -49,6 +49,15 @@
       <ZhuyinText :text="t(embedded ? 'map.information' : 'title.about')" />
     </h1>
 
+    <section class="about-card" aria-labelledby="about-direction-help">
+      <h2 id="about-direction-help"><ZhuyinText :text="t('guide.help')" /></h2>
+      <p><ZhuyinText :text="t('walk.arrowNote')" /></p>
+      <p><ZhuyinText :text="t('scan.caveat')" /></p>
+      <p v-if="displayMode === 'child'">
+        <ZhuyinText :text="t('map.childHint')" />
+      </p>
+    </section>
+
     <section class="about-card" aria-labelledby="about-map-notes">
       <h2 id="about-map-notes"><ZhuyinText :text="t('about.mapNotes')" /></h2>
       <p>

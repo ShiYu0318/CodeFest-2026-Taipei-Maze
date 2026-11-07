@@ -36,7 +36,9 @@
         <p class="share-place">
           <strong>{{ point.floor }}</strong> · {{ name }}
         </p>
-        <p class="share-intro">{{ t("share.intro") }}</p>
+        <InfoDisclosure :label="t('map.information')"
+          ><p>{{ t("share.intro") }}</p></InfoDisclosure
+        >
         <label class="share-link">
           <span>{{ t("share.linkLabel") }}</span>
           <input
@@ -71,6 +73,7 @@
 
 <script setup>
 /* global defineProps, defineEmits */
+import InfoDisclosure from "./InfoDisclosure.vue";
 import { computed, nextTick, onMounted, ref } from "vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { useI18n } from "../i18n/index.mjs";

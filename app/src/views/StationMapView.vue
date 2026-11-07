@@ -62,9 +62,6 @@
         <p v-if="displayMode !== 'standard'" class="display-floor-label">
           {{ level }}・<ZhuyinText :text="t('floor.' + level)" />
         </p>
-        <p v-if="displayMode === 'child'" class="display-hint">
-          <ZhuyinText :text="t('map.childHint')" />
-        </p>
       </section>
 
       <StationEndpointBar
@@ -447,9 +444,10 @@
               >
                 <ZhuyinText :text="pointName(selected)" />
               </h3>
-              <p v-if="showHelp" class="display-hint">
-                <ZhuyinText :text="t('help.' + pointHelpType(selected))" />
-              </p>
+              <InfoDisclosure v-if="showHelp" :label="t('map.information')"
+                ><p>
+                  <ZhuyinText :text="t('help.' + pointHelpType(selected))" /></p
+              ></InfoDisclosure>
               <div
                 v-if="isConnector(selected) && destinations.length"
                 class="facility-transfers"
@@ -635,6 +633,7 @@ import {
   demoNextPoint,
 } from "../station/demo-scenarios.mjs";
 import StationRescanDialog from "../components/StationRescanDialog.vue";
+import InfoDisclosure from "../components/InfoDisclosure.vue";
 import StationRouteGuide from "../components/StationRouteGuide.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
 import StationMapTour from "../components/StationMapTour.vue";

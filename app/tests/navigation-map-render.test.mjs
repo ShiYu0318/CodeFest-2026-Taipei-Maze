@@ -60,6 +60,7 @@ const realComponents = new Set([
   "StationTripDialog",
   "StationRouteSteps",
   "StationRouteGuide",
+  "InfoDisclosure",
   "ZhuyinText",
   "ZhuyinSvgText",
 ]);
@@ -722,6 +723,12 @@ test("inline guidance shares route steps, with no arrow before a route exists or
     const first = await render({});
     assert.doesNotMatch(first, /<dialog/);
     assert.match(first, /station-route-guide/);
+    assert.match(first, /class="info-disclosure"/);
+    assert.doesNotMatch(first, /class="inline-route-help"/);
+    assert.doesNotMatch(
+      first,
+      /<details[^>]*class="info-disclosure"[^>]* open/
+    );
     assert.match(first, /route-step-arrow/);
     assert.match(first, /Previous/);
     assert.match(first, /Next/);
