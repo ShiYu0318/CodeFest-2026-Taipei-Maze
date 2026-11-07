@@ -25,7 +25,8 @@ export default {
   "tour.floors": "1FまたはB1〜B4をタップすると、その階の地図が表示されます。",
   "tour.layers":
     "オンにすると、他の階の輪郭が破線で表示され、位置を比較できます。",
-  "tour.locate": "一覧または地図から出発地と目的地を選びます。",
+  "tour.locate":
+    "いちばん上で出発地と目的地を検索または選択します。真ん中の矢印で入れ替えられます。",
   "tour.facilities":
     "トイレやエレベーターなどの種類を選ぶと、この階の施設を探せます。",
   "tour.marker":
@@ -510,4 +511,16 @@ export default {
   "route.prev": "前へ",
   "route.next": "次へ",
   "route.all": "すべての手順",
+  "endpoint.swap": "出発地と目的地を入れ替える",
+  "endpoint.startPlaceholder": "どこから出発しますか？",
+  "endpoint.destinationPlaceholder": "どこへ行きますか？",
+  "endpoint.browse": "または種類から選ぶ",
+  "endpoint.allTypes": "すべて",
+  "map.zoomIn": "拡大",
+  "map.zoomOut": "縮小",
+  "map.zoomReset": "タップでフロア全体を表示",
+  "map.zoomControls": "地図の拡大・縮小",
+  "guide.title": "全画面ガイド",
+  "guide.map": "地図を見る",
+  "guide.open": "矢印ガイドを開く",
 };

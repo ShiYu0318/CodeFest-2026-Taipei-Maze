@@ -16,6 +16,8 @@ import * as floorPlans from "../src/views/station-floor-plans.mjs";
 import * as navigation from "../src/station/navigation-view.mjs";
 import * as scan from "../src/station/scan.mjs";
 import * as mapFocus from "../src/station/map-focus.mjs";
+import * as nearestAction from "../src/station/nearest-action.mjs";
+import * as stepText from "../src/station/step-text.mjs";
 import * as walkRoute from "../src/station/walk-route.mjs";
 import * as placeShare from "../src/station/place-share.mjs";
 import * as mapTour from "../src/station/map-tour.mjs";
@@ -49,8 +51,11 @@ const realComponents = new Set([
   "StationTransferStep",
   "DestinationSearch",
   "StationScanPanel",
+  "StationEndpointBar",
   "DisplayControls",
   "StationTripDialog",
+  "StationRouteSteps",
+  "StationNavigationGuide",
   "ZhuyinText",
   "ZhuyinSvgText",
 ]);
@@ -100,6 +105,8 @@ function component(name) {
     "scan.mjs": scan,
     "map-focus.mjs": mapFocus,
     "walk-route.mjs": walkRoute,
+    "step-text.mjs": stepText,
+    "nearest-action.mjs": nearestAction,
     "place-share.mjs": placeShare,
     "walking-network.json": JSON.parse(
       readFileSync(
@@ -177,6 +184,15 @@ test("navigation prompts annotate only Traditional Chinese child mode", async ()
           ["StationNavigationRescan", { location }],
           ["StationTripDialog", { direction: language.t("map.faceChoose") }],
           ["StationTripDialog", { direction: "", cancelOnly: true }],
+          [
+            "StationNavigationGuide",
+            {
+              steps: [],
+              index: 0,
+              pointsById: new Map(),
+              status: language.t("walk.noStart"),
+            },
+          ],
         ]) {
           const html = await renderToString(
             Vue.createSSRApp(component(name), props)
@@ -223,13 +239,21 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
       data.points.B2.length
     );
     assert.ok(browsing.includes('class="theme-group'));
+    assert.ok(
+      browsing.includes('class="walk-nearest-button"'),
+      "nearest facilities remain visible before locating"
+    );
     assert.equal(browsing.includes('class="navigation-rescan-bar"'), false);
     const trip = await render({ start: "b1-e4", destination: "m-e4" });
     assert.equal((trip.match(/class="map-pin\b/g) ?? []).length, 9);
     assert.ok(trip.includes('class="navigation-rescan-bar"'));
     assert.equal(trip.includes('class="theme-group'), false);
     assert.equal(trip.includes('class="plan-stairs"'), false);
-    assert.ok(trip.includes('class="station-scan-panel"'));
+    assert.ok(trip.includes('class="station-scan-panel'));
+    assert.ok(
+      trip.includes('class="endpoint-go"'),
+      "manual endpoints expose a direct go button without a scan prerequisite"
+    );
     assert.ok(trip.includes("重新掃描定位"));
     const restored = await render({});
     assert.equal(
@@ -596,5 +620,53 @@ test("navigation actions keep one scan control followed by staff help and trip c
     } finally {
       location.dispose();
     }
+  }
+});
+
+test("full-screen guidance shares real route steps, with no arrow before a route exists", async () => {
+  const language = i18n.useI18n();
+  const previous = language.locale.value;
+  language.setLocale("en");
+  try {
+    const router = walkRoute.walkingRouter(
+      JSON.parse(
+        readFileSync(
+          new URL("../src/station/walking-network.json", import.meta.url)
+        )
+      )
+    );
+    const route = walkRoute.planWalk(router, {
+      startId: "b1-e4",
+      destinationId: "b1-wc-m5",
+    });
+    const steps = walkRoute.routeSteps(route.route);
+    const pointsById = new Map(
+      Object.values(data.points)
+        .flat()
+        .map((p) => [p.id, p])
+    );
+    const render = (extra) =>
+      renderToString(
+        Vue.createSSRApp(component("StationNavigationGuide"), {
+          steps,
+          index: 0,
+          pointsById,
+          ...extra,
+        })
+      );
+    const first = await render({});
+    assert.match(first, /<dialog/);
+    assert.match(first, /route-step-arrow/);
+    assert.match(first, /Previous/);
+    assert.match(first, /Next/);
+    const arrived = await render({ index: steps.length - 1 });
+    assert.match(arrived, /data-kind="arrive"/);
+    const missing = await render({ steps: [], status: "Locate first" });
+    assert.match(missing, /Locate first/);
+    assert.doesNotMatch(missing, /route-step-arrow/);
+    const scanning = await render({ active: true });
+    assert.doesNotMatch(scanning, /route-step-arrow/);
+  } finally {
+    language.setLocale(previous);
   }
 });

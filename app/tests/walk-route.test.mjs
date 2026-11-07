@@ -121,3 +121,30 @@ test("a cross-floor route becomes walk / floor / arrive steps with checkpoints",
 test("no route means no steps", () => {
   assert.deepEqual(routeSteps(null), []);
 });
+
+test("planning and nearest lookup preserve hard route restrictions", () => {
+  const requests = [];
+  const stub = {
+    route: (request) => {
+      requests.push(request);
+      return { type: "NoRoute" };
+    },
+    nearest: (request) => {
+      requests.push(request);
+      return { type: "NoRoute" };
+    },
+  };
+  const constraints = {
+    startId: "b1-e4",
+    destinationId: "b1-wc-m5",
+    category: "restroom",
+    excludedEdgeTypes: ["stairs"],
+    allowFareGates: false,
+  };
+  planWalk(stub, constraints);
+  nearestPlace(stub, constraints);
+  for (const request of requests) {
+    assert.deepEqual(request.excludedEdgeTypes, ["stairs"]);
+    assert.equal(request.allowFareGates, false);
+  }
+});

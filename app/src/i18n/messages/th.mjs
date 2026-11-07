@@ -24,7 +24,8 @@ export default {
     "สแกนคิวอาร์โค้ดในสถานีผ่าน TownPass เพื่อยืนยันชั้นและตำแหน่งปัจจุบัน",
   "tour.floors": "แตะ 1F หรือ B1–B4 เพื่อดูแผนที่ของชั้นนั้น",
   "tour.layers": "เปิดเพื่อดูเส้นประของชั้นอื่นและเปรียบเทียบตำแหน่ง",
-  "tour.locate": "เลือกจุดเริ่มต้นและจุดหมายจากรายการหรือแตะบนแผนที่",
+  "tour.locate":
+    "ค้นหาหรือเลือกจุดเริ่มต้นและปลายทางที่ด้านบน แตะลูกศรตรงกลางเพื่อสลับ",
   "tour.facilities":
     "เลือกประเภท เช่น ห้องน้ำหรือลิฟต์ เพื่อดูตำแหน่งบนชั้นนี้",
   "tour.marker":
@@ -486,4 +487,16 @@ export default {
   "route.prev": "ก่อนหน้า",
   "route.next": "ถัดไป",
   "route.all": "ทุกขั้นตอน",
+  "endpoint.swap": "สลับจุดเริ่มต้นและปลายทาง",
+  "endpoint.startPlaceholder": "เริ่มจากที่ไหน",
+  "endpoint.destinationPlaceholder": "จะไปที่ไหน",
+  "endpoint.browse": "หรือเลือกตามประเภท",
+  "endpoint.allTypes": "ทั้งหมด",
+  "map.zoomIn": "ขยาย",
+  "map.zoomOut": "ย่อ",
+  "map.zoomReset": "แตะเพื่อดูทั้งชั้น",
+  "map.zoomControls": "ซูมแผนที่",
+  "guide.title": "คำแนะนำแบบเต็มหน้าจอ",
+  "guide.map": "ดูแผนที่",
+  "guide.open": "เปิดคำแนะนำลูกศร",
 };

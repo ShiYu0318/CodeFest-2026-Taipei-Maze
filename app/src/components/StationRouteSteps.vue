@@ -7,7 +7,7 @@
         t("route.step", { current: index + 1, total: steps.length })
       }}</span>
     </header>
-    <div class="route-step-card" :data-kind="step.kind">
+    <div v-if="step" class="route-step-card" :data-kind="step.kind">
       <svg
         class="route-step-arrow"
         viewBox="0 0 120 120"
@@ -25,7 +25,7 @@
         />
         <path v-else d="M60 102V32M30 58l30-30 30 30" />
       </svg>
-      <div class="route-step-text">
+      <div :key="index" class="route-step-text">
         <p class="route-step-main"><ZhuyinText :text="describe(step)" /></p>
         <p v-if="step.viaIds?.length" class="route-step-via">
           <ZhuyinText
@@ -78,6 +78,7 @@ import { computed } from "vue";
 import ZhuyinText from "./ZhuyinText.vue";
 import { useI18n } from "../i18n/index.mjs";
 import { placeName } from "../i18n/places.mjs";
+import { describeStep } from "../station/step-text.mjs";
 
 const props = defineProps({
   steps: { type: Array, required: true },
@@ -92,16 +93,7 @@ const name = (id) => {
   const point = props.pointsById.get(id);
   return point ? placeName(point, i18n) : id;
 };
-function describe(item) {
-  if (item.kind === "arrive")
-    return t("route.arrive", { name: name(item.toId) });
-  if (item.kind === "floor")
-    return t(item.direction === "up" ? "walk.arrowUp" : "walk.arrowDown", {
-      via: t(`type.${item.via}`),
-      floor: item.toFloor,
-    });
-  return t("route.walk", { floor: item.floor, name: name(item.toId) });
-}
+const describe = (item) => describeStep(item, t, name);
 function go(next) {
   if (next >= 0 && next < props.steps.length) emit("update:index", next);
 }
@@ -118,6 +110,7 @@ function go(next) {
 }
 .route-steps-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
@@ -169,10 +162,12 @@ function go(next) {
 }
 .route-step-nav {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 .route-step-nav button {
+  min-width: 0;
+  overflow-wrap: anywhere;
   min-height: var(--display-control-height, 44px);
   border: 1px solid var(--tp-primary-500);
   border-radius: var(--tp-radius-button, 10px);
@@ -246,6 +241,14 @@ function go(next) {
 @media (prefers-reduced-motion: reduce) {
   .route-step-arrow {
     transition: none;
+  }
+}
+@media (max-width: 420px) {
+  .route-step-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .route-step-arrow {
+    justify-self: center;
   }
 }
 </style>

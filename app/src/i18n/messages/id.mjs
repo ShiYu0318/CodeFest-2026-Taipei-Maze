@@ -26,7 +26,7 @@ export default {
   "tour.layers":
     "Aktifkan untuk melihat garis putus-putus lantai lain dan membandingkan posisinya.",
   "tour.locate":
-    "Pilih titik awal dan tujuan dari daftar atau langsung pada peta.",
+    "Cari atau pilih titik awal dan tujuan di bagian atas. Ketuk panah di tengah untuk menukar.",
   "tour.facilities":
     "Pilih kategori, seperti toilet atau lift, untuk menemukan fasilitas di lantai ini.",
   "tour.marker":
@@ -519,4 +519,16 @@ export default {
   "route.prev": "Sebelumnya",
   "route.next": "Berikutnya",
   "route.all": "Semua langkah",
+  "endpoint.swap": "Tukar titik awal dan tujuan",
+  "endpoint.startPlaceholder": "Mulai dari mana?",
+  "endpoint.destinationPlaceholder": "Mau ke mana?",
+  "endpoint.browse": "Atau pilih menurut jenis",
+  "endpoint.allTypes": "Semua",
+  "map.zoomIn": "Perbesar",
+  "map.zoomOut": "Perkecil",
+  "map.zoomReset": "Ketuk untuk melihat seluruh lantai",
+  "map.zoomControls": "Zoom peta",
+  "guide.title": "Panduan layar penuh",
+  "guide.map": "Lihat peta",
+  "guide.open": "Buka panduan panah",
 };

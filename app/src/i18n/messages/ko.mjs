@@ -24,7 +24,8 @@ export default {
     "TownPass에서 역의 QR 코드를 스캔해 현재 층과 위치를 확인하세요.",
   "tour.floors": "1F 또는 B1–B4를 눌러 해당 층의 지도를 보세요.",
   "tour.layers": "켜면 다른 층이 점선으로 표시되어 위치를 비교할 수 있어요.",
-  "tour.locate": "목록이나 지도에서 출발지와 목적지를 선택하세요.",
+  "tour.locate":
+    "맨 위에서 출발지와 도착지를 검색하거나 고르세요. 가운데 화살표를 누르면 서로 바뀌어요.",
   "tour.facilities":
     "화장실이나 엘리베이터 같은 유형을 골라 이 층의 시설을 찾으세요.",
   "tour.marker":
@@ -499,4 +500,16 @@ export default {
   "route.prev": "이전",
   "route.next": "다음",
   "route.all": "전체 단계",
+  "endpoint.swap": "출발지와 도착지 바꾸기",
+  "endpoint.startPlaceholder": "어디에서 출발하나요?",
+  "endpoint.destinationPlaceholder": "어디로 가나요?",
+  "endpoint.browse": "또는 종류별로 고르기",
+  "endpoint.allTypes": "전체",
+  "map.zoomIn": "확대",
+  "map.zoomOut": "축소",
+  "map.zoomReset": "눌러서 층 전체 보기",
+  "map.zoomControls": "지도 확대·축소",
+  "guide.title": "전체 화면 안내",
+  "guide.map": "지도 보기",
+  "guide.open": "화살표 안내 열기",
 };
