@@ -410,6 +410,25 @@
   transform: translate(-50%, -50%);
   background: transparent;
 }
+.map-pin.pin-filtered-out {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    opacity 180ms ease,
+    visibility 0s linear 180ms;
+}
+.map-pin:not(.pin-filtered-out) {
+  transition:
+    opacity 180ms ease,
+    visibility 0s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-pin.pin-filtered-out,
+  .map-pin:not(.pin-filtered-out) {
+    transition: none;
+  }
+}
 .pin-icon {
   display: grid;
   place-items: center;

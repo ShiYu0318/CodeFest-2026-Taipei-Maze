@@ -158,10 +158,11 @@
                       </g>
                     </svg>
                     <button
-                      v-for="point in visibleFloorPoints"
+                      v-for="point in floorPoints"
                       :key="point.id"
                       class="map-pin"
                       :class="{
+                        'pin-filtered-out': !isPointVisible(point),
                         'pin-themed': matchesTheme(point, activeTheme),
                         'pin-scan-position': point.id === scanPositionId,
                         'pin-scan-target': point.id === scanTargetId,
@@ -175,6 +176,8 @@
                         (point.id === scanTargetId ? '，目的地' : '')
                       "
                       :aria-pressed="point.id === selected?.id"
+                      :aria-hidden="!isPointVisible(point)"
+                      :tabindex="isPointVisible(point) ? undefined : -1"
                       :aria-expanded="
                         isConnector(point)
                           ? point.id === selected?.id &&
@@ -461,11 +464,7 @@ const floorPoints = computed(() => {
   ];
 });
 const visibleFloorPoints = computed(() =>
-  activeTheme.value
-    ? floorPoints.value.filter((point) =>
-        matchesTheme(point, activeTheme.value)
-      )
-    : floorPoints.value
+  floorPoints.value.filter(isPointVisible)
 );
 const availableThemes = computed(() =>
   Object.keys(categories).filter((type) =>
@@ -552,6 +551,10 @@ function matchesTheme(point, type) {
     (types.includes("stairs-escalator") &&
       (type === "stairs" || type === "escalator"))
   );
+}
+
+function isPointVisible(point) {
+  return !activeTheme.value || matchesTheme(point, activeTheme.value);
 }
 
 function transferNote(transfer) {
