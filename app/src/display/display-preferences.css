@@ -326,3 +326,26 @@ html[data-maze-contrast="high"] .display-page :focus-visible {
 html[data-maze-contrast="high"] .display-page button:not(:disabled) {
   border-width: 2px;
 }
+
+/* PingFang TC mis-stacks Vietnamese tone marks and has no Thai, Korean or
+   Japanese-specific glyphs, so other interface languages lead with system
+   fonts and keep PingFang TC only as the fallback for Chinese place names. */
+:lang(en),
+:lang(vi),
+:lang(id) {
+  --tp-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans",
+    "PingFang TC", sans-serif;
+}
+:lang(th) {
+  --tp-font: -apple-system, BlinkMacSystemFont, Thonburi, "Noto Sans Thai",
+    "Leelawadee UI", "PingFang TC", sans-serif;
+}
+:lang(ko) {
+  --tp-font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+    "Noto Sans KR", "Malgun Gothic", "PingFang TC", sans-serif;
+}
+:lang(ja) {
+  --tp-font: -apple-system, BlinkMacSystemFont, "Hiragino Sans",
+    "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "PingFang TC",
+    sans-serif;
+}
