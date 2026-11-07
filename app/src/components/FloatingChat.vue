@@ -1227,6 +1227,21 @@ onBeforeUnmount(() => {
   }
 }
 
+/* Age-tiered text sizes follow the display mode. */
+[data-display-mode="child"] .maze-chat-bubble,
+[data-display-mode="child"] .maze-chat-place-name {
+  font-size: 17px;
+}
+[data-display-mode="senior"] .maze-chat-bubble,
+[data-display-mode="senior"] .maze-chat-place-name,
+[data-display-mode="senior"] .maze-chat-field textarea {
+  font-size: 19px;
+}
+[data-display-mode="senior"] .maze-chat-tray button {
+  min-height: 44px;
+  font-size: 16px;
+}
+
 /* Phones: a TownPass-style bottom sheet that fills the visible viewport. */
 @media (max-width: 520px) {
   .maze-chat-backdrop {
