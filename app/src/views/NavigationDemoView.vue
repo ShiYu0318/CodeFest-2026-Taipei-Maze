@@ -1,11 +1,22 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
-  <main class="navigation-lab" lang="zh-Hant">
+  <main
+    class="navigation-lab"
+    :class="{ 'simple-mode': simpleMode }"
+    lang="zh-Hant"
+  >
     <header class="lab-header">
       <router-link to="/station-map">← 回車站地圖</router-link>
       <span>導航流程測試</span>
     </header>
     <h1>確認位置，再走下一步</h1>
+    <button
+      type="button"
+      :aria-pressed="simpleMode"
+      @click="simpleMode = !simpleMode"
+    >
+      {{ simpleMode ? "切回標準模式" : "切換易讀模式" }}
+    </button>
     <p class="synthetic-notice">
       <strong>合成測試場景</strong>
       此圖不代表台北車站，請勿在現場依此行走。目前提供繁中測試流程，七語、語音與完整離線驗收尚未完成。
@@ -13,8 +24,16 @@
     <p v-if="view.phase === 'data_error'" role="alert">
       資料驗證失敗，已停止導航。請使用通過驗證的測試資料包。
     </p>
-    <div v-else class="lab-layout">
-      <section class="lab-controls" aria-labelledby="location-title">
+    <div
+      v-else
+      class="lab-layout"
+      :class="{ 'focused-layout': simpleMode && focusedPhase }"
+    >
+      <section
+        v-if="!simpleMode || !focusedPhase"
+        class="lab-controls"
+        aria-labelledby="location-title"
+      >
         <h2 id="location-title">確認出發點</h2>
         <p v-if="view.position" class="location-summary">
           上次確認：<strong>{{ nodeName(view.position.nodeId) }}</strong
@@ -85,6 +104,15 @@
           </p>
           <button @click="act('cancelRelocation')">取消重新定位</button>
         </section>
+        <DestinationSearch
+          id="navigation-destination-search"
+          :catalog="searchCatalogEntries"
+          navigation
+          :disabled="scanning"
+          :current-options="searchOptions"
+          :clear-token="searchClearToken"
+          @select="selectSearchDestination"
+        />
         <fieldset :disabled="scanning || view.phase === 'data_error'">
           <legend>目的地</legend>
           <label
@@ -144,7 +172,25 @@
           >
           <small>距離未校準；不提供公尺、最快或步行時間估計。</small>
         </div>
-        <nav class="floor-tabs" aria-label="測試地圖樓層">
+        <p v-if="view.excludedEdgeTypes.length" class="hint">
+          額外避開：{{
+            view.excludedEdgeTypes
+              .map((type) => edgeTypeNames[type])
+              .join("、")
+          }}。清除本次測試可重設。
+        </p>
+        <button
+          v-if="simpleMode"
+          @click="mapExpanded = !mapExpanded"
+          :aria-expanded="mapExpanded"
+        >
+          {{ mapExpanded ? "收起路線圖" : "查看路線圖" }}
+        </button>
+        <nav
+          v-if="!simpleMode || mapExpanded"
+          class="floor-tabs"
+          aria-label="測試地圖樓層"
+        >
           <button
             v-for="floor in graph.floors"
             :key="floor.id"
@@ -155,6 +201,7 @@
           </button>
         </nav>
         <NavigationDemoMap
+          v-if="!simpleMode || mapExpanded"
           :graph="graph"
           :floor-id="floorId"
           :route="visiblePlan?.route ?? null"
@@ -221,7 +268,7 @@
             結束並清除本次定位
           </button>
         </section>
-        <details class="test-tools">
+        <details v-if="!simpleMode" class="test-tools">
           <summary>開發測試工具與 QR 內容</summary>
           <p>
             目前測試碼：{{
@@ -250,11 +297,24 @@
 
 <script setup>
 import { computed, onBeforeUnmount, ref, shallowRef, watch } from "vue";
+import DestinationSearch from "../components/DestinationSearch.vue";
+import { navigationCatalog } from "../search/catalog.mjs";
 import NavigationDemoMap from "../components/NavigationDemoMap.vue";
 import graph from "../navigation/demo-graph.json";
 import { createSession } from "../navigation/session.mjs";
 import { createQrBridge } from "../navigation/bridge.mjs";
 const session = createSession(graph);
+const searchCatalogEntries = navigationCatalog(graph);
+const simpleMode = ref(false);
+const mapExpanded = ref(false);
+const searchClearToken = ref(0);
+const edgeTypeNames = {
+  walkway: "走道",
+  stairs: "樓梯",
+  elevator: "電梯",
+  escalator: "電扶梯",
+  gate: "閘門",
+};
 const view = shallowRef({ ...session.state });
 const floorId = ref("b1");
 const fixtureAnchor = ref("qr_a");
@@ -267,8 +327,20 @@ function refresh() {
   view.value = { ...session.state };
 }
 function act(method, value) {
+  if (method === "end") searchClearToken.value++;
   session[method](value);
   refresh();
+}
+const focusedPhase = computed(() =>
+  ["navigating", "arrival_confirmation", "arrived"].includes(view.value.phase)
+);
+const searchOptions = computed(() => ({
+  mobilityProfile: view.value.mobilityProfile,
+  excludedEdgeTypes: view.value.excludedEdgeTypes,
+  unavailableConnectorIds: view.value.unavailableConnectorIds,
+}));
+function selectSearchDestination(selection) {
+  act("applySearchSelection", selection);
 }
 const fixturePayload = computed(() =>
   JSON.stringify({
@@ -573,5 +645,24 @@ pre {
     border-bottom: 1px solid #d7e3e6;
     padding: 0 0 24px;
   }
+}
+
+.focused-layout {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 760px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.simple-mode .instruction-text {
+  font-size: 1.65rem;
+  line-height: 1.8;
+}
+.simple-mode .instruction-panel button {
+  min-height: 52px;
+  font-size: 1.1rem;
+}
+.simple-mode .route-summary > span,
+.simple-mode .route-summary > small {
+  display: none;
 }
 </style>
