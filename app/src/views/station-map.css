@@ -288,6 +288,21 @@
   position: relative;
   background: var(--station-map-background);
 }
+.map-return-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 12px;
+}
+.map-return {
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 1px solid var(--tp-primary-300);
+  border-radius: 8px;
+  background: var(--wash);
+  color: var(--tp-primary-800);
+  font-size: 0.8125rem;
+  font-weight: 750;
+}
 .compass {
   position: absolute;
   z-index: 3;
@@ -400,6 +415,11 @@
 .pin-icon svg {
   width: 15px;
   height: 15px;
+}
+.pin-connector:not([aria-pressed="true"]):not(.pin-themed):not(.pin-route)
+  .pin-icon {
+  width: 22px;
+  height: 22px;
 }
 .map-pin[aria-pressed="true"],
 .map-pin:focus-visible,
@@ -563,6 +583,13 @@
   color: var(--muted);
   font-size: 0.8125rem;
   line-height: 1.55;
+}
+.connector-detail {
+  min-height: 0;
+  margin: 8px 12px;
+}
+.connector-detail .floor-destination {
+  margin-top: 0;
 }
 .detail-heading {
   display: flex;
@@ -800,6 +827,7 @@
   .theme-group button:hover,
   .theme-map-link:hover,
   .layer-toggle:hover,
+  .map-return:hover,
   .clear-selection:hover,
   .floor-destination:hover,
   .facility-list button:hover {

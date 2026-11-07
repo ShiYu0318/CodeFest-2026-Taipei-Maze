@@ -61,6 +61,11 @@
       <div class="station-layout">
         <div class="station-map-column">
           <section ref="mapSection" class="map-card" aria-label="車站地圖">
+            <div v-if="originView" class="map-return-bar">
+              <button type="button" class="map-return" @click="returnToOrigin">
+                回到起點・{{ originView.floor }}
+              </button>
+            </div>
             <div class="map-stage">
               <div class="compass" aria-label="北方朝上略偏左" role="img">
                 <span>N</span>
@@ -114,6 +119,7 @@
                     :key="point.id"
                     class="map-pin"
                     :class="{
+                      'pin-connector': isConnector(point),
                       'pin-themed': matchesTheme(point, activeTheme),
                       'pin-route': point.id === routeOrigin?.pointId,
                     }"
@@ -121,11 +127,12 @@
                     :style="pinStyle(point)"
                     :aria-label="point.name"
                     :aria-pressed="point.id === selected?.id"
-                    @click="togglePoint(point)"
+                    @click="selectMapPoint(point, $event)"
                     @focus="focusVisiblePin(point, $event)"
                   >
                     <span
                       v-if="
+                        isConnector(point) ||
                         (matchesTheme(point, activeTheme) &&
                           categories[activeTheme]) ||
                         (point.id === routeOrigin?.pointId &&
@@ -152,7 +159,46 @@
               </div>
             </div>
 
-            <div class="map-tools">
+            <section
+              v-if="selected && isConnector(selected)"
+              class="facility-detail connector-detail"
+              aria-labelledby="connector-detail-title"
+            >
+              <div class="detail-heading">
+                <h3
+                  id="connector-detail-title"
+                  ref="connectorHeading"
+                  tabindex="-1"
+                >
+                  {{ selected.name }}
+                </h3>
+                <button
+                  type="button"
+                  class="clear-selection"
+                  @click="closeConnectorDetails"
+                >
+                  關閉
+                </button>
+              </div>
+              <template v-if="destination">
+                <button
+                  type="button"
+                  class="floor-destination"
+                  @click="visitDestination"
+                >
+                  前往 {{ destination.to.floor }}・{{
+                    zoneName(destination.to.zone)
+                  }}
+                  <StationMapIcon name="arrow" />
+                </button>
+                <p>到達位置 {{ destination.to.point.name }}</p>
+                <p v-if="transferNote(destination)">
+                  {{ transferNote(destination) }}
+                </p>
+              </template>
+              <p v-else>{{ selected.description }}</p>
+            </section>
+            <div v-else class="map-tools">
               <span v-if="selected" class="map-selection">{{
                 selected.name
               }}</span>
@@ -321,6 +367,13 @@ import { zones, planFloorTransfer, transferFromPoint } from "./station-routing";
 const { categories, points } = stationData;
 // const searchCatalogEntries = stationCatalog(stationData);
 // let searchPointRevision = 0;
+const connectorTypes = new Set([
+  "elevator",
+  "stairs",
+  "escalator",
+  "stairs-escalator",
+  "stairway",
+]);
 const floorIds = Object.keys(floors);
 const floorPalette = {
   B1: {
@@ -352,6 +405,8 @@ const level = ref("B2");
 const showLayers = ref(false);
 const activeTheme = ref(null);
 const selected = ref(null);
+const originView = ref(null);
+const connectorHeading = ref(null);
 const zoom = ref(1);
 const viewport = ref(null);
 const dragging = ref(false);
@@ -396,6 +451,7 @@ const targetOptions = computed(() =>
   zones.filter((zone) => zone.floor !== level.value)
 );
 const routeOrigin = computed(() => previewSteps.value[0]?.from);
+const destination = computed(() => getDestination(selected.value));
 const floorPoints = computed(() => {
   const current = points[level.value];
   return [
@@ -458,6 +514,10 @@ const sources = computed(() => [
 
 function getDestination(point) {
   return transferFromPoint(point?.id);
+}
+
+function isConnector(point) {
+  return connectorTypes.has(point.type);
 }
 
 function zoneName(id) {
@@ -788,9 +848,8 @@ function zoomWithKeyboard(event) {
   }
   if (event.key !== "+" && event.key !== "=" && event.key !== "-") return;
   event.preventDefault();
-  const frame = viewport.value;
   const scale = constrainZoom(zoom.value + (event.key === "-" ? -0.5 : 0.5));
-  zoomAt(scale, [frame.clientWidth / 2, frame.clientHeight / 2]);
+  zoomAt(scale, viewportCenter());
 }
 
 async function showFloor(floor) {
@@ -827,11 +886,70 @@ function toggleLayers() {
 //   mapSection.value?.scrollIntoView({ block: "start" });
 // }
 
-function togglePoint(point) {
-  selected.value = selected.value?.id === point.id ? null : point;
+function selectPoint(point) {
+  selected.value = point;
   if (selected.value && startOptions.value.length > 1)
     startZone.value = point.zone;
-  if (selected.value && zoom.value > 1) centerOn(...normalizedPoint(point));
+}
+
+async function selectMapPoint(point, event) {
+  const connector = isConnector(point);
+  selectPoint(connector || selected.value?.id !== point.id ? point : null);
+  if (!selected.value) return;
+  if (zoom.value > 1) centerOn(...normalizedPoint(point));
+  if (!connector) return;
+  await nextTick();
+  if (event.detail === 0) connectorHeading.value?.focus();
+  else
+    connectorHeading.value
+      ?.closest("section")
+      .scrollIntoView({ block: "nearest" });
+}
+
+function closeConnectorDetails() {
+  selectPoint(null);
+  viewport.value.focus({ preventScroll: true });
+}
+
+function viewportCenter() {
+  const frame = viewport.value;
+  return [frame.clientWidth / 2, frame.clientHeight / 2];
+}
+
+async function visitDestination(event) {
+  const arrival = destination.value?.to;
+  if (!arrival) return;
+  const scale = zoom.value;
+  if (!originView.value) {
+    originView.value = {
+      floor: level.value,
+      point: selected.value,
+      layers: showLayers.value,
+      theme: activeTheme.value,
+      scale,
+      center: zoomAnchor(viewportCenter()),
+    };
+  }
+
+  await showFloor(arrival.floor);
+  selectPoint(arrival.point);
+  await zoomAt(scale, viewportCenter(), normalizedPoint(arrival.point));
+  mapSection.value.scrollIntoView({ block: "nearest" });
+  if (event.detail === 0) connectorHeading.value?.focus();
+}
+
+async function returnToOrigin() {
+  const origin = originView.value;
+  if (!origin) return;
+  originView.value = null;
+  await showFloor(origin.floor);
+  showLayers.value = origin.layers;
+  activeTheme.value = origin.theme;
+  selectPoint(origin.point);
+  await nextTick();
+  await zoomAt(origin.scale, viewportCenter(), origin.center);
+  mapSection.value.scrollIntoView({ block: "nearest" });
+  viewport.value.focus({ preventScroll: true });
 }
 
 function toggleTheme(type) {
