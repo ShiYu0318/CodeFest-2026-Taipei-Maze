@@ -367,4 +367,6 @@ export default {
   "chat.welcome2":
     "Halo! Saya asisten stasiun. Tanyakan “Di mana toilet?”, “Di mana lift?”, atau cara memindai lokasi. Jawaban berasal dari data stasiun dan tidak perlu internet.",
   "map.goHere": "Antar saya ke sini",
+  "chat.answer.exitCode":
+    "Pintu keluar belum ada di peta. Tempat-tempat ini mengarah ke pintu keluar {code}; dari sana ikuti papan petunjuk {code}:",
 };

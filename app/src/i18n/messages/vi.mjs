@@ -359,4 +359,6 @@ export default {
   "chat.welcome2":
     "Xin chào! Tôi là trợ lý nhà ga. Hãy hỏi “Nhà vệ sinh ở đâu?”, “Thang máy ở đâu?” hoặc cách quét vị trí. Câu trả lời lấy từ dữ liệu nhà ga, không cần mạng.",
   "map.goHere": "Đưa tôi đến đây",
+  "chat.answer.exitCode":
+    "Lối ra chưa có trên bản đồ. Đây là các điểm dẫn về hướng lối ra {code}; đến đó hãy theo biển chỉ dẫn lối ra {code}:",
 };

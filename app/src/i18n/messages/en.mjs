@@ -360,4 +360,6 @@ export default {
   "chat.welcome2":
     "Hi! I'm the station helper. Ask “Where is the toilet?”, “Where is the elevator?” or how to scan your location. Answers come from the station data and need no internet.",
   "map.goHere": "Go here",
+  "chat.answer.exitCode":
+    "Exits are not on the map yet. These places lead toward exit {code} — from there, follow the {code} exit signs:",
 };

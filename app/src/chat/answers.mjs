@@ -4,7 +4,7 @@
 // get fixed, reviewed text. Anything else returns null so the optional
 // on-device model may try, or the chat explains what it can do.
 import { catalogs } from "../i18n/index.mjs";
-import { placeLabel } from "../i18n/places.mjs";
+import { placeCodes, placeLabel } from "../i18n/places.mjs";
 
 // Types a visitor looks for. Stairs are left out on purpose: listing stairs
 // to someone who said "no stairs" would be harmful.
@@ -475,6 +475,30 @@ export function answerLocally(question, points, i18n, { nearFloor } = {}) {
         label: placeLabel(point, i18n),
       })),
     };
+  }
+  // Exit codes (M1–M8) are understood in every language. Exits themselves
+  // are not mapped, but places toward them are.
+  const exitCode = String(question)
+    .normalize("NFKC")
+    .match(/\bM\s?(\d{1,2})\b/i);
+  if (exitCode) {
+    const code = `M${exitCode[1]}`;
+    const toward = points
+      .filter((point) => placeCodes(point.name).includes(code))
+      .sort((a, b) => FLOORS.indexOf(a.floor) - FLOORS.indexOf(b.floor));
+    if (toward.length)
+      return {
+        kind: "places",
+        type: "exit",
+        floor: null,
+        total: toward.length,
+        text: t("chat.answer.exitCode", { code }),
+        places: toward.slice(0, MAX_PLACES).map((point) => ({
+          id: point.id,
+          floor: point.floor,
+          label: placeLabel(point, i18n),
+        })),
+      };
   }
   const topic = detectTopic(text);
   if (topic) return { kind: "faq", topic, text: t(`chat.answer.${topic}`) };

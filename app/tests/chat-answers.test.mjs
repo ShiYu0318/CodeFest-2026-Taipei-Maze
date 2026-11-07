@@ -122,3 +122,18 @@ test("every suggested question is answered offline in every language", () => {
     );
   }
 });
+
+test("an exit code lists places toward that exit, honestly labelled", () => {
+  const answer = answerLocally("Where is exit M4?", points, i18n("en"));
+  assert.equal(answer.kind, "places");
+  assert.ok(answer.places.length >= 1);
+  assert.ok(answer.places.every((place) => /M4/.test(place.label)));
+  assert.match(answer.text, /M4/);
+  assert.match(answer.text, /signs/);
+  const zh = answerLocally("M8 出口怎麼走", points, i18n("zh-TW"));
+  assert.ok(zh.places.every((place) => /M8/.test(place.label)));
+  assert.equal(
+    answerLocally("Where is exit M99?", points, i18n("en")).topic,
+    "exit"
+  );
+});
