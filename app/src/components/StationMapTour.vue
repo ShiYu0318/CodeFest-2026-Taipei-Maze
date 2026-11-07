@@ -143,7 +143,7 @@ function positionTour() {
 function revealTarget() {
   target = findTarget();
   target?.scrollIntoView({ block: "nearest", inline: "nearest" });
-  if (target && !target.closest(".station-heading")) {
+  if (target && !target.closest(".station-heading, .navigation-rescan-bar")) {
     const rect = target.getBoundingClientRect();
     const height = dialog.value.clientHeight;
     const anchorY = height * (height <= 420 ? 0.4 : 0.5);

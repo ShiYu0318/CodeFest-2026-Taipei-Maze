@@ -110,7 +110,7 @@
 .station-title-row {
   display: flex;
   flex-wrap: nowrap;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   min-height: 44px;
 }
@@ -133,6 +133,7 @@
 }
 .station-title-row .display-controls {
   margin-left: auto;
+  flex-wrap: wrap;
 }
 .station-page .station-heading .display-floor-label {
   margin-top: 10px;
@@ -788,15 +789,6 @@
   flex-basis: 100%;
   font-weight: 600;
   text-decoration: none;
-}
-.map-tour-replay {
-  min-height: 44px;
-  padding-inline: 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--accent);
-  font-weight: 600;
 }
 
 @media (hover: hover) {

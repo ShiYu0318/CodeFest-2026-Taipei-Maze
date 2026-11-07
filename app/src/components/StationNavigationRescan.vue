@@ -4,6 +4,7 @@
     <p class="navigation-rescan-hint">{{ t("scan.relocateHint") }}</p>
     <button
       type="button"
+      data-tour-target="scan"
       :disabled="!view.available || view.active"
       :aria-busy="view.active"
       @click="scan"

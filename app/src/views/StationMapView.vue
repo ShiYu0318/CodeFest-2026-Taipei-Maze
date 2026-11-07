@@ -1,5 +1,6 @@
 <template>
   <main
+    ref="stationPage"
     class="station-page display-page"
     :class="{ 'navigation-focused': navigationMap.active }"
     :lang="htmlLang(locale)"
@@ -7,13 +8,21 @@
     :data-display-mode="displayMode"
   >
     <div
-      ref="stationShell"
       class="station-shell"
       :inert="endpointPickerOpen || tripDialog ? '' : null"
     >
       <section class="station-heading" :aria-label="t('display.group')">
         <div class="station-title-row">
-          <!-- <h1 id="station-title"><ZhuyinText text="台北車站" /></h1> -->
+          <button
+            class="display-icon-button"
+            type="button"
+            aria-haspopup="dialog"
+            :aria-label="t('tour.replay')"
+            :title="t('tour.replay')"
+            @click="tourOpen = true"
+          >
+            <StationMapIcon name="help" />
+          </button>
           <DisplayControls />
         </div>
         <p v-if="displayMode !== 'standard'" class="display-floor-label">
@@ -85,7 +94,7 @@
       </div>
 
       <div
-        v-if="!navigationMap.active"
+        v-if="!navigationMap.active || tourOpen"
         class="theme-group horizontal-scroll"
         data-tour-target="facilities"
         role="group"
@@ -399,13 +408,6 @@
           <router-link to="/about" class="station-about-link">{{
             t("map.about", { version: buildInfo.short })
           }}</router-link>
-          <button
-            type="button"
-            class="map-tour-replay"
-            @click="tourOpen = true"
-          >
-            {{ t("tour.replay") }}
-          </button>
         </footer>
       </div>
     </div>
@@ -432,7 +434,7 @@
     />
     <StationMapTour
       v-if="tourOpen"
-      :root="stationShell"
+      :root="stationPage"
       @finish="finishMapTour"
     />
   </main>
@@ -481,7 +483,7 @@ const { categories, points } = stationData;
 const { theme, displayMode } = useDisplayPreferences();
 const i18n = useI18n();
 const { locale, t } = i18n;
-const stationShell = ref(null);
+const stationPage = ref(null);
 const tourOpen = ref(false);
 
 function finishMapTour() {
