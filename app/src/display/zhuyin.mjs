@@ -4,6 +4,7 @@
 // Prefer reviewed phrases, then reviewed UI characters; leave unknown text plain.
 import { characterReadings } from "./zhuyin-characters.mjs";
 const entries = [
+  ["北車小幫手", "ㄅㄟˇ ㄔㄜ ㄒㄧㄠˇ ㄅㄤ ㄕㄡˇ"],
   ["碰面", "ㄆㄥˋ ㄇㄧㄢˋ"],
   ["貼給朋友", "ㄊㄧㄝ ㄍㄟˇ ㄆㄥˊ ˙ㄧㄡ"],
   ["尚未現場核對", "ㄕㄤˋ ㄨㄟˋ ㄒㄧㄢˋ ㄔㄤˇ ㄏㄜˊ ㄉㄨㄟˋ"],
@@ -72,8 +73,8 @@ const entries = [
   ["工具", "ㄍㄨㄥ ㄐㄩˋ"],
   // Map tour (onboarding) phrases, one per clause.
   [
-    "點右下角的小幫手",
-    "ㄉㄧㄢˇ ㄧㄡˋ ㄒㄧㄚˋ ㄐㄧㄠˇ ˙ㄉㄜ ㄒㄧㄠˇ ㄅㄤ ㄕㄡˇ",
+    "點右下角的北車小幫手",
+    "ㄉㄧㄢˇ ㄧㄡˋ ㄒㄧㄚˋ ㄐㄧㄠˇ ˙ㄉㄜ ㄅㄟˇ ㄔㄜ ㄒㄧㄠˇ ㄅㄤ ㄕㄡˇ",
   ],
   [
     "可以詢問站內設施或地圖操作方式",

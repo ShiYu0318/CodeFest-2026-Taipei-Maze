@@ -8,7 +8,7 @@ export default {
   "map.firstFloorNote":
     "Bản đồ 1F được vẽ lại từ ảnh sơ đồ nhà ga được cung cấp. Vị trí tiện ích chỉ mang tính minh họa. Hãy theo biển chỉ dẫn tại ga.",
   "tour.helper":
-    "Chạm vào trợ lý ở góc dưới bên phải để hỏi về tiện ích trong ga hoặc cách dùng bản đồ.",
+    "Chạm vào Trợ lý Ga Đài Bắc ở góc dưới bên phải để hỏi về tiện ích trong ga hoặc cách dùng bản đồ.",
   "tour.reopen":
     "Chạm vào dấu hỏi trong vòng tròn ở góc trên bên trái để xem lại hướng dẫn từ đầu.",
   "tour.step": "Hướng dẫn {step}/{total}",
@@ -214,14 +214,14 @@ export default {
   "title.meeting": "Điểm hẹn",
   "title.about": "Mã nguồn và giấy phép",
   "title.default": "Taipei Maze",
-  "chat.open": "Mở trò chuyện với trợ lý nhà ga",
-  "chat.launcher": "Trợ lý",
+  "chat.open": "Mở trò chuyện với Trợ lý Ga Đài Bắc",
+  "chat.launcher": "Trợ lý Ga Đài Bắc",
   "chat.close": "Đóng trò chuyện",
-  "chat.title": "Trợ lý nhà ga",
+  "chat.title": "Trợ lý Ga Đài Bắc",
   "chat.clear": "Xóa cuộc trò chuyện",
   "chat.log": "Tin nhắn",
   "chat.welcome":
-    "Xin chào! Tôi là trợ lý nhà ga. Hãy hỏi tôi về chỉ đường bằng mã QR hoặc cách dùng ứng dụng. Về đường đi thực tế, hãy theo bản đồ và gợi ý chỉ đường.",
+    "Xin chào! Tôi là Trợ lý Ga Đài Bắc. Hãy hỏi tôi về chỉ đường bằng mã QR hoặc cách dùng ứng dụng. Về đường đi thực tế, hãy theo bản đồ và gợi ý chỉ đường.",
   "chat.checking":
     "Đang kiểm tra điện thoại này có trò chuyện trên máy được không…",
   "chat.noModel":
@@ -231,7 +231,7 @@ export default {
   "chat.install": "Cài mô hình trò chuyện",
   "chat.recheck": "Kiểm tra lại",
   "chat.you": "Tin nhắn của bạn",
-  "chat.bot": "Trợ lý trả lời",
+  "chat.bot": "Trợ lý Ga Đài Bắc trả lời",
   "chat.thinking": "Đang suy nghĩ trên điện thoại…",
   "chat.starters": "Câu hỏi gợi ý",
   "chat.ask": "Bạn muốn hỏi gì?",
@@ -406,7 +406,7 @@ export default {
   "chat.answer.display":
     "Ở góc trên bên phải: mặt trăng là chế độ tối, hình tròn nửa đen là tương phản cao, menu “Tiêu chuẩn” đổi sang Trẻ em hoặc Người cao tuổi (chữ lớn).",
   "chat.answer.privacy":
-    "Trợ lý này trả lời ngay trên điện thoại của bạn, không cần tài khoản và không gửi câu hỏi lên mạng.",
+    "Trợ lý Ga Đài Bắc trả lời ngay trên điện thoại của bạn, không cần tài khoản và không gửi câu hỏi lên mạng.",
   "chat.answer.greeting":
     "Xin chào! Bạn đang tìm gì? Thử hỏi “nhà vệ sinh” hoặc “thang máy”, hoặc hỏi cách quét vị trí.",
   "chat.answer.thanks": "Không có gì, chúc bạn đi đường thuận lợi!",
@@ -417,7 +417,7 @@ export default {
   "chat.optionalModel":
     "Muốn hỏi câu mở hơn? Bạn có thể cài thêm mô hình AI trên điện thoại (không bắt buộc, khoảng 584 MB).",
   "chat.welcome2":
-    "Xin chào! Tôi là trợ lý nhà ga. Hãy hỏi “Nhà vệ sinh ở đâu?”, “Thang máy ở đâu?” hoặc cách quét vị trí. Câu trả lời lấy từ dữ liệu nhà ga, không cần mạng.",
+    "Xin chào! Tôi là Trợ lý Ga Đài Bắc. Hãy hỏi “Nhà vệ sinh ở đâu?”, “Thang máy ở đâu?” hoặc cách quét vị trí. Câu trả lời lấy từ dữ liệu nhà ga, không cần mạng.",
   "map.goHere": "Đưa tôi đến đây",
   "chat.answer.exitCode":
     "Lối ra chưa có trên bản đồ. Đây là các điểm dẫn về hướng lối ra {code}; đến đó hãy theo biển chỉ dẫn lối ra {code}:",

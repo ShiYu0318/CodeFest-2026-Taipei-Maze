@@ -81,7 +81,7 @@
       {
         "id": "1f-exit-n1",
         "type": "exit",
-        "name": "北1門 N1",
+        "name": "北 1 門 N1",
         "x": 695,
         "y": 109,
         "description": "通往市民大道。",
@@ -90,7 +90,7 @@
       {
         "id": "1f-exit-n2",
         "type": "exit",
-        "name": "北2門 N2",
+        "name": "北 2 門 N2",
         "x": 456,
         "y": 109,
         "description": "通往市民大道。",
@@ -99,7 +99,7 @@
       {
         "id": "1f-exit-n3",
         "type": "exit",
-        "name": "北3門 N3",
+        "name": "北 3 門 N3",
         "x": 218,
         "y": 109,
         "description": "通往市民大道。",
@@ -108,7 +108,7 @@
       {
         "id": "1f-exit-s1",
         "type": "exit",
-        "name": "南1門 S1",
+        "name": "南 1 門 S1",
         "x": 701,
         "y": 684,
         "description": "通往忠孝西路。",
@@ -117,7 +117,7 @@
       {
         "id": "1f-exit-s2",
         "type": "exit",
-        "name": "南2門 S2",
+        "name": "南 2 門 S2",
         "x": 460,
         "y": 684,
         "description": "通往忠孝西路。",
@@ -126,7 +126,7 @@
       {
         "id": "1f-exit-s3",
         "type": "exit",
-        "name": "南3門 S3",
+        "name": "南 3 門 S3",
         "x": 219,
         "y": 684,
         "description": "通往忠孝西路。",
@@ -135,7 +135,7 @@
       {
         "id": "1f-exit-e1",
         "type": "exit",
-        "name": "東1門 E1",
+        "name": "東 1 門 E1",
         "x": 839,
         "y": 247,
         "description": "通往中山北路。",
@@ -144,7 +144,7 @@
       {
         "id": "1f-exit-e3",
         "type": "exit",
-        "name": "東3門 E3",
+        "name": "東 3 門 E3",
         "x": 839,
         "y": 558,
         "description": "通往中山北路。",
@@ -153,7 +153,7 @@
       {
         "id": "1f-exit-w1",
         "type": "exit",
-        "name": "西1門 W1",
+        "name": "西 1 門 W1",
         "x": 80,
         "y": 247,
         "description": "通往承德路。",
@@ -162,7 +162,7 @@
       {
         "id": "1f-exit-w3",
         "type": "exit",
-        "name": "西3門 W3",
+        "name": "西 3 門 W3",
         "x": 80,
         "y": 558,
         "description": "通往承德路。",
@@ -219,7 +219,7 @@
         "name": "東側洗手間",
         "x": 778,
         "y": 316,
-        "description": "靠東1門，鄰近東側樓梯。",
+        "description": "靠東 1 門，鄰近東側樓梯。",
         "zone": "1f-hall"
       },
       {
@@ -228,7 +228,7 @@
         "name": "西側洗手間",
         "x": 161,
         "y": 469,
-        "description": "靠西3門，鄰近哺集乳室。",
+        "description": "靠西 3 門，鄰近哺集乳室。",
         "zone": "1f-hall"
       },
       {
@@ -237,7 +237,7 @@
         "name": "西側多功能洗手間",
         "x": 161,
         "y": 296,
-        "description": "靠西1門的大廳西側。",
+        "description": "靠西 1 門的大廳西側。",
         "zone": "1f-hall"
       },
       {
@@ -246,7 +246,7 @@
         "name": "西側哺集乳室",
         "x": 136,
         "y": 491,
-        "description": "靠西3門，在西側洗手間附近。",
+        "description": "靠西 3 門，在西側洗手間附近。",
         "zone": "1f-hall"
       },
       {
@@ -327,7 +327,7 @@
         "name": "南側東端樓梯",
         "x": 806,
         "y": 624,
-        "description": "靠南1門及東側通道。",
+        "description": "靠南 1 門及東側通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -337,7 +337,7 @@
         "name": "南側西端樓梯",
         "x": 121,
         "y": 623,
-        "description": "靠南3門及西側通道。",
+        "description": "靠南 3 門及西側通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -357,7 +357,7 @@
         "name": "西側洗手間旁樓梯",
         "x": 160,
         "y": 496,
-        "description": "靠西3門，鄰近西側洗手間。",
+        "description": "靠西 3 門，鄰近西側洗手間。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -367,7 +367,7 @@
         "name": "東側洗手間旁樓梯",
         "x": 777,
         "y": 293,
-        "description": "靠東1門，鄰近東側洗手間。",
+        "description": "靠東 1 門，鄰近東側洗手間。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -377,7 +377,7 @@
         "name": "北側東端樓梯",
         "x": 796,
         "y": 180,
-        "description": "靠北1門及東側通道。",
+        "description": "靠北 1 門及東側通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -387,7 +387,7 @@
         "name": "北側西端樓梯",
         "x": 117,
         "y": 179,
-        "description": "靠北3門及西側通道。",
+        "description": "靠北 3 門及西側通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -397,7 +397,7 @@
         "name": "南側東端電扶梯",
         "x": 755,
         "y": 623,
-        "description": "靠南1門，位於南側東端樓梯旁。",
+        "description": "靠南 1 門，位於南側東端樓梯旁。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -407,7 +407,7 @@
         "name": "南側東段電扶梯（東側）",
         "x": 628,
         "y": 622,
-        "description": "位於南1門與南2門之間的通道。",
+        "description": "位於南 1 門與南 2 門之間的通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -417,7 +417,7 @@
         "name": "南側東段電扶梯（西側）",
         "x": 549,
         "y": 623,
-        "description": "位於南1門與南2門之間的通道。",
+        "description": "位於南 1 門與南 2 門之間的通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -427,7 +427,7 @@
         "name": "南側西段電扶梯（東側）",
         "x": 370,
         "y": 622,
-        "description": "位於南2門與南3門之間的通道。",
+        "description": "位於南 2 門與南 3 門之間的通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -437,7 +437,7 @@
         "name": "南側西段電扶梯（西側）",
         "x": 282,
         "y": 623,
-        "description": "位於南2門與南3門之間的通道。",
+        "description": "位於南 2 門與南 3 門之間的通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -447,7 +447,7 @@
         "name": "南側西端電扶梯",
         "x": 175,
         "y": 622,
-        "description": "靠南3門，位於南側西端樓梯旁。",
+        "description": "靠南 3 門，位於南側西端樓梯旁。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -457,7 +457,7 @@
         "name": "北側東端電扶梯",
         "x": 747,
         "y": 181,
-        "description": "靠北1門，位於北側東端樓梯旁。",
+        "description": "靠北 1 門，位於北側東端樓梯旁。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -467,7 +467,7 @@
         "name": "北側東段電扶梯（東側）",
         "x": 622,
         "y": 180,
-        "description": "位於北1門與北2門之間的通道。",
+        "description": "位於北 1 門與北 2 門之間的通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -477,7 +477,7 @@
         "name": "北側東段電扶梯（西側）",
         "x": 541,
         "y": 179,
-        "description": "位於北1門與北2門之間的通道。",
+        "description": "位於北 1 門與北 2 門之間的通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -487,7 +487,7 @@
         "name": "北側西段電扶梯（東側）",
         "x": 362,
         "y": 180,
-        "description": "位於北2門與北3門之間的通道。",
+        "description": "位於北 2 門與北 3 門之間的通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -497,7 +497,7 @@
         "name": "北側西段電扶梯（西側）",
         "x": 273,
         "y": 178,
-        "description": "位於北2門與北3門之間的通道。",
+        "description": "位於北 2 門與北 3 門之間的通道。",
         "angle": 0,
         "zone": "1f-hall"
       },
@@ -507,7 +507,7 @@
         "name": "北側西端電扶梯",
         "x": 170,
         "y": 180,
-        "description": "靠北3門，位於北側西端樓梯旁。",
+        "description": "靠北 3 門，位於北側西端樓梯旁。",
         "angle": 0,
         "zone": "1f-hall"
       }

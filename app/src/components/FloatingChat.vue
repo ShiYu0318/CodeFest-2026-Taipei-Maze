@@ -10,31 +10,28 @@
       data-tour-target="helper"
       :data-theme="theme"
       :aria-label="t('chat.open')"
+      :title="t('chat.launcher')"
       aria-haspopup="dialog"
       :aria-expanded="opened"
       @click="open"
     >
+      <!-- Icon-only launcher: a speech bubble with a friendly face reads as
+           "someone you can ask" without words; the name stays in the label. -->
       <svg
-        width="22"
-        height="22"
-        viewBox="0 0 24 24"
-        fill="none"
+        class="maze-chat-launcher-icon"
+        width="30"
+        height="30"
+        viewBox="0 0 32 32"
         aria-hidden="true"
       >
         <path
-          d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6 4V6a2 2 0 0 1 2-2Z"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linejoin="round"
+          class="bubble"
+          d="M16 4.5c-7 0-12 4.6-12 10.4 0 3.2 1.5 6 4 7.9l-1 4.7 5.1-2.7c1.2.3 2.5.5 3.9.5 7 0 12-4.6 12-10.4S23 4.5 16 4.5Z"
         />
-        <path
-          d="M8 9h8M8 13h5"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-        />
+        <circle class="face" cx="11.6" cy="13.6" r="1.7" />
+        <circle class="face" cx="20.4" cy="13.6" r="1.7" />
+        <path class="smile" d="M11.8 18.2c2.3 2.3 6.1 2.3 8.4 0" />
       </svg>
-      <span><ZhuyinText :text="t('chat.launcher')" /></span>
     </button>
     <div
       v-if="opened"
@@ -860,30 +857,58 @@ onBeforeUnmount(() => {
   right: max(16px, env(safe-area-inset-right));
   bottom: calc(16px + env(safe-area-inset-bottom));
   z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 48px;
-  padding: 0 18px 0 14px;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
   border: 0;
-  border-radius: 24px;
+  border-radius: 50%;
   background: #468d9b;
   color: #fff;
   box-shadow: 0 6px 16px rgb(17 38 41 / 22%), 0 1px 3px rgb(17 38 41 / 18%);
-  font: 600 15px / 1 "PingFang TC", -apple-system, system-ui, sans-serif;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
     background-color 150ms ease;
 }
+.maze-chat-launcher-icon .bubble {
+  fill: #fff;
+}
+.maze-chat-launcher-icon .face {
+  fill: #468d9b;
+}
+.maze-chat-launcher-icon .smile {
+  fill: none;
+  stroke: #468d9b;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
 .maze-chat-launcher:active {
-  transform: scale(0.95);
+  transform: scale(0.94);
   background: #356c77;
+}
+.maze-chat-launcher:active .face {
+  fill: #356c77;
 }
 .maze-chat-launcher[data-theme="dark"] {
   background: #71c5d5;
   color: #081315;
   box-shadow: 0 6px 18px rgb(0 0 0 / 45%);
+}
+.maze-chat-launcher[data-theme="dark"] .bubble {
+  fill: #081315;
+}
+.maze-chat-launcher[data-theme="dark"] .face {
+  fill: #71c5d5;
+}
+.maze-chat-launcher[data-theme="dark"] .smile {
+  stroke: #71c5d5;
+}
+@media (prefers-reduced-motion: reduce) {
+  .maze-chat-launcher {
+    transition: none;
+  }
 }
 .maze-chat-backdrop {
   position: fixed;

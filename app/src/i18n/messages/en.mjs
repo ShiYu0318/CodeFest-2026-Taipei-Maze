@@ -8,7 +8,7 @@ export default {
   "map.firstFloorNote":
     "The 1F map is redrawn from the supplied station floor plan photo. Facility locations are approximate. Follow station signage.",
   "tour.helper":
-    "Tap the helper in the bottom-right corner to ask about station facilities or how to use the map.",
+    "Tap Taipei Main Helper in the bottom-right corner to ask about station facilities or how to use the map.",
   "tour.reopen":
     "Tap the circled question mark in the top-left corner to restart this tour from step one.",
   "tour.step": "Tour {step} of {total}",
@@ -216,14 +216,14 @@ export default {
   "title.meeting": "Meeting point",
   "title.about": "Source code & licenses",
   "title.default": "Taipei Maze",
-  "chat.open": "Open the station helper chat",
-  "chat.launcher": "Helper",
+  "chat.open": "Open the Taipei Main Helper chat",
+  "chat.launcher": "Taipei Main Helper",
   "chat.close": "Close chat",
-  "chat.title": "Station helper",
+  "chat.title": "Taipei Main Helper",
   "chat.clear": "Clear chat",
   "chat.log": "Chat messages",
   "chat.welcome":
-    "Hi! I'm the station helper. Ask me about QR navigation or how to use the app. For the actual route, follow the map and the navigation tips.",
+    "Hi! I'm Taipei Main Helper. Ask me about QR navigation or how to use the app. For the actual route, follow the map and the navigation tips.",
   "chat.checking": "Checking whether this phone can chat on the device…",
   "chat.noModel":
     "This phone does not have the chat model yet. Download it once (about 584 MB) and use it offline after that.",
@@ -231,7 +231,7 @@ export default {
   "chat.install": "Install chat model",
   "chat.recheck": "Check again",
   "chat.you": "Your message",
-  "chat.bot": "Helper reply",
+  "chat.bot": "Taipei Main Helper reply",
   "chat.thinking": "Thinking on your phone…",
   "chat.starters": "Suggested questions",
   "chat.ask": "What would you like to ask?",
@@ -407,7 +407,7 @@ export default {
   "chat.answer.display":
     "At the top right: the moon is dark mode, the half-filled circle is high contrast, and the “Standard” menu switches to Kids or Senior (large text).",
   "chat.answer.privacy":
-    "This helper answers on your phone. No account is needed and your questions are not sent online.",
+    "Taipei Main Helper answers on your phone. No account is needed and your questions are not sent online.",
   "chat.answer.greeting":
     "Hi! What are you looking for? Try “toilet” or “elevator”, or ask how to scan your location.",
   "chat.answer.thanks": "You're welcome — have a good trip!",
@@ -418,7 +418,7 @@ export default {
   "chat.optionalModel":
     "Want to ask open questions? You can also install the on-device AI model (optional, about 584 MB).",
   "chat.welcome2":
-    "Hi! I'm the station helper. Ask “Where is the toilet?”, “Where is the elevator?” or how to scan your location. Answers come from the station data and need no internet.",
+    "Hi! I'm Taipei Main Helper. Ask “Where is the toilet?”, “Where is the elevator?” or how to scan your location. Answers come from the station data and need no internet.",
   "map.goHere": "Go here",
   "chat.answer.exitCode":
     "Exits are not on the map yet. These places lead toward exit {code} — from there, follow the {code} exit signs:",
