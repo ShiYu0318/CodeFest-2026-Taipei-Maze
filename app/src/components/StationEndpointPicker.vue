@@ -41,7 +41,7 @@
           <span class="endpoint-value">
             {{
               choices[role]
-                ? choices[role].floorId + "・" + choices[role].name
+                ? choices[role].floor + "・" + choices[role].name
                 : "尚未選擇"
             }}
           </span>
@@ -61,7 +61,7 @@
               <button
                 type="button"
                 :aria-pressed="point.id === choices[activeRole]?.id"
-                @click="choosePoint({ ...point, floorId: floor })"
+                @click="choosePoint({ ...point, floor })"
               >
                 {{ point.name }}
               </button>
@@ -121,7 +121,13 @@ function showRole(role) {
 
 async function choosePoint(point) {
   choices[activeRole.value] = point;
-  emit("select", choices.start?.id, choices.destination?.id, point);
+  emit(
+    "select",
+    choices.start?.id,
+    choices.destination?.id,
+    point,
+    activeRole.value
+  );
   if (point && activeRole.value === "start" && !choices.destination) {
     showRole("destination");
     panel.value.querySelector('[data-endpoint-role="destination"]').focus();

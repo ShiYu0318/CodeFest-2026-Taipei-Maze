@@ -318,31 +318,6 @@
   font-weight: 750;
   pointer-events: auto;
 }
-.compass {
-  position: absolute;
-  z-index: 3;
-  top: 10px;
-  right: 10px;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  min-height: 44px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--tp-primary-50);
-  padding: 3px;
-  color: var(--tp-primary-800);
-  text-decoration: none;
-}
-.compass span {
-  font-size: 0.625rem;
-  font-weight: 800;
-}
-.compass svg {
-  width: 16px;
-  height: 16px;
-  fill: currentColor;
-}
 .map-window {
   overflow: hidden;
   overflow: clip;

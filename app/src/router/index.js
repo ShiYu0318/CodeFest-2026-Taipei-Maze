@@ -31,8 +31,7 @@ const routes = [
   },
   {
     path: "/station-orientation",
-    name: "station-orientation",
-    component: () => import("../views/StationOrientationView.vue"),
+    redirect: "/station-map",
   },
 ];
 

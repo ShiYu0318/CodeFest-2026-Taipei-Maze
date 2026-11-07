@@ -1,14 +1,5 @@
 <template>
-  <nav
-    v-if="
-      ![
-        'station-map',
-        'station-orientation',
-        'meeting',
-      ].includes($route.name)
-    "
-    class="app-nav"
-  >
+  <nav v-if="!['station-map', 'meeting'].includes($route.name)" class="app-nav">
     <router-link to="/">Home</router-link>
     <router-link to="/test">Test</router-link>
     <router-link to="/station-map">台北車站 B1–B4 地圖</router-link>
@@ -18,15 +9,10 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
+import { onMounted, watch } from "vue";
 import FloatingChat from "./components/FloatingChat.vue";
 import { useDisplayPreferences } from "./display/preferences.mjs";
 import "./display/display-preferences.css";
-import {
-  startStationCompass,
-  stopStationCompass,
-} from "./navigation/station-compass";
 
 const { theme } = useDisplayPreferences();
 onMounted(() => {
@@ -38,17 +24,6 @@ onMounted(() => {
     { immediate: true }
   );
 });
-const route = useRoute();
-watch(
-  () => route.name,
-  (name) => {
-    if (name === "station-orientation")
-      startStationCompass(window.flutterObject);
-    else if (name !== "station-map") stopStationCompass();
-  },
-  { immediate: true }
-);
-onBeforeUnmount(stopStationCompass);
 </script>
 
 <style lang="scss">

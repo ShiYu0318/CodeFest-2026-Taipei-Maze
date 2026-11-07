@@ -83,6 +83,18 @@ test("URL entries carry no invented scan timestamp and invalid/removed parameter
   location.dispose();
 });
 
+test("clearing the destination keeps the last confirmed QR position", async () => {
+  const { n, location } = setup();
+  await scan(n, location, "b1-e4");
+  location.choose("m-e4");
+  const position = location.snapshot().position;
+  assert.equal(location.choose(null), true);
+  assert.equal(location.snapshot().destinationId, null);
+  assert.deepEqual(location.snapshot().position, position);
+  assert.equal(location.snapshot().relation.status, "waiting");
+  location.dispose();
+});
+
 test("cancel, malformed/foreign QR and duplicate clicks preserve position, target and restrictions", async () => {
   const { n, location, located } = setup();
   await scan(n, location, "b1-e4");

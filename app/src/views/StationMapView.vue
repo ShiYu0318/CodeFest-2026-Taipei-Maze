@@ -5,7 +5,10 @@
     :data-theme="theme"
     :data-display-mode="displayMode"
   >
-    <div class="station-shell" :inert="endpointPickerOpen ? '' : null">
+    <div
+      class="station-shell"
+      :inert="endpointPickerOpen || tripDialog ? '' : null"
+    >
       <section class="station-heading" aria-label="顯示設定">
         <div class="station-title-row">
           <!-- <h1 id="station-title"><ZhuyinText text="台北車站" /></h1> -->
@@ -19,7 +22,13 @@
         </p>
       </section>
 
-      <StationScanPanel :location="location" :selected-point="selected" />
+      <StationScanPanel
+        :location="location"
+        :selected-point="selected"
+        @destination="planDestination"
+        @scanned="onQrScanned"
+        @cancel-trip="openTripDialog('cancel')"
+      />
       <div ref="floorControls" class="floor-controls">
         <div class="floor-switch" role="group" aria-label="選擇樓層">
           <button
@@ -118,21 +127,6 @@
                   <ZhuyinText text="回到起點" />・{{ originView.floor }}
                 </button>
               </div>
-              <router-link
-                class="compass"
-                :to="orientationLink"
-                aria-label="開啟指南針"
-                title="開啟指南針"
-              >
-                <span aria-hidden="true">N</span>
-                <svg
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                  :style="{ transform: 'rotate(' + MAP_NORTH_DEGREES + 'deg)' }"
-                >
-                  <path d="M12 3 20 21l-8-4-8 4Z" />
-                </svg>
-              </router-link>
               <div class="map-window" :inert="floorChanging ? '' : null">
                 <div
                   ref="viewport"
@@ -216,7 +210,10 @@
                       @focus="focusVisiblePin(point, $event)"
                     >
                       <span
-                        v-if="point.id === selected?.id || point.id === mapCurrentPoint?.id"
+                        v-if="
+                          point.id === selected?.id ||
+                          point.id === mapCurrentPoint?.id
+                        "
                         class="pin-icon"
                       >
                         <StationMapIcon :name="pointIconType(point)" />
@@ -259,20 +256,11 @@
                             />
                           </linearGradient>
                         </defs>
-                        <g
-                          :transform="
-                            point.id === mapCurrentPoint?.id &&
-                            mapHeading !== null
-                              ? 'rotate(' + mapHeading + ' 40 40)'
-                              : undefined
-                          "
-                        >
-                          <path :d="facingMarkerPath" fill="currentColor" />
-                          <path
-                            :d="facingMarkerPath"
-                            :fill="'url(#location-arrow-' + point.id + ')'"
-                          />
-                        </g>
+                        <path :d="facingMarkerPath" fill="currentColor" />
+                        <path
+                          :d="facingMarkerPath"
+                          :fill="'url(#location-arrow-' + point.id + ')'"
+                        />
                       </svg>
                       <span
                         v-if="
@@ -366,6 +354,14 @@
       @select="chooseEndpoint"
       @map-pick="startMapPicking"
     />
+    <StationTripDialog
+      v-if="tripDialog"
+      :key="tripDialog"
+      :direction="tripDirection"
+      :cancel-only="tripDialog === 'cancel'"
+      @continue="closeTripDialog"
+      @cancel="cancelTrip"
+    />
   </main>
 </template>
 
@@ -384,17 +380,13 @@ import { useRoute, useRouter } from "vue-router";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationScanPanel from "../components/StationScanPanel.vue";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
+import StationTripDialog from "../components/StationTripDialog.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import DisplayControls from "../components/DisplayControls.vue";
 import ZhuyinText from "../components/ZhuyinText.vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { useStationLocation } from "../station/useStationLocation";
 import { stationPoints } from "../station/scan.mjs";
-import {
-  findStationPoint,
-  MAP_NORTH_DEGREES,
-} from "../navigation/orientation.mjs";
-import { stationHeading } from "../navigation/station-compass";
 import { floors, stackBounds } from "./station-floor-plans";
 import stationData from "./station-points.json";
 import stationConnections from "./station-connections.json";
@@ -426,15 +418,11 @@ const facilityHelp = {
 };
 const route = useRoute();
 const router = useRouter();
-const currentPoint = computed(() =>
-  findStationPoint(points, route.query.start)
+const stationById = new Map(
+  stationPoints(stationData).map((point) => [point.id, point])
 );
-const targetPoint = computed(() =>
-  findStationPoint(points, route.query.destination)
-);
-const mapHeading = computed(() =>
-  stationHeading.value ? stationHeading.value.degrees + MAP_NORTH_DEGREES : null
-);
+const currentPoint = computed(() => stationById.get(route.query.start));
+const targetPoint = computed(() => stationById.get(route.query.destination));
 // const searchCatalogEntries = stationCatalog(stationData);
 // let searchPointRevision = 0;
 const mobileZoomQuery = window.matchMedia(
@@ -476,12 +464,14 @@ const floorPalette = {
   },
 };
 const level = ref(
-  currentPoint.value?.floorId ?? targetPoint.value?.floorId ?? "B2"
+  currentPoint.value?.floor ?? targetPoint.value?.floor ?? "B2"
 );
 const showLayers = ref(false);
 const activeTheme = ref(null);
 const selected = ref(null);
 const endpointPickerOpen = ref(false);
+const tripDialog = ref(null);
+let tripTrigger = null;
 const mapPickStep = ref(null);
 const draftStart = ref(null);
 const floorControls = ref(null);
@@ -500,7 +490,13 @@ const scanTargetId = ref(null);
 let scanFocusRevision = 0;
 async function focusScanPoint(point) {
   const revision = ++scanFocusRevision;
-  if (!point || mapPickStep.value || endpointPickerOpen.value) return;
+  if (
+    !point ||
+    mapPickStep.value ||
+    endpointPickerOpen.value ||
+    tripDialog.value
+  )
+    return;
   floorAnimation?.cancel();
   clearMapDrag();
   clearPinch();
@@ -522,13 +518,6 @@ function setScanTarget(point) {
   scanTargetId.value = point?.id ?? null;
   focusScanPoint(point);
 }
-const orientationLink = computed(() => ({
-  name: "station-orientation",
-  query: {
-    start: currentPoint.value?.id,
-    destination: targetPoint.value?.id,
-  },
-}));
 const originView = ref(null);
 const connectorHeading = ref(null);
 const connectorPanel = ref(null);
@@ -550,9 +539,16 @@ const mapSection = ref(null);
 const mapStage = ref(null);
 const mapTop = ref(0);
 const location = useStationLocation(stationData, stationConnections);
-const stationById = new Map(
-  stationPoints(stationData).map((point) => [point.id, point])
-);
+const tripDirection = computed(() => {
+  const { destinationId, relation } = location.view.value;
+  const connector = stationById.get(relation.steps[0]?.from.pointId);
+  if (connector) return `請面向通往「${connector.name}」的站內指標。`;
+  if (relation.status === "at_destination")
+    return "請面向目的地的設施標示，核對名稱與樓層。";
+  return destinationId
+    ? "請面向站內導引指標，確認前往目的地的方向。"
+    : "請面向站內導引指標，接著選擇目的地。";
+});
 watch(
   () => {
     const position = location.view.value.position;
@@ -627,9 +623,6 @@ const floorPoints = computed(() => {
     ...current.filter((point) => isConnector(point)),
   ];
 });
-const visibleFloorPoints = computed(() =>
-  floorPoints.value.filter(isPointVisible)
-);
 const availableThemes = computed(() =>
   Object.keys(categories).filter((type) =>
     floorPoints.value.some((point) => matchesTheme(point, type))
@@ -1221,8 +1214,8 @@ async function closeEndpointPicker() {
   endpointPickerOpen.value = false;
   await nextTick();
   if (point && viewport.value) {
-    await showFloor(point.floorId);
-    if (viewport.value && level.value === point.floorId)
+    await showFloor(point.floor);
+    if (viewport.value && level.value === point.floor)
       centerOn(...normalizedPoint(point));
   }
   trigger?.focus({ preventScroll: true });
@@ -1239,9 +1232,58 @@ function saveEndpoints(start, destination) {
   });
 }
 
-function chooseEndpoint(start, destination, point) {
+function chooseEndpoint(start, destination, point, role) {
+  if (role === "destination" && !location.choose(destination ?? null)) return;
   pickerFocusPoint = point;
-  return saveEndpoints(start, destination);
+  const saved = saveEndpoints(start, destination);
+  if (role === "destination" && destination) openTripDialog();
+  return saved;
+}
+
+function planDestination(destination) {
+  const saved = saveEndpoints(currentPoint.value?.id, destination);
+  openTripDialog();
+  return saved;
+}
+
+function onQrScanned() {
+  const destination = targetPoint.value?.id;
+  if (destination && !location.view.value.destinationId)
+    location.choose(destination);
+  openTripDialog();
+}
+
+function openTripDialog(mode = "orientation") {
+  if (tripDialog.value || !viewport.value?.isConnected) return;
+  tripTrigger = endpointTrigger ?? document.activeElement;
+  endpointTrigger = null;
+  pickerFocusPoint = null;
+  endpointPickerOpen.value = false;
+  selected.value = null;
+  mapPickStep.value = null;
+  draftStart.value = null;
+  tripDialog.value = mode;
+}
+
+async function closeTripDialog() {
+  const trigger = tripTrigger;
+  tripTrigger = null;
+  tripDialog.value = null;
+  await nextTick();
+  (trigger?.isConnected ? trigger : viewport.value)?.focus({
+    preventScroll: true,
+  });
+}
+
+async function cancelTrip() {
+  originView.value = null;
+  arrivalPointId.value = null;
+  try {
+    await location.reset();
+    if (viewport.value?.isConnected) await saveEndpoints();
+  } finally {
+    await closeTripDialog();
+  }
 }
 
 async function startMapPicking() {
@@ -1268,10 +1310,10 @@ async function selectMapPoint(point, event) {
   }
   if (mapPickStep.value === "destination") {
     const start = draftStart.value.id;
-    mapPickStep.value = null;
-    await saveEndpoints(start, point.id);
-    if (viewport.value) openEndpointPicker();
-    return;
+    if (!location.choose(point.id)) return;
+    const saved = saveEndpoints(start, point.id);
+    openTripDialog();
+    return saved;
   }
   selected.value = selected.value?.id === point.id ? null : point;
   if (!selected.value) return;
