@@ -4,6 +4,26 @@
 const registryKey = Symbol.for("taipei_maze.qr_channels");
 const channels =
   globalThis[registryKey] ?? (globalThis[registryKey] = new WeakMap());
+
+function scanReply(text) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    // InAppWebView iOS 1.1.2 injects the reply in a single-quoted JS literal.
+    // It consumes the backslashes around a nested JSON QR's quotes. Recover
+    // only TownPass's exact QR string envelope; the locator is still untrusted
+    // and must pass the normal schema/site/version/local-anchor validation.
+    const prefix = '{"name":"qr_code_scan","data":"';
+    if (
+      typeof text === "string" &&
+      text.startsWith(prefix) &&
+      text.endsWith('"}')
+    )
+      return { name: "qr_code_scan", data: text.slice(prefix.length, -2) };
+    return null;
+  }
+}
+
 function channelFor(bridge) {
   if (channels.has(bridge)) return channels.get(bridge);
   const channel = {
@@ -25,12 +45,7 @@ function channelFor(bridge) {
       if (channel.seenEvents.has(event)) return;
       channel.seenEvents.add(event);
     }
-    let reply;
-    try {
-      reply = JSON.parse(event.data);
-    } catch {
-      return;
-    }
+    const reply = scanReply(event.data);
     if (!reply || reply.name !== "qr_code_scan") return;
     if (channel.draining) {
       channel.draining = false;
