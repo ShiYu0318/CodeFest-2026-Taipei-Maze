@@ -6,7 +6,7 @@
     :data-display-mode="displayMode"
   >
     <div class="station-shell">
-      <section class="station-heading" aria-labelledby="station-title">
+      <section class="station-heading" aria-label="顯示設定">
         <div class="station-title-row">
           <!-- <h1 id="station-title"><ZhuyinText text="台北車站" /></h1> -->
           <DisplayControls />

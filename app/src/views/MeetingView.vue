@@ -6,10 +6,21 @@
     :data-theme="theme"
     :data-display-mode="displayMode"
   >
-    <DisplayControls />
-    <router-link to="/station-map"
-      >← <ZhuyinText text="回車站地圖"
-    /></router-link>
+    <div class="meeting-toolbar">
+      <router-link to="/station-map" class="meeting-back"
+        ><svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="m15 5-7 7 7 7"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          /></svg
+        ><ZhuyinText text="回車站地圖"
+      /></router-link>
+      <DisplayControls />
+    </div>
     <h1><ZhuyinText text="朋友分享的集合點" /></h1>
     <p v-if="displayMode === 'child'" class="display-hint">
       <ZhuyinText text="這是朋友約好的地方，不是你現在的位置。" />
@@ -84,23 +95,57 @@ const timeText = computed(
 .meeting-page {
   max-width: 720px;
   margin: 0 auto;
-  padding: 24px 18px 48px;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  padding: 0 16px max(48px, env(safe-area-inset-bottom));
   text-align: left;
   color: var(--meeting-ink);
   background: var(--surface);
   line-height: 1.75;
-  font-family: system-ui, sans-serif;
+  font-family: var(--tp-font);
+  -webkit-font-smoothing: antialiased;
+}
+.meeting-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 -16px 8px;
+  padding: max(8px, env(safe-area-inset-top)) 16px 8px;
+  background: var(--tp-surface);
+  box-shadow: 0 1px 0 var(--tp-gray-100);
+}
+.meeting-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  min-height: 44px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.meeting-back svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+.meeting-page h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
 }
 .banner {
   background: var(--warning-bg);
-  border-left: 4px solid var(--warning-border);
-  padding: 14px;
+  border-radius: var(--tp-radius-card);
+  padding: 12px 14px;
+  color: var(--tp-secondary-800);
+  font-size: 0.875rem;
 }
 a {
   color: var(--meeting-link);
-}
-.display-controls {
-  margin-bottom: 16px;
 }
 .meeting-page:not([data-display-mode="standard"]) {
   font-size: var(--display-main-size);
@@ -126,9 +171,10 @@ a {
 .primary {
   display: inline-block;
   padding: 12px 18px;
-  border-radius: 6px;
-  background: #326875;
-  color: white;
+  border-radius: var(--tp-radius-button);
+  background: var(--tp-primary-600);
+  color: #fff;
+  font-weight: 600;
   margin: 16px 0;
   text-decoration: none;
 }

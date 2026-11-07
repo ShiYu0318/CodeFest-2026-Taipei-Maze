@@ -1,18 +1,21 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
+<!-- Interaction patterns (avatar bubbles, typing dots, starter chips, pill
+     composer) adapted in spirit from EmbAId-Agent (MIT); no code copied. -->
 <template>
   <Teleport to="body">
     <button
       v-if="!opened"
       ref="launcher"
       class="maze-chat-launcher"
+      :data-theme="theme"
       aria-label="開啟站內小幫手聊天"
       aria-haspopup="dialog"
       :aria-expanded="opened"
       @click="open"
     >
       <svg
-        width="23"
-        height="23"
+        width="22"
+        height="22"
         viewBox="0 0 24 24"
         fill="none"
         aria-hidden="true"
@@ -21,8 +24,14 @@
           d="M5 4h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9l-6 4V6a2 2 0 0 1 2-2Z"
           stroke="currentColor"
           stroke-width="1.8"
+          stroke-linejoin="round"
         />
-        <path d="M7 9h10M7 13h6" stroke="currentColor" stroke-width="1.8" />
+        <path
+          d="M8 9h8M8 13h5"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+        />
       </svg>
       <span>小幫手</span>
     </button>
@@ -48,26 +57,53 @@
         @keydown="handleKeys"
       >
         <header class="maze-chat-header">
-          <div>
-            <h2 id="maze-chat-title">站內小幫手</h2>
-            <p>文字與語音，在你的手機處理</p>
-          </div>
           <button
             ref="closeButton"
             type="button"
+            class="maze-chat-icon"
             aria-label="收合聊天"
             @click="close"
           >
-            ×
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="m6 9 6 6 6-6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <div class="maze-chat-heading">
+            <h2 id="maze-chat-title">站內小幫手</h2>
+            <p
+              class="maze-chat-presence"
+              :data-ready="modelReady"
+              role="status"
+            >
+              <span aria-hidden="true"></span>{{ statusText }}
+            </p>
+          </div>
+          <button
+            type="button"
+            class="maze-chat-icon"
+            aria-label="清除對話"
+            :disabled="busy || listening || !messages.length"
+            @click="clear"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </button>
         </header>
-        <div class="maze-chat-status" role="status">
-          <span :class="{ ready: modelReady }" aria-hidden="true"></span
-          >{{ statusText
-          }}<button :disabled="busy || listening" @click="refreshStatus">
-            重新檢查
-          </button>
-        </div>
         <div
           ref="thread"
           class="maze-chat-thread"
@@ -76,51 +112,200 @@
           aria-relevant="additions text"
           aria-label="聊天訊息"
         >
-          <p class="maze-chat-welcome">
-            你好！可以問我如何使用掃碼導航。實際路線請以地圖與導航指示為準。
-          </p>
-          <p v-if="!modelReady" class="maze-chat-setup">
-            {{
-              nativeAvailable
-                ? "此裝置尚未準備好 Gemma 3 模型。完成模型安裝後，按「重新檢查」即可開始。"
-                : "請在已更新的城市通 App，使用安全連線開啟裝置端聊天。"
-            }}
-          </p>
-          <button
-            v-if="nativeAvailable && !modelReady"
-            type="button"
-            @click="setupModel"
-          >
-            安裝 Gemma 3 聊天模型
-          </button>
+          <article class="maze-chat-message assistant">
+            <span class="maze-chat-avatar" aria-hidden="true">北</span>
+            <p class="maze-chat-bubble maze-chat-static">
+              你好！我是站內小幫手，可以回答掃碼導航與 App
+              操作問題。實際路線請以地圖與導航指示為準。
+            </p>
+          </article>
+          <div v-if="!modelReady" class="maze-chat-setup">
+            <p>
+              {{
+                checking
+                  ? "正在確認這支手機能否使用裝置端聊天…"
+                  : nativeAvailable
+                  ? "這支手機還沒有聊天模型。下載一次約 584 MB，之後可離線使用。"
+                  : "請在最新版城市通 App 開啟，才能使用裝置端聊天。"
+              }}
+            </p>
+            <div class="maze-chat-setup-actions">
+              <button
+                v-if="nativeAvailable"
+                type="button"
+                class="maze-chat-primary"
+                @click="setupModel"
+              >
+                安裝聊天模型
+              </button>
+              <button
+                type="button"
+                class="maze-chat-secondary"
+                :disabled="busy || listening || checking"
+                @click="refreshStatus"
+              >
+                重新檢查
+              </button>
+            </div>
+          </div>
           <article
             v-for="message in messages"
             :key="message.id"
-            :class="['maze-chat-bubble', message.role]"
+            :class="['maze-chat-message', message.role]"
             :aria-label="message.role === 'user' ? '你的訊息' : '小幫手回覆'"
           >
-            <span>{{ message.text }}</span>
+            <span
+              v-if="message.role === 'assistant'"
+              class="maze-chat-avatar"
+              aria-hidden="true"
+              >北</span
+            >
+            <p class="maze-chat-bubble">{{ message.text }}</p>
           </article>
-          <p v-if="busy" class="maze-chat-working" role="status">
-            正在手機上思考…
-          </p>
+          <div v-if="busy" class="maze-chat-message assistant" role="status">
+            <span class="maze-chat-avatar" aria-hidden="true">北</span>
+            <p class="maze-chat-typing">
+              <i></i><i></i><i></i>
+              <span class="display-visually-hidden">正在手機上思考…</span>
+            </p>
+          </div>
         </div>
         <p v-if="notice" class="maze-chat-notice" role="status">{{ notice }}</p>
+        <div
+          v-if="!messages.length && modelReady && !busy"
+          class="maze-chat-tray"
+          aria-label="建議問題"
+        >
+          <button
+            v-for="(starter, index) in starters"
+            :key="starter"
+            type="button"
+            :style="{ '--i': index }"
+            :disabled="listening"
+            @click="ask(starter)"
+          >
+            {{ starter }}
+          </button>
+        </div>
         <form class="maze-chat-compose" @submit.prevent="send">
-          <label for="maze-chat-input">想問什麼？</label>
-          <textarea
-            id="maze-chat-input"
-            ref="input"
-            v-model="draft"
-            rows="2"
-            maxlength="500"
-            placeholder="例如：如何更新目前位置？"
-            :disabled="busy || listening"
-            @keydown="composerKey"
-          />
-          <div class="maze-chat-actions">
-            <label class="maze-chat-language"
-              >語音語言<select
+          <label for="maze-chat-input" class="display-visually-hidden"
+            >想問什麼？</label
+          >
+          <div class="maze-chat-field" :data-listening="listening">
+            <textarea
+              id="maze-chat-input"
+              ref="input"
+              v-model="draft"
+              rows="1"
+              maxlength="500"
+              :placeholder="listening ? '正在聆聽…' : '輸入你的問題'"
+              :disabled="busy || listening"
+              @keydown="composerKey"
+              @input="grow"
+            />
+            <button
+              v-if="listening"
+              type="button"
+              class="maze-chat-round listening"
+              aria-label="完成錄音"
+              @click="stopVoice"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect
+                  x="7"
+                  y="7"
+                  width="10"
+                  height="10"
+                  rx="2"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+            <button
+              v-else
+              type="button"
+              class="maze-chat-round"
+              aria-label="語音輸入"
+              :disabled="busy || !voiceAvailable"
+              @click="record"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect
+                  x="9"
+                  y="3"
+                  width="6"
+                  height="11"
+                  rx="3"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <path
+                  d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
+            <button
+              v-if="busy"
+              type="button"
+              class="maze-chat-round maze-chat-send"
+              aria-label="停止"
+              @click="cancelGeneration"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect
+                  x="7"
+                  y="7"
+                  width="10"
+                  height="10"
+                  rx="2"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+            <button
+              v-else
+              class="maze-chat-round maze-chat-send"
+              type="submit"
+              aria-label="送出"
+              :disabled="!modelReady || listening || !draft.trim()"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 19V5M6 11l6-6 6 6"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
+          <div class="maze-chat-meta">
+            <label class="maze-chat-language">
+              <span class="display-visually-hidden">語音語言</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="8.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
+                <path
+                  d="M3.5 12h17M12 3.5c2.4 2.4 3.5 5.2 3.5 8.5s-1.1 6.1-3.5 8.5c-2.4-2.4-3.5-5.2-3.5-8.5S9.6 5.9 12 3.5Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
+              </svg>
+              <select
                 v-model="locale"
                 :disabled="busy || listening"
                 @change="refreshStatus"
@@ -132,46 +317,14 @@
                 >
                   {{ language[1] }}
                 </option>
-              </select></label
-            >
-            <button v-if="listening" type="button" @click="stopVoice">
-              完成錄音
-            </button>
-            <button
-              v-else
-              type="button"
-              :disabled="busy || !voiceAvailable"
-              @click="record"
-            >
-              語音輸入
-            </button>
-            <button v-if="busy" type="button" @click="cancelGeneration">
-              停止
-            </button>
-            <button
-              v-else
-              class="maze-chat-send"
-              type="submit"
-              :disabled="!modelReady || listening || !draft.trim()"
-            >
-              送出
-            </button>
+              </select>
+            </label>
+            <p class="maze-chat-caption">
+              {{
+                voiceAvailable ? "語音轉成草稿，確認後送出" : "此語言請改用打字"
+              }}
+            </p>
           </div>
-          <p class="maze-chat-caption">
-            語音先轉成草稿，由你確認後送出。{{
-              voiceAvailable
-                ? "按語音輸入才會使用麥克風。"
-                : "此語言目前無可用的裝置端辨識，請打字。"
-            }}
-          </p>
-          <button
-            type="button"
-            class="maze-chat-clear"
-            :disabled="busy || listening || !messages.length"
-            @click="clear"
-          >
-            清除對話
-          </button>
         </form>
       </section>
     </div>
@@ -221,6 +374,11 @@ const languages = [
   ["th-TH", "ไทย"],
   ["ko-KR", "한국어"],
   ["ja-JP", "日本語"],
+];
+const starters = [
+  "怎麼更新目前位置？",
+  "無障礙路線會避開什麼？",
+  "掃不到定位碼怎麼辦？",
 ];
 const bridge = createChatBridge(window.flutterObject);
 const route = useRoute();
@@ -297,6 +455,22 @@ async function scroll() {
   await nextTick();
   thread.value?.scrollTo({ top: thread.value.scrollHeight });
 }
+function grow() {
+  const field = input.value;
+  if (!field) return;
+  if (!field.value) {
+    field.style.height = "";
+    return;
+  }
+  field.style.height = "auto";
+  field.style.height = Math.min(field.scrollHeight, 120) + "px";
+}
+function ask(text) {
+  if (busy.value || listening.value) return;
+  draft.value = text;
+  if (modelReady.value) send();
+  else nextTick(grow);
+}
 function composerKey(event) {
   if (!shouldSendOnEnter(event)) return;
   event.preventDefault();
@@ -315,6 +489,7 @@ async function send() {
   draft.value = "";
   notice.value = "";
   busy.value = true;
+  nextTick(grow);
   scroll();
   const result = await bridge.request("generate", { prompt });
   if (current !== epoch || !opened.value) return;
@@ -333,6 +508,8 @@ async function send() {
     if (!draft.value) draft.value = text;
   }
   scroll();
+  await nextTick();
+  grow();
   input.value?.focus();
 }
 function cancelGeneration() {
@@ -354,6 +531,7 @@ async function record() {
     notice.value = "已轉成草稿，請確認後送出。";
   } else notice.value = explain(result);
   await nextTick();
+  grow();
   input.value?.focus();
 }
 function stopVoice() {
@@ -406,239 +584,535 @@ onBeforeUnmount(() => {
 <style scoped>
 .maze-chat-launcher {
   position: fixed;
-  right: 18px;
-  bottom: calc(20px + env(safe-area-inset-bottom));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: calc(16px + env(safe-area-inset-bottom));
   z-index: 1000;
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 52px;
-  padding: 12px 18px;
+  gap: 6px;
+  height: 48px;
+  padding: 0 18px 0 14px;
   border: 0;
-  border-radius: 28px;
-  background: #153d53;
-  color: white;
-  box-shadow: 0 4px 18px #163b5233;
-  font: 600 16px system-ui;
+  border-radius: 24px;
+  background: #468d9b;
+  color: #fff;
+  box-shadow: 0 6px 16px rgb(17 38 41 / 22%), 0 1px 3px rgb(17 38 41 / 18%);
+  font: 600 15px / 1 "PingFang TC", -apple-system, system-ui, sans-serif;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 150ms ease;
+}
+.maze-chat-launcher:active {
+  transform: scale(0.95);
+  background: #356c77;
+}
+.maze-chat-launcher[data-theme="dark"] {
+  background: #71c5d5;
+  color: #081315;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 45%);
 }
 .maze-chat-backdrop {
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: #102c4355;
   display: flex;
   align-items: flex-end;
   justify-content: flex-end;
   padding: 16px;
+  background: rgb(11 13 14 / 40%);
+  animation: maze-fade 200ms ease both;
 }
 .maze-chat-panel {
-  width: min(410px, 100%);
-  height: min(680px, calc(var(--chat-viewport-height, 100dvh) - 32px));
+  --chat-ink: var(--tp-gray-900);
+  --chat-muted: var(--tp-gray-600);
+  --chat-line: var(--tp-gray-100);
+  --chat-bot: var(--tp-gray-50);
+  --chat-user: var(--tp-primary-600);
+  width: min(420px, 100%);
+  height: min(700px, calc(var(--chat-viewport-height, 100dvh) - 32px));
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--surface, #fff);
-  border-radius: 20px;
-  box-shadow: 0 12px 50px #102c4340;
-  color: var(--ink, #173649);
+  border-radius: 16px;
+  background: var(--tp-surface);
+  box-shadow: 0 12px 40px rgb(0 0 0 / 22%);
+  color: var(--chat-ink);
   text-align: left;
-  font: 16px/1.5 system-ui, -apple-system, "PingFang TC", sans-serif;
+  font: 16px / 1.5 var(--tp-font);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  transform-origin: bottom right;
+  animation: maze-rise 320ms cubic-bezier(0.23, 1, 0.32, 1) both;
 }
-.maze-chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 20px 14px;
-  background: #153d53;
-  color: #fff;
+.maze-chat-panel[data-theme="dark"],
+[data-theme="dark"] > .maze-chat-panel {
+  --chat-user: var(--tp-primary-300);
 }
-.maze-chat-header h2 {
-  margin: 0;
-  font-size: 21px;
-}
-.maze-chat-header p {
-  margin: 3px 0 0;
-  font-size: 13px;
-  color: #d6e8f0;
-}
-.maze-chat-header button {
-  background: transparent;
-  border: 0;
-  color: white;
-  font-size: 30px;
-  min-width: 44px;
-  min-height: var(--display-control-height, 44px);
-}
-.maze-chat-status {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 10px 16px;
-  background: var(--wash, #eef4f7);
-  font-size: 12px;
-}
-.maze-chat-status > span {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #a2782d;
-}
-.maze-chat-status > span.ready {
-  background: #16805b;
-}
-.maze-chat-status button {
-  margin-left: auto;
-  border: 0;
-  background: transparent;
-  text-decoration: underline;
-  min-height: 36px;
-  color: var(--ink, #153d53);
-}
-.maze-chat-thread {
-  flex: 1;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-height: 80px;
-}
-.maze-chat-thread p {
-  margin: 0;
-}
-.maze-chat-welcome {
-  font-size: 15px;
-}
-.maze-chat-setup {
-  color: var(--muted, #596b77);
-  font-size: 13px;
-  border-left: 3px solid #d3dfe7;
-  padding-left: 10px;
-}
-.maze-chat-bubble {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  padding: 11px 14px;
-  border-radius: 14px;
-  max-width: 90%;
-  font-size: 15px;
-}
-.maze-chat-bubble.user {
-  background: #153d53;
-  color: #fff;
-  align-self: flex-end;
-}
-.maze-chat-bubble.assistant {
-  background: var(--wash, #eef4f7);
-  align-self: flex-start;
-}
-.maze-chat-working {
-  color: var(--muted, #596b77);
-  font-size: 13px;
-}
-.maze-chat-notice {
-  margin: 0;
-  padding: 8px 18px;
-  font-size: 13px;
-  color: #745118;
-  background: #fff7e5;
-}
-.maze-chat-compose {
-  padding: 12px 16px 16px;
-  border-top: 1px solid #dce5eb;
-}
-.maze-chat-compose > label {
-  font-weight: 600;
-  font-size: 13px;
-}
-.maze-chat-compose textarea {
+.maze-chat-panel *,
+.maze-chat-panel *::before,
+.maze-chat-panel *::after {
   box-sizing: border-box;
-  display: block;
-  width: 100%;
-  resize: none;
-  border: 1px solid #a8bac5;
-  border-radius: 10px;
-  padding: 10px;
-  margin-top: 6px;
-  font: inherit;
-  color: inherit;
-}
-.maze-chat-actions {
-  display: flex;
-  gap: 6px;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  margin-top: 8px;
-}
-.maze-chat-actions button {
-  min-height: var(--display-control-height, 44px);
-  border: 1px solid #b7c9d4;
-  border-radius: 9px;
-  padding: 8px 10px;
-  background: var(--surface, #fff);
-  color: var(--ink, #153d53);
-  font-weight: 600;
-}
-.maze-chat-actions .maze-chat-send {
-  margin-left: auto;
-  background: #153d53;
-  color: #fff;
-  border-color: #153d53;
-}
-.maze-chat-language {
-  font-size: 11px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.maze-chat-language select {
-  min-height: 40px;
-  max-width: 126px;
-  font-size: 13px;
-  background: var(--surface, #fff);
-  border: 1px solid #b7c9d4;
-  border-radius: 7px;
-  color: var(--ink, #153d53);
-}
-.maze-chat-caption {
-  font-size: 11px;
-  color: var(--muted, #596b77);
-  margin: 8px 0 0;
-}
-.maze-chat-clear {
-  border: 0;
-  background: transparent;
-  color: var(--muted, #596b77);
-  text-decoration: underline;
-  padding: 8px 0;
-  min-height: 36px;
 }
 .maze-chat-panel button {
+  font: inherit;
   cursor: pointer;
 }
 .maze-chat-panel button:disabled {
-  opacity: 0.45;
   cursor: default;
+}
+
+/* TownPass TPAppBar: white, 56px, centered SemiBold title. */
+.maze-chat-header {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: center;
+  min-height: 56px;
+  padding: 4px 4px;
+  background: var(--tp-surface);
+  box-shadow: 0 1px 0 var(--chat-line);
+}
+.maze-chat-heading {
+  min-width: 0;
+  text-align: center;
+}
+.maze-chat-heading h2 {
+  margin: 0;
+  overflow: hidden;
+  color: var(--chat-ink);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.maze-chat-presence {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 1px 0 0;
+  color: var(--chat-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.maze-chat-presence span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tp-secondary-600);
+}
+.maze-chat-presence[data-ready="true"] span {
+  background: #2e9a6c;
+}
+.maze-chat-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--tp-gray-700);
+  transition: background-color 150ms ease, opacity 150ms ease;
+}
+.maze-chat-icon svg {
+  width: 24px;
+  height: 24px;
+}
+.maze-chat-icon:active:not(:disabled) {
+  background: var(--tp-gray-50);
+}
+.maze-chat-icon:disabled {
+  opacity: 0.35;
+}
+
+.maze-chat-thread {
+  flex: 1;
+  min-height: 80px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--tp-page);
+}
+.maze-chat-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 88%;
+  animation: maze-in 320ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+.maze-chat-message.user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+.maze-chat-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--tp-primary-500);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+[data-theme="dark"] .maze-chat-avatar {
+  color: var(--tp-primary-950);
+}
+.maze-chat-bubble {
+  position: relative;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 15px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.maze-chat-static {
+  white-space: normal;
+}
+.maze-chat-message.assistant .maze-chat-bubble {
+  border-top-left-radius: 4px;
+  background: var(--tp-surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+  color: var(--chat-ink);
+}
+.maze-chat-message.user .maze-chat-bubble {
+  border-top-right-radius: 4px;
+  background: var(--chat-user);
+  color: #fff;
+}
+[data-theme="dark"] .maze-chat-message.user .maze-chat-bubble {
+  color: var(--tp-primary-950);
+}
+.maze-chat-typing {
+  display: inline-flex;
+  gap: 4px;
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border-top-left-radius: 4px;
+  background: var(--tp-surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+}
+.maze-chat-typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tp-gray-400);
+  animation: maze-bounce 1.2s cubic-bezier(0.23, 1, 0.32, 1) infinite;
+}
+.maze-chat-typing i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.maze-chat-typing i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.maze-chat-setup {
+  margin-left: 40px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--tp-surface);
+  box-shadow: var(--tp-shadow-card);
+  color: var(--chat-muted);
+  font-size: 14px;
+}
+.maze-chat-setup p {
+  margin: 0 0 10px;
+}
+.maze-chat-setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.maze-chat-primary,
+.maze-chat-secondary {
+  min-height: var(--display-control-height, 44px);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  transition: background-color 150ms ease, transform 120ms ease;
+}
+.maze-chat-primary {
+  border: 1px solid var(--tp-primary-600);
+  background: var(--tp-primary-600);
+  color: #fff;
+}
+.maze-chat-secondary {
+  border: 1px solid var(--tp-primary-500);
+  background: var(--tp-surface);
+  color: var(--tp-primary-700);
+}
+:is(.maze-chat-primary, .maze-chat-secondary):active:not(:disabled) {
+  transform: scale(0.97);
+}
+.maze-chat-secondary:disabled {
+  border-color: var(--tp-gray-100);
+  color: var(--tp-gray-500);
+}
+.maze-chat-notice {
+  margin: 0;
+  padding: 8px 16px;
+  background: var(--tp-secondary-50);
+  color: var(--tp-secondary-800);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.maze-chat-tray {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 16px 0;
+  scrollbar-width: none;
+  background: var(--tp-surface);
+}
+.maze-chat-tray::-webkit-scrollbar {
+  display: none;
+}
+.maze-chat-tray button {
+  flex: none;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid var(--tp-primary-300);
+  border-radius: 999px;
+  background: var(--tp-primary-50);
+  color: var(--tp-primary-700);
+  font-size: 14px;
+  white-space: nowrap;
+  animation: maze-chip 320ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation-delay: calc(var(--i, 0) * 60ms + 120ms);
+  transition: transform 120ms ease;
+}
+.maze-chat-tray button:active {
+  transform: scale(0.96);
+}
+
+.maze-chat-compose {
+  padding: 10px 12px max(12px, env(safe-area-inset-bottom));
+  background: var(--tp-surface);
+}
+.maze-chat-field {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  padding: 4px 4px 4px 14px;
+  border: 1px solid var(--tp-gray-200);
+  border-radius: 24px;
+  background: var(--tp-gray-50);
+  transition: border-color 150ms ease, box-shadow 200ms ease;
+}
+.maze-chat-field:focus-within {
+  border-color: var(--tp-primary-500);
+  box-shadow: 0 0 0 3px rgb(90 180 197 / 22%);
+}
+.maze-chat-field[data-listening="true"] {
+  border-color: var(--tp-red-500);
+}
+.maze-chat-field textarea {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  max-height: 120px;
+  padding: 9px 0;
+  border: 0;
+  outline: 0;
+  resize: none;
+  background: transparent;
+  color: var(--chat-ink);
+  /* 16px stops iOS from zooming the WebView when the field gains focus. */
+  font: 16px / 1.4 var(--tp-font);
+}
+.maze-chat-field textarea::placeholder {
+  color: var(--tp-gray-500);
+}
+.maze-chat-round {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--tp-gray-700);
+  transition: background-color 150ms ease, opacity 150ms ease,
+    transform 120ms ease;
+}
+.maze-chat-round svg {
+  width: 22px;
+  height: 22px;
+}
+.maze-chat-round:active:not(:disabled) {
+  transform: scale(0.92);
+}
+.maze-chat-round:disabled {
+  opacity: 0.35;
+}
+.maze-chat-round.listening {
+  background: var(--tp-red-500);
+  color: #fff;
+  animation: maze-pulse 1.4s ease-in-out infinite;
+}
+.maze-chat-send {
+  background: var(--tp-primary-600);
+  color: #fff;
+}
+[data-theme="dark"] .maze-chat-send {
+  color: var(--tp-primary-950);
+}
+.maze-chat-send:disabled {
+  background: var(--tp-gray-200);
+  color: var(--tp-gray-500);
+  opacity: 1;
+}
+.maze-chat-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 0 4px;
+}
+.maze-chat-language {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  color: var(--tp-gray-600);
+}
+.maze-chat-language svg {
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+.maze-chat-language select {
+  min-height: 36px;
+  max-width: 150px;
+  padding: 0 10px 0 28px;
+  border: 1px solid var(--tp-gray-200);
+  border-radius: 999px;
+  background: var(--tp-surface);
+  color: var(--tp-gray-700);
+  font: 13px / 1 var(--tp-font);
+}
+.maze-chat-caption {
+  min-width: 0;
+  margin: 0;
+  color: var(--tp-gray-500);
+  font-size: 12px;
+  line-height: 1.4;
 }
 .maze-chat-panel :focus-visible,
 .maze-chat-launcher:focus-visible {
-  outline: 3px solid #d18b1b;
-  outline-offset: 3px;
+  outline: 3px solid var(--tp-primary-500, #5ab4c5);
+  outline-offset: 2px;
 }
-@media (max-width: 480px) {
+.maze-chat-field textarea:focus-visible {
+  outline: 0;
+}
+.display-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@keyframes maze-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes maze-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+@keyframes maze-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@keyframes maze-chip {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+@keyframes maze-bounce {
+  0%,
+  60%,
+  100% {
+    transform: none;
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+@keyframes maze-pulse {
+  50% {
+    box-shadow: 0 0 0 6px rgb(212 82 81 / 22%);
+  }
+}
+
+/* Phones: a TownPass-style bottom sheet that fills the visible viewport. */
+@media (max-width: 520px) {
   .maze-chat-backdrop {
     padding: 0;
   }
   .maze-chat-panel {
     width: 100%;
-    height: min(730px, var(--chat-viewport-height, 100dvh));
-    border-radius: 20px 20px 0 0;
-    padding-bottom: env(safe-area-inset-bottom);
+    height: calc(var(--chat-viewport-height, 100dvh) - 24px);
+    border-radius: 16px 16px 0 0;
+    box-shadow: var(--tp-shadow-sheet);
+    animation-name: maze-sheet;
   }
-  .maze-chat-launcher {
-    right: 14px;
+  .maze-chat-header::before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    width: 36px;
+    height: 4px;
+    margin-left: -18px;
+    border-radius: 2px;
+    background: var(--tp-gray-200);
+  }
+  .maze-chat-header {
+    position: relative;
+    padding-top: 12px;
+  }
+}
+@keyframes maze-sheet {
+  from {
+    transform: translateY(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .maze-chat-backdrop,
+  .maze-chat-panel,
+  .maze-chat-message,
+  .maze-chat-tray button {
+    animation: none;
+  }
+  .maze-chat-typing i,
+  .maze-chat-round.listening {
+    animation-duration: 0.001ms;
+    animation-iteration-count: 1;
   }
 }
 </style>
