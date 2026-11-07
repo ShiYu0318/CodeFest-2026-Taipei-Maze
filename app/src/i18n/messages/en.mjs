@@ -329,4 +329,35 @@ export default {
   "staff.stepFree": "I need a step-free route — I can't use stairs.",
   "staff.thanks": "I don't speak Chinese well. Thank you!",
   "staff.thanksPlain": "Thank you!",
+  "chat.answer.places": "Found {count} {type} — tap one to see it on the map:",
+  "chat.answer.none":
+    "No {type} found in our data there. Try another floor, or use “Show to staff” to ask for help.",
+  "chat.answer.more": "{count} more — see them under Facilities on the map.",
+  "chat.answer.lost":
+    "Don't worry. Find a nearby location QR code and tap “Scan location” to see where you are. After choosing a destination you can also tap “Show to staff” and hand your phone to station staff.",
+  "chat.answer.exit":
+    "Exits are not on our map yet, so please follow the exit signs. If unsure, choose a destination and tap “Show to staff” to ask for help.",
+  "chat.answer.staff":
+    "Choose a destination, then tap “Show to staff”. Large Chinese text appears — just show your phone to station staff or someone nearby.",
+  "chat.answer.stepFree":
+    "After choosing a destination, tick “Step-free links only”. We only suggest ways without stairs, such as elevators, never stairs. If there is none, we will ask you to check with staff.",
+  "chat.answer.scan":
+    "Find the location QR code on a pillar or wall and tap “Scan location”. The map jumps to “You are here”. Scan again when you reach a new spot.",
+  "chat.answer.language":
+    "Tap the globe at the top right to switch to 繁體中文, Tiếng Việt, Bahasa Indonesia, ไทย, 한국어 or 日本語.",
+  "chat.answer.display":
+    "At the top right: the moon is dark mode, the half-filled circle is high contrast, and the “Standard” menu switches to Kids or Senior (large text).",
+  "chat.answer.privacy":
+    "This helper answers on your phone. No account is needed and your questions are not sent online.",
+  "chat.answer.greeting":
+    "Hi! What are you looking for? Try “toilet” or “elevator”, or ask how to scan your location.",
+  "chat.answer.thanks": "You're welcome — have a good trip!",
+  "chat.answer.fallback":
+    "I can't answer that yet. I can help you find facilities (like “toilet” or “elevator”), explain how to scan your location, step-free routes, and how to ask staff for help.",
+  "chat.showOnMap": "Show on map",
+  "chat.status.offline": "Station Q&A · offline",
+  "chat.optionalModel":
+    "Want to ask open questions? You can also install the on-device AI model (optional, about 584 MB).",
+  "chat.welcome2":
+    "Hi! I'm the station helper. Ask “Where is the toilet?”, “Where is the elevator?” or how to scan your location. Answers come from the station data and need no internet.",
 };

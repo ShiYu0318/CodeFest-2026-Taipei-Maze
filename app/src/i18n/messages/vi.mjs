@@ -327,4 +327,36 @@ export default {
     "Tôi cần lối đi không có bậc thang, tôi không thể đi cầu thang.",
   "staff.thanks": "Tôi không nói giỏi tiếng Trung. Cảm ơn bạn!",
   "staff.thanksPlain": "Cảm ơn bạn!",
+  "chat.answer.places": "Tìm thấy {count} {type}, chạm vào để xem trên bản đồ:",
+  "chat.answer.none":
+    "Không tìm thấy {type} phù hợp trong dữ liệu. Hãy hỏi tầng khác, hoặc dùng “Đưa cho nhân viên xem” để nhờ giúp.",
+  "chat.answer.more":
+    "Còn {count} nơi khác, xem trong mục Tiện ích trên bản đồ.",
+  "chat.answer.lost":
+    "Đừng lo. Hãy tìm mã QR định vị gần bạn và chạm “Quét vị trí” để biết mình đang ở đâu. Sau khi chọn điểm đến, bạn cũng có thể chạm “Đưa cho nhân viên xem” rồi đưa điện thoại cho nhân viên nhà ga.",
+  "chat.answer.exit":
+    "Bản đồ chưa có dữ liệu lối ra, hãy theo biển chỉ dẫn lối ra. Nếu chưa chắc, hãy chọn điểm đến rồi chạm “Đưa cho nhân viên xem” để nhờ giúp.",
+  "chat.answer.staff":
+    "Chọn điểm đến rồi chạm “Đưa cho nhân viên xem”. Màn hình sẽ hiện chữ Trung lớn, chỉ cần đưa điện thoại cho nhân viên hoặc người gần đó.",
+  "chat.answer.stepFree":
+    "Sau khi chọn điểm đến, hãy đánh dấu “Chỉ dùng lối không có bậc thang”. Chúng tôi chỉ gợi ý cách không cần đi cầu thang như thang máy, không bao giờ thay bằng cầu thang. Nếu không có, hãy hỏi nhân viên.",
+  "chat.answer.scan":
+    "Tìm mã QR định vị trên cột hoặc tường và chạm “Quét vị trí”. Bản đồ sẽ hiện “Bạn đang ở đây”. Đến chỗ mới thì quét lại.",
+  "chat.answer.language":
+    "Chạm biểu tượng quả địa cầu ở góc trên bên phải để đổi sang 繁體中文, English, Bahasa Indonesia, ไทย, 한국어 hoặc 日本語.",
+  "chat.answer.display":
+    "Ở góc trên bên phải: mặt trăng là chế độ tối, hình tròn nửa đen là tương phản cao, menu “Tiêu chuẩn” đổi sang Trẻ em hoặc Người cao tuổi (chữ lớn).",
+  "chat.answer.privacy":
+    "Trợ lý này trả lời ngay trên điện thoại của bạn, không cần tài khoản và không gửi câu hỏi lên mạng.",
+  "chat.answer.greeting":
+    "Xin chào! Bạn đang tìm gì? Thử hỏi “nhà vệ sinh” hoặc “thang máy”, hoặc hỏi cách quét vị trí.",
+  "chat.answer.thanks": "Không có gì, chúc bạn đi đường thuận lợi!",
+  "chat.answer.fallback":
+    "Tôi chưa trả lời được câu này. Tôi có thể giúp bạn tìm tiện ích (như “nhà vệ sinh”, “thang máy”), cách quét vị trí, lối không bậc thang và cách nhờ nhân viên giúp.",
+  "chat.showOnMap": "Xem trên bản đồ",
+  "chat.status.offline": "Hỏi đáp · không cần mạng",
+  "chat.optionalModel":
+    "Muốn hỏi câu mở hơn? Bạn có thể cài thêm mô hình AI trên điện thoại (không bắt buộc, khoảng 584 MB).",
+  "chat.welcome2":
+    "Xin chào! Tôi là trợ lý nhà ga. Hãy hỏi “Nhà vệ sinh ở đâu?”, “Thang máy ở đâu?” hoặc cách quét vị trí. Câu trả lời lấy từ dữ liệu nhà ga, không cần mạng.",
 };
