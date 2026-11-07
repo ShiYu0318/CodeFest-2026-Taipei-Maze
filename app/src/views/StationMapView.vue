@@ -1,21 +1,21 @@
 <template>
   <main class="station-page" lang="zh-Hant">
     <div class="station-shell">
-      <header class="station-header">
+      <!-- <header class="station-header">
         <router-link class="brand" to="/" aria-label="回 TownPass 首頁">
           <span class="brand-icon"><StationMapIcon name="map" /></span>
           <span>TownPass</span>
         </router-link>
         <span class="preview-tag">站內導覽・試用版</span>
-      </header>
+      </header> -->
 
       <section class="station-heading" aria-labelledby="station-title">
-        <p class="eyebrow">TAIPEI MAIN STATION</p>
+        <!-- <p class="eyebrow">TAIPEI MAIN STATION</p> -->
         <div class="station-title-row">
           <h1 id="station-title">台北車站</h1>
-          <span class="floor-tag" :style="floorStyle(level)">{{ level }}</span>
+          <!-- <span class="floor-tag" :style="floorStyle(level)">{{ level }}</span> -->
         </div>
-        <p>地下樓層站內地圖</p>
+        <!-- <p>地下樓層站內地圖</p> -->
       </section>
 
       <div class="floor-controls">
@@ -65,7 +65,7 @@
           >
             <header class="map-header">
               <div>
-                <p class="eyebrow">{{ level }} FLOOR PLAN</p>
+                <!-- <p class="eyebrow">{{ level }} FLOOR PLAN</p> -->
                 <h2 id="map-title">
                   {{ floors[level].name }}
                 </h2>
@@ -381,7 +381,7 @@
             </p>
           </div>
 
-          <ul class="facility-list" aria-label="標點明細">
+          <!-- <ul class="facility-list" aria-label="標點明細">
             <li v-for="point in listedPoints" :key="point.id">
               <button
                 type="button"
@@ -406,7 +406,7 @@
                 <StationMapIcon v-else class="list-arrow" name="arrow" />
               </button>
             </li>
-          </ul>
+          </ul> -->
         </section>
       </div>
 
@@ -503,14 +503,14 @@ const listedPoints = computed(() =>
       )
     : floorPoints.value
 );
-const themeHint = computed(() =>
-  activeTheme.value
-    ? categories[activeTheme.value].name +
-      "・" +
-      listedPoints.value.length +
-      " 處，再點主題可恢復圓點。"
-    : "選一個主題，同類標點會一起顯示圖標。"
-);
+// const themeHint = computed(() =>
+//   activeTheme.value
+//     ? categories[activeTheme.value].name +
+//       "・" +
+//       listedPoints.value.length +
+//       " 處，再點主題可恢復圓點。"
+//     : "選一個主題，同類標點會一起顯示圖標。"
+// );
 const bounds = computed(() => {
   return showLayers.value ? stackBounds : floors[level.value].bounds;
 });
@@ -659,11 +659,11 @@ function togglePoint(point) {
   if (selected.value && zoom.value > 1) centerOn(...normalizedPoint(point));
 }
 
-function toggleTheme(type) {
-  activeTheme.value = activeTheme.value === type ? null : type;
-  if (selected.value && !matchesTheme(selected.value, activeTheme.value))
-    selected.value = null;
-}
+// function toggleTheme(type) {
+//   activeTheme.value = activeTheme.value === type ? null : type;
+//   if (selected.value && !matchesTheme(selected.value, activeTheme.value))
+//     selected.value = null;
+// }
 
 async function followConnection() {
   if (!destination.value) return;
