@@ -8,7 +8,7 @@ export default {
   "map.firstFloorNote":
     "Peta 1F digambar ulang dari foto denah stasiun yang diberikan. Lokasi fasilitas hanya perkiraan. Ikuti petunjuk di stasiun.",
   "tour.helper":
-    "Ketuk asisten di pojok kanan bawah untuk bertanya tentang fasilitas stasiun atau cara memakai peta.",
+    "Ketuk Asisten Stasiun Taipei di pojok kanan bawah untuk bertanya tentang fasilitas stasiun atau cara memakai peta.",
   "tour.reopen":
     "Ketuk ikon tanda tanya dalam lingkaran di pojok kiri atas untuk mengulang panduan dari awal.",
   "tour.step": "Panduan {step}/{total}",
@@ -217,14 +217,14 @@ export default {
   "title.meeting": "Titik temu",
   "title.about": "Kode sumber & lisensi",
   "title.default": "Taipei Maze",
-  "chat.open": "Buka obrolan asisten stasiun",
-  "chat.launcher": "Asisten",
+  "chat.open": "Buka obrolan Asisten Stasiun Taipei",
+  "chat.launcher": "Asisten Stasiun Taipei",
   "chat.close": "Tutup obrolan",
-  "chat.title": "Asisten stasiun",
+  "chat.title": "Asisten Stasiun Taipei",
   "chat.clear": "Hapus obrolan",
   "chat.log": "Pesan obrolan",
   "chat.welcome":
-    "Halo! Saya asisten stasiun. Tanyakan tentang navigasi QR atau cara memakai aplikasi. Untuk rute sebenarnya, ikuti peta dan petunjuk navigasi.",
+    "Halo! Saya Asisten Stasiun Taipei. Tanyakan tentang navigasi QR atau cara memakai aplikasi. Untuk rute sebenarnya, ikuti peta dan petunjuk navigasi.",
   "chat.checking": "Memeriksa apakah ponsel ini bisa mengobrol di perangkat…",
   "chat.noModel":
     "Ponsel ini belum punya model obrolan. Unduh sekali (sekitar 584 MB), lalu bisa dipakai tanpa internet.",
@@ -233,7 +233,7 @@ export default {
   "chat.install": "Pasang model obrolan",
   "chat.recheck": "Periksa lagi",
   "chat.you": "Pesan Anda",
-  "chat.bot": "Balasan asisten",
+  "chat.bot": "Balasan Asisten Stasiun Taipei",
   "chat.thinking": "Sedang berpikir di ponsel Anda…",
   "chat.starters": "Pertanyaan yang disarankan",
   "chat.ask": "Mau tanya apa?",
@@ -415,7 +415,7 @@ export default {
   "chat.answer.display":
     "Di kanan atas: bulan untuk mode gelap, lingkaran setengah hitam untuk kontras tinggi, dan menu “Standar” untuk mode Anak atau Lansia (huruf besar).",
   "chat.answer.privacy":
-    "Asisten ini menjawab langsung di ponsel Anda, tanpa akun, dan pertanyaan Anda tidak dikirim ke internet.",
+    "Asisten Stasiun Taipei menjawab langsung di ponsel Anda, tanpa akun, dan pertanyaan Anda tidak dikirim ke internet.",
   "chat.answer.greeting":
     "Halo! Mau cari apa? Coba tanya “toilet” atau “lift”, atau cara memindai lokasi.",
   "chat.answer.thanks": "Sama-sama, semoga perjalanan lancar!",
@@ -426,7 +426,7 @@ export default {
   "chat.optionalModel":
     "Ingin bertanya lebih bebas? Anda juga bisa memasang model AI di ponsel (opsional, sekitar 584 MB).",
   "chat.welcome2":
-    "Halo! Saya asisten stasiun. Tanyakan “Di mana toilet?”, “Di mana lift?”, atau cara memindai lokasi. Jawaban berasal dari data stasiun dan tidak perlu internet.",
+    "Halo! Saya Asisten Stasiun Taipei. Tanyakan “Di mana toilet?”, “Di mana lift?”, atau cara memindai lokasi. Jawaban berasal dari data stasiun dan tidak perlu internet.",
   "map.goHere": "Antar saya ke sini",
   "chat.answer.exitCode":
     "Pintu keluar belum ada di peta. Tempat-tempat ini mengarah ke pintu keluar {code}; dari sana ikuti papan petunjuk {code}:",

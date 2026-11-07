@@ -8,7 +8,7 @@ export default {
   "zone.1f-hall": "車站大廳",
   "map.firstFloorNote":
     "1F 依提供的台北車站一樓平面圖照片重繪。設施位置為示意，請依現場指標。",
-  "tour.helper": "點右下角的小幫手，可以詢問站內設施或地圖操作方式。",
+  "tour.helper": "點右下角的北車小幫手，可以詢問站內設施或地圖操作方式。",
   "tour.reopen": "點左上角的圓框問號，就能從第一步重看功能導覽。",
   "tour.step": "導覽 {step}／{total}",
   "tour.skip": "跳過導覽",
@@ -180,21 +180,21 @@ export default {
   "title.meeting": "集合點",
   "title.about": "原始碼與授權",
   "title.default": "北車不迷路",
-  "chat.open": "開啟站內小幫手聊天",
-  "chat.launcher": "小幫手",
+  "chat.open": "開啟北車小幫手聊天",
+  "chat.launcher": "北車小幫手",
   "chat.close": "收合聊天",
-  "chat.title": "站內小幫手",
+  "chat.title": "北車小幫手",
   "chat.clear": "清除對話",
   "chat.log": "聊天訊息",
   "chat.welcome":
-    "你好！我是站內小幫手，可以回答掃碼導航與 App 操作問題。實際路線請以地圖與導航指示為準。",
+    "你好！我是北車小幫手，可以回答掃碼導航與 App 操作問題。實際路線請以地圖與導航指示為準。",
   "chat.checking": "正在確認這支手機能否使用裝置端聊天…",
   "chat.noModel": "這支手機還沒有聊天模型。下載一次約 584 MB，之後可離線使用。",
   "chat.needApp": "請在最新版城市通 App 開啟，才能使用裝置端聊天。",
   "chat.install": "安裝聊天模型",
   "chat.recheck": "重新檢查",
   "chat.you": "你的訊息",
-  "chat.bot": "小幫手回覆",
+  "chat.bot": "北車小幫手回覆",
   "chat.thinking": "正在手機上思考…",
   "chat.starters": "建議問題",
   "chat.ask": "想問什麼？",
@@ -351,7 +351,7 @@ export default {
   "chat.answer.display":
     "右上角可以調整：月亮是深色模式，半黑半白的圓是高對比，「標準」選單可以換成兒童（有注音）或長者（大字）。",
   "chat.answer.privacy":
-    "這個小幫手在你的手機上回答，不需要帳號，也不會把你的問題傳到網路上。",
+    "北車小幫手在你的手機上回答，不需要帳號，也不會把你的問題傳到網路上。",
   "chat.answer.greeting":
     "你好！想找什麼設施？例如「廁所」「電梯」，或問我怎麼掃碼定位。",
   "chat.answer.thanks": "不客氣，祝你一路順利！",
@@ -362,7 +362,7 @@ export default {
   "chat.optionalModel":
     "想問更開放的問題？可以另外安裝手機上的 AI 模型（選配，約 584 MB）。",
   "chat.welcome2":
-    "你好！我是站內小幫手。可以問我「廁所在哪」「電梯在哪」，或怎麼掃碼定位。答案都來自車站資料，不需要網路。",
+    "你好！我是北車小幫手。可以問我「廁所在哪」「電梯在哪」，或怎麼掃碼定位。答案都來自車站資料，不需要網路。",
   "map.goHere": "帶我去",
   "chat.answer.exitCode":
     "出口本身還沒畫進地圖。這些是往 {code} 出口方向的地點，到了之後請看現場的 {code} 出口指標：",
