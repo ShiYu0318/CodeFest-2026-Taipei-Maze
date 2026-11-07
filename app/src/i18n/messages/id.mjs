@@ -157,4 +157,140 @@ export default {
     "Alamat halaman gagal diperbarui. Hapus pengaturan point lalu buka lagi peta.",
   "notice.suspended":
     "Pemindaian dijeda. Lokasi Anda tidak berubah. Tutup pemindai terlebih dahulu.",
+
+  "title.station": "Panduan bawah tanah Stasiun Utama Taipei",
+  "title.meeting": "Titik temu",
+  "title.about": "Kode sumber & lisensi",
+  "title.default": "Taipei Maze",
+  "chat.open": "Buka obrolan asisten stasiun",
+  "chat.launcher": "Asisten",
+  "chat.close": "Tutup obrolan",
+  "chat.title": "Asisten stasiun",
+  "chat.clear": "Hapus obrolan",
+  "chat.log": "Pesan obrolan",
+  "chat.welcome":
+    "Halo! Saya asisten stasiun. Tanyakan tentang navigasi QR atau cara memakai aplikasi. Untuk rute sebenarnya, ikuti peta dan petunjuk navigasi.",
+  "chat.checking": "Memeriksa apakah ponsel ini bisa mengobrol di perangkat…",
+  "chat.noModel":
+    "Ponsel ini belum punya model obrolan. Unduh sekali (sekitar 584 MB), lalu bisa dipakai tanpa internet.",
+  "chat.needApp":
+    "Buka di aplikasi TownPass terbaru untuk mengobrol di perangkat.",
+  "chat.install": "Pasang model obrolan",
+  "chat.recheck": "Periksa lagi",
+  "chat.you": "Pesan Anda",
+  "chat.bot": "Balasan asisten",
+  "chat.thinking": "Sedang berpikir di ponsel Anda…",
+  "chat.starters": "Pertanyaan yang disarankan",
+  "chat.ask": "Mau tanya apa?",
+  "chat.listening": "Mendengarkan…",
+  "chat.placeholder": "Ketik pertanyaan Anda",
+  "chat.stopRecording": "Selesai merekam",
+  "chat.voice": "Input suara",
+  "chat.stop": "Berhenti",
+  "chat.send": "Kirim",
+  "chat.voiceLanguage": "Bahasa suara",
+  "chat.voiceDraft": "Suara menjadi draf; periksa sebelum dikirim",
+  "chat.typeInstead": "Silakan mengetik untuk bahasa ini",
+  "chat.starter1": "Bagaimana cara memperbarui lokasi saya?",
+  "chat.starter2": "Rute tanpa anak tangga menghindari apa?",
+  "chat.starter3": "Kode lokasi tidak bisa dipindai, lalu bagaimana?",
+  "chat.status.checking": "Memeriksa perangkat…",
+  "chat.status.unavailable": "Obrolan di perangkat belum tersedia",
+  "chat.status.ready": "Gemma 3 · obrolan di perangkat",
+  "chat.status.notReady": "Model obrolan belum siap",
+  "chat.error.cancelled":
+    "Dihentikan. Anda bisa mengubah pertanyaan lalu mengirim lagi.",
+  "chat.error.timeout":
+    "Terlalu lama sehingga dihentikan. Silakan ajukan pertanyaan yang lebih singkat.",
+  "chat.error.model_missing": "Pasang model obrolan terlebih dahulu.",
+  "chat.error.busy":
+    "Ponsel masih memproses permintaan sebelumnya. Coba lagi sebentar lagi.",
+  "chat.error.no_speech": "Suara tidak dikenali. Coba lagi atau ketik saja.",
+  "chat.error.permission_denied":
+    "Tidak ada izin mikrofon atau suara. Anda tetap bisa mengetik.",
+  "chat.error.unavailable": "Fitur ini tidak tersedia di perangkat ini.",
+  "chat.error.voice_unavailable":
+    "Tidak ada pengenalan suara di perangkat untuk bahasa ini. Silakan mengetik.",
+  "chat.error.generic": "Belum selesai. Coba lagi atau ketik pertanyaan Anda.",
+  "chat.setupHint":
+    "Selesaikan persetujuan dan unduhan model di layar penyiapan aplikasi.",
+  "chat.setupReturned": "Kembali dari penyiapan. Memeriksa model lagi.",
+  "chat.badReply":
+    "Balasan berulang atau tidak lengkap. Ajukan pertanyaan yang lebih singkat; untuk arah, ikuti peta.",
+  "chat.listeningNotice": "Mendengarkan hingga 30 detik.",
+  "chat.drafted": "Sudah menjadi draf. Periksa lalu kirim.",
+  "chat.cleared": "Obrolan dihapus.",
+  "search.title": "Cari fasilitas dengan nama",
+  "search.note":
+    "Prototipe kamus tujuh bahasa; kata-kata belum ditinjau. Hanya mencari fasilitas di halaman ini, tanpa AI daring.",
+  "search.label":
+    "Nama fasilitas atau permintaan sederhana (maks. 80 karakter)",
+  "search.placeholder": "廁所、restroom、nhà vệ sinh…",
+  "search.submit": "Cari",
+  "search.clear": "Hapus pencarian",
+  "search.scope":
+    "Halaman ini hanya mencari letak fasilitas. Tidak merencanakan rute tanpa tangga atau rute aksesibel, dan tidak mencari yang terdekat.",
+  "search.unknown":
+    "Belum dipahami: {terms}. Gunakan nama fasilitas atau syarat yang didukung.",
+  "search.maybe":
+    "Apakah maksud Anda “{term}”? Periksa fasilitas di bawah; navigasi tidak dimulai otomatis.",
+  "search.results": "Fasilitas yang ditemukan",
+  "search.typo": "Saran ejaan",
+  "search.exact": "Nama cocok",
+  "search.dictionary": "Cocok di kamus",
+  "search.accessUnknown": "aksesibilitas belum dipastikan",
+  "search.confirm": "Pakai fasilitas dan syarat ini",
+  "search.showOnMap": "Lihat di peta",
+  "search.nearestUnavailable":
+    "Fitur “terdekat” belum tersedia: perlu titik awal yang dipastikan dan jaringan jalan kaki. Silakan cari dengan nama fasilitas.",
+  "search.status.matched":
+    "Ditemukan {count} fasilitas. Silakan pilih salah satu.",
+  "search.status.suggestionsOnly":
+    "Ini saran ejaan. Periksa fasilitas yang Anda cari.",
+  "search.status.noMatch":
+    "Tidak ada fasilitas yang cocok di data kami. Itu tidak berarti stasiun tidak memilikinya.",
+  "search.status.needsClarification":
+    "Permintaan belum cukup jelas. Cari satu tujuan dalam satu waktu.",
+  "search.status.invalidInput":
+    "Masukkan 1–80 karakter (setelah karakter lebar penuh dikonversi).",
+  "search.status.invalidDictionary":
+    "Kamus tidak bisa dipakai. Gunakan daftar fasilitas saja.",
+  "search.status.invalidCatalog":
+    "Data fasilitas tidak bisa dipakai. Gunakan daftar saja.",
+  "search.status.incomplete":
+    "Pencarian belum selesai, jadi belum bisa dipastikan fasilitasnya tidak ada. Coba nama yang lebih singkat.",
+  "search.cond.stepFree": "Pertahankan / hanya tanpa anak tangga",
+  "search.cond.avoidStairs": "Hindari tangga",
+  "search.cond.avoidElevator": "Hindari lift",
+  "search.cond.keepUnavailable":
+    "Pertahankan alat yang ditandai tidak bisa dipakai",
+  "search.cond.apply": "Diterapkan saat memilih: {list}",
+  "search.cond.parsed":
+    "Syarat yang dipahami (halaman ini tidak merencanakan rute): {list}",
+  "search.changed": "Syarat berubah. Silakan cari lagi.",
+  "search.selectedNav":
+    "Tujuan dipilih. Ikuti petunjuk navigasi untuk memeriksa posisi dan arah.",
+  "search.selectedMap": "Pindah ke lantai fasilitas dan memilihnya.",
+  "search.listSeparator": ", ",
+  "meeting.back": "Kembali ke peta stasiun",
+  "meeting.title": "Titik temu dari teman",
+  "meeting.childHint":
+    "Ini tempat yang dipilih teman Anda, bukan tempat Anda sekarang.",
+  "meeting.banner":
+    "Contoh sintetis, bukan tempat tunggu nyata di Stasiun Utama Taipei. Posisi pembagi tidak langsung.",
+  "meeting.confirmedAt": "Pembagi memastikan lokasi pada: {time}",
+  "meeting.unverifiedSource": "(dari pembagi, belum diperiksa server)",
+  "meeting.legacy":
+    "Titik temu sintetis versi lama ini belum terhubung ke area tunggu yang disetujui di peta stasiun. Tidak bisa memberi rute nyata dan tidak menunjukkan posisi Anda.",
+  "meeting.toMap": "Buka peta stasiun untuk memilih fasilitas nyata",
+  "meeting.invalidTitle": "Tautan titik temu tidak bisa dipakai",
+  "meeting.invalidBody":
+    "Format, versi, atau tempatnya mungkin tidak didukung. Minta tautan baru dari pembagi. Tidak ada lokasi atau rute yang dimuat.",
+  "meeting.time.stale":
+    "Sudah lebih dari 30 menit. Hubungi pembagi untuk memastikan ia masih di sana.",
+  "meeting.time.future":
+    "Waktu ini ada di masa depan; jam perangkat atau tautannya mungkin salah. Silakan periksa.",
+  "meeting.time.unverified":
+    "Waktu yang baru pun tidak membuktikan pembagi masih di sana.",
+  "meeting.time.unknown": "Waktu tidak bisa diperiksa. Silakan pastikan lagi.",
 };

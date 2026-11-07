@@ -155,4 +155,133 @@ export default {
     "페이지 주소를 바꾸지 못했습니다. point 설정을 지우고 지도를 다시 여세요.",
   "notice.suspended":
     "스캔을 일시 중지했습니다. 위치는 그대로입니다. 먼저 스캐너를 닫으세요.",
+
+  "title.station": "타이베이역 지하 길 안내",
+  "title.meeting": "만남 장소",
+  "title.about": "소스 코드 및 라이선스",
+  "title.default": "Taipei Maze",
+  "chat.open": "역 도우미 채팅 열기",
+  "chat.launcher": "도우미",
+  "chat.close": "채팅 닫기",
+  "chat.title": "역 도우미",
+  "chat.clear": "대화 지우기",
+  "chat.log": "채팅 메시지",
+  "chat.welcome":
+    "안녕하세요! 역 도우미예요. QR 길 안내나 앱 사용법을 물어보세요. 실제 경로는 지도와 길 안내를 따르세요.",
+  "chat.checking": "이 휴대폰에서 기기 내 채팅을 쓸 수 있는지 확인하는 중…",
+  "chat.noModel":
+    "이 휴대폰에는 아직 채팅 모델이 없어요. 한 번(약 584MB) 내려받으면 그다음부터 오프라인으로 쓸 수 있어요.",
+  "chat.needApp": "기기 내 채팅을 쓰려면 최신 TownPass 앱에서 여세요.",
+  "chat.install": "채팅 모델 설치",
+  "chat.recheck": "다시 확인",
+  "chat.you": "내 메시지",
+  "chat.bot": "도우미 답변",
+  "chat.thinking": "휴대폰에서 생각하는 중…",
+  "chat.starters": "추천 질문",
+  "chat.ask": "무엇이 궁금하세요?",
+  "chat.listening": "듣는 중…",
+  "chat.placeholder": "질문을 입력하세요",
+  "chat.stopRecording": "녹음 끝내기",
+  "chat.voice": "음성 입력",
+  "chat.stop": "멈추기",
+  "chat.send": "보내기",
+  "chat.voiceLanguage": "음성 언어",
+  "chat.voiceDraft": "음성은 초안이 돼요. 보내기 전에 확인하세요",
+  "chat.typeInstead": "이 언어는 입력해 주세요",
+  "chat.starter1": "현재 위치는 어떻게 바꾸나요?",
+  "chat.starter2": "계단 없는 경로는 무엇을 피하나요?",
+  "chat.starter3": "위치 코드가 스캔되지 않으면요?",
+  "chat.status.checking": "기기를 확인하는 중…",
+  "chat.status.unavailable": "기기 내 채팅을 쓸 수 없음",
+  "chat.status.ready": "Gemma 3 · 기기 내 채팅",
+  "chat.status.notReady": "채팅 모델 준비 안 됨",
+  "chat.error.cancelled": "멈췄어요. 질문을 고쳐서 다시 보낼 수 있어요.",
+  "chat.error.timeout": "시간이 너무 오래 걸려 멈췄어요. 더 짧게 물어보세요.",
+  "chat.error.model_missing": "먼저 채팅 모델을 설치하세요.",
+  "chat.error.busy":
+    "휴대폰이 이전 요청을 처리하는 중이에요. 잠시 후 다시 시도하세요.",
+  "chat.error.no_speech":
+    "음성을 인식하지 못했어요. 다시 시도하거나 입력하세요.",
+  "chat.error.permission_denied":
+    "마이크나 음성 권한이 없어요. 계속 입력할 수 있어요.",
+  "chat.error.unavailable": "이 기기에서는 이 기능을 쓸 수 없어요.",
+  "chat.error.voice_unavailable":
+    "이 언어는 기기 내 음성 인식이 없어요. 입력해 주세요.",
+  "chat.error.generic": "완료되지 않았어요. 다시 시도하거나 질문을 입력하세요.",
+  "chat.setupHint": "앱 설치 화면에서 모델 약관 동의와 내려받기를 마치세요.",
+  "chat.setupReturned": "돌아왔어요. 모델 상태를 다시 확인하는 중이에요.",
+  "chat.badReply":
+    "답변이 반복되거나 불완전해요. 더 짧게 물어보세요. 길 안내는 지도를 따르세요.",
+  "chat.listeningNotice": "최대 30초 동안 듣는 중이에요.",
+  "chat.drafted": "초안으로 바꿨어요. 확인한 뒤 보내세요.",
+  "chat.cleared": "대화를 지웠어요.",
+  "search.title": "이름으로 편의시설 찾기",
+  "search.note":
+    "7개 언어 사전 시제품이며 단어는 아직 검토 전입니다. 이 페이지에 있는 편의시설만 찾으며 온라인 AI를 쓰지 않습니다.",
+  "search.label": "편의시설 이름이나 간단한 요청(최대 80자)",
+  "search.placeholder": "廁所、restroom、nhà vệ sinh…",
+  "search.submit": "검색",
+  "search.clear": "검색어 지우기",
+  "search.scope":
+    "이 페이지는 편의시설 위치만 찾아요. 계단 없는 경로나 무장애 경로를 짜거나 가장 가까운 곳을 고르지 않아요.",
+  "search.unknown":
+    "이해하지 못함: {terms}. 편의시설 이름이나 지원되는 조건을 쓰세요.",
+  "search.maybe":
+    "“{term}”을(를) 찾으셨나요? 아래 편의시설을 확인하세요. 길 안내는 자동으로 시작되지 않아요.",
+  "search.results": "찾은 편의시설",
+  "search.typo": "철자 제안",
+  "search.exact": "이름 일치",
+  "search.dictionary": "사전 일치",
+  "search.accessUnknown": "접근성 미확인",
+  "search.confirm": "이 편의시설과 조건 사용",
+  "search.showOnMap": "지도에서 보기",
+  "search.nearestUnavailable":
+    "‘가장 가까운 곳’은 아직 쓸 수 없어요. 확인된 출발점과 보행 경로망이 필요해요. 편의시설 이름으로 찾아 주세요.",
+  "search.status.matched": "편의시설 {count}곳을 찾았어요. 하나를 고르세요.",
+  "search.status.suggestionsOnly":
+    "철자 제안이에요. 찾는 편의시설이 맞는지 확인하세요.",
+  "search.status.noMatch":
+    "데이터에 맞는 편의시설이 없어요. 역 전체에 없다는 뜻은 아니에요.",
+  "search.status.needsClarification":
+    "요청이 충분히 명확하지 않아요. 목적지를 하나씩 찾아 주세요.",
+  "search.status.invalidInput":
+    "1–80자를 입력하세요(전각 문자를 변환한 뒤 기준).",
+  "search.status.invalidDictionary":
+    "사전을 쓸 수 없어요. 편의시설 목록을 이용하세요.",
+  "search.status.invalidCatalog":
+    "편의시설 데이터를 쓸 수 없어요. 목록을 이용하세요.",
+  "search.status.incomplete":
+    "검색이 끝나지 않아 편의시설이 없다고 판단할 수 없어요. 더 짧은 이름으로 해 보세요.",
+  "search.cond.stepFree": "계단 없는 경로 유지 / 사용",
+  "search.cond.avoidStairs": "계단 피하기",
+  "search.cond.avoidElevator": "엘리베이터 피하기",
+  "search.cond.keepUnavailable": "사용 불가로 표시한 설비 유지",
+  "search.cond.apply": "선택하면 적용: {list}",
+  "search.cond.parsed": "이해한 조건(이 페이지는 경로를 짜지 않음): {list}",
+  "search.changed": "조건이 바뀌었어요. 다시 검색하세요.",
+  "search.selectedNav":
+    "목적지를 골랐어요. 길 안내에 따라 위치와 방향을 확인하세요.",
+  "search.selectedMap": "편의시설이 있는 층으로 바꾸고 선택했어요.",
+  "search.listSeparator": ", ",
+  "meeting.back": "역 지도로 돌아가기",
+  "meeting.title": "친구가 공유한 만남 장소",
+  "meeting.childHint": "친구가 정한 장소예요. 지금 내가 있는 곳이 아니에요.",
+  "meeting.banner":
+    "합성 예시이며 타이베이역의 실제 대기 장소가 아니에요. 공유한 사람의 위치는 실시간이 아니에요.",
+  "meeting.confirmedAt": "공유한 사람의 위치 확인 시각: {time}",
+  "meeting.unverifiedSource":
+    "(공유한 사람이 보낸 정보이며 서버가 확인하지 않음)",
+  "meeting.legacy":
+    "이 예전 합성 만남 장소는 역 지도의 승인된 대기 구역과 연결되어 있지 않아요. 실제 경로를 줄 수 없고, 내 위치를 뜻하지도 않아요.",
+  "meeting.toMap": "역 지도에서 실제 편의시설 고르기",
+  "meeting.invalidTitle": "만남 링크를 쓸 수 없어요",
+  "meeting.invalidBody":
+    "형식, 버전 또는 장소가 지원되지 않을 수 있어요. 공유한 사람에게 새 링크를 받으세요. 위치나 경로를 불러오지 않았어요.",
+  "meeting.time.stale":
+    "30분이 넘었어요. 공유한 사람에게 아직 그곳에 있는지 연락해 보세요.",
+  "meeting.time.future":
+    "미래 시각이에요. 기기 시계나 링크가 잘못되었을 수 있어요. 확인하세요.",
+  "meeting.time.unverified":
+    "시각이 최근이어도 공유한 사람이 지금 거기 있다는 증거는 아니에요.",
+  "meeting.time.unknown": "시각을 확인할 수 없어요. 다시 확인하세요.",
 };

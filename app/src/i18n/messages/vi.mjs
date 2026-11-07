@@ -155,4 +155,136 @@ export default {
     "Không cập nhật được địa chỉ trang. Hãy bỏ thông số point rồi mở lại bản đồ.",
   "notice.suspended":
     "Đã tạm dừng quét. Vị trí của bạn không thay đổi. Hãy đóng máy quét trước.",
+
+  "title.station": "Chỉ đường tầng hầm ga Đài Bắc",
+  "title.meeting": "Điểm hẹn",
+  "title.about": "Mã nguồn và giấy phép",
+  "title.default": "Taipei Maze",
+  "chat.open": "Mở trò chuyện với trợ lý nhà ga",
+  "chat.launcher": "Trợ lý",
+  "chat.close": "Đóng trò chuyện",
+  "chat.title": "Trợ lý nhà ga",
+  "chat.clear": "Xóa cuộc trò chuyện",
+  "chat.log": "Tin nhắn",
+  "chat.welcome":
+    "Xin chào! Tôi là trợ lý nhà ga. Hãy hỏi tôi về chỉ đường bằng mã QR hoặc cách dùng ứng dụng. Về đường đi thực tế, hãy theo bản đồ và gợi ý chỉ đường.",
+  "chat.checking":
+    "Đang kiểm tra điện thoại này có trò chuyện trên máy được không…",
+  "chat.noModel":
+    "Điện thoại này chưa có mô hình trò chuyện. Tải một lần (khoảng 584 MB), sau đó dùng được khi không có mạng.",
+  "chat.needApp":
+    "Hãy mở trong ứng dụng TownPass mới nhất để trò chuyện trên máy.",
+  "chat.install": "Cài mô hình trò chuyện",
+  "chat.recheck": "Kiểm tra lại",
+  "chat.you": "Tin nhắn của bạn",
+  "chat.bot": "Trợ lý trả lời",
+  "chat.thinking": "Đang suy nghĩ trên điện thoại…",
+  "chat.starters": "Câu hỏi gợi ý",
+  "chat.ask": "Bạn muốn hỏi gì?",
+  "chat.listening": "Đang nghe…",
+  "chat.placeholder": "Nhập câu hỏi",
+  "chat.stopRecording": "Kết thúc ghi âm",
+  "chat.voice": "Nhập bằng giọng nói",
+  "chat.stop": "Dừng",
+  "chat.send": "Gửi",
+  "chat.voiceLanguage": "Ngôn ngữ giọng nói",
+  "chat.voiceDraft": "Giọng nói thành bản nháp; kiểm tra trước khi gửi",
+  "chat.typeInstead": "Hãy nhập chữ với ngôn ngữ này",
+  "chat.starter1": "Làm sao cập nhật vị trí của tôi?",
+  "chat.starter2": "Lối không bậc thang tránh những gì?",
+  "chat.starter3": "Không quét được mã định vị thì sao?",
+  "chat.status.checking": "Đang kiểm tra thiết bị…",
+  "chat.status.unavailable": "Chưa trò chuyện trên máy được",
+  "chat.status.ready": "Gemma 3 · trò chuyện trên máy",
+  "chat.status.notReady": "Mô hình chưa sẵn sàng",
+  "chat.error.cancelled": "Đã dừng. Bạn có thể sửa câu hỏi rồi gửi lại.",
+  "chat.error.timeout": "Xử lý quá lâu nên đã dừng. Hãy hỏi ngắn hơn.",
+  "chat.error.model_missing": "Hãy cài mô hình trò chuyện trước.",
+  "chat.error.busy":
+    "Điện thoại vẫn đang xử lý yêu cầu trước. Hãy thử lại sau.",
+  "chat.error.no_speech": "Không nhận ra giọng nói. Hãy thử lại hoặc nhập chữ.",
+  "chat.error.permission_denied":
+    "Chưa có quyền micro hoặc giọng nói. Bạn vẫn có thể nhập chữ.",
+  "chat.error.unavailable": "Thiết bị này chưa dùng được tính năng này.",
+  "chat.error.voice_unavailable":
+    "Ngôn ngữ này chưa có nhận dạng giọng nói trên máy. Hãy nhập chữ.",
+  "chat.error.generic": "Chưa xong. Hãy thử lại hoặc nhập câu hỏi.",
+  "chat.setupHint":
+    "Hãy hoàn tất điều khoản và tải mô hình trong màn hình cài đặt của ứng dụng.",
+  "chat.setupReturned": "Đã quay lại. Đang kiểm tra lại mô hình.",
+  "chat.badReply":
+    "Câu trả lời bị lặp hoặc chưa đầy đủ. Hãy hỏi ngắn hơn; để chỉ đường, hãy theo bản đồ.",
+  "chat.listeningNotice": "Đang nghe, tối đa 30 giây.",
+  "chat.drafted": "Đã thành bản nháp. Hãy kiểm tra rồi gửi.",
+  "chat.cleared": "Đã xóa cuộc trò chuyện.",
+  "search.title": "Tìm tiện ích theo tên",
+  "search.note":
+    "Bản thử từ điển bảy ngôn ngữ, từ ngữ chưa được duyệt. Chỉ tìm các tiện ích trên trang này, không dùng AI trực tuyến.",
+  "search.label": "Tên tiện ích hoặc yêu cầu đơn giản (tối đa 80 ký tự)",
+  "search.placeholder": "廁所、restroom、nhà vệ sinh…",
+  "search.submit": "Tìm",
+  "search.clear": "Xóa tìm kiếm",
+  "search.scope":
+    "Trang này chỉ tìm vị trí tiện ích, không lập đường tránh cầu thang hay đường không rào cản, cũng không tìm nơi gần nhất.",
+  "search.unknown":
+    "Chưa hiểu: {terms}. Hãy dùng tên tiện ích hoặc điều kiện được hỗ trợ.",
+  "search.maybe":
+    "Có phải “{term}”? Hãy kiểm tra các tiện ích bên dưới; chỉ đường sẽ không tự bắt đầu.",
+  "search.results": "Tiện ích tìm được",
+  "search.typo": "Gợi ý chính tả",
+  "search.exact": "Trùng tên",
+  "search.dictionary": "Theo từ điển",
+  "search.accessUnknown": "chưa xác nhận lối đi",
+  "search.confirm": "Dùng tiện ích và điều kiện này",
+  "search.showOnMap": "Xem trên bản đồ",
+  "search.nearestUnavailable":
+    "Chưa có chức năng “gần nhất”: cần điểm xuất phát đã xác nhận và mạng lưới đường đi. Hãy tìm theo tên tiện ích.",
+  "search.status.matched": "Tìm thấy {count} tiện ích. Hãy chọn một.",
+  "search.status.suggestionsOnly":
+    "Đây là gợi ý chính tả. Hãy kiểm tra tiện ích bạn cần.",
+  "search.status.noMatch":
+    "Không có tiện ích phù hợp trong dữ liệu. Điều đó không có nghĩa là cả ga không có.",
+  "search.status.needsClarification":
+    "Yêu cầu chưa đủ rõ. Hãy tìm từng điểm đến một.",
+  "search.status.invalidInput":
+    "Hãy nhập 1–80 ký tự (sau khi chuyển ký tự toàn chiều rộng).",
+  "search.status.invalidDictionary":
+    "Không dùng được từ điển. Hãy dùng danh sách tiện ích.",
+  "search.status.invalidCatalog":
+    "Không dùng được dữ liệu tiện ích. Hãy dùng danh sách.",
+  "search.status.incomplete":
+    "Tìm kiếm chưa xong nên không thể kết luận là không có. Hãy thử tên ngắn hơn.",
+  "search.cond.stepFree": "Giữ / chỉ dùng lối không bậc thang",
+  "search.cond.avoidStairs": "Tránh cầu thang",
+  "search.cond.avoidElevator": "Tránh thang máy",
+  "search.cond.keepUnavailable": "Giữ các thiết bị đã báo không dùng được",
+  "search.cond.apply": "Áp dụng khi chọn: {list}",
+  "search.cond.parsed":
+    "Điều kiện đã hiểu (trang này không lập đường đi): {list}",
+  "search.changed": "Điều kiện đã thay đổi. Hãy tìm lại.",
+  "search.selectedNav":
+    "Đã chọn điểm đến. Hãy theo gợi ý chỉ đường để kiểm tra vị trí và hướng.",
+  "search.selectedMap": "Đã chuyển đến tầng của tiện ích và chọn nó.",
+  "search.listSeparator": ", ",
+  "meeting.back": "Về bản đồ nhà ga",
+  "meeting.title": "Điểm hẹn bạn bè chia sẻ",
+  "meeting.childHint":
+    "Đây là nơi bạn của bạn đã hẹn, không phải nơi bạn đang đứng.",
+  "meeting.banner":
+    "Bản minh họa tổng hợp, không phải chỗ chờ thật ở ga Đài Bắc. Vị trí người chia sẻ không cập nhật trực tiếp.",
+  "meeting.confirmedAt": "Người chia sẻ xác nhận vị trí lúc: {time}",
+  "meeting.unverifiedSource": "(từ người chia sẻ, chưa được máy chủ kiểm tra)",
+  "meeting.legacy":
+    "Điểm hẹn tổng hợp kiểu cũ này chưa gắn với khu chờ được duyệt trên bản đồ ga. Không thể dùng để chỉ đường thật và không cho biết bạn đang ở đâu.",
+  "meeting.toMap": "Mở bản đồ ga để chọn tiện ích thật",
+  "meeting.invalidTitle": "Không dùng được liên kết điểm hẹn",
+  "meeting.invalidBody":
+    "Định dạng, phiên bản hoặc địa điểm có thể không được hỗ trợ. Hãy xin người chia sẻ liên kết mới. Chưa tải vị trí hay đường đi nào.",
+  "meeting.time.stale":
+    "Đã hơn 30 phút. Hãy liên lạc với người chia sẻ để xem họ còn ở đó không.",
+  "meeting.time.future":
+    "Thời gian này ở tương lai; đồng hồ máy hoặc liên kết có thể bị sai. Hãy kiểm tra.",
+  "meeting.time.unverified":
+    "Dù thời gian còn mới, vẫn không chứng minh người chia sẻ còn ở đó.",
+  "meeting.time.unknown": "Không kiểm tra được thời gian. Hãy xác nhận lại.",
 };

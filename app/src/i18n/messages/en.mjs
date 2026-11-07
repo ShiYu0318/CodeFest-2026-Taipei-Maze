@@ -157,4 +157,137 @@ export default {
     "The page address could not be updated. Remove the point setting and reopen the map.",
   "notice.suspended":
     "Scanning paused. Your location has not changed. Close the scanner first.",
+
+  "title.station": "Taipei Main Station underground guide",
+  "title.meeting": "Meeting point",
+  "title.about": "Source code & licenses",
+  "title.default": "Taipei Maze",
+  "chat.open": "Open the station helper chat",
+  "chat.launcher": "Helper",
+  "chat.close": "Close chat",
+  "chat.title": "Station helper",
+  "chat.clear": "Clear chat",
+  "chat.log": "Chat messages",
+  "chat.welcome":
+    "Hi! I'm the station helper. Ask me about QR navigation or how to use the app. For the actual route, follow the map and the navigation tips.",
+  "chat.checking": "Checking whether this phone can chat on the device…",
+  "chat.noModel":
+    "This phone does not have the chat model yet. Download it once (about 584 MB) and use it offline after that.",
+  "chat.needApp": "Open this in the latest TownPass app to use on-device chat.",
+  "chat.install": "Install chat model",
+  "chat.recheck": "Check again",
+  "chat.you": "Your message",
+  "chat.bot": "Helper reply",
+  "chat.thinking": "Thinking on your phone…",
+  "chat.starters": "Suggested questions",
+  "chat.ask": "What would you like to ask?",
+  "chat.listening": "Listening…",
+  "chat.placeholder": "Type your question",
+  "chat.stopRecording": "Finish recording",
+  "chat.voice": "Voice input",
+  "chat.stop": "Stop",
+  "chat.send": "Send",
+  "chat.voiceLanguage": "Voice language",
+  "chat.voiceDraft": "Speech becomes a draft; check it before sending",
+  "chat.typeInstead": "Please type in this language",
+  "chat.starter1": "How do I update my location?",
+  "chat.starter2": "What does the step-free route avoid?",
+  "chat.starter3": "The location code won't scan. What now?",
+  "chat.status.checking": "Checking the device…",
+  "chat.status.unavailable": "On-device chat is not available",
+  "chat.status.ready": "Gemma 3 · on-device chat",
+  "chat.status.notReady": "Chat model not ready",
+  "chat.error.cancelled":
+    "Stopped. You can edit your question and send it again.",
+  "chat.error.timeout":
+    "This took too long and was stopped. Please ask a shorter question.",
+  "chat.error.model_missing": "Please install the chat model first.",
+  "chat.error.busy":
+    "The phone is still working on the last request. Please try again soon.",
+  "chat.error.no_speech":
+    "No speech was recognized. Try again or type instead.",
+  "chat.error.permission_denied":
+    "No microphone or speech permission. You can keep typing.",
+  "chat.error.unavailable": "This feature is not available on this device.",
+  "chat.error.voice_unavailable":
+    "No on-device speech recognition for this language. Please type instead.",
+  "chat.error.generic": "That did not finish. Try again or type your question.",
+  "chat.setupHint":
+    "Finish the model terms and download in the app setup screen.",
+  "chat.setupReturned": "Back from setup. Checking the model again.",
+  "chat.badReply":
+    "The reply was repeated or incomplete. Please ask a shorter question; for directions, follow the map.",
+  "chat.listeningNotice": "Listening for up to 30 seconds.",
+  "chat.drafted": "Turned into a draft. Check it, then send.",
+  "chat.cleared": "Chat cleared.",
+  "search.title": "Find a facility by name",
+  "search.note":
+    "Seven-language dictionary prototype; words are not yet reviewed. Searches only the facilities on this page, without any online AI.",
+  "search.label": "Facility name or a simple request (up to 80 characters)",
+  "search.placeholder": "廁所、restroom、nhà vệ sinh…",
+  "search.submit": "Search",
+  "search.clear": "Clear search",
+  "search.scope":
+    "This page only finds where facilities are. It does not plan stair-free or accessible routes, or find the nearest one.",
+  "search.unknown":
+    "Not understood: {terms}. Please use a facility name or a supported condition.",
+  "search.maybe":
+    "Did you mean “{term}”? Check the facilities below; navigation will not start by itself.",
+  "search.results": "Facilities found",
+  "search.typo": "Spelling suggestion",
+  "search.exact": "Name match",
+  "search.dictionary": "Dictionary match",
+  "search.accessUnknown": "accessibility not confirmed",
+  "search.confirm": "Use this facility and conditions",
+  "search.showOnMap": "Show on map",
+  "search.nearestUnavailable":
+    "“Nearest” is not available yet: it needs a confirmed starting point and a walking network. Please search by facility name.",
+  "search.status.matched": "Found {count} facilities. Please choose one.",
+  "search.status.suggestionsOnly":
+    "This is a spelling suggestion. Please check the facility you want.",
+  "search.status.noMatch":
+    "No facility matches in our data. That does not mean the station has none.",
+  "search.status.needsClarification":
+    "This request is not clear enough. Please search for one place at a time.",
+  "search.status.invalidInput":
+    "Enter 1–80 characters (after converting full-width characters).",
+  "search.status.invalidDictionary":
+    "The dictionary cannot be used. Please use the facility list instead.",
+  "search.status.invalidCatalog":
+    "Facility data cannot be used. Please use the list instead.",
+  "search.status.incomplete":
+    "The search did not finish, so we cannot say the facility is missing. Try a shorter name.",
+  "search.cond.stepFree": "Keep / use step-free only",
+  "search.cond.avoidStairs": "Avoid stairs",
+  "search.cond.avoidElevator": "Avoid elevators",
+  "search.cond.keepUnavailable": "Keep equipment marked unavailable",
+  "search.cond.apply": "Applied when you choose: {list}",
+  "search.cond.parsed":
+    "Conditions understood (this page does not plan routes): {list}",
+  "search.changed": "Conditions changed. Please search again.",
+  "search.selectedNav":
+    "Destination chosen. Follow the navigation tips to check your position and direction.",
+  "search.selectedMap": "Switched to the facility's floor and selected it.",
+  "search.listSeparator": ", ",
+  "meeting.back": "Back to station map",
+  "meeting.title": "Meeting point shared by a friend",
+  "meeting.childHint":
+    "This is the place your friend chose. It is not where you are now.",
+  "meeting.banner":
+    "Synthetic demo, not a real waiting spot in Taipei Main Station. The sharer's position is not live.",
+  "meeting.confirmedAt": "Sharer confirmed their location at: {time}",
+  "meeting.unverifiedSource": "(from the sharer, not checked by a server)",
+  "meeting.legacy":
+    "This old synthetic meeting point is not linked to an approved waiting area on the station map. It cannot give a real route and does not show where you are.",
+  "meeting.toMap": "Open the station map to choose a real facility",
+  "meeting.invalidTitle": "This meeting link cannot be used",
+  "meeting.invalidBody":
+    "The format, version or place may not be supported. Ask the sharer for a new link. No location or route was loaded.",
+  "meeting.time.stale":
+    "It has been more than 30 minutes. Contact the sharer to check they are still there.",
+  "meeting.time.future":
+    "This time is in the future; the device clock or the link may be wrong. Please check.",
+  "meeting.time.unverified":
+    "Even a recent time does not prove the sharer is still there.",
+  "meeting.time.unknown": "The time cannot be checked. Please confirm again.",
 };
