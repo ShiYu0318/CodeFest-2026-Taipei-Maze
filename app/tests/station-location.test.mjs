@@ -159,3 +159,27 @@ test("exit clears point and destination while a browser without bridge never pre
   assert.deepEqual(located, [null]);
   location.dispose();
 });
+
+test("scan remains serialized while its URL update is settling", async () => {
+  let finishNavigation, markSyncing;
+  const syncing = new Promise((resolve) => {
+    markSyncing = resolve;
+  });
+  const { n, location } = setup({
+    onLocated: () =>
+      new Promise((resolve) => {
+        finishNavigation = resolve;
+        markSyncing();
+      }),
+  });
+  const pending = location.scan();
+  n.reply(stationQrPayload("b1-e4", data));
+  await syncing;
+  assert.equal(location.snapshot().active, true);
+  assert.equal((await location.scan()).type, "Busy");
+  assert.equal(n.messages.length, 1);
+  finishNavigation();
+  assert.equal((await pending).type, "success");
+  assert.equal(location.snapshot().active, false);
+  location.dispose();
+});

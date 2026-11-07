@@ -73,7 +73,6 @@ export function createStationLocation({
       publish();
       const reply = await bridge.scan();
       if (disposed || ticket !== generation) return { type: "Stale" };
-      active = false;
       const result =
         reply.type === "success" ? session.scan(reply.payload) : reply;
       if (result.type === "success") {
@@ -84,10 +83,13 @@ export function createStationLocation({
         } catch {
           if (!disposed && ticket === generation) {
             notice = "定位已更新，但網址同步失敗，請重新掃描。";
-            publish();
           }
         }
+        if (disposed || ticket !== generation) return { type: "Stale" };
+        active = false;
+        publish();
       } else {
+        active = false;
         notice =
           {
             Cancelled: "已取消掃描，原位置保持不變。",

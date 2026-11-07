@@ -2,14 +2,21 @@
 <template>
   <section class="station-scan-panel" aria-labelledby="station-scan-heading">
     <div class="scan-heading">
-      <h2 id="station-scan-heading">掃碼找目的地</h2>
+      <h2 id="station-scan-heading">
+        {{ view.mode === "navigation" ? "導航模式" : "瀏覽模式" }}
+      </h2>
       <label><input v-model="easyRead" type="checkbox" />簡明模式</label>
     </div>
     <p class="scan-caveat">
       定位碼尚未現地布設；目前提供設施與樓層關係，完整步行路網待補。
     </p>
-    <template v-if="!easyRead || !view.destinationId">
-      <label for="station-destination">先選終點</label>
+    <p v-if="view.mode === 'browsing'">
+      掃描點位 QR，進入導航模式並顯示「您在這裡」。
+    </p>
+    <template
+      v-if="view.mode === 'navigation' && (!easyRead || !view.destinationId)"
+    >
+      <label for="station-destination">選擇目的地</label>
       <select
         id="station-destination"
         :value="view.destinationId ?? ''"
@@ -54,23 +61,22 @@
     <p role="status">
       {{
         position
-          ? `上次掃碼：${position.floor} · ${position.name}`
-          : "目前尚未定位，選好終點後再掃描。"
+          ? `您在這裡：${position.floor} · ${position.name}`
+          : "目前尚未定位，可先掃描所在點位。"
       }}
     </p>
-    <p v-if="view.position" class="scan-time">
+    <p v-if="view.position?.source === 'qr'" class="scan-time">
       {{ confirmedTime }}
-      確認；不是即時追蹤。
+      掃碼定位；位置不會隨走動自動更新。
     </p>
-    <button
-      class="scan-start"
-      :disabled="!view.destinationId || !available || active"
-      @click="start"
-    >
-      {{ active ? "相機持續掃描中…" : "開啟相機，持續更新位置" }}
+    <p v-else-if="view.position" class="scan-time">
+      由定位連結帶入，請核對現場位置；不是即時追蹤。
+    </p>
+    <button class="scan-start" :disabled="!available || active" @click="start">
+      {{ active ? "等待掃碼結果…" : position ? "重新掃描定位" : "掃描定位" }}
     </button>
     <p v-if="!available" class="scan-note">
-      需要已更新的城市通 App；一般瀏覽器無法使用原生持續掃碼。
+      請由城市通 App 開啟以使用原生掃碼；瀏覽器可查看點位連結。
     </p>
     <p v-if="notice" role="status">{{ notice }}</p>
     <div
@@ -101,39 +107,36 @@
         }}（重新開始可清除）
       </p>
     </div>
-    <button v-if="view.destinationId" :disabled="active" @click="reset">
-      {{ view.arrived ? "開始新的導航" : "結束這次導航" }}
+    <button v-if="view.mode === 'navigation'" :disabled="active" @click="reset">
+      退出導航，返回瀏覽模式
     </button>
   </section>
 </template>
 <script setup>
-/* global defineProps, defineEmits */
-import { computed, onBeforeUnmount, ref, shallowRef } from "vue";
+/* global defineProps */
+import { computed, ref } from "vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import DestinationSearch from "./DestinationSearch.vue";
 import { stationCatalog } from "../search/catalog.mjs";
-import { createContinuousScanner } from "../navigation/continuous.mjs";
-import { createStationScanSession, stationPoints } from "../station/scan.mjs";
+import { stationPoints } from "../station/scan.mjs";
 import data from "../views/station-points.json";
-import connections from "../views/station-connections.json";
-const props = defineProps({ selectedPoint: { type: Object, default: null } });
-const emit = defineEmits(["position", "destination"]);
+const props = defineProps({
+  selectedPoint: { type: Object, default: null },
+  location: { type: Object, required: true },
+});
+const view = computed(() => props.location.view.value);
 const catalog = stationPoints(data),
   searchEntries = stationCatalog(data);
 const byId = new Map(catalog.map((p) => [p.id, p]));
-const session = createStationScanSession(data, connections),
-  view = shallowRef(session.snapshot());
 const { displayMode } = useDisplayPreferences();
-const searchDetails = ref(null);
-const active = ref(false),
-  available = ref(false),
-  notice = ref(""),
+const searchDetails = ref(null),
   easyRead = ref(displayMode.value !== "standard");
-let disposed = false,
-  guidanceVersion = 0;
+const active = computed(() => view.value.active);
+const available = computed(() => view.value.available);
+const notice = computed(() => view.value.notice);
 const destination = computed(() => byId.get(view.value.destinationId));
 const confirmedTime = computed(() =>
-  view.value.position
+  view.value.position?.confirmedAt
     ? new Date(view.value.position.confirmedAt).toLocaleTimeString()
     : ""
 );
@@ -146,113 +149,40 @@ const options = computed(() => ({
 const stopLabel = (stop) =>
   `${stop.floor} ${byId.get(stop.pointId)?.name ?? stop.pointId}`;
 const instruction = computed(() => {
-  if (view.value.arrived) return "已由你確認抵達。可關閉相機，或結束這次導航。";
+  if (view.value.arrived)
+    return "已由你確認抵達。可退出導航，或選擇下一個目的地。";
   if (view.value.relation.status === "at_destination")
-    return "掃到的是終點設施定位碼。請確認現場名稱與樓層是否相符，再確認已抵達。";
+    return "目前定位點與目的地相同。請確認現場名稱與樓層是否相符，再確認已抵達。";
   if (view.value.relation.status === "same_zone")
     return "目前與終點在同一區域。尚無可驗證的走廊指引，請依現場標示確認，沿途掃碼更新。";
   if (view.value.relation.status === "connections")
     return `可參考的樓層連結：${view.value.relation.steps
       .map((step) => `${stopLabel(step.from)} 到 ${stopLabel(step.to)}`)
       .join("；")}。這是樓層關係，不是完整步行路線，請依現場標示確認。`;
-  if (position.value)
-    return "沒有符合目前條件的已知跨區連結。請洽詢站務，不會用樓梯或未知設備替代無階梯需求。";
-  return "請掃描本專案的設施定位碼。掃描後自動更新位置，終點不變。";
-});
-function guidance(error) {
-  return {
-    guidanceVersion: ++guidanceVersion,
-    guidanceToken: view.value.token,
-    title: destination.value ? `終點：${destination.value.name}` : "先選終點",
-    floor: position.value
-      ? `上次掃碼 ${position.value.floor} · ${position.value.name}`
-      : "尚未定位",
-    instruction: error || instruction.value,
-    canAdvance:
-      !error &&
-      view.value.relation.status === "at_destination" &&
-      !view.value.arrived,
-    nextLabel: "確認已抵達",
-  };
-}
-function refresh() {
-  view.value = session.snapshot();
-  if (active.value) scanner.update(guidance());
-}
-const scanner = createContinuousScanner(window.flutterObject, {
-  onPayload(payload) {
-    const result = session.scan(payload);
-    if (result.type === "success") {
-      notice.value = "位置已更新，終點不變；相機保持開啟。";
-      refresh();
-      emit("position", result.point);
-    } else {
-      notice.value = "不是本地圖支援的定位碼，位置與終點維持不變。";
-      scanner.update(guidance(notice.value));
-    }
-  },
-  onAction({ guidanceToken }) {
-    confirm(guidanceToken);
-  },
-  onStatus(status) {
-    active.value = ["starting", "started"].includes(status);
-    if (status === "error")
-      notice.value = "相機無法啟動，請關閉後重試；位置與終點保留。";
-  },
-});
-scanner.probe().then((result) => {
-  if (!disposed) available.value = result.type === "success";
+  return "沒有符合目前條件的已知跨區連結。請洽詢站務，不會用樓梯或未知設備替代無階梯需求。";
 });
 function choose(id) {
-  if (active.value || !session.setDestination(id)) return;
-  notice.value = "終點已設定。掃描沿途定位碼即可更新所在位置。";
-  refresh();
-  emit("destination", byId.get(id));
+  props.location.choose(id);
 }
 function searchSelect(selection) {
-  if (active.value || !session.applySearchSelection(selection)) return;
-  refresh();
-  if (searchDetails.value) searchDetails.value.open = false;
-  emit("destination", destination.value);
-  notice.value = "已選擇終點並保留通行限制；請掃描目前位置。";
+  if (props.location.searchSelect(selection) && searchDetails.value)
+    searchDetails.value.open = false;
 }
 function changeStepFree(value) {
-  if (active.value) return;
-  session.setStepFree(value);
-  refresh();
+  props.location.setStepFree(value);
 }
 function unavailable(id) {
-  if (active.value) return;
-  session.markUnavailable(id);
-  refresh();
-  notice.value = "已排除此設備；不會解除你的通行限制。";
+  props.location.markUnavailable(id);
 }
 function confirm(token) {
-  if (session.confirmArrival(token)) refresh();
+  props.location.confirmArrival(token);
 }
 function start() {
-  if (active.value || !view.value.destinationId) return;
-  const result = scanner.start(guidance());
-  if (result.type !== "success")
-    notice.value = "持續掃碼尚不可用，請更新宿主 App。";
+  props.location.scan();
 }
 function reset() {
-  if (active.value) return;
-  session.reset();
-  refresh();
-  emit("position", null);
-  emit("destination", null);
-  notice.value = "";
+  props.location.reset();
 }
-function pagehide() {
-  scanner.stop();
-}
-window.addEventListener("pagehide", pagehide);
-onBeforeUnmount(() => {
-  disposed = true;
-  scanner.dispose();
-  window.removeEventListener("pagehide", pagehide);
-});
 </script>
 <style scoped>
 .station-scan-panel {
