@@ -485,6 +485,22 @@ export default {
   "walk.arrowDown": "Đi {via} xuống {floor}.",
   "walk.arrowNote":
     "Điện thoại không biết bạn đang quay mặt hướng nào. Hãy so bản đồ với biển chỉ dẫn.",
+  "share.place": "Chia sẻ địa điểm",
+  "share.destination": "Chia sẻ điểm đến",
+  "share.title": "Chia sẻ với bạn bè",
+  "share.intro":
+    "Bạn của bạn mở liên kết sẽ thấy địa điểm này được đặt làm điểm đến. Đây là địa điểm cố định, không phải vị trí trực tiếp của bạn.",
+  "share.system": "Chia sẻ qua ứng dụng khác",
+  "share.copy": "Sao chép liên kết",
+  "share.copied": "Đã sao chép, hãy dán cho bạn bè.",
+  "share.copyFailed":
+    "Không sao chép tự động được. Hãy nhấn giữ liên kết ở trên để sao chép.",
+  "share.close": "Đóng",
+  "share.message":
+    "Gặp nhau ở “{name}” ({floor}) tại ga Đài Bắc. Mở liên kết để xem vị trí:",
+  "share.received":
+    "Địa điểm bạn bè chia sẻ: {name} ({floor}). Đây là địa điểm cố định, không phải vị trí trực tiếp. Quét mã QR định vị gần bạn để lập đường đi.",
+  "share.linkLabel": "Liên kết chia sẻ",
   "route.title": "Các bước đi",
   "route.step": "Bước {current}/{total}",
   "route.walk": "Ở {floor}, đi về phía “{name}”",

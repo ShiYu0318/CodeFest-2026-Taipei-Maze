@@ -4,6 +4,8 @@
 // Prefer reviewed phrases, then reviewed UI characters; leave unknown text plain.
 import { characterReadings } from "./zhuyin-characters.mjs";
 const entries = [
+  ["碰面", "ㄆㄥˋ ㄇㄧㄢˋ"],
+  ["貼給朋友", "ㄊㄧㄝ ㄍㄟˇ ㄆㄥˊ ˙ㄧㄡ"],
   ["尚未現場核對", "ㄕㄤˋ ㄨㄟˋ ㄒㄧㄢˋ ㄔㄤˇ ㄏㄜˊ ㄉㄨㄟˋ"],
   [
     "目前與終點在同一區域",

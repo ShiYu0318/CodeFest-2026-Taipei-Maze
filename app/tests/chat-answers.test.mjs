@@ -157,3 +157,11 @@ test("when the asked floor has none, other floors are offered instead", () => {
   assert.match(answer.text, /B2/);
   assert.match(answer.text, /其他樓層/);
 });
+
+test("1F is a known floor: it can be asked for and sorts above B1", () => {
+  const onFirst = answerLocally("1F toilet", points, i18n("en"));
+  assert.ok(onFirst.places.length > 0);
+  assert.ok(onFirst.places.every((place) => place.floor === "1F"));
+  const all = answerLocally("toilet", points, i18n("en"), { nearFloor: "B1" });
+  assert.equal(all.places[0].floor, "B1");
+});

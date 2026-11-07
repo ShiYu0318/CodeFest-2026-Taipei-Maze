@@ -1143,3 +1143,13 @@
   stroke-dasharray: 2 12;
   opacity: 0.95;
 }
+.station-page .walk-share {
+  justify-self: start;
+  min-height: var(--display-control-height, 44px);
+  padding: 6px 16px;
+  border: 1px solid var(--tp-primary-500);
+  border-radius: var(--tp-radius-button, 10px);
+  background: var(--surface);
+  color: var(--tp-primary-700);
+  font-weight: 600;
+}
