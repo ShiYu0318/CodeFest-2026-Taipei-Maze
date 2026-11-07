@@ -33,6 +33,15 @@ jobs:
           test "$(git -C "$RUNNER_TEMP/flutter" rev-parse HEAD)" = 5fc346839b5d0eef006ed8404392afb4dfae428d
           echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
           echo "JAVA_HOME=$JAVA_HOME_21_X64" >> "$GITHUB_ENV"
+      - name: Verify preinstalled stable NDK (no preview license acceptance)
+        run: |
+          test -f "$ANDROID_HOME/ndk/29.0.14206865/source.properties"
+          cat "$ANDROID_HOME/ndk/29.0.14206865/source.properties"
+      - name: Bundle the web application for on-device loading
+        run: |
+          npm ci --prefix app
+          npm run build --prefix app
+          python3 tools/package-townpass-web.py "$RUNNER_TEMP/TownPass/assets/codefest_web.bundle"
       - name: Resolve and generate official host code
         working-directory: ${{ runner.temp }}/TownPass
         run: |
@@ -41,7 +50,7 @@ jobs:
           dart run build_runner build
       - name: Test chat bridge and QR session
         working-directory: ${{ runner.temp }}/TownPass
-        run: flutter test test/codefest_ai_handler_test.dart test/codefest_scan_session_test.dart test/gemma_model_store_test.dart --no-pub
+        run: flutter test test/codefest_ai_handler_test.dart test/codefest_scan_session_test.dart test/gemma_model_store_test.dart test/codefest_ai_scope_test.dart test/codefest_bundle_server_test.dart --no-pub
       - name: Build Android debug APK (no model weights or signing secrets)
         working-directory: ${{ runner.temp }}/TownPass
         run: flutter build apk --debug --no-pub

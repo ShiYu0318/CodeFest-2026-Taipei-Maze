@@ -125,3 +125,15 @@ export function buildChatPrompt(history, input) {
     turns.shift();
   return compose();
 }
+
+export function shouldSendOnEnter(event) {
+  return (
+    event.key === "Enter" &&
+    !event.shiftKey &&
+    !event.ctrlKey &&
+    !event.altKey &&
+    !event.metaKey &&
+    !event.isComposing &&
+    event.keyCode !== 229
+  );
+}

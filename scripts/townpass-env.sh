@@ -19,6 +19,7 @@ Usage: bash scripts/townpass-env.sh COMMAND [arguments]
   deps        Resolve host dependencies and generate assets/JSON code
   analyze     Run the upstream Flutter analyzer
   test        Run upstream tests (may reveal inherited test failures)
+  bundle-web  Build and package local web assets into the host
   build-ios   Build a debug iOS Simulator application
   run-ios ID  Run the host on the specified simulator/device ID
   serve       Serve the bridge diagnostic page on loopback port 8765
@@ -45,6 +46,17 @@ fi
 export PUB_HOSTED_URL=https://pub.dev
 export FLUTTER_STORAGE_BASE_URL=https://storage.googleapis.com
 
+bundle_web() {
+  npm run build --prefix "$repo_dir/app"
+  python3 "$repo_dir/tools/package-townpass-web.py" "$townpass_dir/assets/codefest_web.bundle"
+}
+if [[ "$command_name" == "bundle-web" ]]; then
+  bundle_web
+  exit 0
+fi
+if [[ "$command_name" == "build-ios" || "$command_name" == "run-ios" || "$command_name" == "deps" ]]; then
+  bundle_web
+fi
 cd -- "$townpass_dir"
 case "$command_name" in
   paths)

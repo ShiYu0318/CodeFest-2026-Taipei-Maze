@@ -104,7 +104,7 @@
             maxlength="500"
             placeholder="例如：如何更新目前位置？"
             :disabled="busy || listening"
-            @keydown.enter.exact.prevent="send"
+            @keydown="composerKey"
           />
           <div class="maze-chat-actions">
             <label class="maze-chat-language"
@@ -168,7 +168,11 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { buildChatPrompt, createChatBridge } from "../chat/bridge.mjs";
+import {
+  buildChatPrompt,
+  createChatBridge,
+  shouldSendOnEnter,
+} from "../chat/bridge.mjs";
 const opened = ref(false),
   draft = ref(""),
   messages = ref([]),
@@ -266,6 +270,11 @@ function close() {
 async function scroll() {
   await nextTick();
   thread.value?.scrollTo({ top: thread.value.scrollHeight });
+}
+function composerKey(event) {
+  if (!shouldSendOnEnter(event)) return;
+  event.preventDefault();
+  send();
 }
 async function send() {
   if (busy.value || listening.value || !modelReady.value) return;

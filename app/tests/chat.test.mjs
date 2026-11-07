@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createChatBridge, buildChatPrompt } from "../src/chat/bridge.mjs";
+import {
+  createChatBridge,
+  buildChatPrompt,
+  shouldSendOnEnter,
+} from "../src/chat/bridge.mjs";
 function host() {
   const sent = [],
     listeners = new Set();
@@ -80,4 +84,11 @@ test("prompt byte budget leaves space for bounded generation with multilingual i
   );
   assert.ok(new TextEncoder().encode(prompt).length <= 3500);
   assert.match(prompt, /😀/);
+});
+
+test("IME Enter accepts composition without sending; Shift Enter stays a newline", () => {
+  assert.equal(shouldSendOnEnter({ key: "Enter", isComposing: true }), false);
+  assert.equal(shouldSendOnEnter({ key: "Enter", keyCode: 229 }), false);
+  assert.equal(shouldSendOnEnter({ key: "Enter", shiftKey: true }), false);
+  assert.equal(shouldSendOnEnter({ key: "Enter" }), true);
 });
