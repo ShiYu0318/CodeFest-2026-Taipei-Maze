@@ -108,6 +108,7 @@ export default {
   "map.ariaYouAreHere": "、現在地",
   "map.ariaDestination": "、目的地",
   "map.youAreHere": "現在地",
+  "map.toolbar": "地図ツールバー",
   "map.information": "地図の説明・出典・ライセンス",
   "about.mapNotes": "地図の説明と参考資料",
   "map.footerNote":
@@ -361,6 +362,7 @@ export default {
   "map.faceChoose": "駅の案内表示のほうを向いてから、目的地を選んでください。",
   "map.badgeStart": "発",
   "map.badgeEnd": "着",
+  "scan.actions": "経路の操作",
   "scan.cancelTrip": "旅程をやめる",
   "endpoint.close": "位置を閉じる",
   "endpoint.roles": "出発地点か目的地を選ぶ",

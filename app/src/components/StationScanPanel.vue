@@ -71,32 +71,6 @@
           :text="t('scan.destination', { place: place(destination) })"
       /></strong>
     </p>
-    <button
-      v-if="destination"
-      type="button"
-      class="scan-staff"
-      @click="staffOpen = true"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <rect
-          x="4"
-          y="3"
-          width="16"
-          height="18"
-          rx="2.5"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-        />
-        <path
-          d="M8 8h8M8 12h8M8 16h5"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-        />
-      </svg>
-      <ZhuyinText :text="t('staff.open')" />
-    </button>
     <StaffCard
       v-if="staffOpen && destination"
       :point="destination"
@@ -123,23 +97,7 @@
     <p v-else-if="view.position" class="scan-time">
       <ZhuyinText :text="t('scan.fromLink')" />
     </p>
-    <button
-      v-if="!persistentScan"
-      class="scan-start"
-      data-tour-target="scan"
-      :disabled="!available || active"
-      @click="start"
-    >
-      <ZhuyinText
-        :text="
-          active
-            ? t('scan.waiting')
-            : position
-            ? t('scan.rescan')
-            : t('scan.scan')
-        "
-      />
-    </button>
+
     <p v-if="!persistentScan && !available" class="scan-note">
       {{ t("scan.needApp") }}
     </p>
@@ -186,15 +144,86 @@
         />
       </p>
     </div>
-    <button
-      v-if="view.mode === 'navigation' || view.destinationId"
-      :disabled="active"
-      @click="emit('cancel-trip')"
-    >
-      <ZhuyinText
-        :text="view.mode === 'browsing' ? t('scan.cancelTrip') : t('scan.exit')"
+
+    <div class="scan-actions" role="group" :aria-label="t('scan.actions')">
+      <StationNavigationRescan
+        v-if="persistentScan"
+        :location="location"
+        @scanned="emit('scanned')"
       />
-    </button>
+      <button
+        v-else
+        class="scan-start"
+        data-tour-target="scan"
+        :disabled="!available || active"
+        @click="start"
+      >
+        <StationMapIcon name="qrcode" />
+        <ZhuyinText
+          :text="
+            active
+              ? t('scan.waiting')
+              : position
+              ? t('scan.rescan')
+              : t('scan.scan')
+          "
+        />
+      </button>
+      <div
+        v-if="destination || view.mode === 'navigation'"
+        class="scan-secondary-actions"
+      >
+        <button
+          v-if="destination"
+          type="button"
+          class="scan-staff"
+          :disabled="active"
+          @click="staffOpen = true"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect
+              x="4"
+              y="3"
+              width="16"
+              height="18"
+              rx="2.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            />
+            <path
+              d="M8 8h8M8 12h8M8 16h5"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          <ZhuyinText :text="t('staff.open')" />
+        </button>
+        <button
+          v-if="view.mode === 'navigation' || view.destinationId"
+          type="button"
+          class="scan-cancel"
+          :disabled="active"
+          @click="emit('cancel-trip')"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="m7 7 10 10M17 7 7 17"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          <ZhuyinText
+            :text="
+              view.mode === 'browsing' ? t('scan.cancelTrip') : t('scan.exit')
+            "
+          />
+        </button>
+      </div>
+    </div>
   </section>
 </template>
 <script setup>
@@ -204,6 +233,8 @@ import DestinationSearch from "./DestinationSearch.vue";
 import StaffCard from "./StaffCard.vue";
 import ZhuyinText from "./ZhuyinText.vue";
 import StationTransferStep from "./StationTransferStep.vue";
+import StationNavigationRescan from "./StationNavigationRescan.vue";
+import StationMapIcon from "./StationMapIcon.vue";
 import { stationCatalog } from "../search/catalog.mjs";
 import { stationPoints } from "../station/scan.mjs";
 import data from "../views/station-points.json";
@@ -418,5 +449,57 @@ async function start() {
 .station-scan-panel button {
   max-width: 100%;
   overflow-wrap: anywhere;
+}
+
+.scan-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.scan-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--display-control-height, 44px);
+  margin: 0;
+  padding: 12px;
+  line-height: 1.4;
+  white-space: normal;
+  text-align: center;
+}
+.scan-actions svg {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+.scan-secondary-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: 10px;
+}
+.scan-secondary-actions .scan-staff {
+  border-color: var(--tp-primary-300);
+  background: var(--wash);
+  color: var(--ink);
+}
+.scan-secondary-actions .scan-cancel {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-weight: 500;
+}
+.scan-actions :deep(.navigation-rescan-bar) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.scan-actions :deep(.navigation-rescan-bar button) {
+  margin: 8px 0 0;
 }
 </style>

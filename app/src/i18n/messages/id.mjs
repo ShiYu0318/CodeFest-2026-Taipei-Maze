@@ -112,6 +112,7 @@ export default {
   "map.ariaYouAreHere": ", Anda di sini",
   "map.ariaDestination": ", tujuan",
   "map.youAreHere": "Anda di sini",
+  "map.toolbar": "Bilah alat peta",
   "map.information": "Informasi peta, sumber, dan lisensi",
   "about.mapNotes": "Catatan dan referensi peta",
   "map.footerNote":
@@ -364,6 +365,7 @@ export default {
   "map.faceChoose": "Hadap ke papan petunjuk stasiun, lalu pilih tujuan.",
   "map.badgeStart": "A",
   "map.badgeEnd": "T",
+  "scan.actions": "Tindakan perjalanan",
   "scan.cancelTrip": "Batalkan perjalanan",
   "endpoint.close": "Tutup lokasi",
   "endpoint.roles": "Pilih titik awal atau tujuan",

@@ -41,6 +41,23 @@
         </option>
       </select>
     </label>
+    <label class="display-mode-label" data-tour-target="mode">
+      <span class="display-visually-hidden">{{ t("display.mode") }}</span>
+      <select
+        :value="displayMode"
+        @change="setDisplayMode($event.target.value)"
+      >
+        <option value="standard">
+          <ZhuyinText :text="t('display.standard')" plain />
+        </option>
+        <option value="child">
+          <ZhuyinText :text="t('display.child')" plain />
+        </option>
+        <option value="senior">
+          <ZhuyinText :text="t('display.senior')" plain />
+        </option>
+      </select>
+    </label>
     <button
       class="display-icon-button"
       data-tour-target="theme"
@@ -107,23 +124,6 @@
       </svg>
       <span class="display-visually-hidden">{{ t("display.contrast") }}</span>
     </button>
-    <label class="display-mode-label" data-tour-target="mode">
-      <span class="display-visually-hidden">{{ t("display.mode") }}</span>
-      <select
-        :value="displayMode"
-        @change="setDisplayMode($event.target.value)"
-      >
-        <option value="standard">
-          <ZhuyinText :text="t('display.standard')" plain />
-        </option>
-        <option value="child">
-          <ZhuyinText :text="t('display.child')" plain />
-        </option>
-        <option value="senior">
-          <ZhuyinText :text="t('display.senior')" plain />
-        </option>
-      </select>
-    </label>
   </div>
 </template>
 

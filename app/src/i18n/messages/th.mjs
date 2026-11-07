@@ -106,6 +106,7 @@ export default {
   "map.ariaYouAreHere": " คุณอยู่ที่นี่",
   "map.ariaDestination": " จุดหมาย",
   "map.youAreHere": "คุณอยู่ที่นี่",
+  "map.toolbar": "แถบเครื่องมือแผนที่",
   "map.information": "ข้อมูลแผนที่ แหล่งข้อมูล และใบอนุญาต",
   "about.mapNotes": "คำอธิบายและเอกสารอ้างอิงแผนที่",
   "map.footerNote":
@@ -337,6 +338,7 @@ export default {
   "map.faceChoose": "หันไปทางป้ายนำทางในสถานี แล้วเลือกจุดหมาย",
   "map.badgeStart": "เริ่ม",
   "map.badgeEnd": "ถึง",
+  "scan.actions": "การดำเนินการเดินทาง",
   "scan.cancelTrip": "ยกเลิกการเดินทาง",
   "endpoint.close": "ปิดการระบุตำแหน่ง",
   "endpoint.roles": "เลือกจุดเริ่มต้นหรือจุดหมาย",

@@ -46,6 +46,8 @@ const realComponents = new Set([
   "StationNavigationRescan",
   "StationTransferStep",
   "DestinationSearch",
+  "StationScanPanel",
+  "DisplayControls",
   "StationTripDialog",
   "ZhuyinText",
   "ZhuyinSvgText",
@@ -110,6 +112,7 @@ function component(name) {
   };
   const load = (path) => {
     const file = path.split("/").at(-1);
+    if (file.endsWith(".css")) return {};
     if (file.endsWith(".vue")) {
       const child = file.slice(0, -4);
       if (realComponents.has(child)) return component(child);
@@ -216,7 +219,7 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
     assert.ok(trip.includes('class="navigation-rescan-bar"'));
     assert.equal(trip.includes('class="theme-group'), false);
     assert.equal(trip.includes('class="plan-stairs"'), false);
-    assert.ok(trip.includes('data-persistent-scan="true"'));
+    assert.ok(trip.includes('class="station-scan-panel"'));
     assert.ok(trip.includes("重新掃描定位"));
     const restored = await render({});
     assert.equal(
@@ -494,7 +497,17 @@ test("map sources stay behind an information entry rather than consuming map foo
       false
     );
     assert.ok(html.includes('aria-haspopup="dialog"'));
-    assert.ok(html.includes('class="map-information-button"'));
+    const info = html.indexOf("map-information-button");
+    assert.ok(info >= 0 && info < html.indexOf('class="map-stage"'));
+    const ordered = ["language", "mode", "theme", "contrast", "reopen"].map(
+      (target) => html.indexOf('data-tour-target="' + target + '"')
+    );
+    assert.ok(ordered.every((index) => index >= 0));
+    assert.deepEqual(
+      [...ordered].sort((a, b) => a - b),
+      ordered
+    );
+    assert.ok(ordered.at(-1) < info);
   } finally {
     globalThis.window = previousWindow;
   }
@@ -547,5 +560,31 @@ test("first-floor information uses its own source note rather than a metro basem
     assert.equal(html.includes("051.pdf#page="), false);
   } finally {
     language.setLocale(previous);
+  }
+});
+
+test("navigation actions keep one scan control followed by staff help and trip cancellation", async () => {
+  for (const persistentScan of [false, true]) {
+    const location = createStationLocation({ data, connections, native: null });
+    try {
+      location.applyQuery({ point: "b1-e4", v: "1" });
+      location.choose("m-e4");
+      const html = await renderToString(
+        Vue.createSSRApp(component("StationScanPanel"), {
+          location: { view: Vue.ref(location.snapshot()) },
+          persistentScan,
+        })
+      );
+      const actions = html.indexOf('class="scan-actions"');
+      const scan = html.indexOf('data-tour-target="scan"');
+      const staff = html.indexOf('class="scan-staff"');
+      const cancel = html.indexOf('class="scan-cancel"');
+      assert.ok(
+        actions >= 0 && scan > actions && staff > scan && cancel > staff
+      );
+      assert.equal((html.match(/data-tour-target="scan"/g) ?? []).length, 1);
+    } finally {
+      location.dispose();
+    }
   }
 });

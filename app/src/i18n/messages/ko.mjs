@@ -108,6 +108,7 @@ export default {
   "map.ariaYouAreHere": ", 현재 위치",
   "map.ariaDestination": ", 목적지",
   "map.youAreHere": "현재 위치",
+  "map.toolbar": "지도 도구 모음",
   "map.information": "지도 안내, 출처 및 라이선스",
   "about.mapNotes": "지도 설명 및 참고 자료",
   "map.footerNote":
@@ -349,6 +350,7 @@ export default {
   "map.faceChoose": "역내 안내판을 바라본 뒤 목적지를 고르세요.",
   "map.badgeStart": "출",
   "map.badgeEnd": "도",
+  "scan.actions": "이동 작업",
   "scan.cancelTrip": "여정 취소",
   "endpoint.close": "위치 닫기",
   "endpoint.roles": "출발점 또는 목적지 선택",

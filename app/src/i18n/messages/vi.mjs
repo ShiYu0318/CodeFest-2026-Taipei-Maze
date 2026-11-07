@@ -112,6 +112,7 @@ export default {
   "map.ariaYouAreHere": ", bạn đang ở đây",
   "map.ariaDestination": ", điểm đến",
   "map.youAreHere": "Bạn đang ở đây",
+  "map.toolbar": "Thanh công cụ bản đồ",
   "map.information": "Thông tin bản đồ, nguồn và giấy phép",
   "about.mapNotes": "Ghi chú và tài liệu bản đồ",
   "map.footerNote":
@@ -357,6 +358,7 @@ export default {
   "map.faceChoose": "Hãy hướng về biển chỉ dẫn trong ga rồi chọn điểm đến.",
   "map.badgeStart": "Đi",
   "map.badgeEnd": "Đến",
+  "scan.actions": "Thao tác hành trình",
   "scan.cancelTrip": "Hủy chuyến đi",
   "endpoint.close": "Đóng định vị",
   "endpoint.roles": "Chọn điểm xuất phát hoặc điểm đến",

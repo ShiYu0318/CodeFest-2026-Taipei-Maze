@@ -113,6 +113,7 @@ export default {
   "map.ariaYouAreHere": ", you are here",
   "map.ariaDestination": ", destination",
   "map.youAreHere": "You are here",
+  "map.toolbar": "Map toolbar",
   "map.information": "Map information, sources and licensing",
   "about.mapNotes": "Map notes and references",
   "map.footerNote":
@@ -360,6 +361,7 @@ export default {
   "map.faceChoose": "Face the station signs, then choose a destination.",
   "map.badgeStart": "S",
   "map.badgeEnd": "E",
+  "scan.actions": "Trip actions",
   "scan.cancelTrip": "Cancel trip",
   "endpoint.close": "Close locate",
   "endpoint.roles": "Choose start or destination",
