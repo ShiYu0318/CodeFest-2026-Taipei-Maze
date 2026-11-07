@@ -26,7 +26,7 @@ npm ci
 npm run serve -- --port 8082
 ```
 
-開啟 `http://localhost:8082/station-map`，在同一頁選終點、搜尋設施、設定通行條件、持續掃碼及確認抵達。獨立合成導航頁已移除，舊網址會回正式地圖；合成 Graph 只保留作自動測試 fixture。完整步行路網仍待現地補齊，限制見[正式地圖持續掃碼開發指南](./docs/正式地圖持續掃碼開發指南.md)。站圖座標與轉乘資料存於 `app/src/views/`，目前為示意位置。`backend/` 保留原 Webview 的本機 Flask 測試 API，地圖以本地 JSON 載入。
+開啟 `http://localhost:8082/` 會直接進入 `/station-map`，在同一頁選終點、搜尋設施、設定通行條件、持續掃碼及確認抵達。獨立合成導航頁已移除，舊網址會回正式地圖；合成 Graph 只保留作自動測試 fixture。完整步行路網仍待現地補齊，限制見[正式地圖持續掃碼開發指南](./docs/正式地圖持續掃碼開發指南.md)。站圖座標與轉乘資料存於 `app/src/views/`，目前為示意位置。`backend/` 保留原 Webview 的本機 Flask 測試 API，地圖以本地 JSON 載入。
 
 ## 部署站
 
