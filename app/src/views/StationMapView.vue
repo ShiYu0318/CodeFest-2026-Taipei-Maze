@@ -18,6 +18,9 @@
           先選要找的設施，再點地圖上的圓點。
         </p>
       </section>
+      <p class="navigation-demo-link">
+        <router-link to="/navigation-demo">測試導航流程（合成圖）</router-link>
+      </p>
 
       <div class="floor-controls">
         <div class="floor-switch" role="group" aria-label="選擇樓層">

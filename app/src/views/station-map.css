@@ -132,6 +132,14 @@
 }
 .station-heading > p:last-child {
   color: var(--muted);
+}
+.navigation-demo-link {
+  margin-block: 8px;
+  text-align: right;
+  font-size: 0.875rem;
+}
+.navigation-demo-link a {
+  color: var(--accent);
   font-size: 0.875rem;
 }
 .floor-controls {
