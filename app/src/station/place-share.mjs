@@ -6,7 +6,7 @@ import { stationPoints } from "./scan.mjs";
 
 export const SHARE_ORIGIN =
   (typeof process !== "undefined" && process.env?.VUE_APP_SHARE_ORIGIN) ||
-  "https://home.yoyo899843.com";
+  "https://codefest.yoyo899843.com";
 
 function findPlace(id, data) {
   if (typeof id !== "string" || !id) return null;
