@@ -37,6 +37,12 @@
   --border: var(--tp-gray-100);
   --wash: var(--tp-primary-50);
   --surface: var(--tp-surface);
+  --station-map-background: radial-gradient(
+      circle,
+      var(--tp-primary-200) 1px,
+      transparent 1px
+    )
+    0 0 / 15px 15px repeat var(--tp-primary-50);
   min-height: 100vh;
   min-height: 100dvh;
   box-sizing: border-box;
@@ -280,6 +286,7 @@
 }
 .map-stage {
   position: relative;
+  background: var(--station-map-background);
 }
 .compass {
   position: absolute;
@@ -313,17 +320,12 @@
   overflow: hidden;
   touch-action: pan-x pan-y;
   border-block: 1px solid var(--border);
-  background: radial-gradient(
-      circle,
-      var(--tp-primary-200) 1px,
-      transparent 1px
-    )
-    var(--tp-primary-50);
-  background-size: 15px 15px;
+  background: var(--station-map-background);
 }
 .map-zoomed {
   overflow: auto;
-  overscroll-behavior: contain;
+  overscroll-behavior: none;
+  scrollbar-color: var(--tp-primary-400) var(--tp-primary-50);
 }
 .map-board {
   position: relative;
