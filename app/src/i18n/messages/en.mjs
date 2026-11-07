@@ -134,7 +134,7 @@ export default {
   "scan.navigation": "Navigation",
   "scan.browsing": "Browsing",
   "scan.caveat":
-    "Location codes are not installed in the station yet. For now we show facilities and floor links; a full walking network is still missing.",
+    "Location codes are not installed in the station yet. Walking routes are estimated from the station plan and not yet checked on site.",
   "scan.browseHint": "Scan a nearby location QR code to see where you are.",
   "scan.chooseDestination": "Choose a destination",
   "scan.choosePlaceholder": "Where do you want to go?",
@@ -178,7 +178,7 @@ export default {
   "scan.instr.atDestination":
     "Your location and destination are the same. Check the name and floor on site, then confirm you have arrived.",
   "scan.instr.sameZone":
-    "You are in the same area as your destination. There is no checked walking route yet; follow the signs and scan again on the way.",
+    "You are in the same area as your destination. The dotted line on the map is a route estimated from the plan; follow the signs and scan again on the way.",
   "scan.instr.connections":
     "Floor links you can use: {steps}. These show how floors connect, not a full walking route. Please follow the signs.",
   "scan.instr.none":
@@ -467,4 +467,23 @@ export default {
   "chat.think.noAnswer": "No matching answer in the station data",
   "chat.think.model": "Writing an answer on your phone (Gemma 3)",
   "chat.think.compose": "Putting the answer together",
+  "walk.routeTitle": "Walking route (estimated from the plan)",
+  "walk.noStart":
+    "Scan your location or choose a start to plan a walking route.",
+  "walk.unknownStart":
+    "Your location is not on the walking network yet. Follow the signs to a nearby corridor and scan again.",
+  "walk.unknownDestination":
+    "This destination is not on the walking network yet. Follow the signs, or use “Show to staff” to ask.",
+  "walk.noRoute":
+    "No walkable route matches your settings. Please ask station staff.",
+  "walk.noRouteStepFree":
+    "No step-free route found. We never replace it with stairs or unconfirmed equipment. Please ask station staff.",
+  "walk.nearest": "Nearest",
+  "walk.nearestNone": "No reachable {type} nearby.",
+  "walk.arrowMap":
+    "Walk the way the arrow points on the map (north is up), toward “{name}”.",
+  "walk.arrowUp": "Take the {via} up to {floor}.",
+  "walk.arrowDown": "Take the {via} down to {floor}.",
+  "walk.arrowNote":
+    "Your phone does not know which way you face. Compare the map with the signs.",
 };

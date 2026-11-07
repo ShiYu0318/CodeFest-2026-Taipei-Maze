@@ -1027,8 +1027,75 @@
 }
 
 /* Large controls overflow the floor row: fade the edge to show it scrolls. */
-.station-page:not([data-display-mode="standard"]) .floor-controls.horizontal-scroll {
-  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
+.station-page:not([data-display-mode="standard"])
+  .floor-controls.horizontal-scroll {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    #000 calc(100% - 36px),
+    transparent
+  );
   mask-image: linear-gradient(90deg, #000 calc(100% - 36px), transparent);
   padding-right: 28px;
+}
+
+/* Walking route: status line, nearest shortcuts and the drawn route. */
+.walk-panel {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.walk-panel:empty {
+  display: none;
+}
+.walk-status {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: var(--tp-radius-button, 10px);
+  font-size: var(--display-secondary-size, 0.875rem);
+  line-height: 1.5;
+}
+.walk-status[data-state="ok"] {
+  background: var(--tp-primary-50);
+  color: var(--tp-primary-800);
+}
+.walk-status[data-state="warn"] {
+  background: var(--warning-bg);
+  color: var(--tp-secondary-800);
+}
+.walk-nearest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.walk-nearest-label {
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.walk-nearest-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--display-control-height, 44px);
+  padding: 4px 12px;
+  border: 1px solid var(--tp-primary-500);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--tp-primary-700);
+  font-size: var(--display-secondary-size, 0.875rem);
+  font-weight: 600;
+}
+.walk-nearest-button svg {
+  width: 18px;
+  height: 18px;
+}
+.walk-route polyline {
+  fill: none;
+  stroke: var(--tp-secondary-600, #e7a43c);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2 12;
+  opacity: 0.95;
 }

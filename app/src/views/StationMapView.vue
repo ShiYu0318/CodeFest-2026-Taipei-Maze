@@ -54,6 +54,39 @@
         @scanned="onQrScanned"
         @cancel-trip="openTripDialog('cancel')"
       />
+      <section class="walk-panel" :aria-label="t('walk.routeTitle')">
+        <p
+          v-if="walkStatus"
+          class="walk-status"
+          :data-state="walk.type === 'success' ? 'ok' : 'warn'"
+          role="status"
+        >
+          <ZhuyinText :text="walkStatus" />
+        </p>
+        <div v-if="walkStart" class="walk-nearest" role="group">
+          <span class="walk-nearest-label"
+            ><ZhuyinText :text="t('walk.nearest')"
+          /></span>
+          <button
+            v-for="category in nearestCategories"
+            :key="category"
+            type="button"
+            class="walk-nearest-button"
+            @click="goNearest(category)"
+          >
+            <StationMapIcon :name="category" />
+            <ZhuyinText :text="t('type.' + category)" />
+          </button>
+        </div>
+        <p
+          v-if="nearestNotice"
+          class="walk-status"
+          data-state="warn"
+          role="status"
+        >
+          <ZhuyinText :text="nearestNotice" />
+        </p>
+      </section>
       <div
         ref="floorControls"
         class="floor-controls horizontal-scroll"
@@ -220,6 +253,13 @@
                           :visible-point-ids="
                             navigationMap.active ? navigationMap.pointIds : null
                           "
+                        />
+                      </g>
+                      <g class="walk-route" aria-hidden="true">
+                        <polyline
+                          v-for="(line, index) in walkLines"
+                          :key="index"
+                          :points="line.map((p) => p.join(',')).join(' ')"
                         />
                       </g>
                     </svg>
@@ -439,6 +479,7 @@
       v-if="tripDialog"
       :key="tripDialog"
       :direction="tripDirection"
+      :arrow="tripArrow"
       :cancel-only="tripDialog === 'cancel'"
       @continue="closeTripDialog"
       @cancel="cancelTrip"
@@ -479,6 +520,14 @@ import { stationPoints } from "../station/scan.mjs";
 import { htmlLang, useI18n } from "../i18n/index.mjs";
 import { placeName } from "../i18n/places.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
+import walkingNetwork from "../station/walking-network.json";
+import {
+  nearestPlace,
+  nextArrow,
+  planWalk,
+  routeLines,
+  walkingRouter,
+} from "../station/walk-route.mjs";
 import {
   navigationMapState,
   navigationPointVisible,
@@ -642,6 +691,76 @@ const mapBoard = ref(null);
 const mapBoardWidth = ref(0);
 let mapBoardObserver;
 const location = useStationLocation(stationData, stationConnections);
+// Walking network: routes, nearest facilities and the first-step arrow.
+const walkRouter = walkingRouter(walkingNetwork);
+const nearestCategories = ["restroom", "elevator", "info", "water", "nursing"];
+const walkStart = computed(
+  () => currentPoint.value?.id ?? location.view.value.position?.pointId ?? null
+);
+const walkDestination = computed(
+  () => targetPoint.value?.id ?? location.view.value.destinationId ?? null
+);
+const walk = computed(() =>
+  walkDestination.value
+    ? planWalk(walkRouter, {
+        startId: walkStart.value,
+        destinationId: walkDestination.value,
+        stepFree: location.view.value.stepFree,
+        unavailableConnectorIds: location.view.value.unavailableConnectorIds,
+      })
+    : { type: "Idle" }
+);
+const walkLines = computed(() =>
+  walk.value.type === "success" ? routeLines(walk.value.route, level.value) : []
+);
+const walkStatus = computed(() => {
+  const type = walk.value.type;
+  if (type === "success") return t("walk.routeTitle");
+  if (type === "NoStart") return t("walk.noStart");
+  if (type === "UnknownStart") return t("walk.unknownStart");
+  if (type === "UnknownDestination") return t("walk.unknownDestination");
+  if (type === "NoRoute")
+    return location.view.value.stepFree
+      ? t("walk.noRouteStepFree")
+      : t("walk.noRoute");
+  return "";
+});
+const tripArrow = computed(() => {
+  if (walk.value.type !== "success") return null;
+  const arrow = nextArrow(walk.value.route);
+  if (arrow.kind === "none") return null;
+  const point = stationById.get(arrow.toward);
+  const name = point ? placeName(point, i18n) : "";
+  return {
+    ...arrow,
+    text:
+      arrow.kind === "map"
+        ? t("walk.arrowMap", { name })
+        : t(arrow.kind === "up" ? "walk.arrowUp" : "walk.arrowDown", {
+            via: t(`type.${arrow.via}`),
+            floor: arrow.floor,
+          }),
+    note: t("walk.arrowNote"),
+  };
+});
+function goNearest(category) {
+  const found = nearestPlace(walkRouter, {
+    startId: walkStart.value,
+    category,
+    stepFree: location.view.value.stepFree,
+    unavailableConnectorIds: location.view.value.unavailableConnectorIds,
+  });
+  const point = found.type === "success" && stationById.get(found.pointId);
+  if (!point) {
+    nearestNotice.value = t("walk.nearestNone", {
+      type: t(`type.${category}`),
+    });
+    return;
+  }
+  nearestNotice.value = "";
+  chooseEndpoint(walkStart.value, point.id, point, "destination");
+}
+const nearestNotice = ref("");
 const navigationMap = computed(() =>
   navigationMapState(location.view.value, {
     startId: currentPoint.value?.id,

@@ -134,7 +134,7 @@ export default {
   "scan.navigation": "Chỉ đường",
   "scan.browsing": "Xem bản đồ",
   "scan.caveat":
-    "Mã định vị chưa được lắp đặt trong ga. Hiện chỉ có tiện ích và lối nối giữa các tầng; mạng lưới đường đi bộ đầy đủ vẫn chưa có.",
+    "Mã định vị chưa được lắp đặt trong ga. Đường đi bộ được ước tính theo sơ đồ, chưa kiểm tra tại chỗ.",
   "scan.browseHint": "Quét mã QR định vị gần bạn để biết bạn đang ở đâu.",
   "scan.chooseDestination": "Chọn điểm đến",
   "scan.choosePlaceholder": "Bạn muốn đi đâu?",
@@ -177,7 +177,7 @@ export default {
   "scan.instr.atDestination":
     "Vị trí của bạn trùng với điểm đến. Hãy kiểm tra tên và tầng tại chỗ, rồi xác nhận đã đến nơi.",
   "scan.instr.sameZone":
-    "Bạn đang ở cùng khu vực với điểm đến. Chưa có đường đi đã kiểm tra; hãy theo biển chỉ dẫn và quét lại trên đường đi.",
+    "Bạn đang ở cùng khu vực với điểm đến. Đường chấm trên bản đồ là đường ước tính theo sơ đồ; hãy theo biển chỉ dẫn và quét lại trên đường đi.",
   "scan.instr.connections":
     "Lối nối giữa các tầng có thể dùng: {steps}. Đây là cách các tầng nối với nhau, không phải đường đi bộ đầy đủ. Hãy theo biển chỉ dẫn.",
   "scan.instr.none":
@@ -466,4 +466,23 @@ export default {
   "chat.think.noAnswer": "Dữ liệu nhà ga không có câu trả lời phù hợp",
   "chat.think.model": "Đang tạo câu trả lời trên điện thoại (Gemma 3)",
   "chat.think.compose": "Sắp xếp câu trả lời",
+  "walk.routeTitle": "Đường đi bộ (ước tính theo sơ đồ)",
+  "walk.noStart":
+    "Hãy quét vị trí hoặc chọn điểm xuất phát để lập đường đi bộ.",
+  "walk.unknownStart":
+    "Vị trí của bạn chưa nằm trong mạng lưới đường đi. Hãy theo biển chỉ dẫn đến lối đi gần đó rồi quét lại.",
+  "walk.unknownDestination":
+    "Điểm đến này chưa nằm trong mạng lưới đường đi. Hãy theo biển chỉ dẫn, hoặc dùng “Đưa cho nhân viên xem” để hỏi.",
+  "walk.noRoute":
+    "Không có đường đi phù hợp với lựa chọn của bạn. Hãy hỏi nhân viên nhà ga.",
+  "walk.noRouteStepFree":
+    "Không tìm thấy đường không bậc thang. Chúng tôi không thay bằng cầu thang hay thiết bị chưa xác nhận. Hãy hỏi nhân viên nhà ga.",
+  "walk.nearest": "Gần nhất",
+  "walk.nearestNone": "Không có {type} nào đi đến được ở gần.",
+  "walk.arrowMap":
+    "Đi theo hướng mũi tên trên bản đồ (hướng bắc ở trên), về phía “{name}”.",
+  "walk.arrowUp": "Đi {via} lên {floor}.",
+  "walk.arrowDown": "Đi {via} xuống {floor}.",
+  "walk.arrowNote":
+    "Điện thoại không biết bạn đang quay mặt hướng nào. Hãy so bản đồ với biển chỉ dẫn.",
 };

@@ -130,7 +130,7 @@ export default {
   "scan.navigation": "길 안내",
   "scan.browsing": "지도 보기",
   "scan.caveat":
-    "위치 코드는 아직 역에 설치되지 않았습니다. 지금은 편의시설과 층간 연결만 보여 주며, 전체 보행 경로망은 아직 없습니다.",
+    "위치 코드는 아직 역에 설치되지 않았어요. 도보 경로는 평면도로 추정한 것이며 현장에서 아직 확인하지 않았어요.",
   "scan.browseHint": "가까운 위치 QR 코드를 스캔하면 지금 위치를 알 수 있어요.",
   "scan.chooseDestination": "목적지 선택",
   "scan.choosePlaceholder": "어디로 가시나요?",
@@ -174,7 +174,7 @@ export default {
   "scan.instr.atDestination":
     "현재 위치와 목적지가 같습니다. 현장에서 이름과 층을 확인한 뒤 도착을 확인하세요.",
   "scan.instr.sameZone":
-    "목적지와 같은 구역에 있습니다. 확인된 보행 경로가 아직 없으니 안내판을 따라가며 중간에 다시 스캔하세요.",
+    "목적지와 같은 구역에 있어요. 지도의 점선은 평면도로 추정한 경로예요. 안내판을 따라가며 중간에 다시 스캔하세요.",
   "scan.instr.connections":
     "이용할 수 있는 층간 연결: {steps}. 층이 어떻게 이어지는지 보여 줄 뿐, 전체 보행 경로는 아닙니다. 안내판을 따르세요.",
   "scan.instr.none":
@@ -457,4 +457,22 @@ export default {
   "chat.think.noAnswer": "역 데이터에 맞는 답이 없음",
   "chat.think.model": "휴대폰에서 답변 만드는 중(Gemma 3)",
   "chat.think.compose": "답변 정리하기",
+  "walk.routeTitle": "도보 경로(평면도 기준 추정)",
+  "walk.noStart":
+    "위치를 스캔하거나 출발점을 고르면 도보 경로를 만들 수 있어요.",
+  "walk.unknownStart":
+    "현재 위치가 아직 도보 경로망에 연결되지 않았어요. 안내판을 따라 가까운 통로로 간 뒤 다시 스캔하세요.",
+  "walk.unknownDestination":
+    "이 목적지는 아직 도보 경로망에 연결되지 않았어요. 안내판을 따르거나 “직원에게 보여주기”로 물어보세요.",
+  "walk.noRoute": "선택한 조건에 맞는 경로가 없어요. 역 직원에게 문의하세요.",
+  "walk.noRouteStepFree":
+    "계단 없는 경로를 찾지 못했어요. 계단이나 확인되지 않은 설비로 대신하지 않아요. 역 직원에게 문의하세요.",
+  "walk.nearest": "가장 가까운",
+  "walk.nearestNone": "갈 수 있는 {type}이(가) 근처에 없어요.",
+  "walk.arrowMap":
+    "지도에서 화살표 방향(북쪽이 위)으로 “{name}” 쪽으로 가세요.",
+  "walk.arrowUp": "{via}로 {floor}까지 올라가세요.",
+  "walk.arrowDown": "{via}로 {floor}까지 내려가세요.",
+  "walk.arrowNote":
+    "휴대폰은 내가 어느 쪽을 보고 있는지 몰라요. 지도와 현장 안내판을 비교하세요.",
 };

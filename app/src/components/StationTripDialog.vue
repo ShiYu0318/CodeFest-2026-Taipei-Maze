@@ -35,6 +35,26 @@
           "
         />
       </h2>
+      <div
+        v-if="!confirming && step === 2 && arrow"
+        class="trip-arrow"
+        :data-kind="arrow.kind"
+      >
+        <svg
+          viewBox="0 0 120 120"
+          aria-hidden="true"
+          :style="
+            arrow.kind === 'map'
+              ? { transform: `rotate(${arrow.angle}deg)` }
+              : null
+          "
+        >
+          <path v-if="arrow.kind === 'down'" d="M60 18v70M30 62l30 30 30-30" />
+          <path v-else d="M60 102V32M30 58l30-30 30 30" />
+        </svg>
+        <p class="trip-arrow-text"><ZhuyinText :text="arrow.text" /></p>
+        <p class="trip-arrow-note">{{ arrow.note }}</p>
+      </div>
       <p v-if="confirming"><ZhuyinText :text="t('trip.cancelNote')" /></p>
       <footer v-if="confirming">
         <button type="button" :disabled="cancelling" @click="keepTrip">
@@ -70,6 +90,8 @@ import ZhuyinText from "./ZhuyinText.vue";
 
 const props = defineProps({
   direction: { type: String, required: true },
+  // Map-bearing arrow for the next step (never a guessed left/right).
+  arrow: { type: Object, default: null },
   cancelOnly: { type: Boolean, default: false },
 });
 const emit = defineEmits(["continue", "cancel"]);
@@ -221,5 +243,36 @@ function keepFocus(event) {
   background: var(--tp-gray-100);
   color: var(--muted);
   cursor: default;
+}
+.trip-arrow {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin: 8px 0 4px;
+  text-align: center;
+}
+.trip-arrow svg {
+  width: min(42vw, 150px);
+  height: min(42vw, 150px);
+  fill: none;
+  stroke: var(--tp-primary-600, #468d9b);
+  stroke-width: 12;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 400ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.trip-arrow-text {
+  margin: 0;
+  font-weight: 600;
+}
+.trip-arrow-note {
+  margin: 0;
+  color: var(--muted, #5e6d76);
+  font-size: 0.8125rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .trip-arrow svg {
+    transition: none;
+  }
 }
 </style>
