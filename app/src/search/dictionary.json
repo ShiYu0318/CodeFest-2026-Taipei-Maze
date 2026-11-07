@@ -1,0 +1,657 @@
+{
+  "dictionary_version": "1.0.0",
+  "intent_rules_version": "1.0.0",
+  "supported_locales": ["zh-TW", "en", "vi", "id", "th", "ko", "ja"],
+  "concepts": [
+    {
+      "id": "facility.restroom",
+      "categories": ["restroom"]
+    },
+    {
+      "id": "facility.elevator",
+      "categories": ["elevator"]
+    },
+    {
+      "id": "facility.exit",
+      "categories": ["exit"]
+    },
+    {
+      "id": "facility.info",
+      "categories": ["info"]
+    },
+    {
+      "id": "facility.highspeed",
+      "categories": ["highspeed_rail"]
+    }
+  ],
+  "aliases": [
+    {
+      "locale": "zh-TW",
+      "text": "廁所",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "洗手間",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "toilet",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "restroom",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "bathroom",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "vi",
+      "text": "nhà vệ sinh",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "id",
+      "text": "toilet",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "id",
+      "text": "kamar kecil",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "th",
+      "text": "ห้องน้ำ",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ko",
+      "text": "화장실",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ja",
+      "text": "トイレ",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ja",
+      "text": "お手洗い",
+      "concept_id": "facility.restroom",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "電梯",
+      "concept_id": "facility.elevator",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "elevator",
+      "concept_id": "facility.elevator",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "lift",
+      "concept_id": "facility.elevator",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "vi",
+      "text": "thang máy",
+      "concept_id": "facility.elevator",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "id",
+      "text": "lift",
+      "concept_id": "facility.elevator",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "id",
+      "text": "elevator",
+      "concept_id": "facility.elevator",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "th",
+      "text": "ลิฟต์",
+      "concept_id": "facility.elevator",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ko",
+      "text": "엘리베이터",
+      "concept_id": "facility.elevator",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ja",
+      "text": "エレベーター",
+      "concept_id": "facility.elevator",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "出口",
+      "concept_id": "facility.exit",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "exit",
+      "concept_id": "facility.exit",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "vi",
+      "text": "lối ra",
+      "concept_id": "facility.exit",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "id",
+      "text": "pintu keluar",
+      "concept_id": "facility.exit",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "th",
+      "text": "ทางออก",
+      "concept_id": "facility.exit",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ko",
+      "text": "출구",
+      "concept_id": "facility.exit",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ja",
+      "text": "出口",
+      "concept_id": "facility.exit",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "詢問處",
+      "concept_id": "facility.info",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "服務台",
+      "concept_id": "facility.info",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "information desk",
+      "concept_id": "facility.info",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "information",
+      "concept_id": "facility.info",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "vi",
+      "text": "quầy thông tin",
+      "concept_id": "facility.info",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "id",
+      "text": "pusat informasi",
+      "concept_id": "facility.info",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "th",
+      "text": "ประชาสัมพันธ์",
+      "concept_id": "facility.info",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ko",
+      "text": "안내소",
+      "concept_id": "facility.info",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ja",
+      "text": "案内所",
+      "concept_id": "facility.info",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "高鐵",
+      "concept_id": "facility.highspeed",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "high speed rail",
+      "concept_id": "facility.highspeed",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "hsr",
+      "concept_id": "facility.highspeed",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "vi",
+      "text": "đường sắt cao tốc",
+      "concept_id": "facility.highspeed",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "id",
+      "text": "kereta cepat",
+      "concept_id": "facility.highspeed",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "th",
+      "text": "รถไฟความเร็วสูง",
+      "concept_id": "facility.highspeed",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ko",
+      "text": "고속철도",
+      "concept_id": "facility.highspeed",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ja",
+      "text": "高速鉄道",
+      "concept_id": "facility.highspeed",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    }
+  ],
+  "intent_aliases": [
+    {
+      "locale": "zh-TW",
+      "text": "不要樓梯",
+      "intent_id": "avoid_stairs",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "不走樓梯",
+      "intent_id": "avoid_stairs",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "避開樓梯",
+      "intent_id": "avoid_stairs",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "no stairs",
+      "intent_id": "avoid_stairs",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "avoid stairs",
+      "intent_id": "avoid_stairs",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "without stairs",
+      "intent_id": "avoid_stairs",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "vi",
+      "text": "không đi cầu thang",
+      "intent_id": "avoid_stairs",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "id",
+      "text": "tanpa tangga",
+      "intent_id": "avoid_stairs",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "th",
+      "text": "ไม่ใช้บันได",
+      "intent_id": "avoid_stairs",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ko",
+      "text": "계단 없이",
+      "intent_id": "avoid_stairs",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ja",
+      "text": "階段なし",
+      "intent_id": "avoid_stairs",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "無障礙",
+      "intent_id": "accessible",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "輪椅",
+      "intent_id": "accessible",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "accessible",
+      "intent_id": "accessible",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "wheelchair accessible",
+      "intent_id": "accessible",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "vi",
+      "text": "tiếp cận xe lăn",
+      "intent_id": "accessible",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "id",
+      "text": "akses kursi roda",
+      "intent_id": "accessible",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "th",
+      "text": "สำหรับรถเข็น",
+      "intent_id": "accessible",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ko",
+      "text": "휠체어 접근 가능",
+      "intent_id": "accessible",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ja",
+      "text": "バリアフリー",
+      "intent_id": "accessible",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ja",
+      "text": "車椅子",
+      "intent_id": "accessible",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "最近",
+      "intent_id": "nearest",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "nearest",
+      "intent_id": "nearest",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "closest",
+      "intent_id": "nearest",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "vi",
+      "text": "gần nhất",
+      "intent_id": "nearest",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "id",
+      "text": "terdekat",
+      "intent_id": "nearest",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "th",
+      "text": "ใกล้ที่สุด",
+      "intent_id": "nearest",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ko",
+      "text": "가장 가까운",
+      "intent_id": "nearest",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "ja",
+      "text": "最寄り",
+      "intent_id": "nearest",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    }
+  ],
+  "fillers": [
+    {
+      "locale": "zh-TW",
+      "text": "請帶我去",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "請幫我找",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "我想要去",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "我要去",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "我想去",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "我要找",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "幫我找",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "找",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "zh-TW",
+      "text": "去",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "i want to go to",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "take me to",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "where is",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "please",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "find",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "the",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    },
+    {
+      "locale": "en",
+      "text": "a",
+      "review_status": "draft",
+      "source_ids": ["team_seed"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "team_seed",
+      "title": "Team-authored prototype dictionary seed",
+      "review_status": "draft",
+      "reviewer": "not yet language-reviewed",
+      "license_reference": "AGPL-3.0-or-later",
+      "note": "No downloaded corpus or remote translation/model service. Seven-language terms require independent language review before release."
+    }
+  ]
+}
