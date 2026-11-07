@@ -138,7 +138,12 @@
                         point.id === routeOrigin?.pointId
                       "
                       class="pin-icon"
-                      ><StationMapIcon :name="point.type"
+                      ><StationMapIcon
+                        :name="
+                          matchesTheme(point, activeTheme)
+                            ? activeTheme
+                            : point.type
+                        "
                     /></span>
                     <svg
                       v-else
@@ -276,7 +281,7 @@
                         <div>
                           <h3>{{ zoneName(step.to.zone) }}</h3>
                           <p>
-                            {{ categories[step.type].name }}・{{
+                            {{ connectionCategoryName(step.type) }}・{{
                               step.from.point.name
                             }}
                           </p>
@@ -303,7 +308,12 @@
             <span>{{ floorPoints.length }} 個標點</span>
           </div>
 
-          <div class="theme-group" role="group" aria-label="設施主題">
+          <div
+            class="theme-group"
+            role="group"
+            aria-label="設施主題，可左右滑動查看更多"
+            tabindex="0"
+          >
             <button
               v-for="type in availableThemes"
               :key="type"
@@ -572,6 +582,10 @@ function zoneName(id) {
   return zones.find((zone) => zone.id === id)?.name;
 }
 
+function connectionCategoryName(type) {
+  return categories[type]?.name || "跨樓層連接";
+}
+
 function matchesTheme(point, type) {
   return (
     point.type === type ||
@@ -582,7 +596,7 @@ function matchesTheme(point, type) {
 
 function transferNote(transfer) {
   if (transfer.typeStatus === "unverified")
-    return "平面圖顯示梯口，梯種及通行方向待確認。";
+    return "這個連接點的通行方式與方向尚未確認，請依現場指標。";
   if (transfer.typeStatus === "inferred")
     return "樓梯與電扶梯配置為推定，請依現場指標。";
   if (
@@ -614,15 +628,20 @@ function normalizedPoint(point) {
 
 function pinStyle(point) {
   const [x, y] = normalizedPoint(point);
+  const theme = matchesTheme(point, activeTheme.value)
+    ? activeTheme.value
+    : point.type;
   return {
     left: x * 100 + "%",
     top: y * 100 + "%",
-    ...pointThemeStyle(point.type),
+    ...pointThemeStyle(theme),
   };
 }
 
 function pointThemeStyle(type) {
-  const { colorToken, iconColorToken = "gray-50" } = categories[type];
+  const category = categories[type];
+  const colorToken = category?.colorToken || "gray-700";
+  const iconColorToken = category?.iconColorToken || "gray-50";
   return {
     "--pin-color": paletteColor(colorToken),
     "--pin-icon": paletteColor(iconColorToken),
