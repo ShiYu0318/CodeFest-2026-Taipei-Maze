@@ -171,12 +171,12 @@
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 750;
-  background: var(--floor-tint);
-  color: var(--floor-ink);
+  background: var(--tp-primary-400);
+  color: var(--tp-primary-950);
 }
 .floor-switch button[aria-pressed="true"] {
-  background: var(--floor-tone);
-  color: var(--floor-on-tone);
+  background: var(--tp-secondary-500);
+  color: var(--tp-secondary-950);
   border-color: var(--floor-ink);
   box-shadow: inset 0 -3px 0 var(--floor-ink);
 }
