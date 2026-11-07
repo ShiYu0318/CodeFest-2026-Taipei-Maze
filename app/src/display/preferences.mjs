@@ -45,10 +45,8 @@ export function createDisplayPreferences(storage = browserStorage) {
     setDisplayMode(value) {
       if (!modes.includes(value)) return;
       state.displayMode = value;
-      if (value === "senior") {
-        state.theme = "light";
-        state.contrast = "high";
-      }
+      state.theme = "light";
+      state.contrast = value === "senior" ? "high" : "standard";
     },
   };
 }

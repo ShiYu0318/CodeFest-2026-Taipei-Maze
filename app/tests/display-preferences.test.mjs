@@ -11,13 +11,13 @@ import {
 test("fresh document state always starts light/standard after any prior mode", () => {
   for (const mode of ["standard", "child", "senior"]) {
     const previous = createDisplayPreferences();
-    previous.toggleTheme();
     previous.setDisplayMode(mode);
+    previous.toggleTheme();
     const next = createDisplayPreferences();
     assert.equal(next.theme.value, "light");
     assert.equal(next.contrast.value, "standard");
     assert.equal(next.displayMode.value, "standard");
-    assert.equal(previous.theme.value, mode === "senior" ? "light" : "dark");
+    assert.equal(previous.theme.value, "dark");
     assert.equal(previous.displayMode.value, mode);
   }
 });
@@ -26,8 +26,8 @@ test("components on the same document share manual choices across SPA pages", ()
   const map = useDisplayPreferences();
   const meeting = useDisplayPreferences();
   try {
-    map.toggleTheme();
     map.setDisplayMode("child");
+    map.toggleTheme();
     assert.equal(meeting.theme.value, "dark");
     assert.equal(meeting.displayMode.value, "child");
     meeting.setDisplayMode("senior");
@@ -36,18 +36,30 @@ test("components on the same document share manual choices across SPA pages", ()
     assert.equal(map.contrast.value, "high");
   } finally {
     map.setDisplayMode("standard");
-    if (map.theme.value === "dark") map.toggleTheme();
-    if (map.contrast.value === "high") map.toggleContrast();
   }
 });
 
-test("invalid modes are ignored and child mode keeps the current theme", () => {
+test("invalid modes leave the current mode and appearance alone", () => {
   const prefs = createDisplayPreferences();
-  prefs.toggleTheme();
   prefs.setDisplayMode("child");
+  prefs.toggleTheme();
+  prefs.toggleContrast();
   prefs.setDisplayMode("invalid");
   assert.equal(prefs.displayMode.value, "child");
   assert.equal(prefs.theme.value, "dark");
+  assert.equal(prefs.contrast.value, "high");
+});
+
+test("switching from senior to standard or child applies light and regular contrast", () => {
+  const prefs = createDisplayPreferences();
+  for (const mode of ["standard", "child"]) {
+    prefs.setDisplayMode("senior");
+    prefs.toggleTheme();
+    prefs.setDisplayMode(mode);
+    assert.equal(prefs.displayMode.value, mode);
+    assert.equal(prefs.theme.value, "light");
+    assert.equal(prefs.contrast.value, "standard");
+  }
 });
 
 test("the senior preset applies light and high contrast without changing saved preferences", () => {
