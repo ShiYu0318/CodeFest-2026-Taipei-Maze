@@ -319,4 +319,6 @@ export default {
   "map.goHere": "帶我去",
   "chat.answer.exitCode":
     "出口本身還沒畫進地圖。這些是往 {code} 出口方向的地點，到了之後請看現場的 {code} 出口指標：",
+  "chat.answer.otherFloors":
+    "{floor} 沒有{type}，其他樓層有，點一下就能在地圖上看到：",
 };

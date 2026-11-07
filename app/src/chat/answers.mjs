@@ -450,9 +450,8 @@ export function answerLocally(question, points, i18n, { nearFloor } = {}) {
   const type = detectType(text);
   if (type) {
     const floor = detectFloor(text);
-    const matches = points
+    const ofType = points
       .filter((point) => [point.type].flat().includes(type))
-      .filter((point) => !floor || point.floor === floor)
       .sort(
         (a, b) =>
           // The visitor's own floor first, then the other floors in order.
@@ -460,13 +459,19 @@ export function answerLocally(question, points, i18n, { nearFloor } = {}) {
           FLOORS.indexOf(a.floor) - FLOORS.indexOf(b.floor) ||
           a.name.localeCompare(b.name, "zh-Hant")
       );
+    const onFloor = ofType.filter((point) => !floor || point.floor === floor);
+    // Nothing on the asked floor: offer the other floors instead of a dead end.
+    const otherFloors = floor && !onFloor.length && ofType.length > 0;
+    const matches = otherFloors ? ofType : onFloor;
     const typeName = t(`type.${type}`);
     return {
       kind: "places",
       type,
       floor,
       total: matches.length,
-      text: matches.length
+      text: otherFloors
+        ? t("chat.answer.otherFloors", { type: typeName, floor })
+        : matches.length
         ? t("chat.answer.places", { type: typeName, count: matches.length })
         : t("chat.answer.none", { type: typeName }),
       places: matches.slice(0, MAX_PLACES).map((point) => ({

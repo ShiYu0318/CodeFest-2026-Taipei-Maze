@@ -355,4 +355,6 @@ export default {
   "map.goHere": "여기로 가기",
   "chat.answer.exitCode":
     "출구는 아직 지도에 없어요. 아래는 {code} 출구 방향의 장소예요. 도착하면 {code} 출구 안내판을 따라가세요:",
+  "chat.answer.otherFloors":
+    "{floor}에는 {type}이(가) 없지만 다른 층에 있어요. 누르면 지도에서 볼 수 있어요:",
 };

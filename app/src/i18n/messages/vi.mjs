@@ -361,4 +361,6 @@ export default {
   "map.goHere": "Đưa tôi đến đây",
   "chat.answer.exitCode":
     "Lối ra chưa có trên bản đồ. Đây là các điểm dẫn về hướng lối ra {code}; đến đó hãy theo biển chỉ dẫn lối ra {code}:",
+  "chat.answer.otherFloors":
+    "Tầng {floor} không có {type}, nhưng tầng khác có. Chạm để xem trên bản đồ:",
 };

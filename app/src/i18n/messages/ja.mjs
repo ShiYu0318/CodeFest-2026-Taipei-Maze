@@ -365,4 +365,6 @@ export default {
   "map.goHere": "ここへ行く",
   "chat.answer.exitCode":
     "出口はまだ地図にありません。{code}出口の方向にある場所です。着いたら{code}出口の案内表示に従ってください：",
+  "chat.answer.otherFloors":
+    "{floor}には{type}がありませんが、ほかの階にあります。タップすると地図で見られます：",
 };

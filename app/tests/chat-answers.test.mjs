@@ -61,11 +61,15 @@ test("answers are capped and sorted by floor", () => {
   assert.ok(answer.total >= answer.places.length);
 });
 
-test("a known type with nothing on that floor says so honestly", () => {
-  const answer = answerLocally("B4 nursing room", points, i18n("en"));
+test("a type that exists nowhere says so honestly", () => {
+  const noNursing = points.filter((point) => point.type !== "nursing");
+  const answer = answerLocally("B4 nursing room", noNursing, i18n("en"));
   assert.equal(answer.kind, "places");
   assert.equal(answer.places.length, 0);
   assert.match(answer.text, /No|no/);
+  const elsewhere = answerLocally("B4 nursing room", points, i18n("en"));
+  assert.ok(elsewhere.places.length >= 1);
+  assert.match(elsewhere.text, /no Nursing room on B4/);
 });
 
 test("how-to questions get a fixed answer in the visitor's language", () => {
@@ -136,4 +140,13 @@ test("an exit code lists places toward that exit, honestly labelled", () => {
     answerLocally("Where is exit M99?", points, i18n("en")).topic,
     "exit"
   );
+});
+
+test("when the asked floor has none, other floors are offered instead", () => {
+  const answer = answerLocally("B2 有沒有飲水機", points, i18n("zh-TW"));
+  assert.equal(answer.kind, "places");
+  assert.ok(answer.places.length >= 1);
+  assert.ok(answer.places.every((place) => place.floor !== "B2"));
+  assert.match(answer.text, /B2/);
+  assert.match(answer.text, /其他樓層/);
 });

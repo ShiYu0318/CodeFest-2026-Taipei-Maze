@@ -369,4 +369,6 @@ export default {
   "map.goHere": "Antar saya ke sini",
   "chat.answer.exitCode":
     "Pintu keluar belum ada di peta. Tempat-tempat ini mengarah ke pintu keluar {code}; dari sana ikuti papan petunjuk {code}:",
+  "chat.answer.otherFloors":
+    "Tidak ada {type} di {floor}, tetapi ada di lantai lain. Ketuk untuk melihat di peta:",
 };

@@ -362,4 +362,6 @@ export default {
   "map.goHere": "Go here",
   "chat.answer.exitCode":
     "Exits are not on the map yet. These places lead toward exit {code} — from there, follow the {code} exit signs:",
+  "chat.answer.otherFloors":
+    "There is no {type} on {floor}, but other floors have one — tap to see it on the map:",
 };
