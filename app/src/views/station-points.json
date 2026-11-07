@@ -67,6 +67,351 @@
     }
   },
   "points": {
+    "1F": [
+      {
+        "id": "1f-lift-1",
+        "type": "elevator",
+        "name": "1 號電梯",
+        "x": 662,
+        "y": 540,
+        "description": "車站大廳東側，靠南側通道。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-lift-2",
+        "type": "elevator",
+        "name": "2 號電梯",
+        "x": 662,
+        "y": 468,
+        "description": "車站大廳東側，鄰近高鐵預售票區。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-lift-3",
+        "type": "elevator",
+        "name": "3 號電梯",
+        "x": 661,
+        "y": 324,
+        "description": "車站大廳東側，鄰近東側洗手間。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-lift-4",
+        "type": "elevator",
+        "name": "4 號電梯",
+        "x": 660,
+        "y": 241,
+        "description": "車站大廳東側，靠北側通道。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-toilet-hsr",
+        "type": "restroom",
+        "name": "高鐵預售票區洗手間",
+        "x": 755,
+        "y": 474,
+        "description": "大廳東側高鐵預售票區旁。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-toilet-east",
+        "type": "restroom",
+        "name": "東側洗手間",
+        "x": 778,
+        "y": 316,
+        "description": "靠東1門，鄰近東側樓梯。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-toilet-west",
+        "type": "restroom",
+        "name": "西側洗手間",
+        "x": 161,
+        "y": 469,
+        "description": "靠西3門，鄰近哺集乳室。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-toilet-west-multi",
+        "type": "restroom",
+        "name": "西側多功能洗手間",
+        "x": 161,
+        "y": 296,
+        "description": "靠西1門的大廳西側。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-nursing-west",
+        "type": "nursing",
+        "name": "西側哺集乳室",
+        "x": 136,
+        "y": 491,
+        "description": "靠西3門，在西側洗手間附近。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-info-hsr",
+        "type": "info",
+        "name": "高鐵預售票區服務中心",
+        "x": 733,
+        "y": 473,
+        "description": "大廳東側高鐵預售票區內。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-info-visitor",
+        "type": "info",
+        "name": "旅遊服務中心",
+        "x": 308,
+        "y": 543,
+        "description": "大廳南側，靠臺鐵售票區一側。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-info-south",
+        "type": "info",
+        "name": "南側服務中心",
+        "x": 271,
+        "y": 548,
+        "description": "大廳南側，靠旅遊服務中心。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-info-tr",
+        "type": "info",
+        "name": "臺鐵售票區服務中心",
+        "x": 302,
+        "y": 507,
+        "description": "位於大廳西側的臺鐵售票區南端。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-ticket-hsr",
+        "type": "ticket",
+        "name": "高鐵預售票處",
+        "x": 816,
+        "y": 493,
+        "description": "大廳東側的高鐵預售票區。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-ticket-hsr-machine",
+        "type": "ticket",
+        "name": "高鐵自動售票機",
+        "x": 724,
+        "y": 493,
+        "description": "大廳東側的高鐵預售票區。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-ticket-tr",
+        "type": "ticket",
+        "name": "臺鐵售票處",
+        "x": 300,
+        "y": 447,
+        "description": "大廳西側的臺鐵售票區。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-ticket-tr-machine",
+        "type": "ticket",
+        "name": "臺鐵自動售票機",
+        "x": 301,
+        "y": 296,
+        "description": "大廳西側的臺鐵售票區北端。",
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-stairs-south-east",
+        "type": "stairs",
+        "name": "南側東端樓梯",
+        "x": 806,
+        "y": 624,
+        "description": "靠南1門及東側通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-stairs-south-west",
+        "type": "stairs",
+        "name": "南側西端樓梯",
+        "x": 121,
+        "y": 623,
+        "description": "靠南3門及西側通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-stairs-hsr",
+        "type": "stairs",
+        "name": "高鐵預售票區旁樓梯",
+        "x": 752,
+        "y": 499,
+        "description": "大廳東側高鐵預售票區旁。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-stairs-west",
+        "type": "stairs",
+        "name": "西側洗手間旁樓梯",
+        "x": 160,
+        "y": 496,
+        "description": "靠西3門，鄰近西側洗手間。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-stairs-east",
+        "type": "stairs",
+        "name": "東側洗手間旁樓梯",
+        "x": 777,
+        "y": 293,
+        "description": "靠東1門，鄰近東側洗手間。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-stairs-north-east",
+        "type": "stairs",
+        "name": "北側東端樓梯",
+        "x": 796,
+        "y": 180,
+        "description": "靠北1門及東側通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-stairs-north-west",
+        "type": "stairs",
+        "name": "北側西端樓梯",
+        "x": 117,
+        "y": 179,
+        "description": "靠北3門及西側通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-south-end-east",
+        "type": "escalator",
+        "name": "南側東端電扶梯",
+        "x": 755,
+        "y": 623,
+        "description": "靠南1門，位於南側東端樓梯旁。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-south-east-east",
+        "type": "escalator",
+        "name": "南側東段電扶梯（東側）",
+        "x": 628,
+        "y": 622,
+        "description": "位於南1門與南2門之間的通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-south-east-west",
+        "type": "escalator",
+        "name": "南側東段電扶梯（西側）",
+        "x": 549,
+        "y": 623,
+        "description": "位於南1門與南2門之間的通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-south-west-east",
+        "type": "escalator",
+        "name": "南側西段電扶梯（東側）",
+        "x": 370,
+        "y": 622,
+        "description": "位於南2門與南3門之間的通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-south-west-west",
+        "type": "escalator",
+        "name": "南側西段電扶梯（西側）",
+        "x": 282,
+        "y": 623,
+        "description": "位於南2門與南3門之間的通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-south-end-west",
+        "type": "escalator",
+        "name": "南側西端電扶梯",
+        "x": 175,
+        "y": 622,
+        "description": "靠南3門，位於南側西端樓梯旁。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-north-end-east",
+        "type": "escalator",
+        "name": "北側東端電扶梯",
+        "x": 747,
+        "y": 181,
+        "description": "靠北1門，位於北側東端樓梯旁。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-north-east-east",
+        "type": "escalator",
+        "name": "北側東段電扶梯（東側）",
+        "x": 622,
+        "y": 180,
+        "description": "位於北1門與北2門之間的通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-north-east-west",
+        "type": "escalator",
+        "name": "北側東段電扶梯（西側）",
+        "x": 541,
+        "y": 179,
+        "description": "位於北1門與北2門之間的通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-north-west-east",
+        "type": "escalator",
+        "name": "北側西段電扶梯（東側）",
+        "x": 362,
+        "y": 180,
+        "description": "位於北2門與北3門之間的通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-north-west-west",
+        "type": "escalator",
+        "name": "北側西段電扶梯（西側）",
+        "x": 273,
+        "y": 178,
+        "description": "位於北2門與北3門之間的通道。",
+        "angle": 0,
+        "zone": "1f-hall"
+      },
+      {
+        "id": "1f-escalator-north-end-west",
+        "type": "escalator",
+        "name": "北側西端電扶梯",
+        "x": 170,
+        "y": 180,
+        "description": "靠北3門，位於北側西端樓梯旁。",
+        "angle": 0,
+        "zone": "1f-hall"
+      }
+    ],
     "B1": [
       {
         "id": "b1-e4",

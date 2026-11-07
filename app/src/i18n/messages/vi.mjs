@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "floor.1F": "Tầng 1",
+  "zone.1f-hall": "Sảnh nhà ga",
+  "map.firstFloorNote":
+    "Bản đồ 1F được vẽ lại từ ảnh sơ đồ nhà ga được cung cấp. Vị trí tiện ích chỉ mang tính minh họa. Hãy theo biển chỉ dẫn tại ga.",
   "tour.helper":
     "Chạm vào trợ lý ở góc dưới bên phải để hỏi về tiện ích trong ga hoặc cách dùng bản đồ.",
   "tour.reopen":
@@ -16,7 +20,7 @@ export default {
   "tour.themeTitle": "Chế độ sáng và tối",
   "tour.scan":
     "Quét mã QR tại ga trong TownPass để xác nhận tầng và vị trí hiện tại.",
-  "tour.floors": "Chạm B1–B4 để xem bản đồ của tầng tương ứng.",
+  "tour.floors": "Chạm 1F hoặc B1–B4 để xem bản đồ của tầng tương ứng.",
   "tour.layers":
     "Bật để xem đường viền nét đứt của các tầng khác và so sánh vị trí.",
   "tour.locate":
@@ -200,7 +204,7 @@ export default {
   "notice.suspended":
     "Đã tạm dừng quét. Vị trí của bạn không thay đổi. Hãy đóng máy quét trước.",
 
-  "title.station": "Chỉ đường tầng hầm ga Đài Bắc",
+  "title.station": "Bản đồ ga chính Đài Bắc",
   "title.meeting": "Điểm hẹn",
   "title.about": "Mã nguồn và giấy phép",
   "title.default": "Taipei Maze",

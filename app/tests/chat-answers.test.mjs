@@ -61,6 +61,13 @@ test("answers are capped and sorted by floor", () => {
   assert.ok(answer.total >= answer.places.length);
 });
 
+test("the helper can filter first-floor facilities by floor", () => {
+  const answer = answerLocally("一樓的廁所", points, i18n("zh-TW"));
+  assert.equal(answer.floor, "1F");
+  assert.equal(answer.total, 4);
+  assert.ok(answer.places.every(({ floor }) => floor === "1F"));
+});
+
 test("a type that exists nowhere says so honestly", () => {
   const noNursing = points.filter((point) => point.type !== "nursing");
   const answer = answerLocally("B4 nursing room", noNursing, i18n("en"));

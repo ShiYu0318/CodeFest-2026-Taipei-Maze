@@ -177,9 +177,9 @@
 }
 .floor-switch {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 4px;
-  flex: 0 0 clamp(172px, 45%, 244px);
+  flex: 0 0 clamp(216px, 45%, 264px);
 }
 .floor-actions {
   display: flex;
@@ -877,7 +877,7 @@
   gap: var(--display-gap);
 }
 .station-page:not([data-display-mode="standard"]) .floor-switch {
-  flex-basis: 220px;
+  flex-basis: 264px;
   gap: 6px;
 }
 .station-page:not([data-display-mode="standard"])

@@ -14,6 +14,28 @@ test("the shipped station map data passes every rule", () => {
   assert.deepEqual(validateStationData(points, connections), []);
 });
 
+test("1F contains only the facilities represented on its reference plan", () => {
+  const counts = {};
+  for (const point of points.points["1F"]) {
+    counts[point.type] = (counts[point.type] ?? 0) + 1;
+    assert.equal(point.zone, "1f-hall");
+  }
+  assert.deepEqual(counts, {
+    elevator: 4,
+    restroom: 4,
+    nursing: 1,
+    info: 4,
+    ticket: 4,
+    stairs: 7,
+    escalator: 12,
+  });
+  assert.ok(
+    connections.connections.every(
+      ({ from, to }) => from.floor !== "1F" && to.floor !== "1F"
+    )
+  );
+});
+
 test("duplicate ids, unknown zones and broken coordinates are reported", () => {
   const p = clone(points);
   p.points.B1.push({ ...p.points.B1[0] });

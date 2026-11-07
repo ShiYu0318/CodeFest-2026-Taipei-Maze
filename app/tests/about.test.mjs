@@ -12,8 +12,8 @@ test("station data summary is derived from the shipped data, not hardcoded", () 
     read("../src/views/station-points.json"),
     read("../src/views/station-connections.json")
   );
-  assert.equal(summary.points, 109);
-  assert.deepEqual(summary.floors, ["B1", "B2", "B3", "B4"]);
+  assert.equal(summary.points, 145);
+  assert.deepEqual(summary.floors, ["1F", "B1", "B2", "B3", "B4"]);
   assert.equal(summary.connections, 19);
   assert.equal(summary.unverifiedConnections, 8);
   assert.equal(summary.walkingNetwork, false);

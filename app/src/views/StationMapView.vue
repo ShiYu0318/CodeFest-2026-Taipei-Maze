@@ -75,10 +75,10 @@
             data-tour-target="layers"
             type="button"
             role="switch"
-            :aria-checked="showLayers"
+            :aria-checked="showLayers && level !== '1F'"
             :aria-label="t('map.layersAria')"
             :title="t('map.layers')"
-            :disabled="floorChanging"
+            :disabled="floorChanging || level === '1F'"
             @click="toggleLayers"
           >
             <StationMapIcon name="layers" />
@@ -398,8 +398,10 @@
         </div>
 
         <footer class="station-footer">
-          <span>{{ t("map.footerNote") }}</span>
-          <div>
+          <span>{{
+            t(level === "1F" ? "map.firstFloorNote" : "map.footerNote")
+          }}</span>
+          <div v-if="sources.length">
             <a
               v-for="[label, url] in sources"
               :key="url"
@@ -530,6 +532,12 @@ const connectorTypes = new Set([
 const floorIds = Object.keys(floors);
 const initialMapZoom = 1.15;
 const floorPalette = {
+  "1F": {
+    tone: "primary-400",
+    tint: "primary-50",
+    ink: "primary-700",
+    onTone: "primary-950",
+  },
   B1: {
     tone: "primary-500",
     tint: "primary-100",
@@ -616,7 +624,7 @@ const facilityDetails = ref(null);
 const floorChanging = ref(false);
 const arrivalPointId = ref(null);
 let floorAnimation = null;
-const zoom = ref(initialMapZoom);
+const zoom = ref(level.value === "1F" ? 1 : initialMapZoom);
 const viewport = ref(null);
 const dragging = ref(false);
 let mapDrag = null;
@@ -752,19 +760,18 @@ const availableThemes = computed(() =>
 );
 const bounds = computed(() => {
   const floor = floors[level.value];
-  const [left, top, width, height] = showLayers.value
-    ? stackBounds
-    : floor.bounds;
+  const [left, top, width, height] =
+    showLayers.value && level.value !== "1F" ? stackBounds : floor.bounds;
   const [x, y] = floor.center;
   const halfWidth = Math.max(x - left, left + width - x);
   const halfHeight = Math.max(y - top, top + height - y);
   return [x - halfWidth, y - halfHeight, 2 * halfWidth, 2 * halfHeight];
 });
 const backgroundLayers = computed(() => {
-  if (!showLayers.value) return [];
+  if (!showLayers.value || level.value === "1F") return [];
   const activeIndex = floorIds.indexOf(level.value);
   return floorIds.flatMap((floor, index) => {
-    if (floor === level.value) return [];
+    if (floor === level.value || floor === "1F") return [];
     const offset = index - activeIndex;
     return [
       {
@@ -777,21 +784,25 @@ const backgroundLayers = computed(() => {
   });
 });
 const dataStatus = summarizeStationData(stationData, stationConnections);
-const sources = computed(() => [
-  [
-    t("map.sourceInfo", { floor: level.value }),
-    "https://web.metro.taipei/img/ALL/INFOPDF/051.pdf#page=" +
-      (floorIds.indexOf(level.value) + 1),
-  ],
-  [
-    t("map.sourceFacilities"),
-    "https://web.metro.taipei/pages2026/WebStation/051/1",
-  ],
-  [
-    t("map.sourceSection"),
-    "https://web.metro.taipei/pages2026/WebStation/051/4",
-  ],
-]);
+const sources = computed(() =>
+  level.value === "1F"
+    ? []
+    : [
+        [
+          t("map.sourceInfo", { floor: level.value }),
+          "https://web.metro.taipei/img/ALL/INFOPDF/051.pdf#page=" +
+            Number(level.value.slice(1)),
+        ],
+        [
+          t("map.sourceFacilities"),
+          "https://web.metro.taipei/pages2026/WebStation/051/1",
+        ],
+        [
+          t("map.sourceSection"),
+          "https://web.metro.taipei/pages2026/WebStation/051/4",
+        ],
+      ]
+);
 
 function isConnector(point) {
   return pointTypes(point).some((type) => connectorTypes.has(type));
@@ -950,7 +961,7 @@ function focusVisiblePin(point, event) {
 }
 
 function constrainZoom(scale) {
-  const minZoom = mobileZoomQuery.matches ? 1.5 : 1;
+  const minZoom = mobileZoomQuery.matches && level.value !== "1F" ? 1.5 : 1;
   return Math.min(3, Math.max(minZoom, scale));
 }
 
@@ -1227,7 +1238,7 @@ async function showFloor(floor, { arrival, origin } = {}) {
     } else if (!availableThemes.value.includes(activeTheme.value)) {
       activeTheme.value = null;
     }
-    await resetZoom(initialMapZoom);
+    await resetZoom(floor === "1F" ? 1 : initialMapZoom);
     if (!frame.isConnected) return;
     if (origin) await zoomAt(origin.scale, viewportCenter(), origin.center);
     else if (arrival)

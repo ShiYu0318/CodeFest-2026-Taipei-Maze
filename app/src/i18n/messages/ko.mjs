@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "floor.1F": "지상 1층",
+  "zone.1f-hall": "역 대합실",
+  "map.firstFloorNote":
+    "제공된 역 평면도 사진을 바탕으로 1F 지도를 다시 그렸습니다. 시설 위치는 대략적이므로 현장 안내를 확인하세요.",
   "tour.helper":
     "오른쪽 아래의 도우미를 눌러 역 시설이나 지도 사용 방법을 물어보세요.",
   "tour.reopen":
@@ -16,7 +20,7 @@ export default {
   "tour.themeTitle": "밝은 모드와 어두운 모드",
   "tour.scan":
     "TownPass에서 역의 QR 코드를 스캔해 현재 층과 위치를 확인하세요.",
-  "tour.floors": "B1–B4를 눌러 해당 층의 지도를 보세요.",
+  "tour.floors": "1F 또는 B1–B4를 눌러 해당 층의 지도를 보세요.",
   "tour.layers": "켜면 다른 층이 점선으로 표시되어 위치를 비교할 수 있어요.",
   "tour.locate": "목록이나 지도에서 출발지와 목적지를 선택하세요.",
   "tour.facilities":
@@ -197,7 +201,7 @@ export default {
   "notice.suspended":
     "스캔을 일시 중지했습니다. 위치는 그대로입니다. 먼저 스캐너를 닫으세요.",
 
-  "title.station": "타이베이역 지하 길 안내",
+  "title.station": "타이베이역 지도",
   "title.meeting": "만남 장소",
   "title.about": "소스 코드 및 라이선스",
   "title.default": "Taipei Maze",

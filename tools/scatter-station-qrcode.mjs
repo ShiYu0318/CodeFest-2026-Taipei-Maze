@@ -15,7 +15,8 @@ data.categories.qrcode = {
   colorToken: "primary-900",
   iconColor: "#244e57",
 };
-for (const [floor, points] of Object.entries(data.points)) {
+for (const floor of ["B1", "B2", "B3", "B4"]) {
+  const points = data.points[floor];
   const existing = points.filter(
     (point) =>
       !(
