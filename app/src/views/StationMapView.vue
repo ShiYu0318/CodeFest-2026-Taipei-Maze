@@ -68,20 +68,7 @@
 
       <div class="station-layout">
         <div class="station-map-column">
-          <section
-            ref="mapSection"
-            class="map-card"
-            aria-labelledby="map-title"
-          >
-            <header class="map-header">
-              <div>
-                <!-- <p class="eyebrow">{{ level }} FLOOR PLAN</p> -->
-                <h2 id="map-title">
-                  {{ floors[level].name }}
-                </h2>
-              </div>
-            </header>
-
+          <section ref="mapSection" class="map-card" aria-label="車站地圖">
             <div class="map-stage">
               <div class="compass" aria-label="北方朝上略偏左" role="img">
                 <span>N</span>
@@ -92,14 +79,20 @@
               <div
                 ref="viewport"
                 class="map-viewport"
-                :class="{ 'map-zoomed': zoom > 1 }"
+                :class="{ 'map-zoomed': zoom > 1, 'map-dragging': dragging }"
                 :style="{ '--map-aspect': bounds[2] + ' / ' + bounds[3] }"
                 role="region"
                 :aria-label="level + ' 互動地圖，可用加減鍵縮放，0 鍵重設'"
-                aria-describedby="map-gesture-help"
                 tabindex="0"
                 @wheel="zoomWithWheel"
                 @keydown.self="zoomWithKeyboard"
+                @pointerdown="startMapDrag"
+                @pointermove="moveMapDrag"
+                @pointerup="endMapDrag"
+                @pointercancel="endMapDrag"
+                @pointerleave="leaveMapDrag"
+                @lostpointercapture="endMapDrag"
+                @click.capture="ignoreDragClick"
               >
                 <div class="map-board" :style="{ width: zoom * 100 + '%' }">
                   <svg
@@ -170,13 +163,13 @@
                 }}
                 處</span
               >
-              <span v-else>{{
+              <!-- <span v-else>{{
                 zoom === 1 ? "選擇設施主題來顯示圖標" : "滑動地圖查看其他位置"
-              }}</span>
-              <span id="map-gesture-help" class="map-gesture-help">
+              }}</span> -->
+              <!-- <span id="map-gesture-help" class="map-gesture-help">
                 <span class="map-gesture-touch">雙指捏合縮放</span>
                 <span class="map-gesture-wheel">滑鼠滾輪縮放</span>
-              </span>
+              </span> -->
             </div>
             <div
               v-if="backgroundLayers.length"
@@ -322,7 +315,7 @@
               <StationMapIcon :name="type" />{{ categories[type].name }}
             </button>
           </div>
-          <div class="theme-feedback">
+          <!-- <div class="theme-feedback">
             <p class="theme-hint" role="status">{{ themeHint }}</p>
             <button
               v-if="activeTheme"
@@ -332,9 +325,9 @@
             >
               查看地圖
             </button>
-          </div>
+          </div> -->
 
-          <div
+          <!-- <div
             v-if="selected"
             class="facility-detail"
             aria-live="polite"
@@ -374,7 +367,7 @@
             >
               {{ transferNote(destination) }}
             </p>
-          </div>
+          </div> -->
 
           <!-- <ul class="facility-list" aria-label="標點明細">
             <li v-for="point in listedPoints" :key="point.id">
@@ -469,6 +462,9 @@ const activeTheme = ref(null);
 const selected = ref(null);
 const zoom = ref(1);
 const viewport = ref(null);
+const dragging = ref(false);
+let mapDrag = null;
+let ignoreMouseClick = false;
 let pinch = null;
 let webkitPinch = null;
 let zoomRevision = 0;
@@ -491,6 +487,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  clearMapDrag();
   clearPinch();
   document.removeEventListener("touchstart", startPinch, true);
   document.removeEventListener("touchend", endPinch, true);
@@ -553,7 +550,6 @@ const backgroundLayers = computed(() => {
     ];
   });
 });
-const destination = computed(() => getDestination(selected.value));
 const mapNote = computed(() => {
   if (showLayers.value) return "實線是目前樓層，淡色虛線是其他樓層的相對輪廓。";
   return "實線為目前樓層。開啟透視樓層可查看其他樓層的相對位置。";
@@ -669,6 +665,7 @@ function zoomAnchor([x, y]) {
 }
 
 async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
+  clearMapDrag();
   const frame = viewport.value;
   const board = frame.firstElementChild;
   const revision = ++zoomRevision;
@@ -681,6 +678,65 @@ async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
       anchor[0] * board.clientWidth - x,
       anchor[1] * board.clientHeight - y
     );
+}
+
+function startMapDrag(event) {
+  ignoreMouseClick = false;
+  if (event.pointerType !== "mouse" || event.button !== 0 || zoom.value <= 1)
+    return;
+  const frame = viewport.value;
+  mapDrag = {
+    pointerId: event.pointerId,
+    x: event.clientX,
+    y: event.clientY,
+    left: frame.scrollLeft,
+    top: frame.scrollTop,
+  };
+}
+
+function moveMapDrag(event) {
+  if (event.pointerId !== mapDrag?.pointerId) return;
+  if (!(event.buttons & 1)) {
+    clearMapDrag();
+    return;
+  }
+  const dx = event.clientX - mapDrag.x;
+  const dy = event.clientY - mapDrag.y;
+  const frame = viewport.value;
+  if (!dragging.value) {
+    // A small movement should still count as a tap on a facility marker.
+    if (Math.hypot(dx, dy) < 5) return;
+    frame.setPointerCapture(event.pointerId);
+    dragging.value = true;
+    ignoreMouseClick = true;
+  }
+  event.preventDefault();
+  frame.scrollTo(mapDrag.left - dx, mapDrag.top - dy);
+}
+
+function clearMapDrag() {
+  if (!mapDrag) return;
+  const { pointerId } = mapDrag;
+  const frame = viewport.value;
+  mapDrag = null;
+  dragging.value = false;
+  if (frame?.hasPointerCapture(pointerId))
+    frame.releasePointerCapture(pointerId);
+}
+
+function endMapDrag(event) {
+  if (event.pointerId === mapDrag?.pointerId) clearMapDrag();
+}
+
+function leaveMapDrag(event) {
+  if (!dragging.value) endMapDrag(event);
+}
+
+function ignoreDragClick(event) {
+  if (!ignoreMouseClick || event.detail === 0) return;
+  ignoreMouseClick = false;
+  event.preventDefault();
+  event.stopPropagation();
 }
 
 function resetZoom() {
@@ -859,19 +915,10 @@ function togglePoint(point) {
   if (selected.value && zoom.value > 1) centerOn(...normalizedPoint(point));
 }
 
-// function toggleTheme(type) {
-//   activeTheme.value = activeTheme.value === type ? null : type;
-//   if (selected.value && !matchesTheme(selected.value, activeTheme.value))
-//     selected.value = null;
-// }
-
-async function followConnection() {
-  if (!destination.value) return;
-  routeMessage.value = "";
-  previewSteps.value = [destination.value];
-  await nextTick();
-  previewHeading.value?.scrollIntoView({ block: "nearest" });
-  previewHeading.value?.focus({ preventScroll: true });
+function toggleTheme(type) {
+  activeTheme.value = activeTheme.value === type ? null : type;
+  if (selected.value && !matchesTheme(selected.value, activeTheme.value))
+    selected.value = null;
 }
 
 function previewRoute() {
@@ -885,10 +932,10 @@ function previewRoute() {
     : "目前沒有已確認的跨樓層連接。";
 }
 
-function revealMap() {
-  mapSection.value.scrollIntoView({ block: "nearest" });
-  viewport.value.focus({ preventScroll: true });
-}
+// function revealMap() {
+//   mapSection.value.scrollIntoView({ block: "nearest" });
+//   viewport.value.focus({ preventScroll: true });
+// }
 </script>
 
 <style scoped src="./station-map.css"></style>
