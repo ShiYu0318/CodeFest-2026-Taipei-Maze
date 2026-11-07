@@ -8,7 +8,7 @@
       ref="launcher"
       class="maze-chat-launcher"
       :data-theme="theme"
-      aria-label="開啟站內小幫手聊天"
+      :aria-label="t('chat.open')"
       aria-haspopup="dialog"
       :aria-expanded="opened"
       @click="open"
@@ -33,7 +33,7 @@
           stroke-linecap="round"
         />
       </svg>
-      <span>小幫手</span>
+      <span>{{ t("chat.launcher") }}</span>
     </button>
     <div
       v-if="opened"
@@ -61,7 +61,7 @@
             ref="closeButton"
             type="button"
             class="maze-chat-icon"
-            aria-label="收合聊天"
+            :aria-label="t('chat.close')"
             @click="close"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -76,7 +76,7 @@
             </svg>
           </button>
           <div class="maze-chat-heading">
-            <h2 id="maze-chat-title">站內小幫手</h2>
+            <h2 id="maze-chat-title">{{ t("chat.title") }}</h2>
             <p
               class="maze-chat-presence"
               :data-ready="modelReady"
@@ -88,7 +88,7 @@
           <button
             type="button"
             class="maze-chat-icon"
-            aria-label="清除對話"
+            :aria-label="t('chat.clear')"
             :disabled="busy || listening || !messages.length"
             @click="clear"
           >
@@ -110,23 +110,32 @@
           role="log"
           aria-live="polite"
           aria-relevant="additions text"
-          aria-label="聊天訊息"
+          :aria-label="t('chat.log')"
         >
           <article class="maze-chat-message assistant">
-            <span class="maze-chat-avatar" aria-hidden="true">北</span>
+            <span class="maze-chat-avatar" aria-hidden="true"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="10" r="2.4" fill="currentColor" /></svg
+            ></span>
             <p class="maze-chat-bubble maze-chat-static">
-              你好！我是站內小幫手，可以回答掃碼導航與 App
-              操作問題。實際路線請以地圖與導航指示為準。
+              {{ t("chat.welcome") }}
             </p>
           </article>
           <div v-if="!modelReady" class="maze-chat-setup">
             <p>
               {{
                 checking
-                  ? "正在確認這支手機能否使用裝置端聊天…"
+                  ? t("chat.checking")
                   : nativeAvailable
-                  ? "這支手機還沒有聊天模型。下載一次約 584 MB，之後可離線使用。"
-                  : "請在最新版城市通 App 開啟，才能使用裝置端聊天。"
+                  ? t("chat.noModel")
+                  : t("chat.needApp")
               }}
             </p>
             <div class="maze-chat-setup-actions">
@@ -136,7 +145,7 @@
                 class="maze-chat-primary"
                 @click="setupModel"
               >
-                安裝聊天模型
+                {{ t("chat.install") }}
               </button>
               <button
                 type="button"
@@ -144,7 +153,7 @@
                 :disabled="busy || listening || checking"
                 @click="refreshStatus"
               >
-                重新檢查
+                {{ t("chat.recheck") }}
               </button>
             </div>
           </div>
@@ -152,21 +161,43 @@
             v-for="message in messages"
             :key="message.id"
             :class="['maze-chat-message', message.role]"
-            :aria-label="message.role === 'user' ? '你的訊息' : '小幫手回覆'"
+            :aria-label="
+              message.role === 'user' ? t('chat.you') : t('chat.bot')
+            "
           >
             <span
               v-if="message.role === 'assistant'"
               class="maze-chat-avatar"
               aria-hidden="true"
-              >北</span
-            >
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="10" r="2.4" fill="currentColor" /></svg
+            ></span>
             <p class="maze-chat-bubble">{{ message.text }}</p>
           </article>
           <div v-if="busy" class="maze-chat-message assistant" role="status">
-            <span class="maze-chat-avatar" aria-hidden="true">北</span>
+            <span class="maze-chat-avatar" aria-hidden="true"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+                <circle cx="12" cy="10" r="2.4" fill="currentColor" /></svg
+            ></span>
             <p class="maze-chat-typing">
               <i></i><i></i><i></i>
-              <span class="display-visually-hidden">正在手機上思考…</span>
+              <span class="display-visually-hidden">{{
+                t("chat.thinking")
+              }}</span>
             </p>
           </div>
         </div>
@@ -174,7 +205,7 @@
         <div
           v-if="!messages.length && modelReady && !busy"
           class="maze-chat-tray"
-          aria-label="建議問題"
+          :aria-label="t('chat.starters')"
         >
           <button
             v-for="(starter, index) in starters"
@@ -188,9 +219,9 @@
           </button>
         </div>
         <form class="maze-chat-compose" @submit.prevent="send">
-          <label for="maze-chat-input" class="display-visually-hidden"
-            >想問什麼？</label
-          >
+          <label for="maze-chat-input" class="display-visually-hidden">{{
+            t("chat.ask")
+          }}</label>
           <div class="maze-chat-field" :data-listening="listening">
             <textarea
               id="maze-chat-input"
@@ -198,7 +229,9 @@
               v-model="draft"
               rows="1"
               maxlength="500"
-              :placeholder="listening ? '正在聆聽…' : '輸入你的問題'"
+              :placeholder="
+                listening ? t('chat.listening') : t('chat.placeholder')
+              "
               :disabled="busy || listening"
               @keydown="composerKey"
               @input="grow"
@@ -207,7 +240,7 @@
               v-if="listening"
               type="button"
               class="maze-chat-round listening"
-              aria-label="完成錄音"
+              :aria-label="t('chat.stopRecording')"
               @click="stopVoice"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -225,7 +258,7 @@
               v-else
               type="button"
               class="maze-chat-round"
-              aria-label="語音輸入"
+              :aria-label="t('chat.voice')"
               :disabled="busy || !voiceAvailable"
               @click="record"
             >
@@ -253,7 +286,7 @@
               v-if="busy"
               type="button"
               class="maze-chat-round maze-chat-send"
-              aria-label="停止"
+              :aria-label="t('chat.stop')"
               @click="cancelGeneration"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -271,7 +304,7 @@
               v-else
               class="maze-chat-round maze-chat-send"
               type="submit"
-              aria-label="送出"
+              :aria-label="t('chat.send')"
               :disabled="!modelReady || listening || !draft.trim()"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -288,7 +321,9 @@
           </div>
           <div class="maze-chat-meta">
             <label class="maze-chat-language">
-              <span class="display-visually-hidden">語音語言</span>
+              <span class="display-visually-hidden">{{
+                t("chat.voiceLanguage")
+              }}</span>
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <circle
                   cx="12"
@@ -321,7 +356,7 @@
             </label>
             <p class="maze-chat-caption">
               {{
-                voiceAvailable ? "語音轉成草稿，確認後送出" : "此語言請改用打字"
+                voiceAvailable ? t("chat.voiceDraft") : t("chat.typeInstead")
               }}
             </p>
           </div>
@@ -341,6 +376,7 @@ import {
   shouldSendOnEnter,
   isUsableChatReply,
 } from "../chat/bridge.mjs";
+import { useI18n } from "../i18n/index.mjs";
 const opened = ref(false),
   draft = ref(""),
   messages = ref([]),
@@ -365,7 +401,23 @@ function updateViewport() {
 window.visualViewport?.addEventListener("resize", updateViewport);
 window.visualViewport?.addEventListener("scroll", updateViewport);
 window.addEventListener("resize", updateViewport);
-const locale = ref("zh-TW");
+const { locale: uiLocale, t } = useI18n();
+// Voice input follows the interface language until the visitor picks another.
+const voiceLocales = {
+  "zh-TW": "zh-TW",
+  en: "en-US",
+  vi: "vi-VN",
+  id: "id-ID",
+  th: "th-TH",
+  ko: "ko-KR",
+  ja: "ja-JP",
+};
+const locale = ref(voiceLocales[uiLocale.value] ?? "zh-TW");
+watch(uiLocale, (value) => {
+  if (busy.value || listening.value) return;
+  locale.value = voiceLocales[value] ?? locale.value;
+  if (opened.value) refreshStatus();
+});
 const languages = [
   ["zh-TW", "繁體中文"],
   ["en-US", "English"],
@@ -375,11 +427,11 @@ const languages = [
   ["ko-KR", "한국어"],
   ["ja-JP", "日本語"],
 ];
-const starters = [
-  "怎麼更新目前位置？",
-  "無障礙路線會避開什麼？",
-  "掃不到定位碼怎麼辦？",
-];
+const starters = computed(() => [
+  t("chat.starter1"),
+  t("chat.starter2"),
+  t("chat.starter3"),
+]);
 const bridge = createChatBridge(window.flutterObject);
 const route = useRoute();
 const { theme, displayMode } = useDisplayPreferences();
@@ -389,31 +441,33 @@ let epoch = 0,
   previousInert = false;
 const statusText = computed(() =>
   checking.value
-    ? "正在確認裝置狀態…"
+    ? t("chat.status.checking")
     : !nativeAvailable.value
-    ? "裝置端聊天尚不可用"
+    ? t("chat.status.unavailable")
     : modelReady.value
-    ? "Gemma 3 · 裝置端對話"
-    : "聊天模型尚未準備好"
+    ? t("chat.status.ready")
+    : t("chat.status.notReady")
 );
-const errors = {
-  cancelled: "已停止，可修改問題後再送出。",
-  timeout: "處理時間較長，已停止這次請求。請縮短問題後重試。",
-  model_missing: "請先安裝聊天模型。",
-  busy: "手機正在處理上一個請求，請稍後重試。",
-  no_speech: "沒有辨識到語音，請重試或改用文字。",
-  permission_denied: "未取得麥克風或語音權限，可繼續使用文字輸入。",
-  unavailable: "這個裝置目前無法使用此功能。",
-  voice_unavailable: "此語言沒有可用的裝置端語音辨識，請改用文字。",
-};
+const errorCodes = new Set([
+  "cancelled",
+  "timeout",
+  "model_missing",
+  "busy",
+  "no_speech",
+  "permission_denied",
+  "unavailable",
+  "voice_unavailable",
+]);
 const explain = (result) =>
-  errors[result.code] || "這次處理未完成，請重試或使用文字輸入。";
+  errorCodes.has(result.code)
+    ? t(`chat.error.${result.code}`)
+    : t("chat.error.generic");
 async function setupModel() {
-  notice.value = "請在 App 安裝畫面完成模型授權與下載。";
+  notice.value = t("chat.setupHint");
   const result = await bridge.request("setup");
   if (!opened.value) return;
   if (result.status !== "success") notice.value = explain(result);
-  else notice.value = "已返回，正在重新確認模型狀態。";
+  else notice.value = t("chat.setupReturned");
   refreshStatus();
 }
 async function refreshStatus() {
@@ -502,9 +556,7 @@ async function send() {
     messages.value.push({ id: ++serial, role: "assistant", text: result.text });
   else {
     notice.value =
-      result.status === "success"
-        ? "這次回覆出現重複或不完整內容，請縮短問題後重試；導航請以地圖提示為準。"
-        : explain(result);
+      result.status === "success" ? t("chat.badReply") : explain(result);
     if (!draft.value) draft.value = text;
   }
   scroll();
@@ -519,7 +571,7 @@ async function record() {
   if (busy.value || listening.value || !voiceAvailable.value) return;
   const current = epoch;
   listening.value = true;
-  notice.value = "正在聆聽，最長 30 秒。";
+  notice.value = t("chat.listeningNotice");
   const result = await bridge.request("voice", { locale: locale.value });
   if (current !== epoch || !opened.value) return;
   listening.value = false;
@@ -528,7 +580,7 @@ async function record() {
       .filter(Boolean)
       .join(" ")
       .slice(0, 500);
-    notice.value = "已轉成草稿，請確認後送出。";
+    notice.value = t("chat.drafted");
   } else notice.value = explain(result);
   await nextTick();
   grow();
@@ -539,7 +591,7 @@ function stopVoice() {
 }
 function clear() {
   messages.value = [];
-  notice.value = "對話已清除。";
+  notice.value = t("chat.cleared");
 }
 function handleKeys(event) {
   if (event.key === "Escape") {
@@ -760,6 +812,10 @@ onBeforeUnmount(() => {
   color: #fff;
   font-size: 14px;
   font-weight: 600;
+}
+.maze-chat-avatar svg {
+  width: 18px;
+  height: 18px;
 }
 [data-theme="dark"] .maze-chat-avatar {
   color: var(--tp-primary-950);

@@ -119,7 +119,9 @@ html[data-maze-theme="dark"] {
 
 .display-controls {
   display: flex;
-  flex: none;
+  flex: 0 1 auto;
+  min-width: 0;
+  justify-content: flex-end;
   flex-wrap: nowrap;
   align-items: center;
   gap: 8px;
@@ -165,6 +167,7 @@ html[data-maze-theme="dark"] {
 .display-mode-label {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
 }
 .display-mode-label select {
   appearance: none;
@@ -176,6 +179,51 @@ html[data-maze-theme="dark"] {
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
   font-weight: 600;
+  /* Long labels such as "Người cao tuổi" must not widen the toolbar. */
+  min-width: 0;
+  max-width: 9.5em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.display-language {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  height: var(--display-control-height);
+  min-width: var(--display-control-height);
+  padding: 0 10px;
+  border: 1px solid var(--tp-gray-200);
+  border-radius: var(--tp-radius-button);
+  background: var(--surface);
+  color: var(--tp-gray-700);
+  font-weight: 600;
+}
+.display-language svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+.display-language-code {
+  font-size: 0.875em;
+  line-height: 1;
+}
+/* The native picker stays usable and accessible; only its box is hidden. */
+.display-language select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  font-size: 16px;
+  cursor: pointer;
+}
+.display-language:focus-within {
+  outline: 3px solid var(--tp-primary-500);
+  outline-offset: 2px;
 }
 .display-visually-hidden {
   position: absolute;

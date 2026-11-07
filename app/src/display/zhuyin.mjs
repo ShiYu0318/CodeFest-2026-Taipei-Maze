@@ -4,6 +4,7 @@
 // Match reviewed phrases only; never guess an unknown character's pronunciation.
 const entries = [
   ["此舊版", "ㄘˇ ㄐㄧㄡˋ ㄅㄢˇ"],
+  ["樓層通道", "ㄌㄡˊ ㄘㄥˊ ㄊㄨㄥ ㄉㄠˋ"],
   ["尚未對應", "ㄕㄤˋ ㄨㄟˋ ㄉㄨㄟˋ ㄧㄥˋ"],
   ["正式地圖", "ㄓㄥˋ ㄕˋ ㄉㄧˋ ㄊㄨˊ"],
   ["的已核准等候區", "˙ㄉㄜ ㄧˇ ㄏㄜˊ ㄓㄨㄣˇ ㄉㄥˇ ㄏㄡˋ ㄑㄩ"],

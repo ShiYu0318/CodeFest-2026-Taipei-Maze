@@ -9,6 +9,8 @@ import { compileScript, parse } from "@vue/compiler-sfc";
 import { transformSync } from "@babel/core";
 import * as preferences from "../src/display/preferences.mjs";
 import * as zhuyin from "../src/display/zhuyin.mjs";
+import * as i18n from "../src/i18n/index.mjs";
+import zhTW from "../src/i18n/messages/zh-TW.mjs";
 import {
   annotateZhuyin,
   splitZhuyin,
@@ -60,12 +62,10 @@ test("all current facility categories and child explanations have annotation cov
   const station = JSON.parse(
     readFileSync(new URL("../src/views/station-points.json", import.meta.url))
   );
-  const view = readFileSync(
-    new URL("../src/views/StationMapView.vue", import.meta.url),
-    "utf8"
-  );
-  const helpBlock = view.match(/const facilityHelp = \{([\s\S]*?)\n\};/)[1];
-  const help = [...helpBlock.matchAll(/: "([^"]+)"/g)].map((match) => match[1]);
+  // Child explanations now live in the Traditional Chinese catalog.
+  const help = Object.entries(zhTW)
+    .filter(([key]) => key.startsWith("help.") || key.startsWith("type."))
+    .map(([, text]) => text);
   for (const text of [
     ...Object.values(station.categories).map((entry) => entry.name),
     ...help,
@@ -108,6 +108,11 @@ test("opted-in fixed labels and meeting messages have full Han coverage", () => 
     );
     for (const match of source.matchAll(/<ZhuyinText\s+text="([^"]+)"/g))
       texts.push(match[1]);
+    // Translated labels: check the Traditional Chinese text behind the key.
+    for (const match of source.matchAll(
+      /<ZhuyinText\s+:text="t\(\s*'([\w.-]+)'\s*[,)]/g
+    ))
+      texts.push(zhTW[match[1]].replace(/\{\w+\}/g, ""));
   }
   const graph = JSON.parse(
     readFileSync(new URL("../src/navigation/demo-graph.json", import.meta.url))
@@ -147,6 +152,8 @@ test("the Vue component annotates child mode only and escapes unknown text", asy
       ? Vue
       : name.endsWith("preferences.mjs")
       ? preferences
+      : name.endsWith("i18n/index.mjs")
+      ? i18n
       : zhuyin;
   new Function("require", "module", "exports", code)(
     load,
@@ -169,6 +176,15 @@ test("the Vue component annotates child mode only and escapes unknown text", asy
         assert.match(html, /zhuyin-readable[^>]*>電梯&lt;script&gt;/);
       }
     }
+    // Zhuyin is for Traditional Chinese readers only.
+    const language = i18n.useI18n();
+    const before = language.locale.value;
+    language.setLocale("en");
+    const html = await renderToString(
+      Vue.createSSRApp(compiled.exports.default, { text: "電梯" })
+    );
+    language.setLocale(before);
+    assert.equal(html.includes("<ruby"), false);
   } finally {
     settings.setDisplayMode(original);
   }

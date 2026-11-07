@@ -1,12 +1,44 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
-  <div class="display-controls" role="group" aria-label="顯示設定">
+  <div class="display-controls" role="group" :aria-label="t('display.group')">
+    <label class="display-language" :title="t('lang.label')">
+      <span class="display-visually-hidden">{{ t("lang.label") }}</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle
+          cx="12"
+          cy="12"
+          r="8.5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+        />
+        <path
+          d="M3.5 12h17M12 3.5c2.4 2.4 3.5 5.2 3.5 8.5s-1.1 6.1-3.5 8.5c-2.4-2.4-3.5-5.2-3.5-8.5S9.6 5.9 12 3.5Z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.7"
+        />
+      </svg>
+      <span class="display-language-code" aria-hidden="true">{{
+        shortCode
+      }}</span>
+      <select :value="locale" @change="setLocale($event.target.value)">
+        <option
+          v-for="item in LOCALES"
+          :key="item.code"
+          :value="item.code"
+          :lang="item.htmlLang"
+        >
+          {{ item.nativeName }}
+        </option>
+      </select>
+    </label>
     <button
       class="display-theme-switch"
       type="button"
       role="switch"
       :aria-checked="theme === 'dark'"
-      :title="theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'"
+      :title="theme === 'dark' ? t('display.toLight') : t('display.toDark')"
       @click="toggleTheme"
     >
       <svg v-if="theme === 'dark'" viewBox="0 0 24 24" aria-hidden="true">
@@ -35,28 +67,34 @@
         />
       </svg>
       <span class="display-visually-hidden"
-        ><ZhuyinText text="深色模式"
+        ><ZhuyinText :text="t('display.dark')"
       /></span>
     </button>
     <label class="display-mode-label">
-      <span class="display-visually-hidden">介面模式</span>
+      <span class="display-visually-hidden">{{ t("display.mode") }}</span>
       <select
         :value="displayMode"
         @change="setDisplayMode($event.target.value)"
       >
-        <option value="standard">標準</option>
-        <option value="child">兒童</option>
-        <option value="senior">長者</option>
+        <option value="standard">{{ t("display.standard") }}</option>
+        <option value="child">{{ t("display.child") }}</option>
+        <option value="senior">{{ t("display.senior") }}</option>
       </select>
     </label>
   </div>
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
+import { LOCALES, useI18n } from "../i18n/index.mjs";
 import ZhuyinText from "./ZhuyinText.vue";
 import "../display/display-preferences.css";
 
 const { theme, displayMode, toggleTheme, setDisplayMode } =
   useDisplayPreferences();
+const { locale, setLocale, t } = useI18n();
+const shortCode = computed(() =>
+  locale.value === "zh-TW" ? "中" : locale.value.toUpperCase()
+);
 </script>

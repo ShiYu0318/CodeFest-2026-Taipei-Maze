@@ -16,18 +16,22 @@
       @keydown.tab="keepFocus"
     >
       <header>
-        <h2 id="endpoint-dialog-title">定位</h2>
+        <h2 id="endpoint-dialog-title">{{ t("map.locate") }}</h2>
         <button
           ref="closeButton"
           class="endpoint-close"
           type="button"
-          aria-label="關閉定位"
+          :aria-label="t('endpoint.close')"
           @click="emit('close')"
         >
           ×
         </button>
       </header>
-      <div class="endpoint-roles" role="group" aria-label="選擇起點或終點">
+      <div
+        class="endpoint-roles"
+        role="group"
+        :aria-label="t('endpoint.roles')"
+      >
         <button
           v-for="(label, role) in labels"
           :key="role"
@@ -41,8 +45,8 @@
           <span class="endpoint-value">
             {{
               choices[role]
-                ? choices[role].floor + "・" + choices[role].name
-                : "尚未選擇"
+                ? choices[role].floor + "・" + placeName(choices[role], i18n)
+                : t("endpoint.none")
             }}
           </span>
         </button>
@@ -50,7 +54,7 @@
       <div
         ref="list"
         class="endpoint-list"
-        :aria-label="labels[activeRole] + '標點'"
+        :aria-label="t('endpoint.pointsAria', { role: labels[activeRole] })"
         @touchmove.stop
         @wheel.stop
       >
@@ -63,7 +67,7 @@
                 :aria-pressed="point.id === choices[activeRole]?.id"
                 @click="choosePoint({ ...point, floor })"
               >
-                {{ point.name }}
+                {{ placeLabel(point, i18n) }}
               </button>
             </li>
           </ul>
@@ -75,14 +79,14 @@
           :disabled="!choices[activeRole]"
           @click="choosePoint(null)"
         >
-          清除{{ labels[activeRole] }}
+          {{ t("endpoint.clear", { role: labels[activeRole] }) }}
         </button>
         <button
           type="button"
           class="endpoint-map-pick"
           @click="emit('map-pick')"
         >
-          地圖選點
+          {{ t("endpoint.mapPick") }}
         </button>
       </footer>
     </section>
@@ -91,7 +95,9 @@
 
 <script setup>
 /* global defineProps, defineEmits */
-import { nextTick, onMounted, reactive, ref } from "vue";
+import { computed, nextTick, onMounted, reactive, ref } from "vue";
+import { useI18n } from "../i18n/index.mjs";
+import { placeLabel, placeName } from "../i18n/places.mjs";
 import stationData from "../views/station-points.json";
 
 const props = defineProps({
@@ -100,7 +106,12 @@ const props = defineProps({
 });
 const emit = defineEmits(["select", "close", "map-pick"]);
 const { points } = stationData;
-const labels = { start: "起點", destination: "終點" };
+const i18n = useI18n();
+const { t } = i18n;
+const labels = computed(() => ({
+  start: t("endpoint.start"),
+  destination: t("endpoint.destination"),
+}));
 const choices = reactive({
   start: props.startPoint,
   destination: props.targetPoint,

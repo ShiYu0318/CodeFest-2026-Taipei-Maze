@@ -1,0 +1,323 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Draft translation (team-authored, not yet language-reviewed).
+export default {
+  "lang.label": "Language",
+  "display.group": "Display settings",
+  "display.dark": "Dark mode",
+  "display.toLight": "Switch to light mode",
+  "display.toDark": "Switch to dark mode",
+  "display.mode": "Interface mode",
+  "display.standard": "Standard",
+  "display.child": "Kids",
+  "display.senior": "Senior",
+
+  "floor.B1": "Basement 1",
+  "floor.B2": "Basement 2",
+  "floor.B3": "Basement 3",
+  "floor.B4": "Basement 4",
+  "zone.b1-passage": "Station passage",
+  "zone.b2-concourse": "Bannan Line concourse",
+  "zone.b3-blue": "Bannan Line platform",
+  "zone.b3-red": "Tamsui-Xinyi Line concourse",
+  "zone.b4-platform": "Tamsui-Xinyi Line platform",
+
+  "type.elevator": "Elevator",
+  "type.restroom": "Restroom",
+  "type.nursing": "Nursing room",
+  "type.info": "Information desk",
+  "type.ticket": "Ticket office",
+  "type.aed": "AED",
+  "type.phone": "Public phone",
+  "type.escalator": "Escalator",
+  "type.stairs": "Stairs",
+  "type.stairs-escalator": "Stairs / escalator",
+  "type.stairway": "Floor access",
+  "type.water": "Drinking water",
+  "type.locker": "Lockers",
+  "type.accessible": "Wheelchair waiting area",
+  "help.elevator": "Elevator: change floors without using stairs.",
+  "help.stairs": "Stairs: walk step by step to another floor.",
+  "help.escalator":
+    "Escalator: moving stairs. Check the direction before you step on.",
+  "help.stairs-escalator":
+    "A way to another floor. Check the signs for stairs or an escalator.",
+  "help.stairway":
+    "A way to another floor. Check the signs for the type and direction.",
+  "help.restroom": "Restroom: toilets and sinks.",
+  "help.nursing":
+    "Nursing room: a place to care for a baby, breastfeed or pump milk.",
+  "help.info": "Information desk: ask the staff if you have a question.",
+  "help.ticket": "Ticket office: ask about or buy tickets.",
+  "help.aed":
+    "AED: emergency equipment. If someone needs first aid, ask the staff for help.",
+  "help.phone": "Public phone: a place to make a phone call.",
+  "help.water": "Drinking water: follow the signs on the machine.",
+  "help.locker": "Lockers: leave your bags here for a while.",
+  "help.accessible":
+    "Wheelchair waiting area: space for wheelchair users to wait for the train.",
+
+  "map.childHint":
+    "First pick what you are looking for, then tap its icon on the map.",
+  "map.floorGroup": "Choose a floor",
+  "map.layersAria": "Show other floors",
+  "map.layers": "Show all floors",
+  "map.facilities": "Facilities",
+  "map.pointCount": "{count} places",
+  "map.themesAria": "Facilities, swipe sideways for more",
+  "map.mapAria": "Station map",
+  "map.compass": "North is up, tilted slightly left",
+  "map.backToStart": "Back to start",
+  "map.interactiveAria":
+    "{floor} interactive map. Press plus or minus to zoom, 0 to reset",
+  "map.planAria": "{floor} floor plan",
+  "map.ariaYouAreHere": ", you are here",
+  "map.ariaDestination": ", destination",
+  "map.youAreHere": "You are here",
+  "map.footerNote":
+    "Redrawn from public station maps. Positions are approximate; follow the signs on site.",
+  "map.dataStatus":
+    "Data: {points} places, {connections} floor links ({unverified} not yet checked on site), no walking network yet.",
+  "map.about": "Source code & licenses · version {version}",
+  "map.sourceInfo": "Taipei Metro {floor} information map",
+  "map.sourceFacilities": "Taipei Metro station facilities",
+  "map.sourceSection": "Taipei Metro station cross-section",
+  "map.connectorUnknown":
+    "The plan shows a way up or down; its type and direction are not confirmed yet.",
+  "map.connectorInferred":
+    "The stairs and escalator layout is estimated. Follow the signs on site.",
+  "map.escalatorDirection": "Check the signs for the escalator direction.",
+  "map.originalName": "Name on site: {name}",
+
+  "scan.navigation": "Navigation",
+  "scan.browsing": "Browsing",
+  "scan.easyRead": "Easy read",
+  "scan.caveat":
+    "Location codes are not installed in the station yet. For now we show facilities and floor links; a full walking network is still missing.",
+  "scan.browseHint":
+    "Scan a location QR code to start navigation and show “You are here”.",
+  "scan.chooseDestination": "Choose a destination",
+  "scan.choosePlaceholder": "Where do you want to go?",
+  "scan.useSelected": "Set “{name}” selected on the map as the destination",
+  "scan.searchByName": "Search by name (seven-language prototype)",
+  "scan.stepFree": "Step-free links only",
+  "scan.destination": "Destination: {place}",
+  "scan.youAreHere": "You are here: {place}",
+  "scan.notLocated": "Location not set yet. Scan the code where you are.",
+  "scan.scannedAt":
+    "Scanned at {time}. Your position does not update as you walk.",
+  "scan.fromLink":
+    "Set from a location link. Please check where you are; this is not live tracking.",
+  "scan.waiting": "Waiting for the scan…",
+  "scan.rescan": "Scan again",
+  "scan.scan": "Scan location",
+  "scan.needApp":
+    "Open this in the TownPass app to use the scanner. In a browser you can only view location links.",
+  "scan.arrivedTitle": "You confirmed you have arrived",
+  "scan.currentHint": "Current tip",
+  "scan.unavailable": "Not working",
+  "scan.confirmArrival": "The name and floor match — I have arrived",
+  "scan.excluded": "Excluded from search: {list} (start again to clear)",
+  "scan.exit": "Stop navigation and go back to browsing",
+  "scan.stepPair": "{from} to {to}",
+  "scan.listSeparator": "; ",
+  "scan.instr.arrived":
+    "You confirmed you have arrived. Stop navigation or choose your next destination.",
+  "scan.instr.atDestination":
+    "Your location and destination are the same. Check the name and floor on site, then confirm you have arrived.",
+  "scan.instr.sameZone":
+    "You are in the same area as your destination. There is no checked walking route yet; follow the signs and scan again on the way.",
+  "scan.instr.connections":
+    "Floor links you can use: {steps}. These show how floors connect, not a full walking route. Please follow the signs.",
+  "scan.instr.none":
+    "No known link matches your settings. Please ask station staff. We never replace a step-free need with stairs or unknown equipment.",
+
+  "notice.linkLoaded": "Location set from a link. Please check where you are.",
+  "notice.linkInvalid":
+    "The location link is invalid or the place does not exist. Back to browsing.",
+  "notice.waiting": "Waiting for the TownPass scanner…",
+  "notice.located":
+    "Location updated — you are here. Choose a destination or keep exploring the map.",
+  "notice.locatedUrlFailed":
+    "Location updated, but the page address could not be saved. Please scan again.",
+  "notice.Cancelled": "Scan cancelled. Your location has not changed.",
+  "notice.Unavailable": "Open this in the TownPass app to use the scanner.",
+  "notice.Busy":
+    "A scan is still running. Finish it or close the scanner first.",
+  "notice.Timeout":
+    "The scan timed out. Close the scanner first; you can scan again once the old reply clears. If needed, close and reopen the service.",
+  "notice.WaitingForDrain":
+    "Still waiting for the previous scan. Close the scanner first; if needed, close and reopen the service.",
+  "notice.SendFailed":
+    "The scanner could not start. Close and reopen the service, then try again.",
+  "notice.InvalidReply":
+    "The app sent an unexpected reply. Your location has not changed.",
+  "notice.unsupportedCode":
+    "This code is not a location on this map. Your location and destination have not changed.",
+  "notice.resetUrlFailed":
+    "The page address could not be updated. Remove the point setting and reopen the map.",
+  "notice.suspended":
+    "Scanning paused. Your location has not changed. Close the scanner first.",
+
+  "title.station": "Taipei Main Station underground guide",
+  "title.meeting": "Meeting point",
+  "title.about": "Source code & licenses",
+  "title.default": "Taipei Maze",
+  "chat.open": "Open the station helper chat",
+  "chat.launcher": "Helper",
+  "chat.close": "Close chat",
+  "chat.title": "Station helper",
+  "chat.clear": "Clear chat",
+  "chat.log": "Chat messages",
+  "chat.welcome":
+    "Hi! I'm the station helper. Ask me about QR navigation or how to use the app. For the actual route, follow the map and the navigation tips.",
+  "chat.checking": "Checking whether this phone can chat on the device…",
+  "chat.noModel":
+    "This phone does not have the chat model yet. Download it once (about 584 MB) and use it offline after that.",
+  "chat.needApp": "Open this in the latest TownPass app to use on-device chat.",
+  "chat.install": "Install chat model",
+  "chat.recheck": "Check again",
+  "chat.you": "Your message",
+  "chat.bot": "Helper reply",
+  "chat.thinking": "Thinking on your phone…",
+  "chat.starters": "Suggested questions",
+  "chat.ask": "What would you like to ask?",
+  "chat.listening": "Listening…",
+  "chat.placeholder": "Type your question",
+  "chat.stopRecording": "Finish recording",
+  "chat.voice": "Voice input",
+  "chat.stop": "Stop",
+  "chat.send": "Send",
+  "chat.voiceLanguage": "Voice language",
+  "chat.voiceDraft": "Speech becomes a draft; check it before sending",
+  "chat.typeInstead": "Please type in this language",
+  "chat.starter1": "How do I update my location?",
+  "chat.starter2": "What does the step-free route avoid?",
+  "chat.starter3": "The location code won't scan. What now?",
+  "chat.status.checking": "Checking the device…",
+  "chat.status.unavailable": "On-device chat is not available",
+  "chat.status.ready": "Gemma 3 · on-device chat",
+  "chat.status.notReady": "Chat model not ready",
+  "chat.error.cancelled":
+    "Stopped. You can edit your question and send it again.",
+  "chat.error.timeout":
+    "This took too long and was stopped. Please ask a shorter question.",
+  "chat.error.model_missing": "Please install the chat model first.",
+  "chat.error.busy":
+    "The phone is still working on the last request. Please try again soon.",
+  "chat.error.no_speech":
+    "No speech was recognized. Try again or type instead.",
+  "chat.error.permission_denied":
+    "No microphone or speech permission. You can keep typing.",
+  "chat.error.unavailable": "This feature is not available on this device.",
+  "chat.error.voice_unavailable":
+    "No on-device speech recognition for this language. Please type instead.",
+  "chat.error.generic": "That did not finish. Try again or type your question.",
+  "chat.setupHint":
+    "Finish the model terms and download in the app setup screen.",
+  "chat.setupReturned": "Back from setup. Checking the model again.",
+  "chat.badReply":
+    "The reply was repeated or incomplete. Please ask a shorter question; for directions, follow the map.",
+  "chat.listeningNotice": "Listening for up to 30 seconds.",
+  "chat.drafted": "Turned into a draft. Check it, then send.",
+  "chat.cleared": "Chat cleared.",
+  "search.title": "Find a facility by name",
+  "search.note":
+    "Seven-language dictionary prototype; words are not yet reviewed. Searches only the facilities on this page, without any online AI.",
+  "search.label": "Facility name or a simple request (up to 80 characters)",
+  "search.placeholder": "廁所、restroom、nhà vệ sinh…",
+  "search.submit": "Search",
+  "search.clear": "Clear search",
+  "search.scope":
+    "This page only finds where facilities are. It does not plan stair-free or accessible routes, or find the nearest one.",
+  "search.unknown":
+    "Not understood: {terms}. Please use a facility name or a supported condition.",
+  "search.maybe":
+    "Did you mean “{term}”? Check the facilities below; navigation will not start by itself.",
+  "search.results": "Facilities found",
+  "search.typo": "Spelling suggestion",
+  "search.exact": "Name match",
+  "search.dictionary": "Dictionary match",
+  "search.accessUnknown": "accessibility not confirmed",
+  "search.confirm": "Use this facility and conditions",
+  "search.showOnMap": "Show on map",
+  "search.nearestUnavailable":
+    "“Nearest” is not available yet: it needs a confirmed starting point and a walking network. Please search by facility name.",
+  "search.status.matched": "Found {count} facilities. Please choose one.",
+  "search.status.suggestionsOnly":
+    "This is a spelling suggestion. Please check the facility you want.",
+  "search.status.noMatch":
+    "No facility matches in our data. That does not mean the station has none.",
+  "search.status.needsClarification":
+    "This request is not clear enough. Please search for one place at a time.",
+  "search.status.invalidInput":
+    "Enter 1–80 characters (after converting full-width characters).",
+  "search.status.invalidDictionary":
+    "The dictionary cannot be used. Please use the facility list instead.",
+  "search.status.invalidCatalog":
+    "Facility data cannot be used. Please use the list instead.",
+  "search.status.incomplete":
+    "The search did not finish, so we cannot say the facility is missing. Try a shorter name.",
+  "search.cond.stepFree": "Keep / use step-free only",
+  "search.cond.avoidStairs": "Avoid stairs",
+  "search.cond.avoidElevator": "Avoid elevators",
+  "search.cond.keepUnavailable": "Keep equipment marked unavailable",
+  "search.cond.apply": "Applied when you choose: {list}",
+  "search.cond.parsed":
+    "Conditions understood (this page does not plan routes): {list}",
+  "search.changed": "Conditions changed. Please search again.",
+  "search.selectedNav":
+    "Destination chosen. Follow the navigation tips to check your position and direction.",
+  "search.selectedMap": "Switched to the facility's floor and selected it.",
+  "search.listSeparator": ", ",
+  "meeting.back": "Back to station map",
+  "meeting.title": "Meeting point shared by a friend",
+  "meeting.childHint":
+    "This is the place your friend chose. It is not where you are now.",
+  "meeting.banner":
+    "Synthetic demo, not a real waiting spot in Taipei Main Station. The sharer's position is not live.",
+  "meeting.confirmedAt": "Sharer confirmed their location at: {time}",
+  "meeting.unverifiedSource": "(from the sharer, not checked by a server)",
+  "meeting.legacy":
+    "This old synthetic meeting point is not linked to an approved waiting area on the station map. It cannot give a real route and does not show where you are.",
+  "meeting.toMap": "Open the station map to choose a real facility",
+  "meeting.invalidTitle": "This meeting link cannot be used",
+  "meeting.invalidBody":
+    "The format, version or place may not be supported. Ask the sharer for a new link. No location or route was loaded.",
+  "meeting.time.stale":
+    "It has been more than 30 minutes. Contact the sharer to check they are still there.",
+  "meeting.time.future":
+    "This time is in the future; the device clock or the link may be wrong. Please check.",
+  "meeting.time.unverified":
+    "Even a recent time does not prove the sharer is still there.",
+  "meeting.time.unknown": "The time cannot be checked. Please confirm again.",
+  "map.locate": "Locate",
+  "map.pickStart": "1/2 Tap your starting point (you can switch floors first)",
+  "map.pickEnd": "2/2 Tap your destination (you can switch floors)",
+  "map.cancel": "Cancel",
+  "map.faceConnector": "Face the station sign that points to “{name}”.",
+  "map.faceDestination":
+    "Face the sign at your destination and check the name and floor.",
+  "map.faceToDestination":
+    "Face the station signs and check the direction to your destination.",
+  "map.faceChoose": "Face the station signs, then choose a destination.",
+  "map.badgeStart": "S",
+  "map.badgeEnd": "E",
+  "scan.cancelTrip": "Cancel trip",
+  "endpoint.close": "Close locate",
+  "endpoint.roles": "Choose start or destination",
+  "endpoint.none": "Not chosen",
+  "endpoint.pointsAria": "{role} places",
+  "endpoint.clear": "Clear {role}",
+  "endpoint.mapPick": "Pick on map",
+  "endpoint.start": "Start",
+  "endpoint.destination": "Destination",
+  "trip.step": "Step {step}/2",
+  "trip.cancel": "Cancel trip",
+  "trip.confirmTitle": "Cancel this trip?",
+  "trip.faceQr": "Face the QR code panel",
+  "trip.cancelNote":
+    "Cancelling clears your start, destination and this location.",
+  "trip.keep": "Keep trip",
+  "trip.confirmCancel": "Yes, cancel",
+  "trip.continue": "Continue",
+};

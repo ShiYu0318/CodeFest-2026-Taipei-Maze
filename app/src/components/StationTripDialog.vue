@@ -11,12 +11,14 @@
       @keydown.tab="keepFocus"
     >
       <header>
-        <span v-if="!confirming" class="trip-step">步驟 {{ step }}／2</span>
+        <span v-if="!confirming" class="trip-step">{{
+          t("trip.step", { step })
+        }}</span>
         <button
           v-if="!confirming"
           type="button"
           class="trip-close"
-          aria-label="取消行程"
+          :aria-label="t('trip.cancel')"
           @click="askToCancel"
         >
           ×
@@ -25,23 +27,23 @@
       <h2 id="trip-dialog-title" ref="heading" tabindex="-1">
         {{
           confirming
-            ? "確定要取消行程嗎？"
+            ? t("trip.confirmTitle")
             : step === 1
-            ? "請面向QRcode面板"
+            ? t("trip.faceQr")
             : direction
         }}
       </h2>
-      <p v-if="confirming">取消後會清除起點、目的地和這次的定位。</p>
+      <p v-if="confirming">{{ t("trip.cancelNote") }}</p>
       <footer v-if="confirming">
         <button type="button" :disabled="cancelling" @click="keepTrip">
-          保留行程
+          {{ t("trip.keep") }}
         </button>
         <button
           type="button"
           :disabled="cancelling"
           @click="confirmCancellation"
         >
-          確認取消
+          {{ t("trip.confirmCancel") }}
         </button>
       </footer>
       <footer v-else>
@@ -51,7 +53,7 @@
           :disabled="!ready"
           @click="continueTrip"
         >
-          繼續
+          {{ t("trip.continue") }}
         </button>
       </footer>
     </section>
@@ -61,12 +63,14 @@
 <script setup>
 /* global defineProps, defineEmits */
 import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import { useI18n } from "../i18n/index.mjs";
 
 const props = defineProps({
   direction: { type: String, required: true },
   cancelOnly: { type: Boolean, default: false },
 });
 const emit = defineEmits(["continue", "cancel"]);
+const { t } = useI18n();
 const panel = ref(null);
 const heading = ref(null);
 const step = ref(1);
