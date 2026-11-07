@@ -39,10 +39,10 @@
 
 **Files:** 新增 `station/walking-network.json`、`station/walking.mjs`、對應 tests 與建置／覆蓋檢查工具；視需要抽出 `navigation/route.mjs` 的純最短路徑引擎供共用。
 
-**Interface:** `planStationWalk(network, {startPointId, destinationId, stepFree, excludedEdgeTypes, unavailableConnectorIds})` 回傳 route 或明確失敗原因；route 含來源、節點、路段、分層折線及相對成本。
+**Interface:** `createWalkingRouter(network).route({startPointId, destinationId, stepFree, excludedEdgeTypes, unavailableConnectorIds, allowFareGates})` 回傳 route 或明確失敗原因；route 含來源、節點、路段、分層折線及相對成本。
 
-- [ ] 先測驗證錯誤、單向、斷路、成本最短、未知可及性排除與故障設備。
-- [ ] 實作資料驗證與 Dijkstra，保留既有合成核心行為。
+- [x] 先測驗證錯誤、單向、斷路、成本最短、未知可及性排除與故障設備。
+- [x] 實作資料驗證與 Dijkstra，保留既有合成核心行為。
 - [ ] 逐頁核對 B1–B4 官方圖，建立走道骨架、設施入口與已知跨層連結；來源與未涵蓋點逐項列出。
 - [ ] 產出每層路網覆蓋圖，視覺檢查與來源核對；跑資料驗證及測試，提交。
 
@@ -50,7 +50,7 @@
 
 **Files:** `station/scan.mjs`、`station/location.mjs`、`StationScanPanel.vue`、`StationMapView.vue`、七語目錄及 tests。
 
-**Interface:** `nearestStationFacilities(network, request)` 依同一合法步行路線成本回傳候選，不可達候選跳過。
+**Interface:** `createWalkingRouter(network).nearest(request)` 依同一合法步行路線成本回傳候選，不可達候選跳過。
 
 - [ ] 測最近的直線候選不可達、無障礙候選較遠、無起點、無涵蓋及無候選。
 - [ ] 加入廁所／電梯／詢問處／飲水機／哺集乳室快捷鍵，整合新路線與原有跨樓層確認流程。
