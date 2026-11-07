@@ -15,8 +15,9 @@ test("fresh document state always starts light/standard after any prior mode", (
     previous.setDisplayMode(mode);
     const next = createDisplayPreferences();
     assert.equal(next.theme.value, "light");
+    assert.equal(next.contrast.value, "standard");
     assert.equal(next.displayMode.value, "standard");
-    assert.equal(previous.theme.value, "dark");
+    assert.equal(previous.theme.value, mode === "senior" ? "light" : "dark");
     assert.equal(previous.displayMode.value, mode);
   }
 });
@@ -31,24 +32,25 @@ test("components on the same document share manual choices across SPA pages", ()
     assert.equal(meeting.displayMode.value, "child");
     meeting.setDisplayMode("senior");
     assert.equal(map.displayMode.value, "senior");
-    assert.equal(map.theme.value, "dark");
+    assert.equal(map.theme.value, "light");
+    assert.equal(map.contrast.value, "high");
   } finally {
-    map.toggleTheme();
     map.setDisplayMode("standard");
+    if (map.theme.value === "dark") map.toggleTheme();
+    if (map.contrast.value === "high") map.toggleContrast();
   }
 });
 
-test("invalid modes are ignored and mode changes do not change theme", () => {
+test("invalid modes are ignored and child mode keeps the current theme", () => {
   const prefs = createDisplayPreferences();
+  prefs.toggleTheme();
   prefs.setDisplayMode("child");
   prefs.setDisplayMode("invalid");
   assert.equal(prefs.displayMode.value, "child");
-  assert.equal(prefs.theme.value, "light");
-  prefs.toggleTheme();
-  assert.equal(prefs.displayMode.value, "child");
+  assert.equal(prefs.theme.value, "dark");
 });
 
-test("only an explicit theme choice persists across document reloads", () => {
+test("the senior preset applies light and high contrast without changing saved preferences", () => {
   const values = new Map();
   const storage = () => ({
     getItem: (key) => values.get(key),
@@ -58,9 +60,12 @@ test("only an explicit theme choice persists across document reloads", () => {
   assert.equal(first.theme.value, "light");
   assert.equal(values.size, 0);
   first.toggleTheme();
-  first.setDisplayMode("child");
+  first.setDisplayMode("senior");
+  assert.equal(first.theme.value, "light");
+  assert.equal(first.contrast.value, "high");
   const next = createDisplayPreferences(storage);
   assert.equal(next.theme.value, "dark");
+  assert.equal(next.contrast.value, "standard");
   assert.equal(next.displayMode.value, "standard");
   next.toggleTheme();
   assert.equal(createDisplayPreferences(storage).theme.value, "light");
@@ -84,7 +89,7 @@ test("denied or malformed storage never prevents manual theme changes", () => {
   assert.equal(invalid.theme.value, "dark");
 });
 
-test("high contrast is independent of theme and mode and is remembered", () => {
+test("manual contrast changes work in senior mode and are remembered", () => {
   const values = new Map();
   const storage = () => ({
     getItem: (key) => values.get(key),
@@ -92,8 +97,10 @@ test("high contrast is independent of theme and mode and is remembered", () => {
   });
   const first = createDisplayPreferences(storage);
   assert.equal(first.contrast.value, "standard");
-  first.toggleContrast();
   first.setDisplayMode("senior");
+  first.toggleContrast();
+  assert.equal(first.contrast.value, "standard");
+  first.toggleContrast();
   first.toggleTheme();
   assert.equal(first.contrast.value, "high");
   assert.equal(values.get(contrastStorageKey), "high");
