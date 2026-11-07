@@ -108,6 +108,7 @@ export default {
   "map.ariaYouAreHere": "、現在地",
   "map.ariaDestination": "、目的地",
   "map.youAreHere": "現在地",
+  "map.toolbar": "地図ツールバー",
   "map.information": "地図の説明・出典・ライセンス",
   "about.mapNotes": "地図の説明と参考資料",
   "map.footerNote":

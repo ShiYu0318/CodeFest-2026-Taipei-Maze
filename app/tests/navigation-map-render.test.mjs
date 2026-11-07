@@ -46,6 +46,7 @@ const realComponents = new Set([
   "StationTransferStep",
   "DestinationSearch",
   "StationScanPanel",
+  "DisplayControls",
 ]);
 function component(name) {
   if (components.has(name)) return components.get(name);
@@ -106,6 +107,7 @@ function component(name) {
   };
   const load = (path) => {
     const file = path.split("/").at(-1);
+    if (file.endsWith(".css")) return {};
     if (file.endsWith(".vue")) {
       const child = file.slice(0, -4);
       if (realComponents.has(child)) return component(child);
@@ -443,7 +445,17 @@ test("map sources stay behind an information entry rather than consuming map foo
       false
     );
     assert.ok(html.includes('aria-haspopup="dialog"'));
-    assert.ok(html.includes('class="map-information-button"'));
+    const info = html.indexOf("map-information-button");
+    assert.ok(info >= 0 && info < html.indexOf('class="map-stage"'));
+    const ordered = ["language", "mode", "theme", "contrast", "reopen"].map(
+      (target) => html.indexOf('data-tour-target="' + target + '"')
+    );
+    assert.ok(ordered.every((index) => index >= 0));
+    assert.deepEqual(
+      [...ordered].sort((a, b) => a - b),
+      ordered
+    );
+    assert.ok(ordered.at(-1) < info);
   } finally {
     globalThis.window = previousWindow;
   }

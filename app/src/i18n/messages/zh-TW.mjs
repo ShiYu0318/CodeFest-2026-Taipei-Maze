@@ -97,6 +97,7 @@ export default {
   "map.ariaYouAreHere": "，您在這裡",
   "map.ariaDestination": "，目的地",
   "map.youAreHere": "您在這裡",
+  "map.toolbar": "地圖工具列",
   "map.information": "地圖說明、資料來源與授權",
   "about.mapNotes": "地圖說明與參考資料",
   "map.footerNote": "依公開站圖重繪。標點與樓層相對位置為示意，請依現場指標。",
