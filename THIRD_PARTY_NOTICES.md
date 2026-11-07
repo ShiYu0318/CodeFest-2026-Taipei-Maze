@@ -15,7 +15,7 @@
 
 ## 實際依賴與素材登錄
 
-目前 repository 已包含研究資料及 Python standard library 處理工具，尚無可據以產生完整產品依賴清單的前端 package／lockfile。實作時每項新增依賴或素材必須補上：
+目前 repository 包含文件、研究資料工具、本地環境 helper 與橋接診斷頁；診斷伺服器只使用 Node.js built-ins，未新增 npm 依賴。`integration/townpass/test-env.patch` 含 TownPass 原檔脈絡，保留上游 GPL 與著作權；宿主完整 checkout、SDK 與套件快取均未納入本 repo。尚無可據以產生完整產品依賴清單的前端 package／lockfile。實作時每項新增依賴或素材必須補上：
 
 - 名稱、版本、檔案或 package 路徑、上游來源與實際提供者。
 - SPDX 授權或條款連結、應保留的 Copyright／NOTICE。
