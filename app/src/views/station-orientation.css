@@ -77,6 +77,12 @@
   gap: 8px;
 }
 
+.endpoint-summary {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
 .endpoint-field {
   display: grid;
   grid-template-columns: 5.5em minmax(0, 1fr);
@@ -110,15 +116,14 @@
   background: var(--tp-secondary-700);
 }
 
-.endpoint-field select {
-  width: 100%;
-  min-height: var(--display-control-height);
-  padding: 4px 6px;
+.endpoint-value {
+  margin: 0;
+  padding: 8px;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--wash);
   color: var(--ink);
-  font: inherit;
+  overflow-wrap: anywhere;
 }
 
 .compass-heading {

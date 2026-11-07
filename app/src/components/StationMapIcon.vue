@@ -15,8 +15,6 @@
 <script>
 const paths = {
   map: "m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3V6Zm6-3v15m6-12v15",
-  locate:
-    "M12 2v3m0 14v3M2 12h3m14 0h3M12 5a7 7 0 1 0 0 14 7 7 0 0 0 0-14Zm0 5a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z",
   elevator: "M5 10h14v11H5zm7 0v11M8 7V3L6 5m2-2 2 2m6-2v4l-2-2m2 2 2-2",
   restroom: "M7 5h.01M5 10h4m-2 0v10m-2 0 2-5 2 5M17 5h.01m0 5-3 6h6l-3-6v10",
   nursing:

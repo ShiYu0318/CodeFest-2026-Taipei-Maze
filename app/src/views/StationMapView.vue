@@ -5,7 +5,7 @@
     :data-theme="theme"
     :data-display-mode="displayMode"
   >
-    <div class="station-shell">
+    <div class="station-shell" :inert="endpointRole ? '' : null">
       <section class="station-heading" aria-label="顯示設定">
         <div class="station-title-row">
           <!-- <h1 id="station-title"><ZhuyinText text="台北車站" /></h1> -->
@@ -20,7 +20,7 @@
       </section>
 
       <StationScanPanel :location="location" :selected-point="selected" />
-      <div class="floor-controls">
+      <div ref="floorControls" class="floor-controls">
         <div class="floor-switch" role="group" aria-label="選擇樓層">
           <button
             v-for="floor in floorIds"
@@ -53,10 +53,27 @@
         <div class="facility-title-group">
           <h2 id="facility-title"><ZhuyinText text="設施主題" /></h2>
         </div>
-        <router-link class="location-link" :to="orientationLink">
-          <StationMapIcon name="locate" />
-          定位
-        </router-link>
+        <div class="endpoint-controls" role="group" aria-label="起點與終點">
+          <button
+            v-for="(label, role) in endpointLabels"
+            :key="role"
+            type="button"
+            aria-haspopup="dialog"
+            :disabled="floorChanging"
+            :title="(role === 'start' ? currentPoint : targetPoint)?.name"
+            @click="openEndpointPicker(role, $event)"
+          >
+            {{ label }}
+          </button>
+          <button
+            type="button"
+            :aria-pressed="!!mapPickStep"
+            :disabled="floorChanging"
+            @click="mapPickStep ? cancelMapPicking() : startMapPicking()"
+          >
+            地圖選點
+          </button>
+        </div>
       </div>
 
       <div
@@ -79,6 +96,17 @@
         </button>
       </div>
 
+      <div v-if="mapPickStep" class="map-pick-instructions">
+        <p role="status">
+          {{
+            mapPickStep === "start"
+              ? "1／2 點選起點，可先切換樓層"
+              : "2／2 點選終點，可切換到其他樓層"
+          }}
+        </p>
+        <button type="button" @click="cancelMapPicking">取消</button>
+      </div>
+
       <div class="station-layout">
         <div class="station-map-column">
           <section ref="mapSection" class="map-card" aria-label="車站地圖">
@@ -86,21 +114,11 @@
               ref="mapStage"
               class="map-stage"
               :style="{ '--map-top': mapTop * 1.5 + 'px' }"
-              @keydown.esc="closeConnectorDetails"
+              @keydown.esc="
+                mapPickStep ? cancelMapPicking() : closeConnectorDetails()
+              "
             >
               <div class="map-corner">
-                <div class="compass" aria-label="北方朝上略偏左" role="img">
-                  <span>N</span>
-                  <svg
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    :style="{
-                      transform: 'rotate(' + MAP_NORTH_DEGREES + 'deg)',
-                    }"
-                  >
-                    <path d="M12 3 20 21l-8-4-8 4Z" />
-                  </svg>
-                </div>
                 <button
                   v-if="originView"
                   type="button"
@@ -111,6 +129,21 @@
                   <ZhuyinText text="回到起點" />・{{ originView.floor }}
                 </button>
               </div>
+              <router-link
+                class="compass"
+                :to="orientationLink"
+                aria-label="開啟指南針"
+                title="開啟指南針"
+              >
+                <span aria-hidden="true">N</span>
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  :style="{ transform: 'rotate(' + MAP_NORTH_DEGREES + 'deg)' }"
+                >
+                  <path d="M12 3 20 21l-8-4-8 4Z" />
+                </svg>
+              </router-link>
               <div class="map-window" :inert="floorChanging ? '' : null">
                 <div
                   ref="viewport"
@@ -170,9 +203,12 @@
                         'pin-scan-position': point.id === scanPositionId,
                         'pin-scan-target': point.id === scanTargetId,
                         'pin-arrival': point.id === arrivalPointId,
+                        'pin-location':
+                          point.id === selected?.id ||
+                          point.id === mapCurrentPoint?.id,
                         'pin-endpoint':
-                          point.id === currentPoint?.id ||
-                          point.id === targetPoint?.id,
+                          point.id === mapCurrentPoint?.id ||
+                          point.id === mapTargetPoint?.id,
                       }"
                       type="button"
                       :style="pinStyle(point)"
@@ -181,7 +217,7 @@
                       :aria-hidden="!isPointVisible(point)"
                       :tabindex="isPointVisible(point) ? undefined : -1"
                       :aria-expanded="
-                        isConnector(point)
+                        isConnector(point) && !mapPickStep
                           ? point.id === selected?.id &&
                             !floorChanging &&
                             !!connectorPosition
@@ -190,7 +226,10 @@
                       @click="selectMapPoint(point, $event)"
                       @focus="focusVisiblePin(point, $event)"
                     >
-                      <span v-if="point.id === selected?.id" class="pin-icon">
+                      <span
+                        v-if="point.id === selected?.id || point.id === mapCurrentPoint?.id"
+                        class="pin-icon"
+                      >
                         <StationMapIcon :name="pointIconType(point)" />
                       </span>
                       <span v-else class="point-pin">
@@ -211,7 +250,7 @@
                       <svg
                         v-if="
                           point.id === selected?.id ||
-                          point.id === currentPoint?.id
+                          point.id === mapCurrentPoint?.id
                         "
                         class="map-location-arrow"
                         viewBox="0 0 80 80"
@@ -223,41 +262,38 @@
                             x2="0"
                             y2="1"
                           >
+                            <stop stop-color="#fff" stop-opacity="0" />
                             <stop
-                              stop-color="currentColor"
-                              stop-opacity=".45"
+                              offset="1"
+                              stop-color="#fff"
+                              stop-opacity=".55"
                             />
-                            <stop offset="1" stop-color="currentColor" />
                           </linearGradient>
                         </defs>
                         <g
-                          v-if="
-                            point.id === currentPoint?.id && mapHeading !== null
+                          :transform="
+                            point.id === mapCurrentPoint?.id &&
+                            mapHeading !== null
+                              ? 'rotate(' + mapHeading + ' 40 40)'
+                              : undefined
                           "
-                          :transform="'rotate(' + mapHeading + ' 40 40)'"
                         >
+                          <path :d="facingMarkerPath" fill="currentColor" />
                           <path
-                            d="M40 2 50 19 40 15 30 19Z"
+                            :d="facingMarkerPath"
                             :fill="'url(#location-arrow-' + point.id + ')'"
                           />
-                          <path d="M27 16l3 3m23-3-3 3" />
-                        </g>
-                        <g v-else>
-                          <path
-                            d="M30 5h20L40 19Z"
-                            :fill="'url(#location-arrow-' + point.id + ')'"
-                          />
-                          <path d="M27 7l3 4m23-4-3 4" />
                         </g>
                       </svg>
                       <span
                         v-if="
-                          point.id === currentPoint?.id ||
-                          point.id === targetPoint?.id
+                          point.id === mapCurrentPoint?.id ||
+                          point.id === mapTargetPoint?.id
                         "
                         class="map-endpoint"
                         :class="{
-                          'map-endpoint-target': point.id === targetPoint?.id,
+                          'map-endpoint-target':
+                            point.id === mapTargetPoint?.id,
                         }"
                         aria-hidden="true"
                         >{{ endpointBadge(point) }}</span
@@ -333,6 +369,13 @@
         </footer>
       </div>
     </div>
+    <StationEndpointPicker
+      v-if="endpointRole"
+      :label="endpointLabels[endpointRole]"
+      :selected-id="(endpointRole === 'start' ? currentPoint : targetPoint)?.id"
+      @close="closeEndpointPicker"
+      @select="chooseEndpoint"
+    />
   </main>
 </template>
 
@@ -345,11 +388,12 @@ import {
   ref,
   watch,
 } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 // import DestinationSearch from "../components/DestinationSearch.vue";
 // import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationScanPanel from "../components/StationScanPanel.vue";
+import StationEndpointPicker from "../components/StationEndpointPicker.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import DisplayControls from "../components/DisplayControls.vue";
 import ZhuyinText from "../components/ZhuyinText.vue";
@@ -391,6 +435,7 @@ const facilityHelp = {
   accessible: "輪椅候車區：提供輪椅使用者候車的空間。",
 };
 const route = useRoute();
+const router = useRouter();
 const currentPoint = computed(() =>
   findStationPoint(points, route.query.start)
 );
@@ -446,12 +491,26 @@ const level = ref(
 const showLayers = ref(false);
 const activeTheme = ref(null);
 const selected = ref(null);
+const endpointLabels = { start: "起點", destination: "終點" };
+const endpointRole = ref(null);
+const mapPickStep = ref(null);
+const draftStart = ref(null);
+const floorControls = ref(null);
+let endpointTrigger = null;
+const mapCurrentPoint = computed(() =>
+  mapPickStep.value ? draftStart.value : currentPoint.value
+);
+const mapTargetPoint = computed(() =>
+  mapPickStep.value ? null : targetPoint.value
+);
+const facingMarkerPath =
+  "M40 1 47.5 14C53 15.8 58 18.7 61 22H57C47.3 12.8 32.7 12.8 23 22H19C22 18.7 27 15.8 32.5 14Z";
 const scanPositionId = ref(null);
 const scanTargetId = ref(null);
 let scanFocusRevision = 0;
 async function focusScanPoint(point) {
   const revision = ++scanFocusRevision;
-  if (!point) return;
+  if (!point || mapPickStep.value || endpointRole.value) return;
   floorAnimation?.cancel();
   clearMapDrag();
   clearPinch();
@@ -476,7 +535,7 @@ function setScanTarget(point) {
 const orientationLink = computed(() => ({
   name: "station-orientation",
   query: {
-    start: selected.value?.id ?? currentPoint.value?.id,
+    start: currentPoint.value?.id,
     destination: targetPoint.value?.id,
   },
 }));
@@ -519,7 +578,7 @@ watch(
   (id) => setScanTarget(stationById.get(id)),
   { flush: "post" }
 );
-watch(level, updateMapLayout, { flush: "post" });
+watch([level, mapPickStep], updateMapLayout, { flush: "post" });
 watch(displayMode, async () => {
   const frame = viewport.value;
   if (!frame) return;
@@ -715,8 +774,8 @@ function pinStyle(point) {
 }
 
 function endpointBadge(point) {
-  const start = point.id === currentPoint.value?.id ? "起" : "";
-  const destination = point.id === targetPoint.value?.id ? "終" : "";
+  const start = point.id === mapCurrentPoint.value?.id ? "起" : "";
+  const destination = point.id === mapTargetPoint.value?.id ? "終" : "";
   return start + destination;
 }
 
@@ -738,6 +797,7 @@ function pointThemeStyle(type) {
   return {
     "--point-icon-color": iconColor || paletteColor(colorToken),
     "--marker-base-color": iconColor || "#4a5258",
+    "--location-icon-ink": iconColor ? "#fdfefe" : "var(--surface)",
   };
 }
 
@@ -1155,9 +1215,73 @@ function placeConnectorPanel() {
   };
 }
 
+function openEndpointPicker(role, event) {
+  cancelMapPicking();
+  selected.value = null;
+  endpointTrigger = event.currentTarget;
+  endpointRole.value = role;
+}
+
+async function closeEndpointPicker() {
+  const trigger = endpointTrigger;
+  endpointTrigger = null;
+  endpointRole.value = null;
+  await nextTick();
+  trigger?.focus({ preventScroll: true });
+}
+
+function saveEndpoints(start, destination) {
+  return router.replace({
+    name: "station-map",
+    query: {
+      ...route.query,
+      start: start || undefined,
+      destination: destination || undefined,
+    },
+  });
+}
+
+async function chooseEndpoint(id) {
+  const role = endpointRole.value;
+  const point = findStationPoint(points, id);
+  await closeEndpointPicker();
+  await saveEndpoints(
+    role === "start" ? id : currentPoint.value?.id,
+    role === "destination" ? id : targetPoint.value?.id
+  );
+  if (!point || !viewport.value) return;
+  await showFloor(point.floorId);
+  if (viewport.value && level.value === point.floorId)
+    centerOn(...normalizedPoint(point));
+}
+
+async function startMapPicking() {
+  selected.value = null;
+  draftStart.value = null;
+  mapPickStep.value = "start";
+  await nextTick();
+  floorControls.value?.scrollIntoView({ block: "start" });
+}
+
+function cancelMapPicking() {
+  mapPickStep.value = null;
+  draftStart.value = null;
+}
+
 async function selectMapPoint(point, event) {
   if (floorChanging.value) return;
   arrivalPointId.value = null;
+  if (mapPickStep.value === "start") {
+    draftStart.value = point;
+    mapPickStep.value = "destination";
+    return;
+  }
+  if (mapPickStep.value === "destination") {
+    const start = draftStart.value.id;
+    cancelMapPicking();
+    await saveEndpoints(start, point.id);
+    return;
+  }
   selected.value = selected.value?.id === point.id ? null : point;
   if (!selected.value) return;
   if (zoom.value > 1) centerOn(...normalizedPoint(point));
@@ -1177,8 +1301,7 @@ function closeConnectorDetails() {
 function dismissConnectorOutside(event) {
   const panel = connectorPanel.value;
   if (!panel || panel.contains(event.target)) return;
-  // The location link uses the selected point as its starting position.
-  if (event.target.closest?.(".display-controls, .location-link")) return;
+  if (event.target.closest?.(".display-controls")) return;
   if (viewport.value.contains(event.target)) {
     // Marker clicks handle selection, and a click following a drag is ignored.
     const dragClick = ignoreMouseClick && event.detail !== 0;

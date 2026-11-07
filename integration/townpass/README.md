@@ -23,7 +23,7 @@ bash scripts/townpass-env.sh serve
 
 ## 定位指南針的 Flutter 介面
 
-地圖上的「定位」開啟 `/station-orientation`。網頁使用既有的 `flutterObject` Web Message Listener。進入指南針時送出下列 JSON 字串，回到站圖後繼續顯示手機方位，離開這兩個頁面時送出相同訂閱編號的 `stop`。Flutter 團隊可在 TownPass 的 `TPWebMessageHandler` 註冊 `compass_heading`，從 `message` 取得 `action` 和 `subscriptionId`。 [InAppWebView 官方文件](https://inappwebview.dev/docs/webview/javascript/communication/#web-message-listeners)
+地圖右上角的指北按鈕開啟 `/station-orientation`。網頁使用既有的 `flutterObject` Web Message Listener。進入指南針時送出下列 JSON 字串，回到站圖後繼續顯示手機方位，離開這兩個頁面時送出相同訂閱編號的 `stop`。Flutter 團隊可在 TownPass 的 `TPWebMessageHandler` 註冊 `compass_heading`，從 `message` 取得 `action` 和 `subscriptionId`。 [InAppWebView 官方文件](https://inappwebview.dev/docs/webview/javascript/communication/#web-message-listeners)
 
 ```json
 {"name":"compass_heading","data":{"action":"start","subscriptionId":1}}

@@ -12,7 +12,7 @@
           車站地圖
         </router-link>
         <h1>定位指南針</h1>
-        <p>選擇你所在的標點與終點，再比對手機的面向方向。</p>
+        <p>用地圖選好的起點和終點，比對手機的面向方向。</p>
       </header>
 
       <div class="orientation-layout">
@@ -21,42 +21,33 @@
           aria-labelledby="endpoints-title"
         >
           <h2 id="endpoints-title">起點與終點</h2>
-          <label
-            v-for="field in endpointFields"
-            :key="field.key"
-            class="endpoint-field"
-          >
-            <span class="endpoint-label">
-              <span
-                :class="['endpoint-dot', field.key]"
-                aria-hidden="true"
-              ></span>
-              <span>
-                {{ field.label }}
-                <small>{{ field.description }}</small>
-              </span>
-            </span>
-            <select
-              :aria-label="field.label + '（' + field.description + '）'"
-              :value="endpoints[field.key]?.id || ''"
-              @change="selectEndpoint(field.key, $event.target.value)"
+          <dl class="endpoint-summary">
+            <div
+              v-for="field in endpointFields"
+              :key="field.key"
+              class="endpoint-field"
             >
-              <option value="">選擇標點</option>
-              <optgroup
-                v-for="(floorPoints, floor) in points"
-                :key="floor"
-                :label="floor"
-              >
-                <option
-                  v-for="point in floorPoints"
-                  :key="point.id"
-                  :value="point.id"
-                >
-                  {{ floor }}・{{ point.name }}
-                </option>
-              </optgroup>
-            </select>
-          </label>
+              <dt class="endpoint-label">
+                <span
+                  :class="['endpoint-dot', field.key]"
+                  aria-hidden="true"
+                ></span>
+                <span>
+                  {{ field.label }}
+                  <small>{{ field.description }}</small>
+                </span>
+              </dt>
+              <dd class="endpoint-value">
+                {{
+                  endpoints[field.key]
+                    ? endpoints[field.key].floorId +
+                      "・" +
+                      endpoints[field.key].name
+                    : "請在地圖選擇"
+                }}
+              </dd>
+            </div>
+          </dl>
           <p class="orientation-note">
             目前位置由你手動選定。同層顯示直線方位，實際路線請依站內指標。
           </p>
@@ -198,7 +189,7 @@
 
 <script setup>
 import { computed, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import "../display/display-preferences.css";
@@ -212,7 +203,6 @@ import { stationHeading } from "../navigation/station-compass";
 import stationData from "./station-points.json";
 
 const route = useRoute();
-const router = useRouter();
 const { theme, displayMode } = useDisplayPreferences();
 const { points } = stationData;
 const endpointFields = [
@@ -260,7 +250,7 @@ const aligned = computed(
 );
 const status = computed(() => {
   const { start, destination } = endpoints.value;
-  if (!start || !destination) return "請先選擇起點和終點。";
+  if (!start || !destination) return "請回地圖選擇起點和終點。";
   if (start.id === destination.id) return "起點與終點是同一個標點。";
   if (start.floorId !== destination.floorId)
     return "跨樓層方向需由路徑資料提供。";
@@ -270,13 +260,6 @@ const status = computed(() => {
   if (aligned.value) return "已對準目標方位";
   return error.value > 0 ? "向右轉向目標方位" : "向左轉向目標方位";
 });
-
-function selectEndpoint(field, value) {
-  router.replace({
-    name: "station-orientation",
-    query: { ...endpointQuery.value, [field]: value || undefined },
-  });
-}
 
 function toggleSimulation() {
   if (!simulating.value)
