@@ -21,7 +21,7 @@
       <span class="display-switch-track" aria-hidden="true"></span>
     </button>
     <label class="display-mode-label">
-      <span><ZhuyinText text="介面模式" /></span>
+      <!-- <span><ZhuyinText text="介面模式" /></span> -->
       <select
         :value="displayMode"
         @change="setDisplayMode($event.target.value)"

@@ -587,15 +587,14 @@
 }
 .theme-group svg {
   width: 16px;
-  color: var(--point-icon-color);
-}
-.station-page[data-theme="dark"] .theme-group svg {
-  color: color-mix(in srgb, var(--point-icon-color) 75%, white);
 }
 .theme-group button[aria-pressed="true"] {
-  background: var(--tp-secondary-200);
+  background: #f5ba4b;
   border-color: var(--accent);
   box-shadow: inset 0 -2px 0 var(--accent);
+}
+.station-page[data-theme="dark"] .theme-group button[aria-pressed="true"] {
+  color: #1a1306;
 }
 .theme-feedback {
   display: flex;

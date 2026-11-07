@@ -77,7 +77,6 @@
           :key="type"
           type="button"
           :aria-pressed="activeTheme === type"
-          :style="pointThemeStyle(type)"
           @click="toggleTheme(type)"
         >
           <StationMapIcon :name="type" /><ZhuyinText
