@@ -4,7 +4,9 @@
     <div class="scan-heading">
       <h2 id="station-scan-heading">
         {{
-          view.mode === "navigation" ? t("scan.navigation") : t("scan.browsing")
+          view.mode === "navigation" || persistentScan
+            ? t("scan.navigation")
+            : t("scan.browsing")
         }}
       </h2>
     </div>
@@ -104,7 +106,12 @@
     <p v-else-if="view.position" class="scan-time">
       {{ t("scan.fromLink") }}
     </p>
-    <button class="scan-start" :disabled="!available || active" @click="start">
+    <button
+      v-if="!persistentScan"
+      class="scan-start"
+      :disabled="!available || active"
+      @click="start"
+    >
       {{
         active
           ? t("scan.waiting")
@@ -113,10 +120,10 @@
           : t("scan.scan")
       }}
     </button>
-    <p v-if="!available" class="scan-note">
+    <p v-if="!persistentScan && !available" class="scan-note">
       {{ t("scan.needApp") }}
     </p>
-    <p v-if="notice" role="status">{{ notice }}</p>
+    <p v-if="!persistentScan && notice" role="status">{{ notice }}</p>
     <div
       v-if="position && destination"
       class="scan-overview"
@@ -171,6 +178,7 @@ import { placeLabel, placeName } from "../i18n/places.mjs";
 const props = defineProps({
   selectedPoint: { type: Object, default: null },
   location: { type: Object, required: true },
+  persistentScan: { type: Boolean, default: false },
 });
 const emit = defineEmits(["destination", "scanned", "cancel-trip"]);
 const view = computed(() => props.location.view.value);

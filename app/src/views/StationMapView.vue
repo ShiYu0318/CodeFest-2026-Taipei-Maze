@@ -1,6 +1,7 @@
 <template>
   <main
     class="station-page display-page"
+    :class="{ 'navigation-focused': navigationMap.active }"
     :lang="htmlLang(locale)"
     :data-theme="theme"
     :data-display-mode="displayMode"
@@ -25,6 +26,7 @@
       <StationScanPanel
         :location="location"
         :selected-point="selected"
+        :persistent-scan="navigationMap.active"
         @destination="planDestination"
         @scanned="onQrScanned"
         @cancel-trip="openTripDialog('cancel')"
@@ -79,6 +81,7 @@
       </div>
 
       <div
+        v-if="!navigationMap.active"
         class="theme-group horizontal-scroll"
         role="group"
         :aria-label="t('map.themesAria')"
@@ -181,7 +184,12 @@
                           'active-with-layers': backgroundLayers.length,
                         }"
                       >
-                        <StationFloorPlan :floor="level" />
+                        <StationFloorPlan
+                          :floor="level"
+                          :visible-point-ids="
+                            navigationMap.active ? navigationMap.pointIds : null
+                          "
+                        />
                       </g>
                     </svg>
                     <button
@@ -388,6 +396,11 @@
         </footer>
       </div>
     </div>
+    <StationNavigationRescan
+      v-if="navigationMap.active && !endpointPickerOpen && !tripDialog"
+      :location="location"
+      @scanned="onQrScanned"
+    />
     <StationEndpointPicker
       v-if="endpointPickerOpen"
       :start-point="currentPoint"
@@ -421,6 +434,7 @@ import { useRoute, useRouter } from "vue-router";
 // import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationScanPanel from "../components/StationScanPanel.vue";
+import StationNavigationRescan from "../components/StationNavigationRescan.vue";
 import StaffCard from "../components/StaffCard.vue";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
@@ -434,6 +448,10 @@ import { buildInfo, summarizeStationData } from "../about/about.mjs";
 import { htmlLang, useI18n } from "../i18n/index.mjs";
 import { placeName } from "../i18n/places.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
+import {
+  navigationMapState,
+  navigationPointVisible,
+} from "../station/navigation-view.mjs";
 import { floors, stackBounds } from "./station-floor-plans.mjs";
 import stationData from "./station-points.json";
 import stationConnections from "./station-connections.json";
@@ -575,6 +593,21 @@ const mapSection = ref(null);
 const mapStage = ref(null);
 const mapTop = ref(0);
 const location = useStationLocation(stationData, stationConnections);
+const navigationMap = computed(() =>
+  navigationMapState(location.view.value, {
+    startId: currentPoint.value?.id,
+    targetId: targetPoint.value?.id,
+    picking: !!mapPickStep.value,
+  })
+);
+watch(
+  navigationMap,
+  () => {
+    if (selected.value && !isPointVisible(selected.value))
+      selected.value = null;
+  },
+  { flush: "post" }
+);
 const tripDirection = computed(() => {
   const { destinationId, relation } = location.view.value;
   const connector = stationById.get(relation.steps[0]?.from.pointId);
@@ -665,16 +698,21 @@ onBeforeUnmount(() => {
 });
 
 const destinations = computed(() => transfersFromPoint(selected.value?.id));
-const floorPoints = computed(() => {
+const allFloorPoints = computed(() => {
   const current = points[level.value];
   return [
     ...current.filter((point) => !isConnector(point)),
     ...current.filter((point) => isConnector(point)),
   ];
 });
+const floorPoints = computed(() =>
+  allFloorPoints.value.filter((point) =>
+    navigationPointVisible(point, navigationMap.value)
+  )
+);
 const availableThemes = computed(() =>
   Object.keys(categories).filter((type) =>
-    floorPoints.value.some((point) => matchesTheme(point, type))
+    allFloorPoints.value.some((point) => matchesTheme(point, type))
   )
 );
 const bounds = computed(() => {
@@ -776,7 +814,11 @@ function matchesTheme(point, type) {
 }
 
 function isPointVisible(point) {
-  return !activeTheme.value || matchesTheme(point, activeTheme.value);
+  return navigationPointVisible(
+    point,
+    navigationMap.value,
+    !activeTheme.value || matchesTheme(point, activeTheme.value)
+  );
 }
 
 function transferNote(transfer) {

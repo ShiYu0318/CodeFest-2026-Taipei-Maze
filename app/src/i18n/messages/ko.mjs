@@ -109,6 +109,8 @@ export default {
     "링크로 위치를 불러왔습니다. 현재 위치를 확인하세요. 실시간 추적이 아닙니다.",
   "scan.waiting": "스캔 결과를 기다리는 중…",
   "scan.rescan": "다시 스캔",
+  "scan.relocateHint":
+    "길을 잃었거나 잘 모르겠나요? 가까운 QR을 스캔하면 목적지를 유지하며 위치를 갱신합니다.",
   "scan.scan": "위치 스캔",
   "scan.needApp":
     "스캐너를 쓰려면 TownPass 앱에서 여세요. 브라우저에서는 위치 링크만 볼 수 있습니다.",

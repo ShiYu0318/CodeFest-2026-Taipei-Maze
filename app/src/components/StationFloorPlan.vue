@@ -77,14 +77,20 @@ const stairwayTypes = new Set([
 
 export default {
   components: { StationB2Plan },
-  props: { floor: { type: String, required: true }, outlineOnly: Boolean },
+  props: {
+    floor: { type: String, required: true },
+    outlineOnly: Boolean,
+    visiblePointIds: { type: Array, default: null },
+  },
   computed: {
     plan() {
       return plans[this.floor];
     },
     stairways() {
-      return stationData.points[this.floor].filter((point) =>
-        this.pointTypes(point).some((type) => stairwayTypes.has(type))
+      return stationData.points[this.floor].filter(
+        (point) =>
+          this.pointTypes(point).some((type) => stairwayTypes.has(type)) &&
+          (!this.visiblePointIds || this.visiblePointIds.includes(point.id))
       );
     },
   },

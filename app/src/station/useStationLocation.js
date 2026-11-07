@@ -16,12 +16,17 @@ export function useStationLocation(data, connections) {
     onChange: (state) => {
       view.value = state;
     },
-    onLocated: (point) =>
-      router.replace({
+    onLocated: (point) => {
+      const query = stationLocationQuery(point?.id ?? null, data, route.query);
+      // Once a trip has a map-selected start, a fresh QR replaces that start.
+      // Keep the destination and other settings while synchronizing both views.
+      if (point && Object.hasOwn(route.query, "start")) query.start = point.id;
+      return router.replace({
         path: route.path,
-        query: stationLocationQuery(point?.id ?? null, data, route.query),
+        query,
         hash: route.hash,
-      }),
+      });
+    },
   });
   view.value = controller.snapshot();
   watch(

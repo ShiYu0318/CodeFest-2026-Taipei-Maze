@@ -98,6 +98,7 @@ export default {
   "scan.fromLink": "由定位連結帶入，請核對現場位置；不是即時追蹤。",
   "scan.waiting": "等待掃碼結果…",
   "scan.rescan": "重新掃描定位",
+  "scan.relocateHint": "迷路或不確定？掃描附近的 QR 重新定位，目的地會保留。",
   "scan.scan": "掃描定位",
   "scan.needApp": "請由城市通 App 開啟以使用原生掃碼；瀏覽器可查看點位連結。",
   "scan.arrivedTitle": "你已確認抵達",

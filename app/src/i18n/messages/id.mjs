@@ -109,6 +109,8 @@ export default {
     "Lokasi diambil dari tautan. Periksa posisi Anda; ini bukan pelacakan langsung.",
   "scan.waiting": "Menunggu hasil pindai…",
   "scan.rescan": "Pindai lagi",
+  "scan.relocateHint":
+    "Tersesat atau ragu? Pindai QR terdekat untuk memperbarui lokasi tanpa mengubah tujuan.",
   "scan.scan": "Pindai lokasi",
   "scan.needApp":
     "Buka di aplikasi TownPass untuk memakai pemindai. Di peramban, Anda hanya bisa melihat tautan lokasi.",

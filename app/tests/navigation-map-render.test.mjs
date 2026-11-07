@@ -1,0 +1,254 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+/* global globalThis */
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import * as Vue from "vue";
+import * as VueRouter from "vue-router";
+import { renderToString } from "@vue/server-renderer";
+import { parse, compileScript, compileTemplate } from "@vue/compiler-sfc";
+import { transformSync } from "@babel/core";
+import * as i18n from "../src/i18n/index.mjs";
+import * as places from "../src/i18n/places.mjs";
+import * as preferences from "../src/display/preferences.mjs";
+import * as floorPlans from "../src/views/station-floor-plans.mjs";
+import * as navigation from "../src/station/navigation-view.mjs";
+import * as scan from "../src/station/scan.mjs";
+import * as mapFocus from "../src/station/map-focus.mjs";
+import * as about from "../src/about/about.mjs";
+import * as locationHook from "../src/station/useStationLocation.js";
+import { createStationLocation } from "../src/station/location.mjs";
+import { iosWebMessageData } from "./helpers/ios-web-message.mjs";
+
+const data = JSON.parse(
+  readFileSync(new URL("../src/views/station-points.json", import.meta.url))
+);
+const connections = JSON.parse(
+  readFileSync(
+    new URL("../src/views/station-connections.json", import.meta.url)
+  )
+);
+const components = new Map();
+const realComponents = new Set([
+  "StationMapView",
+  "StationFloorPlan",
+  "StationB2Plan",
+  "StationMapIcon",
+  "StationNavigationRescan",
+]);
+function component(name) {
+  if (components.has(name)) return components.get(name);
+  const directory = name === "StationMapView" ? "views" : "components";
+  const source = readFileSync(
+    new URL(`../src/${directory}/${name}.vue`, import.meta.url),
+    "utf8"
+  );
+  const descriptor = parse(source).descriptor;
+  let script;
+  if (descriptor.scriptSetup) {
+    script = compileScript(descriptor, {
+      id: name,
+      inlineTemplate: true,
+    }).content;
+  } else {
+    const template = compileTemplate({
+      source: descriptor.template.content,
+      filename: name,
+      id: name,
+    });
+    assert.deepEqual(template.errors, []);
+    script =
+      descriptor.script.content.replace("export default", "const component =") +
+      "\n" +
+      template.code.replace("export function render", "function render") +
+      "\ncomponent.render = render; export default component;";
+  }
+  const output = transformSync(script, {
+    babelrc: false,
+    configFile: false,
+    plugins: ["@babel/plugin-transform-modules-commonjs"],
+  }).code;
+  const modules = {
+    vue: Vue,
+    "vue-router": VueRouter,
+    "station-floor-plans.mjs": floorPlans,
+    "station-points.json": data,
+    "station-connections.json": connections,
+    "index.mjs": i18n,
+    "places.mjs": places,
+    "preferences.mjs": preferences,
+    "navigation-view.mjs": navigation,
+    "scan.mjs": scan,
+    "map-focus.mjs": mapFocus,
+    "about.mjs": about,
+    useStationLocation: locationHook,
+    "station-routing": {
+      zones: connections.zones,
+      transfersFromPoint: () => [],
+    },
+  };
+  const load = (path) => {
+    const file = path.split("/").at(-1);
+    if (file.endsWith(".vue")) {
+      const child = file.slice(0, -4);
+      if (realComponents.has(child)) return component(child);
+      // Map marker rendering and the scan dock remain real; unrelated panels
+      // are stubbed so this test does not depend on chat, search or dialogs.
+      return {
+        props: ["text", "persistentScan"],
+        render() {
+          return Vue.h(
+            "span",
+            { "data-persistent-scan": this.persistentScan },
+            this.text
+          );
+        },
+      };
+    }
+    assert.ok(Object.hasOwn(modules, file), path);
+    return modules[file];
+  };
+  const compiled = { exports: {} };
+  new Function("require", "module", "exports", output)(
+    load,
+    compiled,
+    compiled.exports
+  );
+  components.set(name, compiled.exports.default);
+  return compiled.exports.default;
+}
+
+test("the map renders only needed icons during a trip, keeps QR markers and the dock, then restores browsing", async () => {
+  const previousWindow = globalThis.window;
+  globalThis.window = { matchMedia: () => ({ matches: false }) };
+  const language = i18n.useI18n();
+  const previousLocale = language.locale.value;
+  language.setLocale("zh-TW");
+  async function render(query) {
+    const router = VueRouter.createRouter({
+      history: VueRouter.createMemoryHistory(),
+      routes: [
+        { path: "/station-map", component: component("StationMapView") },
+        { path: "/about", component: { render: () => Vue.h("p", "About") } },
+      ],
+    });
+    await router.push({ path: "/station-map", query });
+    await router.isReady();
+    const app = Vue.createSSRApp({ render: () => Vue.h(VueRouter.RouterView) });
+    app.use(router);
+    return renderToString(app);
+  }
+  try {
+    const browsing = await render({});
+    assert.equal(
+      (browsing.match(/class="map-pin\b/g) ?? []).length,
+      data.points.B2.length
+    );
+    assert.ok(browsing.includes('class="theme-group'));
+    assert.equal(browsing.includes('class="navigation-rescan-bar"'), false);
+    const trip = await render({ start: "b1-e4", destination: "m-e4" });
+    assert.equal((trip.match(/class="map-pin\b/g) ?? []).length, 9);
+    assert.ok(trip.includes('class="navigation-rescan-bar"'));
+    assert.equal(trip.includes('class="theme-group'), false);
+    assert.equal(trip.includes('class="plan-stairs"'), false);
+    assert.ok(trip.includes('data-persistent-scan="true"'));
+    assert.ok(trip.includes("重新掃描定位"));
+    const restored = await render({});
+    assert.equal(
+      (restored.match(/class="map-pin\b/g) ?? []).length,
+      data.points.B2.length
+    );
+  } finally {
+    language.setLocale(previousLocale);
+    globalThis.window = previousWindow;
+  }
+});
+
+test("the real fixed scan button calls TownPass once, handles cancel and can relocate without changing the target", async () => {
+  const replies = new Set(),
+    messages = [];
+  const native = {
+    postMessage: (text) => messages.push(JSON.parse(text)),
+    addEventListener: (_, fn) => replies.add(fn),
+    removeEventListener: (_, fn) => replies.delete(fn),
+  };
+  const view = Vue.shallowRef(null);
+  const controller = createStationLocation({
+    data,
+    connections,
+    native,
+    onChange: (state) => {
+      view.value = state;
+    },
+  });
+  controller.applyQuery({ point: "b1-e4" });
+  controller.choose("m-e4");
+  controller.setStepFree(true);
+  view.value = controller.snapshot();
+  const location = { view, scan: () => controller.scan() };
+  let button,
+    scanned = 0;
+  const renderer = Vue.createRenderer({
+    createElement(tag) {
+      const node = { children: [] };
+      if (tag === "button") button = node;
+      return node;
+    },
+    createText: (text) => ({ text }),
+    createComment: (text) => ({ text }),
+    insert(node, parent) {
+      parent.children.push(node);
+      node.parent = parent;
+    },
+    remove() {},
+    setText(node, text) {
+      node.text = text;
+    },
+    setElementText(node, text) {
+      node.text = text;
+    },
+    parentNode: (node) => node.parent,
+    nextSibling: () => null,
+    patchProp(node, key, _, value) {
+      node[key] = value;
+    },
+  });
+  const reply = (payload) => {
+    for (const receiver of replies)
+      receiver({
+        data: iosWebMessageData({ name: "qr_code_scan", data: payload }),
+      });
+  };
+  const app = renderer.createApp(component("StationNavigationRescan"), {
+    location,
+    onScanned: () => {
+      scanned++;
+    },
+  });
+  try {
+    app.mount({ children: [] });
+    assert.equal(button.disabled, false);
+    const cancelled = button.onClick();
+    await Vue.nextTick();
+    assert.equal(button.disabled, true);
+    assert.deepEqual(messages, [{ name: "qr_code_scan", data: null }]);
+    assert.equal((await controller.scan()).type, "Busy");
+    reply(null);
+    await cancelled;
+    await Vue.nextTick();
+    assert.equal(button.disabled, false);
+    assert.equal(scanned, 0);
+    const pending = button.onClick();
+    reply(scan.stationQrPayload("b2-qr-01", data));
+    await pending;
+    await Vue.nextTick();
+    assert.equal(scanned, 1);
+    assert.equal(button.disabled, false);
+    assert.equal(view.value.position.pointId, "b2-qr-01");
+    assert.equal(view.value.destinationId, "m-e4");
+    assert.equal(view.value.stepFree, true);
+  } finally {
+    app.unmount();
+    controller.dispose();
+  }
+});

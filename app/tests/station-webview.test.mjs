@@ -18,8 +18,17 @@ const connections = JSON.parse(
   )
 );
 
-for (const readyEvent of ["flutterInAppWebViewPlatformReady", "pageshow"]) {
-  test(`${readyEvent}: web scan calls the unchanged TownPass protocol and locates on the map`, async () => {
+for (const { readyEvent, query = {} } of [
+  { readyEvent: "flutterInAppWebViewPlatformReady" },
+  { readyEvent: "pageshow" },
+  {
+    readyEvent: "pageshow",
+    query: { start: "b1-e7", destination: "m-e4", lang: "vi" },
+  },
+]) {
+  test(`${readyEvent} ${
+    query.destination ? "existing trip" : "browsing"
+  }: web scan calls TownPass and locates on the map`, async () => {
     const previousWindow = globalThis.window;
     const events = new Map(),
       replies = new Set(),
@@ -93,7 +102,7 @@ for (const readyEvent of ["flutterInAppWebViewPlatformReady", "pageshow"]) {
         });
     };
     try {
-      await router.push("/station-map");
+      await router.push({ path: "/station-map", query });
       await router.isReady();
       app = renderer.createApp({ render: () => h(RouterView) });
       app.use(router);
@@ -105,6 +114,10 @@ for (const readyEvent of ["flutterInAppWebViewPlatformReady", "pageshow"]) {
       await nextTick();
       assert.equal(button.disabled, false);
       assert.deepEqual(messages, []); // Readiness never starts a camera by itself.
+      if (query.destination) {
+        location.choose(query.destination);
+        location.setStepFree(true);
+      }
       const pending = button.onClick();
       await nextTick();
       assert.equal(button.disabled, true);
@@ -113,6 +126,8 @@ for (const readyEvent of ["flutterInAppWebViewPlatformReady", "pageshow"]) {
       assert.equal((await pending).type, "success");
       await nextTick();
       assert.deepEqual(router.currentRoute.value.query, {
+        ...query,
+        ...(query.start ? { start: "b1-e4" } : {}),
         point: "b1-e4",
         v: "1",
       });
@@ -120,6 +135,28 @@ for (const readyEvent of ["flutterInAppWebViewPlatformReady", "pageshow"]) {
       assert.equal(location.view.value.position.floor, "B1");
       assert.ok(location.view.value.position.confirmedAt);
       assert.equal(button.disabled, false);
+      if (query.destination) {
+        const before = { ...router.currentRoute.value.query };
+        for (const payload of [null, "wrong QR"]) {
+          const rescan = button.onClick();
+          reply(payload);
+          assert.notEqual((await rescan).type, "success");
+          assert.deepEqual(router.currentRoute.value.query, before);
+          assert.equal(location.view.value.destinationId, query.destination);
+          assert.equal(location.view.value.stepFree, true);
+        }
+        const rescan = button.onClick();
+        reply(stationQrPayload("b2-qr-01", data));
+        assert.equal((await rescan).type, "success");
+        assert.equal(router.currentRoute.value.query.start, "b2-qr-01");
+        assert.equal(router.currentRoute.value.query.point, "b2-qr-01");
+        assert.equal(
+          router.currentRoute.value.query.destination,
+          query.destination
+        );
+        assert.equal(location.view.value.destinationId, query.destination);
+        assert.equal(location.view.value.stepFree, true);
+      }
       const stale = button.onClick();
       await router.push("/other");
       await nextTick();

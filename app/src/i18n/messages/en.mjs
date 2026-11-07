@@ -110,6 +110,8 @@ export default {
     "Set from a location link. Please check where you are; this is not live tracking.",
   "scan.waiting": "Waiting for the scan…",
   "scan.rescan": "Scan again",
+  "scan.relocateHint":
+    "Lost or unsure? Scan a nearby QR code to update your location and keep your destination.",
   "scan.scan": "Scan location",
   "scan.needApp":
     "Open this in the TownPass app to use the scanner. In a browser you can only view location links.",

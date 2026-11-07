@@ -109,6 +109,8 @@ export default {
     "Vị trí lấy từ liên kết. Hãy kiểm tra nơi bạn đứng; đây không phải theo dõi trực tiếp.",
   "scan.waiting": "Đang chờ kết quả quét…",
   "scan.rescan": "Quét lại",
+  "scan.relocateHint":
+    "Bị lạc hoặc chưa chắc? Quét mã QR gần bạn để cập nhật vị trí và giữ nguyên điểm đến.",
   "scan.scan": "Quét vị trí",
   "scan.needApp":
     "Hãy mở trong ứng dụng TownPass để dùng máy quét. Trên trình duyệt chỉ xem được liên kết vị trí.",
