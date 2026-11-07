@@ -1,6 +1,6 @@
 # Taipei Maze 北車不迷路產品與技術規格
 
-版本：1.1｜更新日期：2026-11-07｜文件狀態：開發規格，尚非完成實作或現場安全認證
+版本：1.2｜更新日期：2026-11-07｜文件狀態：開發規格，尚非完成實作或現場安全認證
 
 本規格將[提案企劃書](./提案企劃書.md)轉為可分工、實作、測試與交付的要求。產品讓旅客掃描 QR Code 確認位置，以局部跨樓層路網規劃路線，再透過一步一圖、多語文字與預生成語音理解下一步。核心承諾是「找得到、走得了、看得懂」，不能用完整功能數量取代路線正確性。
 
@@ -30,7 +30,7 @@
 - [18 例外處理與恢復](#18-例外處理與恢復)
 - [19 非功能需求](#19-非功能需求)
 - [20 隱私與資料安全](#20-隱私與資料安全)
-- [21 P1 認知友善路線與 ML](#21-p1-認知友善路線與-ml)
+- [21 多目標認知路線與離線目的地搜尋](#21-多目標認知路線與離線目的地搜尋)
 - [22 測試資料與案例](#22-測試資料與案例)
 - [23 驗收與證據](#23-驗收與證據)
 - [24 開發分工與時程](#24-開發分工與時程)
@@ -45,7 +45,7 @@
 ### 01.1 資料優先順序
 
 1. 使用者最新提供的《2026 城市通入門指引》及架構資訊：作品為 WebView 微服務網頁、前端框架不限；七語與排除中國相關來源要求繼續適用。
-2. 提案第 17 章及第 15 章最新功能取捨；第 16 章認知排序維持 P1。
+2. 提案第 18 章新增多目標路線與離線搜尋，及第 17、15 章功能取捨；認知排序、字典搜尋與未來 ML 先列 P1。
 3. 提案第 13、14 章的預生成音檔決策保留；獨立 Flutter 導航客戶端已被本次 WebView 架構覆寫，Flutter 改作城市通宿主。
 4. 提案較早章節的長期願景，僅在不牴觸上述決策時採用。
 5. 本 SPEC 補充的工程預設。這些是為使規格可執行而制定，不代表使用者曾逐項指定。
@@ -128,9 +128,10 @@
 ### 03.2 P1
 
 1. 以 Graph 距離找最近廁所／電梯，不使用直線距離代替可達距離。
-2. 規則式「容易理解」候選路線與可解釋差異；有資料再評估 ML。
+2. 多目標候選路線比較：有可信時間模型才稱「最快」，否則顯示「最短」；另提供候選中較容易理解的路線，保留無障礙硬限制。
 3. 語速 0.8／1.0／1.2 倍、較完整的播放佇列、語言包擴充。
 4. 小型志願者可用性測試；只呈現實際樣本與條件。
+5. 離線多語目的地搜尋：七語同義詞、有限錯字容忍、簡單意圖及 Graph 最近可達設施。主流程仍可用大卡片，不強迫輸入文字。
 
 ### 03.3 時間不足的降級規則
 
@@ -280,6 +281,19 @@ GATE-01 不再是「Flutter 能否當作品」的開放選項，而是必須完�
 | FR-SRC-02 | 所有依賴與素材符合來源允許清單 | 未審查資產不得進正式包 |
 | FR-DEL-01 | 完成城市通 WebView 微服務整合 | 從服務入口真機掃碼，普通瀏覽器或獨立 App 不等於完成 |
 | FR-LIC-01 | 顯著提供部署版本的原始碼與授權 | repo 匿名可讀、commit／tag 對應、建置資料及第三方通知齊全 |
+
+### 06.6 P1 路線與搜尋擴充
+
+| ID | 必要行為 | 驗收條件 |
+| --- | --- | --- |
+| FR-MO-01 | 同一可行圖產生去重多路線候選 | 2–5 條或明確只有 1 條，保留方向及無障礙限制 |
+| FR-MO-02 | 有完整有效時間模型才啟用 fastest | 缺時間回 UnsupportedOptions，不把最短冒稱最快 |
+| FR-MO-03 | 易懂排序有繞路上限及特徵解釋 | 顯示可核對差異，同路線不造兩張卡 |
+| FR-SRCH-01 | 七語核准 alias 映射同一概念／真實 POI | 查詞語言不受 UI locale 限制，不重複創建設施 |
+| FR-SRCH-02 | 有界 typo matching 只提供建議 | 出口／樓層／節點碼不 fuzzy；不自動開始導航 |
+| FR-SRCH-03 | 解析有限意圖並讓使用者確認 | 否定、衝突、未理解條件需澄清，不移除既有限制 |
+| FR-SRCH-04 | nearest 以符合需求的 Graph 可達成本排序 | 缺可靠起點要求掃碼，不使用直線距離 |
+| FR-SRCH-05 | 搜尋離線且結果具版本與 queryId | 舊結果不可覆蓋新輸入，無查詢上傳及 runtime AI |
 
 ## 07 導航狀態與一致性
 
@@ -552,7 +566,7 @@ P0 不顯示步行時間估計。未建立可驗證時間模型前，不提供�
 
 ### 10.1 RouteOptions
 
-`mobilityProfile` 為 `standard`／`stepFree`；`preference` 為 `shortest`／`easyToUnderstand`，後者 P1 才可啟用。`unavailableConnectorIds` 為本次 session 使用者回報不可用設備；`allowedZoneIds` 在 P0 固定僅公共示範區，不開放任意付費區通行。
+`mobilityProfile` 為 `standard`／`stepFree`；P0 preference 僅 shortest，P1 可啟用 easyToUnderstand，以及有完整時間模型才可用的 fastest。`unavailableConnectorIds` 為本次 session 使用者回報不可用設備；`allowedZoneIds` 在 P0 固定僅公共示範區。P1 excludedEdgeTypes 只能追加禁止類型，不可放寬 mobilityProfile。
 
 UI 的「無障礙」對應 `stepFree`，文字說明是「依已核對資料避開樓梯與電扶梯，優先可及電梯」，不是對所有障別或即時狀態保證。
 
@@ -560,7 +574,7 @@ UI 的「無障礙」對應 `stepFree`，文字說明是「依已核對資料避
 
 1. 驗證起終點存在且 enabled，圖版本可用。
 2. 排除 status 非 open、未符合部署驗證模式的邊。
-3. 排除不允許區域、方向不存在或 session 不可用 connector。
+3. 排除不允許區域、方向不存在、session 不可用 connector，以及 P1 excludedEdgeTypes 中的邊。
 4. `stepFree` 額外排除 stairs、escalator，並要求 step_free=yes 且 wheelchair_passable=yes；任何 unknown 不得視為 yes。
 5. 在剩餘有向圖上計算最短路徑；無候選即返回 NoRoute，不放寬上述條件。
 
@@ -922,6 +936,8 @@ CI 應列出 lockfile、assets、endpoint、CDN、模型與授權清單，對照
 | VoiceService | 指令音檔解析、token、中止與播放狀態 | 路線推進及位置推測 |
 | MapView | 同層底圖、變換與路徑呈現 | 自行重算另一條路 |
 | PreferencesStore | 本機語言、模式與靜音 | 保存個資、相機圖或自動恢復定位 |
+| CandidateRoutePlanner／RouteRanker（P1） | 同可行圖候選、時間門檻及可解釋排序 | 放寬硬限制或聲稱全圖認知最優 |
+| DictionaryRepository／DestinationSearch（P1） | 核准七語 alias、有限意圖、有界 fuzzy 及可達排名 | runtime AI、上傳查詢或猜出口編號 |
 
 ### 17.2 核心介面
 
@@ -1020,27 +1036,136 @@ P95 使用排序後 nearest-rank 法；10 次取第 10 筆，100 次取第 95 �
 
 QR parser 限制 1024 bytes、欄位及型別；不支援任意 URL 跳轉。資產路徑限定 manifest 中的相對位置，拒絕 `..`、絕對路徑及外部 scheme。正式 QR 部署需管理單位許可、實際點位核對及維護；原型不能解決遭移貼的合法碼。
 
-## 21 P1 認知友善路線與 ML
+## 21 多目標認知路線與離線目的地搜尋
 
-### 21.1 P1 規則基線
+本節依使用者最新補充擴充為兩個 P1 高價值工作包：多目標候選路線與離線語意目的地搜尋。兩者不需要 runtime LLM、不呼叫語意 API，並沿用七語、來源限制及既有 P0。這是規格增補，不代表演算法、詞典或測試已實作。
 
-先以與 P0 完全相同的可行圖產生 2–5 條 simple candidate paths；工程預設採 Yen K-shortest paths，K=3，最多 5。候選不得含 cycle，成本不得超過最短可行路徑的 1.5 倍；此為工程預設繞路上限，不是研究證實的最佳門檻。
+### 21.1 可行圖與多候選路線
 
-特徵：相對成本或可靠 distance_m、turn_count、complex_junction_count、floor_change_count、instruction_count、landmark_count、ambiguous_segment_count、gate_transfer_count。不得以 null 公尺填 0，或從未驗證地標推得優勢。
+先依第 10 節建立相同硬限制的有向可行圖。一般／無障礙、區域、封閉／未知狀態、電扶梯方向、session 不可用設備一律先過濾，排序階段無權加回。
 
-第一版規則分數預設為 `2×turns + 2×complexJunctions + 3×floorChanges + 3×ambiguousSegments + gateTransfers - min(landmarks,3)`；越低越優。只在候選成本上限內比較，同分以總成本，再以 edge ID 序列排序。權重標示為 rule_baseline_v1、示範參數，必須公開可重現，不能說是訓練模型。
+單次 Dijkstra／A* 求一條對指定成本最優的路徑；多條候選需額外枚舉機制。本版工程預設用 Yen K-shortest simple paths，內層呼叫 Dijkstra，每種已啟用目標 K=3；以 edge ID 序列去重，最終最多保留 5 條有效路線。若只能找到 1 條就顯示 1 條，不憑空生成第二條。
 
-候選圖的「複雜岔路」工程預設定義為可行圖內可離開邊數 ≥3 的 decision node，計數時排除立即原路返回方向；計算規則須在 fixture 固定。若候選完全相同，只顯示一條，不能換顏色充當第二種路線。
+有時間模型時分別以 routing_cost、travel_time_s 產生候選；保證保留兩個目標各自最佳路線，其餘依 routing_cost、edge ID 序列補滿上限。所有候選都不能含循環。路線需具完整可用的方向／地標指令，否則不得直接開始；摘要可標「指引尚不可用」。
 
-### 21.2 解釋與降級
+A* 可作後續等價替換，但 heuristic 必須針對該成本可證明不高估；未校準的跨層像素不適合當時間或公尺 heuristic，無可信 heuristic 時取 0，相當於 Dijkstra。測試結果須與基準一致。
 
-顯示「少 2 次轉彎」「多 1 次換層」等直接從資料計算的差異；不顯示憑空生成的安心分數或降低迷路率百分比。UI 名稱為「容易理解」，避免「安心」暗示安全保證。P1 失敗、無適當候選或資料不足時，返回最短可行路徑並標示目前無其他可比較路線。
+### 21.2 最快與最短的資料門檻
 
-### 21.3 未來 ML 門檻
+P1 可新增 edge `travel_time_s`（有限正數或 null）、`time_model_id`；package 新增 time model 版本、來源、核對日期、適用情境及失效狀態。電梯時間須包含已建模等待／搭乘假設，不能只拿垂直距離除一般步速。
 
-只有取得真實標註、明確受測條件與保留測試集時才可稱 ML。模型輸入與輸出具版本；以受測者／場景分組避免洩漏，依任務選 MAE、Spearman 或 pairwise accuracy，另記錄任務成功、走錯次數及完成時間。不得用規則生成標籤再宣稱學到真實理解難度。
+保守門檻：本次可行圖的全部邊均具有相同可用時間模型且未失效，才啟用 `fastest`；任何邊時間未知，不得只排除未知邊後宣稱找到整張圖最快路線。缺資料時 UI 顯示「最短」並說明「目前無可靠時間估計」。
 
-模型本地或離線預計算，不能引入 runtime API；模型及衍生權重同樣受第 16 節來源限制。模型永遠只排序已驗證可行路線，不能增加邊或降低無障礙限制。未通過來源、資料與效果審查時不打包模型，P0 不受影響。
+「最快」指靜態模型估計時間最少，不是即時人流、電梯故障或保證實際抵達時間。時間有完整依據才顯示估計秒／分；distance_m 未校準仍不能顯示公尺。P0 及未通過此門檻的 P1 均維持不顯示時間。
+
+RouteOptions 在 P1 增加 `fastest`，與 `shortest`、`easyToUnderstand` 並列。未啟用時間模型卻請求 fastest，回 UnsupportedOptions 並請使用者確認改選 shortest；不靜默改變偏好。
+
+### 21.3 容易理解的規則式排序
+
+特徵包含距離或相對成本、turn_count、complex_junction_count、floor_change_count、instruction_count、landmark_count、ambiguous_segment_count、gate_transfer_count；未知公尺不能補 0，未核對地標不能算優勢。
+
+工程預設規則：
+
+```text
+R(P) = 2*turns + 2*complexJunctions + 3*floorChanges
+       + 3*ambiguousSegments + gateTransfers - min(landmarks,3)
+```
+
+複雜岔路是在該可行圖中，排除立即原路返回方向後仍至少有 3 條可離開邊的 decision node。只有第 11 節指令生成器已定義的轉向才計 turn；地標須對當前進入方向可見且有驗證，不能只數節點掛了幾個名稱。
+
+容易理解候選的 `routing_cost ≤ shortest.routing_cost × 1.5`，有完整時間模型時另要求 `time ≤ fastest.time × 1.5`；均為示範工程上限，非研究證明。先移除被成本與 R 同時支配的候選，再選 R 最低、同分選 routing_cost 最低，再按 edge ID 序列排序。模型失敗或無其他候選時回到有效 shortest 摘要，明示易懂排序不可用。
+
+分數來源標 `rule_baseline_v1`。UI 稱「容易理解」，說明為「候選路線中的規則評估」，不宣稱全圖認知成本最優或已證實降低迷路率。可顯示可核對的「少 2 次轉彎」「少 1 次換層」「經過電梯標誌」；相同路徑只顯示一張卡，不換色冒充差異。
+
+### 21.4 候選介面與一致性
+
+```text
+CandidateRoutePlanner.generate(RouteRequest, GraphSnapshot) -> CandidateRouteResult
+RouteRanker.compare(candidates, RankingConfig) -> RankedRouteComparison
+```
+
+結果至少包含 requestId、graphVersion、optionsSnapshot、timeModelVersion、rankingVersion、candidateRoutes、shortestRouteId、fastestRouteId（可 null）、easyRouteId（可 null）、可解釋特徵與降級原因。它沿用 Route／NavigationPlan 契約，不自建另一套位置狀態。
+
+比較卡顯示可用的「估計最快／最短」及「容易理解」，由使用者選擇後才建立 active NavigationPlan。語言切換只換呈現，不改候選；新掃碼、目的地、mobility、不可用設備或圖版本變更均使舊候選失效。候選快取包含上述條件及排名／時間模型版本，不只以起終點當 key。
+
+### 21.5 離線語意搜尋的範圍
+
+本版 NLP 是可解釋的詞典概念對應、字串近似與有限意圖，不是任意自然語言理解。將「洗手間」「廁所」「toilet」「restroom」對應到 `facility.restroom`，再查同一份實際 POI，避免每個別名造出重複設施。
+
+詞典涵蓋七語，跨所有已核准 alias 搜尋；UI 語言只作同分排序偏好及結果呈現，不限制可查語言。每個 alias 含 locale、text、concept_id 或 poi_id、來源及 review_status；只有 approved 項進 release 詞典。七語完整詞典仍須逐語核對，以下範例不代表外語詞庫已建立。
+
+concept_id 是搜尋詞彙的命名空間（例如 facility.restroom），不屬於第 09 節 Graph entity ID；每一 alias 必須且只能設定 concept_id 或 poi_id 其中之一。concept 需在詞典 concepts 清單定義其 POI 類別／必要屬性，poi_id 必須引用實際啟用 POI；不存在引用、正規化後同詞對到多個概念須報驗證錯誤或明確列為歧義，不依陣列先後偷偷選一個。
+
+```json
+{
+  "dictionary_version": "1.0.0",
+  "aliases": [
+    {"locale": "zh-TW", "text": "廁所", "concept_id": "facility.restroom", "review_status": "draft"},
+    {"locale": "zh-TW", "text": "洗手間", "concept_id": "facility.restroom", "review_status": "draft"},
+    {"locale": "en", "text": "toilet", "concept_id": "facility.restroom", "review_status": "draft"},
+    {"locale": "en", "text": "restroom", "concept_id": "facility.restroom", "review_status": "draft"}
+  ]
+}
+```
+
+### 21.6 正規化與錯字容忍
+
+輸入上限 80 個 Unicode code points，NFKC 展開後也必須 ≤80；去前後空白、字母小寫、合併重複空白，保留 rawQuery 以供本機本次顯示。正式地標及出口原文不被改寫。變音符號保留作第一層精確比對；越南文等不能先全面去音調再假稱同一字。
+
+匹配順序固定：POI 名稱／明確編號精確→核准 alias 精確→完整詞組／核准詞邊界匹配→有界 fuzzy。中文及泰文不要求空白切詞，以字典最長詞組處理；不以任意 substring 將一段文字硬套設施，需保留已消耗及未理解的片段。
+
+Fuzzy 預設使用自行實作的 Optimal String Alignment 編輯距離，插入、刪除、替換及相鄰交換各 1；以正規化 Unicode code points 計算，不以 UTF-16 code units。長度 <4 的 alias 不模糊；4–7 最大 1；≥8 最大 2，且 distance／maxLength ≤0.30。出口編號、QR／節點 ID、樓層碼永遠精確，不 fuzzy。
+
+例：`restrom` 可建議 restroom；`toielt` 可由一次相鄰交換建議 toilet。低信心或同距離多個概念時列出「你是指…？」供確認，不自動導航。去音調可作低優先建議層，須單獨標 match_type，不覆蓋精確結果；不將「錯字容忍」宣稱可理解任意拼錯的七語句子。
+
+### 21.7 簡單意圖與通行條件
+
+僅辨識經七語校對的白名單詞組：設施／地標、最近、無障礙設施、避樓梯、指定已知樓層。目的地、POI 類別與路線需求分開保存；解析結果先顯示 chips 與原文，再由使用者確認，不因打一段字就開始走。
+
+| 例子 | 解析與限制 |
+| --- | --- |
+| `toilet`／`洗手間` | facility.restroom；若有多個設施顯示候選，不擅選 |
+| `nearest restroom` | restroom＋nearest；須有確認起點，按 Graph 成本排名 |
+| `accessible toilet` | accessible_facility=true＋proposedOptions.stepFree，先按此需求算預覽，確認後才套用導航 |
+| `不要樓梯` | 新增 excluded_edge_types=[stairs]，不等同使用者自稱輪椅；不能刪除既有 stepFree 條件 |
+| `不是廁所`、`不要無障礙` | 否定／衝突需澄清，不套肯定關鍵詞，不默默解除既有需求 |
+| 未知出口編號／不存在設施 | 無精確目的地，顯示查無結果與類別入口，不建虛構 POI |
+
+P1 RouteOptions 增加 `excludedEdgeTypes`，只能進一步縮小可行圖，不覆寫 stepFree 的硬條件。搜尋「無障礙廁所」時同時過濾設施本身的 accessible_facility 及路線可及性；無匹配就清楚提示，不能換一般廁所。
+
+合併契約為 `proposedOptions = 現有硬限制 ∪ 已辨識新增限制`。搜尋預覽與可達性／Graph 排名使用 proposedOptions；確認後才發布為 active options。accessible toilet 即使目前為 standard，也按 stepFree 檢查，只有樓梯可達者不得列可達。拒絕建議需求時回澄清／重新選擇，不保留「無障礙廁所」標籤卻偷偷改一般路線。
+
+不支援的比較、否定範圍、混合多個目的地或剩餘文字含未理解條件，回 needsClarification；不能只取其中已知詞而捨棄可能重要需求。搜尋不從國籍／年齡推測語言或能力。
+
+### 21.8 POI 排名與搜尋結果契約
+
+```text
+DestinationSearch.search(SearchRequest, DictionarySnapshot, GraphSnapshot) -> SearchResult
+```
+
+SearchRequest 包含 queryId、rawQuery、uiLocale、dictionaryVersion、intentRulesVersion、graphVersion、confirmedOrigin（可 null）、originConfirmationToken（可 null）、目前 RouteOptions。SearchResult 另保存 proposedOptions 完整 snapshot，並包含 queryId、normalizedQuery、recognizedIntents、unparsedTerms、status、matches、建議及版本；status 為 matched／suggestionsOnly／needsClarification／noMatch／invalidInput／incomplete。
+
+每個 match 具 poiId、conceptId、matchedAlias、aliasLocale、matchType、editDistance、需求符合狀態、reachability、graphCost（未知時 null）。不生成虛構的機率信心；以 exact／alias／fuzzy 等可核對證據分級。
+
+一般搜尋依匹配層級、編輯距離、已確認的可達性與成本、UI 語系偏好、poiId 排序；nearest 意圖在需求匹配後，以可行 Graph 成本為主。沒有可靠位置時標「距離未知，請先掃碼」，不使用直線距離或把上次走動前的位置稱為即時最近。不可達結果可列為不可達且不能點「開始」，不能以直線近覆蓋路網不通。
+
+nearest 前必須重新掃碼，或明確按「我仍在此定位點」；本次搜尋流程建立 originConfirmationToken，包含 anchor、session、導航 revision、確認方式與時間。前進導航步驟、掃新碼、改起點或結束搜尋即失效；未確認只列設施、不標最近。文字使用「以您確認的位置排序」，不宣稱有持續感測使用者實際位置。
+
+搜尋輸入可 debounce 150ms，較晚完成的舊 queryId 不得覆蓋新字串結果。使用者點選並確認解析需求後才進原 RoutePlanner；此步核對 queryId、graph／dictionary／intentRules 版本、完整 proposedOptions（含 excludedEdgeTypes）及 origin token 均一致，否則重算。語音只播放選定 POI 導航的既有七語句，不即時念任意搜尋輸入。
+
+### 21.9 詞典封裝、隱私與效能
+
+P1 package 加 `assets/search/dictionary.json`、`intent_rules.json`、`dictionary_version`、`intent_rules_version` 及 hash；只有啟用搜尋擴充才要求這些檔，P0 不因尚無詞典失敗。詞典、規則、可選索引隨靜態包／宿主 bundle，runtime 不走 CDN、embedding API、翻譯 API 或 LLM。
+
+新增套件不是必要條件；純 TypeScript 匹配優先，任何第三方字典／fuzzy library 須先完成非中國來源、授權與再散布審查。查詢字串僅在記憶體使用，不上傳、不新增歷史或分析追蹤。只在使用者需要 nearest／可達排名時讀本 session 已確認節點，不請求 GPS。
+
+工程效能目標：1000 POI／5000 alias 測試資料，20–80 code points 的有效查詢，warm search p95 ≤100ms（100 次，不含 150ms debounce），在 Android／iOS 實際 WebView 記錄。不能以效能截斷搜尋後假稱「確定不存在」；若達安全運算預算須回 incomplete 狀態並提供類別入口。這是待驗證目標，不是目前測試成績。
+
+### 21.10 未來 ML 門檻
+
+只有取得真實標註、明確受測條件與保留測試集時才可稱 ML。路線模型以受測者／場景分組避免洩漏，依任務選 MAE、Spearman 或 pairwise accuracy；不得以規則生成標籤再宣稱學到真實理解難度。
+
+本地或離線預計算模型同樣受來源限制。排序模型不能增加通道或放寬需求；搜尋詞典及 fuzzy 版也不冒稱學習型 NLP。未通過模型資料、來源與效果審查時，不打包模型，規則版與 P0 可獨立運作。
 
 ## 22 測試資料與案例
 
@@ -1115,6 +1240,19 @@ QR parser 限制 1024 bytes、欄位及型別；不支援任意 URL 跳轉。資
 | T-E2E-01 | 兩 QR 起點、四目的地、跨層、重掃、抵達 | 至少兩組完整閉環實機通過 |
 | T-P1-01 | 最短與易懂候選相同或 ranker 失敗 | 只有有效最短路，不造差異 |
 | T-P1-02 | 認知分數偏好含樓梯路線、使用者 stepFree | 樓梯從候選階段已排除，模型無權恢復 |
+| T-MO-01 | 圖有多路徑、同路徑重複生成、圖只有一路 | 2–5 條去重 simple paths，只有一路則如實顯示 |
+| T-MO-02 | 某可行邊缺 travel_time_s 或時間模型失效 | fastest 不可用，不排除未知邊後冒稱最快 |
+| T-MO-03 | 最短／最快不同，易懂路徑超過 1.5 倍上限 | 分別保留各目標最佳，過度繞路不得當易懂推薦 |
+| T-MO-04 | A* heuristic=0 與 Dijkstra、同分路線 | 最佳成本與確定性 tie-break 一致 |
+| T-SRCH-01 | 洗手間、廁所、toilet、restroom | 同概念及同一組 POI，不產生重複設施 |
+| T-SRCH-02 | restrom、toielt、短詞、出口代碼拼錯 | 合規 typo 僅建議，短詞及代碼不模糊猜測 |
+| T-SRCH-03 | 七語別名跨 UI locale、泰文無空格、越南變音 | 可查核准 alias，保留精確語意，不按 UI 限制語言 |
+| T-SRCH-04 | accessible toilet、不要樓梯、不是廁所、衝突需求 | 顯示待確認 chips／澄清，不解除 stepFree、不默認一般廁所 |
+| T-SRCH-05 | 直線近但不連通、Graph 較遠可達、無確認起點 | 依可達成本排序；缺起點不聲稱最近 |
+| T-SRCH-06 | 新字串後舊搜尋才完成、辭典／圖版本變更 | 不套過期結果；重算前不直接導航 |
+| T-SRCH-07 | 斷網查詢、超長輸入、未核准 alias、運算中斷 | 離線可用、超限拒絕、不載未核准詞；中斷回 incomplete 而非 noMatch |
+| T-SRCH-08 | 目前 standard，搜尋 accessible toilet，設施本身可及但只有樓梯可達 | 以 proposed stepFree 預覽，不列可達，確認前不改 active options |
+| T-SRCH-09 | nearest 無新確認、確認後導航前進、NFKC 展開超過 80 | 無有效 origin token 不標最近；步驟前進使 token 失效；正規化前後均檢查長度 |
 
 ### 22.3 測試分層
 
@@ -1143,6 +1281,7 @@ QR parser 限制 1024 bytes、欄位及型別；不支援任意 URL 跳轉。資
 | GATE-05 來源與權利 | 無 unverified 依賴／素材；模型、服務及輸出權利通過 | 排除或換已核准來源，不降低限制 |
 | GATE-06 離線與穩定 | 新安裝關網完成、連續三次主流程、30 分鐘壓力操作 | 不宣稱完全離線與 Demo Ready |
 | GATE-07 交付文件 | build hash、package、QR 對照、README、授權、測試結果 | 補齊後才交付 |
+| GATE-08 P1 擴充（啟用才適用） | T-MO／T-SRCH、時間模型或降級、七語詞典來源與版本 | 未通過則不宣稱對應擴充完成，不影響獨立 P0 驗收 |
 
 這些 gate 是未來產品驗收，不是本次 SPEC 能否提交的門檻。提交規格只代表要求已定義，不能將表格勾成 App 已通過。
 
@@ -1213,6 +1352,7 @@ docs/acceptance/
 | WP-06 語音 | WP-05、語音權利核准 | manifest、168 檔、VoiceService；T-AUD |
 | WP-07 交付整合 | WP-03 至 WP-06 | 官方入口、release、README；T-OFF、T-E2E、T-SRC |
 | WP-08 P1 擴充 | 全部 P0 穩定 | 候選排序／最近設施；T-P1 |
+| WP-09 P1 離線搜尋 | WP-01、WP-02、WP-05、核准七語詞典 | DestinationSearch、字典／意圖資料、確認 UI；T-SRCH |
 
 ## 25 建置交付與維護
 
@@ -1319,7 +1459,8 @@ Repo 的[競賽指南](./2026-fall-competition-guide.md)記錄官方線上規則
 | 快速製作多語介面及語音 | 第 14 節 | catalog、批次工作、審查及可續跑工具契約 |
 | 絕不採中國相關資源 | 第 16、20、23 節 | T-SRC-01、T-PRIV-01，GATE-05 |
 | 預生成而非即時 AI | 第 14、15 節 | T-OFF、T-AUD、runtime 連線檢查 |
-| 認知理解難度排序 | 第 21 節，P1 | T-P1，明確 rule／ML 標示 |
+| 多目標認知路線 | 第 21.1–21.4 節，P1 | T-MO、T-P1，時間門檻與 rule／ML 標示 |
+| 離線七語目的地搜尋 | 第 21.5–21.9 節，P1 | T-SRCH，詞典、typo、意圖與可達排名 |
 | 24 小時可 Demo 與交付 | 第 23–26 節 | GATE-01 至 07、T-E2E |
 | 官方資料、開源與部署許可 | 第 09、12、16、25 節 | provenance、QR 許可與驗證報告 |
 
