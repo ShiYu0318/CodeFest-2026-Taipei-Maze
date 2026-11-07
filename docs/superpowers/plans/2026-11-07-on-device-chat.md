@@ -9,10 +9,10 @@
 
 ## Tasks
 
-- [ ] Implement and test correlated web bridge (timeouts, late results, cancellation, bounded input), bounded in-memory chat state and accessible floating panel with truthful native/model status.
-- [ ] Add native origin-gated bridge; official LiteRT-LM iOS/Android integration with bounded local generation and explicit model setup/import, no network inference.
-- [ ] Add user-initiated, local-only speech recognition on both platforms; draft-only transcript, stop/cancel/background cleanup and text fallback.
-- [ ] Verify web tests/lint/build and native analysis/build/tests available locally; obtain review, fix issues, update provenance and docs, segmented commits/push/merge.
+- [x] Implement and test correlated web bridge (timeouts, late results, cancellation, bounded input), bounded in-memory chat state and accessible floating panel with truthful native/model status.
+- [x] Add native origin-gated bridge; official LiteRT-LM iOS/Android integration with bounded local generation and explicit model setup/import, no network inference.
+- [x] Add user-initiated, local-only speech recognition on both platforms; draft-only transcript, stop/cancel/background cleanup and text fallback.
+- [x] Verify web tests/lint/build and native analysis/build/tests available locally; obtain review, fix issues, update provenance and docs, segmented commits/push/merge. (Done in PR #3/#7; real-device inference, latency and microphone remain not_run.)
 
 ## Acceptance / limitations
 

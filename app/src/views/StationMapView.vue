@@ -270,6 +270,16 @@
               >{{ label }}</a
             >
           </div>
+          <p class="station-data-status">
+            資料狀態：{{ dataStatus.points }} 個標點、{{
+              dataStatus.connections
+            }}
+            條樓層連接（{{ dataStatus.unverifiedConnections }}
+            條待現場核對），尚無步行路網。
+          </p>
+          <router-link to="/about" class="station-about-link"
+            >原始碼與授權 · 版本 {{ buildInfo.short }}</router-link
+          >
         </footer>
       </div>
     </div>
@@ -295,6 +305,7 @@ import ZhuyinText from "../components/ZhuyinText.vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { useStationLocation } from "../station/useStationLocation";
 import { stationPoints } from "../station/scan.mjs";
+import { buildInfo, summarizeStationData } from "../about/about.mjs";
 import { floors, stackBounds } from "./station-floor-plans";
 import stationData from "./station-points.json";
 import stationConnections from "./station-connections.json";
@@ -517,6 +528,7 @@ const backgroundLayers = computed(() => {
     ];
   });
 });
+const dataStatus = summarizeStationData(stationData, stationConnections);
 const sources = computed(() => [
   [
     "台北捷運 " + level.value + " 資訊圖",
