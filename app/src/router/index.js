@@ -24,6 +24,12 @@ const routes = [
     component: TestPage,
   },
   {
+    path: "/about",
+    name: "about",
+    meta: { title: "原始碼與授權" },
+    component: () => import("../views/AboutView.vue"),
+  },
+  {
     path: "/station-map",
     name: "station-map",
     meta: { title: "台北車站地下導航" },

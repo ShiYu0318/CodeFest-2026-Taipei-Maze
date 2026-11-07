@@ -97,7 +97,7 @@ const timeText = computed(
   margin: 0 auto;
   min-height: 100dvh;
   box-sizing: border-box;
-  padding: 0 16px max(48px, env(safe-area-inset-bottom));
+  padding: 0 16px calc(88px + env(safe-area-inset-bottom));
   text-align: left;
   color: var(--meeting-ink);
   background: var(--surface);
