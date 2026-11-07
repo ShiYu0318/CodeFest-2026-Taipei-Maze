@@ -635,7 +635,14 @@ const availableThemes = computed(() =>
   )
 );
 const bounds = computed(() => {
-  return showLayers.value ? stackBounds : floors[level.value].bounds;
+  const floor = floors[level.value];
+  const [left, top, width, height] = showLayers.value
+    ? stackBounds
+    : floor.bounds;
+  const [x, y] = floor.center;
+  const halfWidth = Math.max(x - left, left + width - x);
+  const halfHeight = Math.max(y - top, top + height - y);
+  return [x - halfWidth, y - halfHeight, 2 * halfWidth, 2 * halfHeight];
 });
 const backgroundLayers = computed(() => {
   if (!showLayers.value) return [];
@@ -920,10 +927,10 @@ function ignoreDragClick(event) {
   event.stopPropagation();
 }
 
-function resetZoom() {
+function resetZoom(scale = 1) {
   clearPinch();
   webkitPinch = null;
-  return zoomAt(1, [0, 0], [0, 0]);
+  return zoomAt(scale, viewportCenter(), [0.5, 0.5]);
 }
 
 function zoomWithWheel(event) {
@@ -1094,9 +1101,8 @@ async function showFloor(floor, { arrival, origin } = {}) {
     } else if (!availableThemes.value.includes(activeTheme.value)) {
       activeTheme.value = null;
     }
-    await resetZoom();
+    await resetZoom(initialMapZoom);
     if (!frame.isConnected) return;
-    if (!origin) await zoomAt(initialMapZoom, viewportCenter());
     if (origin) await zoomAt(origin.scale, viewportCenter(), origin.center);
     else if (arrival)
       await zoomAt(scale, viewportCenter(), normalizedPoint(arrival.point));
