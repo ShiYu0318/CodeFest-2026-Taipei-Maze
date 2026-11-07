@@ -130,6 +130,7 @@ export default {
     "仍在等待舊掃碼回覆。請先關閉原生掃碼頁，必要時關閉並重新進入服務。",
   "notice.SendFailed": "無法啟動掃碼。請關閉並重新進入服務後再試。",
   "notice.InvalidReply": "App 回傳格式不正確，原位置保持不變。",
+  "notice.ScanFailed": "無法處理掃描結果，請重新掃描。",
   "notice.unsupportedCode": "不是本地圖支援的定位碼，原位置與目的地保持不變。",
   "notice.resetUrlFailed": "網址同步失敗，請移除 point 參數後重新開啟地圖。",
   "notice.suspended": "掃碼已暫停，原位置保持不變。請先關閉原生掃碼頁。",

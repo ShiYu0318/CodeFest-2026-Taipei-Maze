@@ -11,6 +11,7 @@ function channelFor(bridge) {
     pending: null,
     timer: null,
     draining: false,
+    seenEvents: new WeakSet(),
   };
   channel.finish = (result) => {
     clearTimeout(channel.timer);
@@ -19,6 +20,11 @@ function channelFor(bridge) {
     pending?.resolve(result);
   };
   channel.onReply = (event) => {
+    // iOS may deliver the same event through onmessage and its listener array.
+    if (event && typeof event === "object") {
+      if (channel.seenEvents.has(event)) return;
+      channel.seenEvents.add(event);
+    }
     let reply;
     try {
       reply = JSON.parse(event.data);
@@ -38,6 +44,32 @@ function channelFor(bridge) {
         ? { type: "success", payload: reply.data }
         : { type: "InvalidReply" }
     );
+  };
+  channel.subscribe = () => {
+    const previous = bridge.onmessage;
+    const receiver = (event) => {
+      channel.onReply(event);
+      if (typeof previous === "function") {
+        try {
+          previous.call(bridge, event);
+        } catch {
+          // One unrelated receiver must not stop native delivery to this page.
+        }
+      }
+    };
+    // TownPass's WebMessageListener also supports this documented callback.
+    if ("onmessage" in bridge) {
+      try {
+        bridge.onmessage = receiver;
+      } catch {
+        // Read-only implementations still support the event listener below.
+      }
+    }
+    bridge.addEventListener("message", channel.onReply);
+    channel.unsubscribe = () => {
+      bridge.removeEventListener("message", channel.onReply);
+      if (bridge.onmessage === receiver) bridge.onmessage = previous;
+    };
   };
   channels.set(bridge, channel);
   return channel;
@@ -62,8 +94,7 @@ export function createQrBridge(native, timeoutMs = 60_000) {
       return false;
     bridge = candidate;
     channel = channelFor(bridge);
-    if (!channel.users.size)
-      bridge.addEventListener("message", channel.onReply);
+    if (!channel.users.size) channel.subscribe();
     channel.users.add(owner);
     return true;
   }
@@ -101,8 +132,7 @@ export function createQrBridge(native, timeoutMs = 60_000) {
         channel.finish({ type: "Cancelled" });
       }
       channel.users.delete(owner);
-      if (!channel.users.size)
-        bridge.removeEventListener("message", channel.onReply);
+      if (!channel.users.size) channel.unsubscribe();
     },
   };
 }

@@ -148,6 +148,7 @@ export default {
     "스캐너를 열 수 없습니다. 서비스를 닫았다가 다시 연 뒤 시도하세요.",
   "notice.InvalidReply":
     "앱의 응답 형식이 올바르지 않습니다. 위치는 그대로입니다.",
+  "notice.ScanFailed": "스캔 결과를 처리할 수 없습니다. 다시 스캔해 주세요.",
   "notice.unsupportedCode":
     "이 지도에서 쓰는 위치 코드가 아닙니다. 위치와 목적지는 그대로입니다.",
   "notice.resetUrlFailed":
