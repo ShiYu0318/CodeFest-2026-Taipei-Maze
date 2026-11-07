@@ -17,11 +17,11 @@
           stroke-linejoin="round"
         />
       </svg>
-      <span>深色模式</span>
+      <ZhuyinText text="深色模式" />
       <span class="display-switch-track" aria-hidden="true"></span>
     </button>
     <label class="display-mode-label">
-      <span>介面模式</span>
+      <span><ZhuyinText text="介面模式" /></span>
       <select
         :value="displayMode"
         @change="setDisplayMode($event.target.value)"
@@ -37,6 +37,7 @@
 <script setup>
 import { onBeforeUnmount, onMounted, watch } from "vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
+import ZhuyinText from "./ZhuyinText.vue";
 import "../display/display-preferences.css";
 
 const { theme, displayMode, toggleTheme, setDisplayMode } =

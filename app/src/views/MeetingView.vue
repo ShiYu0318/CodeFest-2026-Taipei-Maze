@@ -7,47 +7,58 @@
     :data-display-mode="displayMode"
   >
     <DisplayControls />
-    <router-link to="/station-map">← 回車站地圖</router-link>
-    <h1>朋友分享的集合點</h1>
+    <router-link to="/station-map"
+      >← <ZhuyinText text="回車站地圖"
+    /></router-link>
+    <h1><ZhuyinText text="朋友分享的集合點" /></h1>
     <p v-if="displayMode === 'child'" class="display-hint">
-      這是朋友約好的地方，不是你現在的位置。
+      <ZhuyinText text="這是朋友約好的地方，不是你現在的位置。" />
     </p>
     <p class="banner">
-      合成場景示範，不是北車實際等候地點。分享者位置非即時資訊。
+      <ZhuyinText
+        text="合成場景示範，不是北車實際等候地點。分享者位置非即時資訊。"
+      />
     </p>
     <section v-if="resolved.type === 'success'">
-      <h2>{{ graph.messages[resolved.point.name_key] }}</h2>
+      <h2><ZhuyinText :text="graph.messages[resolved.point.name_key]" /></h2>
       <p>
         <strong>{{ resolved.node.floor_id.toUpperCase() }}</strong> ·
-        {{ resolved.point.original_signage }}
+        <ZhuyinText :text="resolved.point.original_signage" />
       </p>
-      <p>{{ graph.messages[resolved.point.waiting_guidance_key] }}</p>
       <p>
-        分享者定位確認時間：{{
-          resolved.confirmedAt
-        }}（來自分享端，未經伺服器驗證）
+        <ZhuyinText
+          :text="graph.messages[resolved.point.waiting_guidance_key]"
+        />
       </p>
-      <p role="status">{{ timeText }}</p>
+      <p>
+        <ZhuyinText text="分享者定位確認時間" />：{{ resolved.confirmedAt
+        }}<ZhuyinText text="（來自分享端，未經伺服器驗證）" />
+      </p>
+      <p role="status"><ZhuyinText :text="timeText" /></p>
       <NavigationDemoMap
         :graph="graph"
         :floor-id="resolved.node.floor_id"
         :destination-node-id="resolved.node.id"
       />
       <p>
-        這是目的地，不是你的位置。請先與朋友確認仍在等候；開始時需掃你自己附近的定位碼。
+        <ZhuyinText
+          text="這是目的地，不是你的位置。請先與朋友確認仍在等候；開始時需掃你自己附近的定位碼。"
+        />
       </p>
       <router-link class="primary" :to="navigationTarget"
-        >帶我到這個集合點（合成導航）</router-link
-      >
+        ><ZhuyinText text="帶我到這個集合點（合成導航）"
+      /></router-link>
       <p>
         一般瀏覽器可查看此卡，沒有城市通橋接時只能使用明確標示的合成測試定位。未驗證自動開啟城市通，不會自行跳轉外部
         App。
       </p>
     </section>
     <section v-else role="alert">
-      <h2>集合連結無法使用</h2>
+      <h2><ZhuyinText text="集合連結無法使用" /></h2>
       <p>
-        格式、版本或點位可能不支援，請向分享者取得新連結。未載入任何位置或路線。
+        <ZhuyinText
+          text="格式、版本或點位可能不支援，請向分享者取得新連結。未載入任何位置或路線。"
+        />
       </p>
     </section>
   </main>
@@ -56,6 +67,7 @@
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import DisplayControls from "../components/DisplayControls.vue";
+import ZhuyinText from "../components/ZhuyinText.vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import graph from "../navigation/demo-graph.json";
 import points from "../meeting/meeting-points.json";
