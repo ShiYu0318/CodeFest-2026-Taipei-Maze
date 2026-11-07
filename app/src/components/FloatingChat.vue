@@ -532,8 +532,8 @@ function grow() {
 function ask(text) {
   if (busy.value || listening.value) return;
   draft.value = text;
-  if (modelReady.value) send();
-  else nextTick(grow);
+  // Offline answers work without the model, so a suggestion always sends.
+  send();
 }
 function composerKey(event) {
   if (!shouldSendOnEnter(event)) return;
