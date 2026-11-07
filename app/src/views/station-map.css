@@ -973,9 +973,45 @@
   padding: 16px;
   border-top: 1px solid var(--border);
   overflow-wrap: anywhere;
-  font-size: var(--display-main-size);
+  font-size: var(--display-main-size, 0.9375rem);
   line-height: 1.65;
+}
+.display-facility-detail h3 {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
 }
 .display-facility-detail p {
   margin-top: 8px;
+}
+
+.station-page .facility-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--display-control-height, 44px);
+  margin-top: 12px;
+  padding: 8px 18px;
+  border: 1px solid var(--tp-primary-600);
+  border-radius: var(--tp-radius-button, 10px);
+  background: var(--tp-primary-600);
+  color: #fff;
+  font-weight: 600;
+}
+.station-page[data-theme="dark"] .facility-go {
+  color: var(--tp-primary-950);
+}
+.station-page .facility-go svg {
+  width: 18px;
+  height: 18px;
+}
+.station-page .facility-staff {
+  min-height: var(--display-control-height, 44px);
+  margin: 12px 0 0 8px;
+  padding: 8px 16px;
+  border: 1px solid var(--tp-primary-500);
+  border-radius: var(--tp-radius-button, 10px);
+  background: var(--surface);
+  color: var(--tp-primary-700);
+  font-weight: 600;
 }

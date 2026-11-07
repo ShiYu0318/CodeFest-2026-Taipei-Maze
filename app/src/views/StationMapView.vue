@@ -324,9 +324,7 @@
               </section>
             </div>
             <div
-              v-if="
-                selected && !isConnector(selected) && displayMode !== 'standard'
-              "
+              v-if="selected && !isConnector(selected)"
               class="display-facility-detail"
               role="status"
             >
@@ -335,6 +333,30 @@
                 <ZhuyinText :text="t('help.' + pointHelpType(selected))" />
               </p>
               <p><ZhuyinText :text="pointDescription(selected)" /></p>
+              <button
+                v-if="selected.id !== targetPoint?.id"
+                type="button"
+                class="facility-go"
+                @click="goHere(selected)"
+              >
+                <StationMapIcon name="arrow" />
+                <ZhuyinText :text="t('map.goHere')" />
+              </button>
+              <button
+                type="button"
+                class="facility-staff"
+                @click="
+                  staffPoint = { ...selected, floor: selected.floor ?? level }
+                "
+              >
+                <ZhuyinText :text="t('staff.open')" />
+              </button>
+              <StaffCard
+                v-if="staffPoint"
+                :point="staffPoint"
+                :step-free="location.view.value.stepFree"
+                @close="staffPoint = null"
+              />
             </div>
           </section>
         </div>
@@ -399,6 +421,7 @@ import { useRoute, useRouter } from "vue-router";
 // import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationScanPanel from "../components/StationScanPanel.vue";
+import StaffCard from "../components/StaffCard.vue";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
@@ -410,6 +433,7 @@ import { stationPoints } from "../station/scan.mjs";
 import { buildInfo, summarizeStationData } from "../about/about.mjs";
 import { htmlLang, useI18n } from "../i18n/index.mjs";
 import { placeName } from "../i18n/places.mjs";
+import { useMapFocus } from "../station/map-focus.mjs";
 import { floors, stackBounds } from "./station-floor-plans";
 import stationData from "./station-points.json";
 import stationConnections from "./station-connections.json";
@@ -568,6 +592,21 @@ watch(
   },
   () => setScanPosition(stationById.get(location.view.value.position?.pointId)),
   { flush: "post" }
+);
+// Requests from the floating chat ("show on map").
+const mapFocus = useMapFocus();
+watch(
+  () => mapFocus.request.value,
+  async (request) => {
+    const point = stationById.get(request?.pointId);
+    if (!point) return;
+    mapFocus.clear();
+    await nextTick();
+    // Bring the map itself into view; the scan panel sits above it.
+    mapSection.value?.scrollIntoView({ block: "start", behavior: "smooth" });
+    focusScanPoint(point);
+  },
+  { immediate: true, flush: "post" }
 );
 watch(
   () => location.view.value.destinationId,
@@ -1263,6 +1302,12 @@ function chooseEndpoint(start, destination, point, role) {
   const saved = saveEndpoints(start, destination);
   if (role === "destination" && destination) openTripDialog();
   return saved;
+}
+
+const staffPoint = ref(null);
+// One tap from a facility card to trip guidance.
+function goHere(point) {
+  return chooseEndpoint(currentPoint.value?.id, point.id, point, "destination");
 }
 
 function planDestination(destination) {

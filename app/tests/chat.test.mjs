@@ -100,3 +100,22 @@ test("repeated model output is rejected instead of displayed as a useful answer"
   assert.equal(isUsableChatReply("地、".repeat(40)), false);
   assert.equal(isUsableChatReply("abcdef".repeat(10)), false);
 });
+
+test("prompt names the reply language and carries app facts within the byte budget", () => {
+  const prompt = buildChatPrompt([], "Tôi nên làm gì?", {
+    languageName: "Tiếng Việt",
+  });
+  assert.match(prompt, /Reply only in Tiếng Việt/);
+  assert.match(prompt, /Show to staff/);
+  assert.match(prompt, /exits are not mapped/i);
+  const long = buildChatPrompt(
+    Array.from({ length: 20 }, () => ({
+      role: "user",
+      text: "你好".repeat(250),
+    })),
+    "😀".repeat(500),
+    { languageName: "ไทย" }
+  );
+  assert.ok(new TextEncoder().encode(long).length <= 3500);
+  assert.match(long, /ไทย/);
+});

@@ -94,8 +94,7 @@ export default {
   "scan.easyRead": "Dễ đọc",
   "scan.caveat":
     "Mã định vị chưa được lắp đặt trong ga. Hiện chỉ có tiện ích và lối nối giữa các tầng; mạng lưới đường đi bộ đầy đủ vẫn chưa có.",
-  "scan.browseHint":
-    "Quét mã QR định vị để bắt đầu chỉ đường và hiện “Bạn đang ở đây”.",
+  "scan.browseHint": "Quét mã QR định vị gần bạn để biết bạn đang ở đâu.",
   "scan.chooseDestination": "Chọn điểm đến",
   "scan.choosePlaceholder": "Bạn muốn đi đâu?",
   "scan.useSelected": "Đặt “{name}” đã chọn trên bản đồ làm điểm đến",
@@ -191,7 +190,7 @@ export default {
   "chat.voiceLanguage": "Ngôn ngữ giọng nói",
   "chat.voiceDraft": "Giọng nói thành bản nháp; kiểm tra trước khi gửi",
   "chat.typeInstead": "Hãy nhập chữ với ngôn ngữ này",
-  "chat.starter1": "Làm sao cập nhật vị trí của tôi?",
+  "chat.starter1": "Nhà vệ sinh ở đâu?",
   "chat.starter2": "Lối không bậc thang tránh những gì?",
   "chat.starter3": "Không quét được mã định vị thì sao?",
   "chat.status.checking": "Đang kiểm tra thiết bị…",
@@ -327,4 +326,41 @@ export default {
     "Tôi cần lối đi không có bậc thang, tôi không thể đi cầu thang.",
   "staff.thanks": "Tôi không nói giỏi tiếng Trung. Cảm ơn bạn!",
   "staff.thanksPlain": "Cảm ơn bạn!",
+  "chat.answer.places": "Tìm thấy {count} {type}, chạm vào để xem trên bản đồ:",
+  "chat.answer.none":
+    "Không tìm thấy {type} phù hợp trong dữ liệu. Hãy hỏi tầng khác, hoặc dùng “Đưa cho nhân viên xem” để nhờ giúp.",
+  "chat.answer.more":
+    "Còn {count} nơi khác, xem trong mục Tiện ích trên bản đồ.",
+  "chat.answer.lost":
+    "Đừng lo. Hãy tìm mã QR định vị gần bạn và chạm “Quét vị trí” để biết mình đang ở đâu. Sau khi chọn điểm đến, bạn cũng có thể chạm “Đưa cho nhân viên xem” rồi đưa điện thoại cho nhân viên nhà ga.",
+  "chat.answer.exit":
+    "Bản đồ chưa có dữ liệu lối ra, hãy theo biển chỉ dẫn lối ra. Nếu chưa chắc, hãy chọn điểm đến rồi chạm “Đưa cho nhân viên xem” để nhờ giúp.",
+  "chat.answer.staff":
+    "Chọn điểm đến rồi chạm “Đưa cho nhân viên xem”. Màn hình sẽ hiện chữ Trung lớn, chỉ cần đưa điện thoại cho nhân viên hoặc người gần đó.",
+  "chat.answer.stepFree":
+    "Sau khi chọn điểm đến, hãy đánh dấu “Chỉ dùng lối không có bậc thang”. Chúng tôi chỉ gợi ý cách không cần đi cầu thang như thang máy, không bao giờ thay bằng cầu thang. Nếu không có, hãy hỏi nhân viên.",
+  "chat.answer.scan":
+    "Tìm mã QR định vị trên cột hoặc tường và chạm “Quét vị trí”. Bản đồ sẽ hiện “Bạn đang ở đây”. Đến chỗ mới thì quét lại.",
+  "chat.answer.language":
+    "Chạm biểu tượng quả địa cầu ở góc trên bên phải để đổi sang 繁體中文, English, Bahasa Indonesia, ไทย, 한국어 hoặc 日本語.",
+  "chat.answer.display":
+    "Ở góc trên bên phải: mặt trăng là chế độ tối, hình tròn nửa đen là tương phản cao, menu “Tiêu chuẩn” đổi sang Trẻ em hoặc Người cao tuổi (chữ lớn).",
+  "chat.answer.privacy":
+    "Trợ lý này trả lời ngay trên điện thoại của bạn, không cần tài khoản và không gửi câu hỏi lên mạng.",
+  "chat.answer.greeting":
+    "Xin chào! Bạn đang tìm gì? Thử hỏi “nhà vệ sinh” hoặc “thang máy”, hoặc hỏi cách quét vị trí.",
+  "chat.answer.thanks": "Không có gì, chúc bạn đi đường thuận lợi!",
+  "chat.answer.fallback":
+    "Tôi chưa trả lời được câu này. Tôi có thể giúp bạn tìm tiện ích (như “nhà vệ sinh”, “thang máy”), cách quét vị trí, lối không bậc thang và cách nhờ nhân viên giúp.",
+  "chat.showOnMap": "Xem trên bản đồ",
+  "chat.status.offline": "Hỏi đáp · không cần mạng",
+  "chat.optionalModel":
+    "Muốn hỏi câu mở hơn? Bạn có thể cài thêm mô hình AI trên điện thoại (không bắt buộc, khoảng 584 MB).",
+  "chat.welcome2":
+    "Xin chào! Tôi là trợ lý nhà ga. Hãy hỏi “Nhà vệ sinh ở đâu?”, “Thang máy ở đâu?” hoặc cách quét vị trí. Câu trả lời lấy từ dữ liệu nhà ga, không cần mạng.",
+  "map.goHere": "Đưa tôi đến đây",
+  "chat.answer.exitCode":
+    "Lối ra chưa có trên bản đồ. Đây là các điểm dẫn về hướng lối ra {code}; đến đó hãy theo biển chỉ dẫn lối ra {code}:",
+  "chat.answer.otherFloors":
+    "Tầng {floor} không có {type}, nhưng tầng khác có. Chạm để xem trên bản đồ:",
 };

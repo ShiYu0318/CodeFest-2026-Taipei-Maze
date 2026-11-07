@@ -93,8 +93,7 @@ export default {
   "scan.easyRead": "Mudah dibaca",
   "scan.caveat":
     "Kode lokasi belum dipasang di stasiun. Saat ini hanya ada fasilitas dan penghubung antarlantai; jaringan jalan kaki lengkap belum tersedia.",
-  "scan.browseHint":
-    "Pindai kode QR lokasi untuk memulai navigasi dan menampilkan “Anda di sini”.",
+  "scan.browseHint": "Pindai kode QR lokasi terdekat untuk tahu posisi Anda.",
   "scan.chooseDestination": "Pilih tujuan",
   "scan.choosePlaceholder": "Mau ke mana?",
   "scan.useSelected": "Jadikan “{name}” yang dipilih di peta sebagai tujuan",
@@ -192,7 +191,7 @@ export default {
   "chat.voiceLanguage": "Bahasa suara",
   "chat.voiceDraft": "Suara menjadi draf; periksa sebelum dikirim",
   "chat.typeInstead": "Silakan mengetik untuk bahasa ini",
-  "chat.starter1": "Bagaimana cara memperbarui lokasi saya?",
+  "chat.starter1": "Di mana toilet?",
   "chat.starter2": "Rute tanpa anak tangga menghindari apa?",
   "chat.starter3": "Kode lokasi tidak bisa dipindai, lalu bagaimana?",
   "chat.status.checking": "Memeriksa perangkat…",
@@ -334,4 +333,42 @@ export default {
     "Saya perlu rute tanpa anak tangga, saya tidak bisa naik tangga.",
   "staff.thanks": "Saya kurang bisa berbahasa Mandarin. Terima kasih!",
   "staff.thanksPlain": "Terima kasih!",
+  "chat.answer.places":
+    "Ditemukan {count} {type}, ketuk untuk melihat di peta:",
+  "chat.answer.none":
+    "Tidak ada {type} yang cocok di data kami. Coba lantai lain, atau pakai “Tunjukkan ke petugas” untuk minta bantuan.",
+  "chat.answer.more":
+    "Masih ada {count} lagi, lihat di bagian Fasilitas pada peta.",
+  "chat.answer.lost":
+    "Jangan khawatir. Cari kode QR lokasi terdekat dan ketuk “Pindai lokasi” untuk tahu posisi Anda. Setelah memilih tujuan, Anda juga bisa mengetuk “Tunjukkan ke petugas” dan memperlihatkan ponsel ke petugas stasiun.",
+  "chat.answer.exit":
+    "Data pintu keluar belum ada di peta, jadi ikuti papan petunjuk keluar. Jika ragu, pilih tujuan lalu ketuk “Tunjukkan ke petugas” untuk minta bantuan.",
+  "chat.answer.staff":
+    "Pilih tujuan, lalu ketuk “Tunjukkan ke petugas”. Akan muncul tulisan Mandarin besar, tinggal tunjukkan ponsel ke petugas atau orang di dekat Anda.",
+  "chat.answer.stepFree":
+    "Setelah memilih tujuan, centang “Hanya penghubung tanpa anak tangga”. Kami hanya menyarankan cara tanpa tangga seperti lift, tidak pernah tangga. Jika tidak ada, silakan tanya petugas.",
+  "chat.answer.scan":
+    "Cari kode QR lokasi di tiang atau dinding, lalu ketuk “Pindai lokasi”. Peta akan menampilkan “Anda di sini”. Pindai lagi saat tiba di tempat baru.",
+  "chat.answer.language":
+    "Ketuk ikon bola dunia di kanan atas untuk mengganti ke 繁體中文, English, Tiếng Việt, ไทย, 한국어, atau 日本語.",
+  "chat.answer.display":
+    "Di kanan atas: bulan untuk mode gelap, lingkaran setengah hitam untuk kontras tinggi, dan menu “Standar” untuk mode Anak atau Lansia (huruf besar).",
+  "chat.answer.privacy":
+    "Asisten ini menjawab langsung di ponsel Anda, tanpa akun, dan pertanyaan Anda tidak dikirim ke internet.",
+  "chat.answer.greeting":
+    "Halo! Mau cari apa? Coba tanya “toilet” atau “lift”, atau cara memindai lokasi.",
+  "chat.answer.thanks": "Sama-sama, semoga perjalanan lancar!",
+  "chat.answer.fallback":
+    "Saya belum bisa menjawab itu. Saya bisa membantu mencari fasilitas (seperti “toilet” atau “lift”), cara memindai lokasi, rute tanpa tangga, dan cara minta bantuan petugas.",
+  "chat.showOnMap": "Lihat di peta",
+  "chat.status.offline": "Tanya jawab · luring",
+  "chat.optionalModel":
+    "Ingin bertanya lebih bebas? Anda juga bisa memasang model AI di ponsel (opsional, sekitar 584 MB).",
+  "chat.welcome2":
+    "Halo! Saya asisten stasiun. Tanyakan “Di mana toilet?”, “Di mana lift?”, atau cara memindai lokasi. Jawaban berasal dari data stasiun dan tidak perlu internet.",
+  "map.goHere": "Antar saya ke sini",
+  "chat.answer.exitCode":
+    "Pintu keluar belum ada di peta. Tempat-tempat ini mengarah ke pintu keluar {code}; dari sana ikuti papan petunjuk {code}:",
+  "chat.answer.otherFloors":
+    "Tidak ada {type} di {floor}, tetapi ada di lantai lain. Ketuk untuk melihat di peta:",
 };

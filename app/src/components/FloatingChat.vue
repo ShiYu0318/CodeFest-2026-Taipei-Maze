@@ -77,11 +77,7 @@
           </button>
           <div class="maze-chat-heading">
             <h2 id="maze-chat-title">{{ t("chat.title") }}</h2>
-            <p
-              class="maze-chat-presence"
-              :data-ready="modelReady"
-              role="status"
-            >
+            <p class="maze-chat-presence" :data-ready="!checking" role="status">
               <span aria-hidden="true"></span>{{ statusText }}
             </p>
           </div>
@@ -125,35 +121,21 @@
                 <circle cx="12" cy="10" r="2.4" fill="currentColor" /></svg
             ></span>
             <p class="maze-chat-bubble maze-chat-static">
-              {{ t("chat.welcome") }}
+              {{ t("chat.welcome2") }}
             </p>
           </article>
-          <div v-if="!modelReady" class="maze-chat-setup">
-            <p>
-              {{
-                checking
-                  ? t("chat.checking")
-                  : nativeAvailable
-                  ? t("chat.noModel")
-                  : t("chat.needApp")
-              }}
-            </p>
+          <div
+            v-if="nativeAvailable && !modelReady && !checking"
+            class="maze-chat-setup"
+          >
+            <p>{{ t("chat.optionalModel") }}</p>
             <div class="maze-chat-setup-actions">
-              <button
-                v-if="nativeAvailable"
-                type="button"
-                class="maze-chat-primary"
-                @click="setupModel"
-              >
-                {{ t("chat.install") }}
-              </button>
               <button
                 type="button"
                 class="maze-chat-secondary"
-                :disabled="busy || listening || checking"
-                @click="refreshStatus"
+                @click="setupModel"
               >
-                {{ t("chat.recheck") }}
+                {{ t("chat.install") }}
               </button>
             </div>
           </div>
@@ -179,7 +161,28 @@
                 />
                 <circle cx="12" cy="10" r="2.4" fill="currentColor" /></svg
             ></span>
-            <p class="maze-chat-bubble">{{ message.text }}</p>
+            <div class="maze-chat-content">
+              <p class="maze-chat-bubble">{{ message.text }}</p>
+              <ul v-if="message.places?.length" class="maze-chat-places">
+                <li v-for="place in message.places" :key="place.id">
+                  <button type="button" @click="showPlace(place.id)">
+                    <span class="maze-chat-floor">{{ place.floor }}</span>
+                    <span class="maze-chat-place-name"
+                      ><StationMapIcon
+                        class="maze-chat-place-icon"
+                        :name="place.icon"
+                      />{{ place.label }}</span
+                    >
+                    <span class="maze-chat-place-action">{{
+                      t("chat.showOnMap")
+                    }}</span>
+                  </button>
+                </li>
+              </ul>
+              <p v-if="message.more" class="maze-chat-more">
+                {{ message.more }}
+              </p>
+            </div>
           </article>
           <div v-if="busy" class="maze-chat-message assistant" role="status">
             <span class="maze-chat-avatar" aria-hidden="true"
@@ -203,7 +206,7 @@
         </div>
         <p v-if="notice" class="maze-chat-notice" role="status">{{ notice }}</p>
         <div
-          v-if="!messages.length && modelReady && !busy"
+          v-if="!messages.length && !busy"
           class="maze-chat-tray"
           :aria-label="t('chat.starters')"
         >
@@ -305,7 +308,7 @@
               class="maze-chat-round maze-chat-send"
               type="submit"
               :aria-label="t('chat.send')"
-              :disabled="!modelReady || listening || !draft.trim()"
+              :disabled="listening || !draft.trim()"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -367,7 +370,7 @@
 </template>
 <script setup>
 import { computed, nextTick, onBeforeUnmount, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import "../display/display-preferences.css";
 import {
@@ -376,7 +379,12 @@ import {
   shouldSendOnEnter,
   isUsableChatReply,
 } from "../chat/bridge.mjs";
-import { useI18n } from "../i18n/index.mjs";
+import StationMapIcon from "./StationMapIcon.vue";
+import { LOCALES, useI18n } from "../i18n/index.mjs";
+import { answerLocally } from "../chat/answers.mjs";
+import { useMapFocus } from "../station/map-focus.mjs";
+import { stationPoints } from "../station/scan.mjs";
+import stationData from "../views/station-points.json";
 const opened = ref(false),
   draft = ref(""),
   messages = ref([]),
@@ -401,7 +409,11 @@ function updateViewport() {
 window.visualViewport?.addEventListener("resize", updateViewport);
 window.visualViewport?.addEventListener("scroll", updateViewport);
 window.addEventListener("resize", updateViewport);
-const { locale: uiLocale, t } = useI18n();
+const i18n = useI18n();
+const { locale: uiLocale, t } = i18n;
+const chatPoints = stationPoints(stationData);
+const mapFocus = useMapFocus();
+const router = useRouter();
 // Voice input follows the interface language until the visitor picks another.
 const voiceLocales = {
   "zh-TW": "zh-TW",
@@ -440,13 +452,11 @@ let epoch = 0,
   priorFocus = null,
   previousInert = false;
 const statusText = computed(() =>
-  checking.value
-    ? t("chat.status.checking")
-    : !nativeAvailable.value
-    ? t("chat.status.unavailable")
-    : modelReady.value
+  modelReady.value
     ? t("chat.status.ready")
-    : t("chat.status.notReady")
+    : checking.value
+    ? t("chat.status.checking")
+    : t("chat.status.offline")
 );
 const errorCodes = new Set([
   "cancelled",
@@ -522,47 +532,81 @@ function grow() {
 function ask(text) {
   if (busy.value || listening.value) return;
   draft.value = text;
-  if (modelReady.value) send();
-  else nextTick(grow);
+  // Offline answers work without the model, so a suggestion always sends.
+  send();
 }
 function composerKey(event) {
   if (!shouldSendOnEnter(event)) return;
   event.preventDefault();
   send();
 }
+function addReply(reply) {
+  messages.value.push({ id: ++serial, role: "assistant", ...reply });
+}
 async function send() {
-  if (busy.value || listening.value || !modelReady.value) return;
-  const text = draft.value.trim(),
-    prompt = buildChatPrompt(messages.value, text);
-  if (!prompt) return;
+  if (busy.value || listening.value) return;
+  const text = draft.value.trim();
+  if (!text || [...text].length > 500) return;
   const current = epoch;
+  const history = messages.value;
   messages.value = [
     ...messages.value.slice(-18),
     { id: ++serial, role: "user", text },
   ];
   draft.value = "";
   notice.value = "";
-  busy.value = true;
   nextTick(grow);
   scroll();
-  const result = await bridge.request("generate", { prompt });
-  if (current !== epoch || !opened.value) return;
-  busy.value = false;
-  if (
-    result.status === "success" &&
-    typeof result.text === "string" &&
-    isUsableChatReply(result.text)
-  )
-    messages.value.push({ id: ++serial, role: "assistant", text: result.text });
-  else {
-    notice.value =
-      result.status === "success" ? t("chat.badReply") : explain(result);
-    if (!draft.value) draft.value = text;
+  // Grounded, offline answers first: facilities come from station data.
+  const here = chatPoints.find(
+    (point) => point.id === route.query.point || point.id === route.query.start
+  );
+  const local = answerLocally(text, chatPoints, i18n, {
+    nearFloor: here?.floor,
+  });
+  if (local) {
+    addReply({
+      text: local.text,
+      places: local.places,
+      more:
+        local.total > (local.places?.length ?? 0)
+          ? t("chat.answer.more", {
+              count: local.total - local.places.length,
+            })
+          : "",
+    });
+  } else if (!modelReady.value) {
+    addReply({ text: t("chat.answer.fallback") });
+  } else {
+    const prompt = buildChatPrompt(history, text, {
+      languageName: LOCALES.find((item) => item.code === uiLocale.value)
+        ?.nativeName,
+    });
+    busy.value = true;
+    const result = await bridge.request("generate", { prompt });
+    if (current !== epoch || !opened.value) return;
+    busy.value = false;
+    if (
+      result.status === "success" &&
+      typeof result.text === "string" &&
+      isUsableChatReply(result.text)
+    )
+      addReply({ text: result.text });
+    else {
+      notice.value =
+        result.status === "success" ? t("chat.badReply") : explain(result);
+      if (!draft.value) draft.value = text;
+    }
   }
   scroll();
   await nextTick();
   grow();
   input.value?.focus();
+}
+async function showPlace(pointId) {
+  close();
+  if (route.name !== "station-map") await router.push("/station-map");
+  mapFocus.focus(pointId);
 }
 function cancelGeneration() {
   bridge.cancelAll();
@@ -832,6 +876,80 @@ onBeforeUnmount(() => {
 }
 .maze-chat-static {
   white-space: normal;
+}
+.maze-chat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.maze-chat-places {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.maze-chat-places button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "floor name" "floor action";
+  align-items: center;
+  gap: 0 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 12px;
+  border: 1px solid var(--tp-primary-200);
+  border-radius: 12px;
+  background: var(--tp-surface);
+  color: var(--chat-ink);
+  text-align: left;
+  transition: background-color 150ms ease, transform 120ms ease;
+}
+.maze-chat-places button:active {
+  transform: scale(0.98);
+  background: var(--tp-primary-50);
+}
+.maze-chat-floor {
+  grid-area: floor;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--tp-primary-600);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+[data-theme="dark"] .maze-chat-floor {
+  color: var(--tp-primary-950);
+}
+.maze-chat-place-name {
+  grid-area: name;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.maze-chat-place-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  color: var(--tp-primary-700);
+}
+.maze-chat-place-action {
+  grid-area: action;
+  color: var(--tp-primary-700);
+  font-size: 13px;
+}
+.maze-chat-more {
+  margin: 0;
+  color: var(--chat-muted);
+  font-size: 13px;
 }
 .maze-chat-message.assistant .maze-chat-bubble {
   border-top-left-radius: 4px;
@@ -1123,6 +1241,21 @@ onBeforeUnmount(() => {
   50% {
     box-shadow: 0 0 0 6px rgb(212 82 81 / 22%);
   }
+}
+
+/* Age-tiered text sizes follow the display mode. */
+[data-display-mode="child"] .maze-chat-bubble,
+[data-display-mode="child"] .maze-chat-place-name {
+  font-size: 17px;
+}
+[data-display-mode="senior"] .maze-chat-bubble,
+[data-display-mode="senior"] .maze-chat-place-name,
+[data-display-mode="senior"] .maze-chat-field textarea {
+  font-size: 19px;
+}
+[data-display-mode="senior"] .maze-chat-tray button {
+  min-height: 44px;
+  font-size: 16px;
 }
 
 /* Phones: a TownPass-style bottom sheet that fills the visible viewport. */

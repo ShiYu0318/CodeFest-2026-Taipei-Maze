@@ -84,7 +84,7 @@ export default {
   "scan.easyRead": "簡明模式",
   "scan.caveat":
     "定位碼尚未現地布設；目前提供設施與樓層關係，完整步行路網待補。",
-  "scan.browseHint": "掃描點位 QR，進入導航模式並顯示「您在這裡」。",
+  "scan.browseHint": "掃描附近的定位 QR，就能知道你在哪裡。",
   "scan.chooseDestination": "選擇目的地",
   "scan.choosePlaceholder": "請選擇要去的設施",
   "scan.useSelected": "將地圖上選取的「{name}」設為終點",
@@ -166,7 +166,7 @@ export default {
   "chat.voiceLanguage": "語音語言",
   "chat.voiceDraft": "語音轉成草稿，確認後送出",
   "chat.typeInstead": "此語言請改用打字",
-  "chat.starter1": "怎麼更新目前位置？",
+  "chat.starter1": "廁所在哪裡？",
   "chat.starter2": "無障礙路線會避開什麼？",
   "chat.starter3": "掃不到定位碼怎麼辦？",
   "chat.status.checking": "正在確認裝置狀態…",
@@ -285,4 +285,40 @@ export default {
   "staff.stepFree": "我需要無障礙路線，不能走樓梯。",
   "staff.thanks": "我不太會說中文，謝謝您！",
   "staff.thanksPlain": "謝謝您！",
+  "chat.answer.places": "找到 {count} 處{type}，點一下就能在地圖上看到：",
+  "chat.answer.none":
+    "目前資料裡沒有找到符合的{type}。可以換個樓層問，或用「給站務人員看」請人幫忙。",
+  "chat.answer.more": "還有 {count} 處，可以在地圖上方的設施主題裡查看。",
+  "chat.answer.lost":
+    "別擔心。找一個附近的定位 QR，按「掃描定位」就知道你在哪裡。也可以選好目的地後，按「給站務人員看」把畫面拿給站務人員。",
+  "chat.answer.exit":
+    "出口資料還沒整理進地圖，請先看現場的出口指標。不確定的話，選好目的地後按「給站務人員看」請人幫忙。",
+  "chat.answer.staff":
+    "選好目的地後，按「給站務人員看」，畫面會出現大字中文，把手機拿給站務人員或附近的人看就可以。",
+  "chat.answer.stepFree":
+    "選好目的地後，勾選「只參考無階梯連結」。我們只會建議電梯這類不用走樓梯的方式，不會用樓梯代替；找不到時會請你詢問站務人員。",
+  "chat.answer.scan":
+    "找到柱子或牆上的定位 QR，按「掃描定位」對準它。地圖會跳到你的位置，顯示「您在這裡」。走到新地方時再掃一次就會更新。",
+  "chat.answer.language":
+    "按右上角的地球圖示，就能換成 English、Tiếng Việt、Bahasa Indonesia、ไทย、한국어 或日本語。",
+  "chat.answer.display":
+    "右上角可以調整：月亮是深色模式，半黑半白的圓是高對比，「標準」選單可以換成兒童（有注音）或長者（大字）。",
+  "chat.answer.privacy":
+    "這個小幫手在你的手機上回答，不需要帳號，也不會把你的問題傳到網路上。",
+  "chat.answer.greeting":
+    "你好！想找什麼設施？例如「廁所」「電梯」，或問我怎麼掃碼定位。",
+  "chat.answer.thanks": "不客氣，祝你一路順利！",
+  "chat.answer.fallback":
+    "這題我還不會回答。我可以幫你：找設施（例如「廁所」「電梯」）、說明怎麼掃碼定位、無障礙路線，以及怎麼請站務人員幫忙。",
+  "chat.showOnMap": "在地圖上看",
+  "chat.status.offline": "站內問答 · 離線可用",
+  "chat.optionalModel":
+    "想問更開放的問題？可以另外安裝手機上的 AI 模型（選配，約 584 MB）。",
+  "chat.welcome2":
+    "你好！我是站內小幫手。可以問我「廁所在哪」「電梯在哪」，或怎麼掃碼定位。答案都來自車站資料，不需要網路。",
+  "map.goHere": "帶我去",
+  "chat.answer.exitCode":
+    "出口本身還沒畫進地圖。這些是往 {code} 出口方向的地點，到了之後請看現場的 {code} 出口指標：",
+  "chat.answer.otherFloors":
+    "{floor} 沒有{type}，其他樓層有，點一下就能在地圖上看到：",
 };

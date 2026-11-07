@@ -71,7 +71,7 @@
       /></span>
     </button>
     <button
-      class="display-theme-switch display-contrast-switch"
+      class="display-icon-button display-contrast-switch"
       type="button"
       role="switch"
       :aria-checked="contrast === 'high'"
