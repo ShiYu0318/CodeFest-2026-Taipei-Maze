@@ -602,13 +602,13 @@
   padding-inline: 0;
   flex-wrap: wrap;
 }
-.endpoint-controls {
+.location-link {
   display: inline-flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
   margin-inline-start: auto;
 }
-.endpoint-controls button,
+.location-link,
 .map-pick-instructions button {
   min-height: var(--display-control-height);
   padding-inline: 12px;
@@ -619,9 +619,9 @@
   font-size: var(--display-control-size);
   font-weight: 750;
 }
-.endpoint-controls button[aria-pressed="true"] {
-  border-color: var(--accent);
-  background: var(--tp-primary-100);
+.location-link svg {
+  width: 18px;
+  height: 18px;
 }
 .map-pick-instructions {
   display: flex;

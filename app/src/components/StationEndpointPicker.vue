@@ -11,20 +11,50 @@
       @keydown.tab="keepFocus"
     >
       <header>
-        <h2 id="endpoint-dialog-title">選擇{{ label }}</h2>
-        <button ref="closeButton" type="button" @click="emit('close')">
-          關閉
+        <h2 id="endpoint-dialog-title">定位</h2>
+        <button
+          ref="closeButton"
+          class="endpoint-close"
+          type="button"
+          aria-label="關閉定位"
+          @click="emit('close')"
+        >
+          ×
         </button>
       </header>
-      <div class="endpoint-list">
+      <div class="endpoint-roles" role="group" aria-label="選擇起點或終點">
+        <button
+          v-for="(label, role) in labels"
+          :key="role"
+          type="button"
+          :data-endpoint-role="role"
+          :aria-label="label"
+          :aria-pressed="role === activeRole"
+          @click="showRole(role)"
+        >
+          <strong>{{ label }}</strong>
+          <span class="endpoint-value">
+            {{
+              choices[role]
+                ? choices[role].floorId + "・" + choices[role].name
+                : "尚未選擇"
+            }}
+          </span>
+        </button>
+      </div>
+      <div
+        ref="list"
+        class="endpoint-list"
+        :aria-label="labels[activeRole] + '標點'"
+      >
         <section v-for="(floorPoints, floor) in points" :key="floor">
           <h3>{{ floor }}</h3>
           <ul>
             <li v-for="point in floorPoints" :key="point.id">
               <button
                 type="button"
-                :aria-pressed="point.id === selectedId"
-                @click="emit('select', point.id)"
+                :aria-pressed="point.id === choices[activeRole]?.id"
+                @click="choosePoint({ ...point, floorId: floor })"
               >
                 {{ point.name }}
               </button>
@@ -32,9 +62,20 @@
           </ul>
         </section>
       </div>
-      <footer v-if="selectedId">
-        <button type="button" @click="emit('select', null)">
-          清除{{ label }}
+      <footer>
+        <button
+          type="button"
+          :disabled="!choices[activeRole]"
+          @click="choosePoint(null)"
+        >
+          清除{{ labels[activeRole] }}
+        </button>
+        <button
+          type="button"
+          class="endpoint-map-pick"
+          @click="emit('map-pick')"
+        >
+          地圖選點
         </button>
       </footer>
     </section>
@@ -43,21 +84,48 @@
 
 <script setup>
 /* global defineProps, defineEmits */
-import { onMounted, ref } from "vue";
+import { nextTick, onMounted, reactive, ref } from "vue";
 import stationData from "../views/station-points.json";
 
-defineProps({
-  label: { type: String, required: true },
-  selectedId: { type: String, default: null },
+const props = defineProps({
+  startPoint: { type: Object, default: null },
+  targetPoint: { type: Object, default: null },
 });
-const emit = defineEmits(["select", "close"]);
+const emit = defineEmits(["select", "close", "map-pick"]);
 const { points } = stationData;
+const labels = { start: "起點", destination: "終點" };
+const choices = reactive({
+  start: props.startPoint,
+  destination: props.targetPoint,
+});
+const activeRole = ref(
+  choices.start && !choices.destination ? "destination" : "start"
+);
 const panel = ref(null);
+const list = ref(null);
 const closeButton = ref(null);
 onMounted(() => closeButton.value.focus({ preventScroll: true }));
 
+function showRole(role) {
+  if (role === activeRole.value) return;
+  activeRole.value = role;
+  list.value.scrollTop = 0;
+}
+
+async function choosePoint(point) {
+  choices[activeRole.value] = point;
+  emit("select", choices.start?.id, choices.destination?.id, point);
+  if (point && activeRole.value === "start" && !choices.destination) {
+    showRole("destination");
+    panel.value.querySelector('[data-endpoint-role="destination"]').focus();
+  } else if (!point) {
+    await nextTick();
+    closeButton.value?.focus({ preventScroll: true });
+  }
+}
+
 function keepFocus(event) {
-  const buttons = panel.value.querySelectorAll("button");
+  const buttons = panel.value.querySelectorAll("button:not(:disabled)");
   const first = buttons[0];
   const last = buttons[buttons.length - 1];
   if (document.activeElement !== (event.shiftKey ? first : last)) return;
@@ -81,8 +149,8 @@ function keepFocus(event) {
   display: flex;
   flex-direction: column;
   width: min(100%, 440px);
-  max-height: min(78vh, 620px);
-  max-height: min(78svh, 620px);
+  height: 75vh;
+  height: 75svh;
   min-height: 0;
   overflow: hidden;
   border: 1px solid var(--border);
@@ -118,7 +186,41 @@ function keepFocus(event) {
   outline: 2px solid var(--accent);
   outline-offset: -3px;
 }
+.endpoint-dialog .endpoint-close {
+  min-width: var(--display-control-height, 44px);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.endpoint-roles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0 12px 8px;
+}
+.endpoint-roles button {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+}
+.endpoint-value {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--display-secondary-size, 0.75rem);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.endpoint-roles button[aria-pressed="true"],
+.endpoint-dialog .endpoint-map-pick {
+  border-color: var(--tp-primary-500);
+  background: var(--wash);
+}
+.endpoint-dialog button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
 .endpoint-list {
+  flex: 1;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;

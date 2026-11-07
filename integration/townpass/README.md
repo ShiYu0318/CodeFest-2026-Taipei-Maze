@@ -41,4 +41,4 @@ onReply?.call(replyWebMessage(data: {
 
 感測器不可用時回傳相同訂閱編號，並將 `headingDegrees` 設為 `null`。收到 `stop`、App 進入背景、WebView 重新載入或關閉時，停止對應串流。App 回到前景且原頁仍在使用指南針時，以同一訂閱編號恢復更新。網頁在 5 秒未收到有效讀數後清除指針，並忽略其他訂閱的資料。Android 和 iOS 的感測器與權限處理由宿主接手。
 
-測試頁的 `start` 和 `destination` 查詢參數分別保存 `station-points.json` 的起點與終點 ID，可轉成後端的 `startPointId` 與 `destinationPointId`。同層直線方位使用站圖目前向左偏 12° 的北向基準估算，仍待現場校正。跨樓層的下一步方位由後端路線提供。指南針可在一般瀏覽器用「模擬手機方位」操作。
+地圖「定位」浮窗選擇的起終點以 `start` 和 `destination` 查詢參數保存 `station-points.json` 的標點 ID，可轉成後端的 `startPointId` 與 `destinationPointId`。指南針顯示手機目前朝向，回到地圖可繼續查看選定的起終點。一般瀏覽器可用「模擬手機方位」測試指針。

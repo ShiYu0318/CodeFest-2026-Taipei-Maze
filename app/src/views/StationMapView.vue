@@ -5,7 +5,7 @@
     :data-theme="theme"
     :data-display-mode="displayMode"
   >
-    <div class="station-shell" :inert="endpointRole ? '' : null">
+    <div class="station-shell" :inert="endpointPickerOpen ? '' : null">
       <section class="station-heading" aria-label="顯示設定">
         <div class="station-title-row">
           <!-- <h1 id="station-title"><ZhuyinText text="台北車站" /></h1> -->
@@ -53,27 +53,16 @@
         <div class="facility-title-group">
           <h2 id="facility-title"><ZhuyinText text="設施主題" /></h2>
         </div>
-        <div class="endpoint-controls" role="group" aria-label="起點與終點">
-          <button
-            v-for="(label, role) in endpointLabels"
-            :key="role"
-            type="button"
-            aria-haspopup="dialog"
-            :disabled="floorChanging"
-            :title="(role === 'start' ? currentPoint : targetPoint)?.name"
-            @click="openEndpointPicker(role, $event)"
-          >
-            {{ label }}
-          </button>
-          <button
-            type="button"
-            :aria-pressed="!!mapPickStep"
-            :disabled="floorChanging"
-            @click="mapPickStep ? cancelMapPicking() : startMapPicking()"
-          >
-            地圖選點
-          </button>
-        </div>
+        <button
+          class="location-link"
+          type="button"
+          aria-haspopup="dialog"
+          :disabled="floorChanging"
+          @click="openEndpointPicker"
+        >
+          <StationMapIcon name="locate" />
+          <ZhuyinText text="定位" />
+        </button>
       </div>
 
       <div
@@ -104,7 +93,7 @@
               : "2／2 點選終點，可切換到其他樓層"
           }}
         </p>
-        <button type="button" @click="cancelMapPicking">取消</button>
+        <button type="button" @click="openEndpointPicker()">取消</button>
       </div>
 
       <div class="station-layout">
@@ -115,7 +104,7 @@
               class="map-stage"
               :style="{ '--map-top': mapTop * 1.5 + 'px' }"
               @keydown.esc="
-                mapPickStep ? cancelMapPicking() : closeConnectorDetails()
+                mapPickStep ? openEndpointPicker() : closeConnectorDetails()
               "
             >
               <div class="map-corner">
@@ -370,11 +359,12 @@
       </div>
     </div>
     <StationEndpointPicker
-      v-if="endpointRole"
-      :label="endpointLabels[endpointRole]"
-      :selected-id="(endpointRole === 'start' ? currentPoint : targetPoint)?.id"
+      v-if="endpointPickerOpen"
+      :start-point="currentPoint"
+      :target-point="targetPoint"
       @close="closeEndpointPicker"
       @select="chooseEndpoint"
+      @map-pick="startMapPicking"
     />
   </main>
 </template>
@@ -491,12 +481,12 @@ const level = ref(
 const showLayers = ref(false);
 const activeTheme = ref(null);
 const selected = ref(null);
-const endpointLabels = { start: "起點", destination: "終點" };
-const endpointRole = ref(null);
+const endpointPickerOpen = ref(false);
 const mapPickStep = ref(null);
 const draftStart = ref(null);
 const floorControls = ref(null);
 let endpointTrigger = null;
+let pickerFocusPoint = null;
 const mapCurrentPoint = computed(() =>
   mapPickStep.value ? draftStart.value : currentPoint.value
 );
@@ -510,7 +500,7 @@ const scanTargetId = ref(null);
 let scanFocusRevision = 0;
 async function focusScanPoint(point) {
   const revision = ++scanFocusRevision;
-  if (!point || mapPickStep.value || endpointRole.value) return;
+  if (!point || mapPickStep.value || endpointPickerOpen.value) return;
   floorAnimation?.cancel();
   clearMapDrag();
   clearPinch();
@@ -1215,18 +1205,26 @@ function placeConnectorPanel() {
   };
 }
 
-function openEndpointPicker(role, event) {
-  cancelMapPicking();
+function openEndpointPicker(event) {
+  if (event) endpointTrigger = event.currentTarget;
   selected.value = null;
-  endpointTrigger = event.currentTarget;
-  endpointRole.value = role;
+  mapPickStep.value = null;
+  draftStart.value = null;
+  endpointPickerOpen.value = true;
 }
 
 async function closeEndpointPicker() {
   const trigger = endpointTrigger;
+  const point = pickerFocusPoint;
   endpointTrigger = null;
-  endpointRole.value = null;
+  pickerFocusPoint = null;
+  endpointPickerOpen.value = false;
   await nextTick();
+  if (point && viewport.value) {
+    await showFloor(point.floorId);
+    if (viewport.value && level.value === point.floorId)
+      centerOn(...normalizedPoint(point));
+  }
   trigger?.focus({ preventScroll: true });
 }
 
@@ -1241,31 +1239,23 @@ function saveEndpoints(start, destination) {
   });
 }
 
-async function chooseEndpoint(id) {
-  const role = endpointRole.value;
-  const point = findStationPoint(points, id);
-  await closeEndpointPicker();
-  await saveEndpoints(
-    role === "start" ? id : currentPoint.value?.id,
-    role === "destination" ? id : targetPoint.value?.id
-  );
-  if (!point || !viewport.value) return;
-  await showFloor(point.floorId);
-  if (viewport.value && level.value === point.floorId)
-    centerOn(...normalizedPoint(point));
+function chooseEndpoint(start, destination, point) {
+  pickerFocusPoint = point;
+  return saveEndpoints(start, destination);
 }
 
 async function startMapPicking() {
+  endpointPickerOpen.value = false;
+  pickerFocusPoint = null;
   selected.value = null;
   draftStart.value = null;
   mapPickStep.value = "start";
   await nextTick();
-  floorControls.value?.scrollIntoView({ block: "start" });
-}
-
-function cancelMapPicking() {
-  mapPickStep.value = null;
-  draftStart.value = null;
+  const controls = floorControls.value;
+  controls?.scrollIntoView({ block: "start" });
+  controls
+    ?.querySelector('.floor-switch button[aria-pressed="true"]')
+    ?.focus({ preventScroll: true });
 }
 
 async function selectMapPoint(point, event) {
@@ -1278,8 +1268,9 @@ async function selectMapPoint(point, event) {
   }
   if (mapPickStep.value === "destination") {
     const start = draftStart.value.id;
-    cancelMapPicking();
+    mapPickStep.value = null;
     await saveEndpoints(start, point.id);
+    if (viewport.value) openEndpointPicker();
     return;
   }
   selected.value = selected.value?.id === point.id ? null : point;
