@@ -55,6 +55,14 @@
         @cancel-trip="openTripDialog('cancel')"
       />
       <section class="walk-panel" :aria-label="t('walk.routeTitle')">
+        <p v-if="sharedPlace" class="walk-status" data-state="ok" role="status">
+          {{
+            t("share.received", {
+              name: placeLabel(sharedPlace, i18n),
+              floor: sharedPlace.floor,
+            })
+          }}
+        </p>
         <p
           v-if="walkStatus"
           class="walk-status"
@@ -63,6 +71,14 @@
         >
           <ZhuyinText :text="walkStatus" />
         </p>
+        <button
+          v-if="walkDestinationPoint"
+          type="button"
+          class="walk-share"
+          @click="sharePoint = walkDestinationPoint"
+        >
+          {{ t("share.destination") }}
+        </button>
         <div v-if="walkStart" class="walk-nearest" role="group">
           <span class="walk-nearest-label"
             ><ZhuyinText :text="t('walk.nearest')"
@@ -445,6 +461,15 @@
                 >
                   <ZhuyinText :text="t('staff.open')" />
                 </button>
+                <button
+                  type="button"
+                  class="facility-staff"
+                  @click="
+                    sharePoint = { ...selected, floor: selected.floor ?? level }
+                  "
+                >
+                  {{ t("share.place") }}
+                </button>
               </div>
               <StaffCard
                 v-if="staffPoint"
@@ -474,6 +499,11 @@
       @close="closeEndpointPicker"
       @select="chooseEndpoint"
       @map-pick="startMapPicking"
+    />
+    <PlaceShareSheet
+      v-if="sharePoint"
+      :point="sharePoint"
+      @close="sharePoint = null"
     />
     <StationTripDialog
       v-if="tripDialog"
@@ -507,6 +537,8 @@ import { useRoute, useRouter } from "vue-router";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationScanPanel from "../components/StationScanPanel.vue";
 import StaffCard from "../components/StaffCard.vue";
+import PlaceShareSheet from "../components/PlaceShareSheet.vue";
+import { readSharedPlace } from "../station/place-share.mjs";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
 import StationInformationDialog from "../components/StationInformationDialog.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
@@ -518,7 +550,7 @@ import { useDisplayPreferences } from "../display/preferences.mjs";
 import { useStationLocation } from "../station/useStationLocation";
 import { stationPoints } from "../station/scan.mjs";
 import { htmlLang, useI18n } from "../i18n/index.mjs";
-import { placeName } from "../i18n/places.mjs";
+import { placeLabel, placeName } from "../i18n/places.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
 import walkingNetwork from "../station/walking-network.json";
 import {
@@ -761,6 +793,12 @@ function goNearest(category) {
   chooseEndpoint(walkStart.value, point.id, point, "destination");
 }
 const nearestNotice = ref("");
+// Place sharing: a fixed place for a friend, never a live position.
+const sharePoint = ref(null);
+const sharedPlace = computed(() => readSharedPlace(route.query, stationData));
+const walkDestinationPoint = computed(() =>
+  walkDestination.value ? stationById.get(walkDestination.value) : null
+);
 const navigationMap = computed(() =>
   navigationMapState(location.view.value, {
     startId: currentPoint.value?.id,

@@ -486,4 +486,20 @@ export default {
   "walk.arrowDown": "{via}で{floor}へ下りてください。",
   "walk.arrowNote":
     "スマホはあなたの向きを知りません。地図と現地の案内表示を見比べてください。",
+  "share.place": "場所を共有",
+  "share.destination": "目的地を共有",
+  "share.title": "友だちに共有",
+  "share.intro":
+    "友だちがリンクを開くと、この場所が目的地として表示されます。決まった場所で、あなたの現在地ではありません。",
+  "share.system": "ほかのアプリで共有",
+  "share.copy": "リンクをコピー",
+  "share.copied": "コピーしました。友だちに貼り付けてください。",
+  "share.copyFailed":
+    "自動でコピーできませんでした。上のリンクを長押ししてコピーしてください。",
+  "share.close": "閉じる",
+  "share.message":
+    "台北駅の「{name}」（{floor}）で会いましょう。リンクで場所を確認できます：",
+  "share.received":
+    "友だちが共有した場所：{name}（{floor}）。決まった場所で、現在地ではありません。近くの位置QRコードを読み取るとルートを作れます。",
+  "share.linkLabel": "共有リンク",
 };

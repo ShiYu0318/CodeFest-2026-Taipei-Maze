@@ -475,4 +475,20 @@ export default {
   "walk.arrowDown": "{via}로 {floor}까지 내려가세요.",
   "walk.arrowNote":
     "휴대폰은 내가 어느 쪽을 보고 있는지 몰라요. 지도와 현장 안내판을 비교하세요.",
+  "share.place": "장소 공유",
+  "share.destination": "목적지 공유",
+  "share.title": "친구에게 공유",
+  "share.intro":
+    "친구가 링크를 열면 이 장소가 목적지로 설정돼요. 고정된 장소이며 내 실시간 위치가 아니에요.",
+  "share.system": "다른 앱으로 공유",
+  "share.copy": "링크 복사",
+  "share.copied": "복사했어요. 친구에게 붙여 넣으세요.",
+  "share.copyFailed":
+    "자동으로 복사하지 못했어요. 위 링크를 길게 눌러 복사하세요.",
+  "share.close": "닫기",
+  "share.message":
+    "타이베이역 “{name}”({floor})에서 만나요. 링크를 열면 위치를 볼 수 있어요:",
+  "share.received":
+    "친구가 공유한 장소: {name}({floor}). 고정된 장소이며 실시간 위치가 아니에요. 가까운 위치 QR 코드를 스캔하면 경로를 만들 수 있어요.",
+  "share.linkLabel": "공유 링크",
 };

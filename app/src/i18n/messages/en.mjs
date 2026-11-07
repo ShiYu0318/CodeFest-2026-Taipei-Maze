@@ -486,4 +486,20 @@ export default {
   "walk.arrowDown": "Take the {via} down to {floor}.",
   "walk.arrowNote":
     "Your phone does not know which way you face. Compare the map with the signs.",
+  "share.place": "Share place",
+  "share.destination": "Share destination",
+  "share.title": "Share with a friend",
+  "share.intro":
+    "Your friend opens the link and sees this place set as their destination. It is a fixed place, not your live location.",
+  "share.system": "Share with another app",
+  "share.copy": "Copy link",
+  "share.copied": "Copied — paste it to your friend.",
+  "share.copyFailed":
+    "Couldn't copy automatically. Press and hold the link above to copy it.",
+  "share.close": "Close",
+  "share.message":
+    "Meet me at “{name}” ({floor}) in Taipei Main Station. Open the link to see where:",
+  "share.received":
+    "Place shared by a friend: {name} ({floor}). It is a fixed place, not a live location. Scan a nearby location QR code to plan your route.",
+  "share.linkLabel": "Share link",
 };

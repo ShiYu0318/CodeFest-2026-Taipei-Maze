@@ -424,4 +424,18 @@ export default {
   "walk.arrowUp": "搭{via}往上到 {floor}。",
   "walk.arrowDown": "搭{via}往下到 {floor}。",
   "walk.arrowNote": "手機不知道你面向哪裡，請對照地圖和現場指標。",
+  "share.place": "分享地點",
+  "share.destination": "分享目的地",
+  "share.title": "分享給朋友",
+  "share.intro":
+    "朋友打開連結，會看到這個地點並設為目的地。這是固定地點，不是你的即時位置。",
+  "share.system": "用其他 App 分享",
+  "share.copy": "複製連結",
+  "share.copied": "已複製，可以貼給朋友。",
+  "share.copyFailed": "無法自動複製，請長按上面的連結複製。",
+  "share.close": "關閉",
+  "share.message": "在台北車站的「{name}」（{floor}）碰面，打開連結看位置：",
+  "share.received":
+    "朋友分享的地點：{name}（{floor}）。這是固定地點，不是即時位置；掃描附近的定位 QR，就能規劃路線。",
+  "share.linkLabel": "分享連結",
 };

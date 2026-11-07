@@ -495,4 +495,20 @@ export default {
   "walk.arrowDown": "Turun dengan {via} ke {floor}.",
   "walk.arrowNote":
     "Ponsel tidak tahu arah hadap Anda. Bandingkan peta dengan papan petunjuk.",
+  "share.place": "Bagikan tempat",
+  "share.destination": "Bagikan tujuan",
+  "share.title": "Bagikan ke teman",
+  "share.intro":
+    "Teman Anda membuka tautan dan melihat tempat ini sebagai tujuannya. Ini tempat tetap, bukan lokasi langsung Anda.",
+  "share.system": "Bagikan lewat aplikasi lain",
+  "share.copy": "Salin tautan",
+  "share.copied": "Sudah disalin, tempelkan ke teman Anda.",
+  "share.copyFailed":
+    "Tidak bisa menyalin otomatis. Tekan lama tautan di atas untuk menyalinnya.",
+  "share.close": "Tutup",
+  "share.message":
+    "Ketemu di “{name}” ({floor}) di Stasiun Utama Taipei. Buka tautan untuk melihat lokasinya:",
+  "share.received":
+    "Tempat dari teman: {name} ({floor}). Ini tempat tetap, bukan lokasi langsung. Pindai kode QR lokasi terdekat untuk merencanakan rute.",
+  "share.linkLabel": "Tautan berbagi",
 };
