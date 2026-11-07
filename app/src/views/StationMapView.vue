@@ -19,11 +19,7 @@
         </p>
       </section>
 
-      <StationScanPanel
-        :selected-point="selected"
-        @position="setScanPosition"
-        @destination="setScanTarget"
-      />
+      <StationScanPanel :location="location" :selected-point="selected" />
       <div class="floor-controls">
         <div class="floor-switch" role="group" aria-label="選擇樓層">
           <button
@@ -166,7 +162,7 @@
                       :style="pinStyle(point)"
                       :aria-label="
                         point.name +
-                        (point.id === scanPositionId ? '，上次掃碼位置' : '') +
+                        (point.id === scanPositionId ? '，您在這裡' : '') +
                         (point.id === scanTargetId ? '，目的地' : '')
                       "
                       :aria-pressed="point.id === selected?.id"
@@ -188,6 +184,15 @@
                         class="point-icon"
                         :name="point.type"
                       />
+                      <span
+                        v-if="point.id === scanPositionId"
+                        class="location-badge"
+                      >
+                        <ZhuyinText text="您在這裡" />
+                        <span class="location-name"
+                          ><ZhuyinText :text="point.name"
+                        /></span>
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -279,8 +284,11 @@ import StationMapIcon from "../components/StationMapIcon.vue";
 import DisplayControls from "../components/DisplayControls.vue";
 import ZhuyinText from "../components/ZhuyinText.vue";
 import { useDisplayPreferences } from "../display/preferences.mjs";
+import { useStationLocation } from "../station/useStationLocation";
+import { stationPoints } from "../station/scan.mjs";
 import { floors, stackBounds } from "./station-floor-plans";
 import stationData from "./station-points.json";
+import stationConnections from "./station-connections.json";
 import { zones, transfersFromPoint } from "./station-routing";
 
 const { categories, points } = stationData;
@@ -365,7 +373,7 @@ async function focusScanPoint(point) {
   selected.value = point;
   await nextTick();
   if (revision !== scanFocusRevision || !viewport.value?.isConnected) return;
-  await resetZoom();
+  await zoomAt(2, viewportCenter(), normalizedPoint(point));
   if (revision !== scanFocusRevision || !viewport.value?.isConnected) return;
   const [x, y] = normalizedPoint(point);
   centerOn(x, y);
@@ -398,6 +406,25 @@ const webkitGestures = ["gesturestart", "gesturechange", "gestureend"];
 const mapSection = ref(null);
 const mapStage = ref(null);
 const mapTop = ref(0);
+const location = useStationLocation(stationData, stationConnections);
+const stationById = new Map(
+  stationPoints(stationData).map((point) => [point.id, point])
+);
+watch(
+  () => {
+    const position = location.view.value.position;
+    return position
+      ? `${position.pointId}:${position.source}:${position.confirmedAt}`
+      : null;
+  },
+  () => setScanPosition(stationById.get(location.view.value.position?.pointId)),
+  { flush: "post" }
+);
+watch(
+  () => location.view.value.destinationId,
+  (id) => setScanTarget(stationById.get(id)),
+  { flush: "post" }
+);
 watch(level, updateMapLayout, { flush: "post" });
 watch(displayMode, async () => {
   const frame = viewport.value;

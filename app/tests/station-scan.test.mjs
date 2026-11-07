@@ -14,10 +14,15 @@ const connections = JSON.parse(
   )
 );
 const setup = () => createStationScanSession(points, connections);
-test("requires destination; accepts only exact namespace and known point without trusting coordinates", () => {
+test("locates before choosing a destination and accepts only known local anchors", () => {
   const session = setup(),
     valid = stationQrPayload("b1-e4", points);
-  assert.equal(session.scan(valid).type, "DestinationRequired");
+  assert.equal(session.scan(valid).type, "success");
+  assert.equal(session.snapshot().position.pointId, "b1-e4");
+  assert.equal(session.snapshot().destinationId, null);
+  assert.equal(session.snapshot().position.source, "qr");
+  assert.ok(session.snapshot().position.confirmedAt);
+  session.reset();
   session.setDestination("m-e4");
   for (const input of [
     "https://example.com/meet",
