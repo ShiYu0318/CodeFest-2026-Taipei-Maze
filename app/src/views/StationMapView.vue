@@ -47,37 +47,31 @@
             {{ floor }}
           </button>
         </div>
-        <button
-          class="layer-toggle"
-          type="button"
-          role="switch"
-          :aria-checked="showLayers"
-          :aria-label="t('map.layersAria')"
-          :disabled="floorChanging"
-          @click="toggleLayers"
-        >
-          <StationMapIcon name="layers" />
-          <span><ZhuyinText :text="t('map.layers')" /></span>
-          <span class="switch-track" aria-hidden="true"></span>
-        </button>
-      </div>
-
-      <div class="facility-header">
-        <div class="facility-title-group">
-          <h2 id="facility-title">
-            <ZhuyinText :text="t('map.facilities')" />
-          </h2>
+        <div class="floor-actions">
+          <button
+            class="display-icon-button"
+            type="button"
+            role="switch"
+            :aria-checked="showLayers"
+            :aria-label="t('map.layersAria')"
+            :title="t('map.layers')"
+            :disabled="floorChanging"
+            @click="toggleLayers"
+          >
+            <StationMapIcon name="layers" />
+          </button>
+          <button
+            class="display-icon-button"
+            type="button"
+            :aria-label="t('map.locate')"
+            aria-haspopup="dialog"
+            :title="t('map.locate')"
+            :disabled="floorChanging"
+            @click="openEndpointPicker"
+          >
+            <StationMapIcon name="locate" />
+          </button>
         </div>
-        <button
-          class="location-link"
-          type="button"
-          aria-haspopup="dialog"
-          :disabled="floorChanging"
-          @click="openEndpointPicker"
-        >
-          <StationMapIcon name="locate" />
-          <ZhuyinText :text="t('map.locate')" />
-        </button>
       </div>
 
       <div
