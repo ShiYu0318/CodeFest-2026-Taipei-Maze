@@ -21,6 +21,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Pull latest changes
+        working-directory: ./
+        run: git pull origin main
+
       - name: Start services
         working-directory: ./
         run: docker compose up -d --build --remove-orphans
