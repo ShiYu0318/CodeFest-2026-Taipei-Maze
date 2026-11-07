@@ -1,3 +1,8 @@
 services:
-  hello-world:
-    image: hello-world:latest
+  townpass:
+    build:
+      context: ./app
+      target: prod
+    ports:
+      - "8000:80"
+    restart: unless-stopped

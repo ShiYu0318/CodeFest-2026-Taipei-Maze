@@ -21,9 +21,22 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Pull latest main
-        run: git pull origin main --rebase
-
       - name: Start services
         working-directory: ./
         run: docker compose up -d --build --remove-orphans
+
+      - name: Health check
+        run: |
+          for i in $(seq 1 15); do
+            if curl -fsS http://localhost:8000/ > /dev/null; then
+              echo "service is up"
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs --tail=50
+          exit 1
+
+      - name: Prune dangling images
+        if: always()
+        run: docker image prune -f

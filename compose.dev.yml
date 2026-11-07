@@ -1,0 +1,12 @@
+# 本機開發：docker compose -f compose.yml -f compose.dev.yml up --build
+services:
+  townpass:
+    build:
+      target: dev
+    ports: !override
+      - "5173:5173"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - ./app:/app
+      - /app/node_modules
