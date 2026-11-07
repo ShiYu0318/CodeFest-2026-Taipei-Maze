@@ -264,13 +264,11 @@
                           :name="pointIconType(point)"
                         />
                       </span>
-                      <span
+                      <StationMapIcon
                         v-if="matchesTheme(point, 'platform')"
-                        class="pin-platform-label"
-                        aria-hidden="true"
-                      >
-                        <ZhuyinText :text="t('type.platform')" />
-                      </span>
+                        class="pin-platform-icon"
+                        name="platform"
+                      />
                       <span
                         v-if="point.id === scanPositionId"
                         class="location-badge"

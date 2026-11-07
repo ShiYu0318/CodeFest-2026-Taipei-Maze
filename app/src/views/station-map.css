@@ -436,20 +436,18 @@
   height: 9px;
   color: #fff;
 }
-.pin-platform-label {
+.pin-platform-icon {
   position: absolute;
-  top: 100%;
-  left: 50%;
-  padding: 1px 4px;
+  top: 50%;
+  left: calc(100% + 2px);
+  width: 18px;
+  height: 18px;
+  padding: 2px;
   border: 1px solid var(--tp-primary-300);
-  border-radius: 4px;
+  border-radius: 50%;
   background: var(--surface);
   color: var(--tp-primary-800);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  line-height: 1.2;
-  white-space: nowrap;
-  transform: translateX(-50%);
+  transform: translateY(-50%);
   pointer-events: none;
 }
 .pin-arrival .point-pin {
