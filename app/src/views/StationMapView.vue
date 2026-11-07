@@ -46,6 +46,13 @@
         </p>
       </section>
 
+      <StationEndpointBar
+        :start-point="currentPoint"
+        :target-point="targetPoint"
+        @open="(role, event) => openEndpointPicker(event, role)"
+        @swap="swapEndpoints"
+      />
+
       <StationScanPanel
         :location="location"
         :selected-point="selected"
@@ -146,18 +153,6 @@
             @click="toggleLayers"
           >
             <StationMapIcon name="layers" />
-          </button>
-          <button
-            class="display-icon-button"
-            data-tour-target="locate"
-            type="button"
-            :aria-label="t('map.locate')"
-            aria-haspopup="dialog"
-            :title="displayPlainZhuyin(t('map.locate'), displayMode, locale)"
-            :disabled="floorChanging"
-            @click="openEndpointPicker"
-          >
-            <StationMapIcon name="locate" />
           </button>
         </div>
       </div>
@@ -527,6 +522,7 @@
       v-if="endpointPickerOpen"
       :start-point="currentPoint"
       :target-point="targetPoint"
+      :initial-role="pickerRole"
       @close="closeEndpointPicker"
       @select="chooseEndpoint"
       @map-pick="startMapPicking"
@@ -572,6 +568,7 @@ import StaffCard from "../components/StaffCard.vue";
 import PlaceShareSheet from "../components/PlaceShareSheet.vue";
 import { readSharedPlace } from "../station/place-share.mjs";
 import StationEndpointPicker from "../components/StationEndpointPicker.vue";
+import StationEndpointBar from "../components/StationEndpointBar.vue";
 import StationInformationDialog from "../components/StationInformationDialog.vue";
 import StationTripDialog from "../components/StationTripDialog.vue";
 import StationRouteSteps from "../components/StationRouteSteps.vue";
@@ -1556,8 +1553,10 @@ function updateMapLayout() {
   enforceZoomLimit();
 }
 
-function openEndpointPicker(event) {
+const pickerRole = ref(null);
+function openEndpointPicker(event, role = null) {
   if (event) endpointTrigger = event.currentTarget;
+  pickerRole.value = role;
   selected.value = null;
   mapPickStep.value = null;
   draftStart.value = null;
@@ -1602,6 +1601,15 @@ function chooseEndpoint(start, destination, point, role, proposedOptions) {
   const saved = saveEndpoints(start, destination);
   if (role === "destination" && destination) openTripDialog();
   return saved;
+}
+
+// Swap start and destination without opening the trip dialog.
+function swapEndpoints() {
+  const start = currentPoint.value?.id ?? null,
+    destination = targetPoint.value?.id ?? null;
+  if (!start && !destination) return;
+  if (!location.choose(start)) return;
+  return saveEndpoints(destination, start);
 }
 
 const staffPoint = ref(null);

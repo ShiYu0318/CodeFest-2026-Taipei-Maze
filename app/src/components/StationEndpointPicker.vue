@@ -74,11 +74,33 @@
           navigation
           @select="chooseSearch"
         />
+        <p class="endpoint-browse-title">
+          <ZhuyinText :text="t('endpoint.browse')" />
+        </p>
+        <div
+          class="endpoint-types"
+          role="group"
+          :aria-label="t('endpoint.browse')"
+          @touchmove.stop
+          @wheel.stop
+        >
+          <button
+            v-for="type in browseTypes"
+            :key="type || 'all'"
+            type="button"
+            :aria-pressed="browseType === type"
+            @click="browseType = type"
+          >
+            <ZhuyinText
+              :text="type ? t('type.' + type) : t('endpoint.allTypes')"
+            />
+          </button>
+        </div>
         <div
           class="endpoint-list"
           :aria-label="t('endpoint.pointsAria', { role: labels[activeRole] })"
         >
-          <section v-for="(floorPoints, floor) in points" :key="floor">
+          <section v-for="(floorPoints, floor) in browsePoints" :key="floor">
             <h3>{{ floor }}</h3>
             <ul>
               <li v-for="point in floorPoints" :key="point.id">
@@ -130,6 +152,8 @@ import { stationCatalog } from "../search/catalog.mjs";
 const props = defineProps({
   startPoint: { type: Object, default: null },
   targetPoint: { type: Object, default: null },
+  // Which field the visitor tapped in the endpoint bar.
+  initialRole: { type: String, default: null },
   currentOptions: {
     type: Object,
     default: () => ({
@@ -154,12 +178,57 @@ const choices = reactive({
   destination: props.targetPoint,
 });
 const activeRole = ref(
-  choices.start && !choices.destination ? "destination" : "start"
+  ["start", "destination"].includes(props.initialRole)
+    ? props.initialRole
+    : choices.start && !choices.destination
+    ? "destination"
+    : "start"
+);
+// Secondary browsing: filter the floor lists by facility type.
+const typeOrder = [
+  "restroom",
+  "elevator",
+  "exit",
+  "info",
+  "ticket",
+  "escalator",
+  "stairs",
+  "nursing",
+  "water",
+  "locker",
+  "aed",
+  "accessible",
+];
+const typesOf = (point) => [point.type].flat();
+const browseTypes = [
+  null,
+  ...typeOrder.filter((type) =>
+    Object.values(points).some((list) =>
+      list.some((point) => typesOf(point).includes(type))
+    )
+  ),
+];
+const browseType = ref(null);
+const browsePoints = computed(() =>
+  Object.fromEntries(
+    Object.entries(points)
+      .map(([floor, list]) => [
+        floor,
+        browseType.value
+          ? list.filter((point) => typesOf(point).includes(browseType.value))
+          : list,
+      ])
+      .filter(([, list]) => list.length)
+  )
 );
 const panel = ref(null);
 const list = ref(null);
 const closeButton = ref(null);
-onMounted(() => closeButton.value.focus({ preventScroll: true }));
+// Opened from a field in the endpoint bar: searching comes first.
+onMounted(() => {
+  const search = props.initialRole && list.value?.querySelector("input");
+  (search || closeButton.value).focus({ preventScroll: true });
+});
 
 function showRole(role) {
   if (role === activeRole.value) return;
@@ -350,5 +419,37 @@ function keepFocus(event) {
   .endpoint-dialog footer {
     padding-block: 4px;
   }
+}
+.endpoint-browse-title {
+  margin: 16px 0 8px;
+  color: var(--muted);
+  font-size: var(--display-secondary-size, 0.8125rem);
+  font-weight: 600;
+}
+.endpoint-types {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.endpoint-types button {
+  flex: none;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--tp-primary-300, #9fd2dc);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--tp-primary-700);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.endpoint-types button[aria-pressed="true"] {
+  border-color: var(--tp-primary-600);
+  background: var(--tp-primary-600);
+  color: #fff;
 }
 </style>

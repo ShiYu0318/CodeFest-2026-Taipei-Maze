@@ -26,7 +26,7 @@ export default {
   "tour.layers":
     "Turn this on to see other floors as dashed outlines and compare their positions.",
   "tour.locate":
-    "Choose a start and destination from the list or pick them on the map.",
+    "Search or pick your start and destination at the top. Tap the arrows between them to swap.",
   "tour.facilities":
     "Select a category, such as restrooms or elevators, to find those facilities on this floor.",
   "tour.marker":
@@ -510,4 +510,9 @@ export default {
   "route.prev": "Previous",
   "route.next": "Next",
   "route.all": "All steps",
+  "endpoint.swap": "Swap start and destination",
+  "endpoint.startPlaceholder": "Where are you starting?",
+  "endpoint.destinationPlaceholder": "Where are you going?",
+  "endpoint.browse": "Or browse by type",
+  "endpoint.allTypes": "All",
 };

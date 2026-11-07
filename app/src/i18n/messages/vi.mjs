@@ -26,7 +26,7 @@ export default {
   "tour.layers":
     "Bật để xem đường viền nét đứt của các tầng khác và so sánh vị trí.",
   "tour.locate":
-    "Chọn điểm đi và điểm đến từ danh sách hoặc trực tiếp trên bản đồ.",
+    "Tìm hoặc chọn điểm đi và điểm đến ở trên cùng. Chạm mũi tên ở giữa để đổi chỗ.",
   "tour.facilities":
     "Chọn một loại tiện ích, như nhà vệ sinh hay thang máy, để tìm trên tầng này.",
   "tour.marker":
@@ -509,4 +509,9 @@ export default {
   "route.prev": "Bước trước",
   "route.next": "Bước tiếp",
   "route.all": "Tất cả các bước",
+  "endpoint.swap": "Đổi điểm đi và điểm đến",
+  "endpoint.startPlaceholder": "Bạn bắt đầu từ đâu?",
+  "endpoint.destinationPlaceholder": "Bạn muốn đi đâu?",
+  "endpoint.browse": "Hoặc chọn theo loại",
+  "endpoint.allTypes": "Tất cả",
 };
