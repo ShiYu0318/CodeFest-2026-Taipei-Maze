@@ -553,7 +553,7 @@
   color: var(--pin-color);
 }
 .theme-group button[aria-pressed="true"] {
-  background: var(--wash);
+  background: var(--tp-secondary-200);
   border-color: var(--accent);
   box-shadow: inset 0 -2px 0 var(--accent);
 }
