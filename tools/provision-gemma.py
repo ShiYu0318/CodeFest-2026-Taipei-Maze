@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import ssl
 import subprocess
 import sys
 import urllib.request
@@ -19,6 +20,7 @@ REPO = 'litert-community/Gemma3-1B-IT'
 REVISION = '42d538a932e8d5b12e6b3b455f5572560bd60b2c'
 NAME = 'gemma3-1b-it-int4.litertlm'
 SIZE = 584417280
+EXPECTED_SHA256 = '1325ae366d31950f137c9c357b9fa89448b176d76998180c08ceaca78bba98be'
 SOURCE = f'https://huggingface.co/{REPO}/resolve/{REVISION}/{NAME}'
 RAW = f'https://huggingface.co/{REPO}/raw/{REVISION}/{NAME}'
 
@@ -34,22 +36,38 @@ class SafeRedirect(urllib.request.HTTPRedirectHandler):
             redirected.remove_header('Authorization')
         return redirected
 
+def ssl_context():
+    # Framework Python on macOS can lack its own CA bundle. Use the OS CA file,
+    # preserving certificate/hostname verification; never disable TLS checks.
+    if ssl.get_default_verify_paths().cafile is None and Path('/etc/ssl/cert.pem').is_file():
+        return ssl.create_default_context(cafile='/etc/ssl/cert.pem')
+    return ssl.create_default_context()
+
+def read_token():
+    token = os.environ.get('HF_TOKEN')
+    if token:
+        return token
+    path = Path.home() / '.cache/huggingface/token'
+    return path.read_text().strip() if path.is_file() else None
+
 def open_source(url, token):
     request = urllib.request.Request(url, headers={'Authorization': f'Bearer {token}'} if token else {})
-    return urllib.request.build_opener(SafeRedirect()).open(request, timeout=60)
+    return urllib.request.build_opener(SafeRedirect(), urllib.request.HTTPSHandler(context=ssl_context())).open(request, timeout=60)
 
 def provision(directory, accepted, token):
     if not accepted:
         raise ValueError('Accept Gemma terms in your own HF account first, then pass --accepted-gemma-terms.')
-    with open_source(RAW, token) as response:
-        pointer = response.read(1024).decode('utf-8')
-    match = re.fullmatch(r'version https://git-lfs.github.com/spec/v1\noid sha256:([a-f0-9]{64})\nsize 584417280\n?', pointer)
-    if not match:
-        raise ValueError('Pinned Google model pointer is invalid; refusing download.')
-    expected = match.group(1)
+    expected = EXPECTED_SHA256
     directory.mkdir(parents=True, exist_ok=True)
     target = directory / NAME
     temporary = directory / (NAME + '.part')
+    existing = Path.home() / '.litert-lm/cache/huggingface' / REPO / NAME
+    if not target.exists() and existing.is_file() and existing.stat().st_size == SIZE:
+        shutil.copy2(existing, temporary)
+        if digest(temporary) == expected:
+            temporary.replace(target)
+        else:
+            temporary.unlink(missing_ok=True)
     if target.exists() and target.stat().st_size == SIZE and digest(target) == expected:
         pass
     else:
@@ -86,7 +104,7 @@ def main():
     args = parser.parse_args()
     directory = Path(__file__).resolve().parents[1] / '.local' / 'models' / 'gemma3'
     try:
-        provision(directory, args.accepted_gemma_terms, os.environ.get('HF_TOKEN'))
+        provision(directory, args.accepted_gemma_terms, read_token())
         if args.simulator:
             container = subprocess.check_output(['xcrun','simctl','get_app_container',args.simulator,'com.example.townpass','data'], text=True).strip()
             destination = Path(container) / 'Library' / 'Application Support' / 'CodefestAI'
