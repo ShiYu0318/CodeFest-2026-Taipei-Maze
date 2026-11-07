@@ -90,7 +90,6 @@ export default {
 
   "scan.navigation": "Navigasi",
   "scan.browsing": "Lihat peta",
-  "scan.easyRead": "Mudah dibaca",
   "scan.caveat":
     "Kode lokasi belum dipasang di stasiun. Saat ini hanya ada fasilitas dan penghubung antarlantai; jaringan jalan kaki lengkap belum tersedia.",
   "scan.browseHint": "Pindai kode QR lokasi terdekat untuk tahu posisi Anda.",
