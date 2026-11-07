@@ -64,10 +64,10 @@ index 771d33a..b4e8dbf 100644
              <action android:name="android.intent.action.VIEW" />
 diff --git a/android/app/src/main/kotlin/com/example/townpass/CodefestAI.kt b/android/app/src/main/kotlin/com/example/townpass/CodefestAI.kt
 new file mode 100644
-index 0000000..8cdc19c
+index 0000000..0a2169c
 --- /dev/null
 +++ b/android/app/src/main/kotlin/com/example/townpass/CodefestAI.kt
-@@ -0,0 +1,172 @@
+@@ -0,0 +1,173 @@
 +// SPDX-License-Identifier: AGPL-3.0-or-later
 +package com.example.townpass
 +
@@ -164,6 +164,7 @@ index 0000000..8cdc19c
 +                        }
 +                        check(!cancelled.get())
 +                        engine!!.createConversation().use { chat ->
++                            check(!cancelled.get())
 +                            conversation = chat
 +                            val reply = chat.sendMessage(prompt, maxOutputToken = 256).toString()
 +                            response = if (cancelled.get()) error("cancelled") else mapOf("status" to "success", "text" to reply.take(6000))
@@ -467,10 +468,10 @@ index b509907..bb493eb 100644
  }
 diff --git a/ios/Runner/CodefestAI.swift b/ios/Runner/CodefestAI.swift
 new file mode 100644
-index 0000000..c260ad0
+index 0000000..241a0de
 --- /dev/null
 +++ b/ios/Runner/CodefestAI.swift
-@@ -0,0 +1,169 @@
+@@ -0,0 +1,170 @@
 +// SPDX-License-Identifier: AGPL-3.0-or-later
 +import Flutter
 +import UIKit
@@ -522,7 +523,7 @@ index 0000000..c260ad0
 +      let recognizer = locales.contains(locale) ? SFSpeechRecognizer(locale: Locale(identifier: locale)) : nil
 +      result(["status":"success", "modelReady":receipt() != nil, "voiceAvailable":recognizer?.supportsOnDeviceRecognition == true, "model":"Gemma 3 1B INT4"])
 +    case "generate":
-+      guard generationId == nil else { result(error("busy")); return }
++      guard generationId == nil, voiceId == nil else { result(error("busy")); return }
 +      guard let prompt = args["prompt"] as? String, !prompt.isEmpty, prompt.utf16.count <= 6000 else { result(error("invalid_input")); return }
 +      guard let expected = receipt() else { result(error("model_missing")); return }
 +      generationId = id
@@ -541,6 +542,7 @@ index 0000000..c260ad0
 +          }
 +          guard let current = engine else { throw NSError(domain:"model_missing",code:1) }
 +          let chat = try await current.createConversation()
++          try Task.checkCancellation()
 +          conversation = chat
 +          let reply = try await chat.sendMessage(Message(prompt), maxOutputTokens: 256)
 +          try Task.checkCancellation()
@@ -1326,14 +1328,13 @@ index 0000000..07cf472
 +}
 diff --git a/lib/util/codefest_bundle_server.dart b/lib/util/codefest_bundle_server.dart
 new file mode 100644
-index 0000000..06f2f0a
+index 0000000..28c1438
 --- /dev/null
 +++ b/lib/util/codefest_bundle_server.dart
-@@ -0,0 +1,115 @@
+@@ -0,0 +1,114 @@
 +// SPDX-License-Identifier: AGPL-3.0-or-later
 +import 'dart:convert';
 +import 'dart:io';
-+import 'dart:typed_data';
 +
 +import 'package:crypto/crypto.dart';
 +import 'package:flutter/services.dart';
@@ -1920,10 +1921,10 @@ index 0000000..fa57335
 +}
 diff --git a/test/codefest_bundle_server_test.dart b/test/codefest_bundle_server_test.dart
 new file mode 100644
-index 0000000..f8db154
+index 0000000..e493235
 --- /dev/null
 +++ b/test/codefest_bundle_server_test.dart
-@@ -0,0 +1,78 @@
+@@ -0,0 +1,74 @@
 +import 'dart:convert';
 +import 'dart:io';
 +
@@ -1931,11 +1932,7 @@ index 0000000..f8db154
 +import 'package:flutter_test/flutter_test.dart';
 +import 'package:town_pass/util/codefest_bundle_server.dart';
 +
-+class RealLoopbackHttp extends HttpOverrides {
-+  @override
-+  HttpClient createHttpClient(SecurityContext? context) =>
-+      super.createHttpClient(context);
-+}
++class RealLoopbackHttp extends HttpOverrides {}
 +
 +void main() {
 +  TestWidgetsFlutterBinding.ensureInitialized();
