@@ -1,0 +1,30 @@
+[
+  {
+    "id": "mp_a",
+    "site_id": "synthetic_lab",
+    "anchor_id": "qr_a",
+    "destination_poi_id": "poi_meet_a",
+    "name_key": "meeting_a",
+    "original_signage": "TEST-A 合成集合點",
+    "waiting_guidance_key": "wait_a",
+    "enabled": true,
+    "shareable": true,
+    "waiting_area_status": "approved",
+    "verification_status": "synthetic",
+    "source_ids": ["src_fixture"]
+  },
+  {
+    "id": "mp_b",
+    "site_id": "synthetic_lab",
+    "anchor_id": "qr_b2_lift",
+    "destination_poi_id": "poi_meet_b",
+    "name_key": "meeting_b",
+    "original_signage": "TEST-B 合成集合點",
+    "waiting_guidance_key": "wait_b",
+    "enabled": true,
+    "shareable": true,
+    "waiting_area_status": "approved",
+    "verification_status": "synthetic",
+    "source_ids": ["src_fixture"]
+  }
+]

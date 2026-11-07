@@ -189,3 +189,71 @@ test("invalid search choices do not replace an active destination or plan", () =
     assert.equal(s.state.phase, "navigating");
   }
 });
+
+test("meeting destination selection clears B location, preserves B restrictions and waits for B scan", () => {
+  const s = ready();
+  s.setMobility("stepFree");
+  s.confirmLocation();
+  s.prepareMeetingDestination("poi_meet_b");
+  assert.equal(s.state.destinationId, "poi_meet_b");
+  assert.equal(s.state.position, null);
+  assert.equal(s.state.phase, "unlocated");
+  assert.equal(s.state.mobilityProfile, "stepFree");
+  assert.equal(s.state.plan, null);
+  s.acceptQr(payload());
+  s.confirmLocation();
+  assert.equal(s.state.phase, "ready");
+  assert.ok(s.state.plan.route.edgeIds.includes("e_lift_up"));
+  assert.equal(s.state.position.nodeId, "b1_a");
+});
+test("meeting at recipient origin requires arrival confirmation; unavailable elevator keeps NoRoute", () => {
+  const s = ready();
+  s.prepareMeetingDestination("poi_meet_a");
+  s.acceptQr(payload());
+  s.confirmLocation();
+  assert.equal(s.state.phase, "arrival_confirmation");
+  s.setMobility("stepFree");
+  s.markConnectorUnavailable("lift_1");
+  s.prepareMeetingDestination("poi_meet_b");
+  s.acceptQr(payload());
+  s.confirmLocation();
+  assert.equal(s.state.phase, "no_route");
+  assert.equal(s.state.plan, null);
+});
+
+test("destination-first continuous scans update the origin each time and preserve the destination", () => {
+  const s = createSession(fixture());
+  assert.equal(s.applyContinuousAnchor(payload()).type, "DestinationRequired");
+  assert.equal(s.state.position, null);
+  s.selectDestination("poi_restroom");
+  assert.equal(s.applyContinuousAnchor(payload()).type, "success");
+  assert.equal(s.state.position.nodeId, "b1_a");
+  const revision = s.state.revision;
+  assert.equal(s.applyContinuousAnchor(payload("qr_b2_lift")).type, "success");
+  assert.equal(s.state.position.nodeId, "b2_lift");
+  assert.equal(s.state.destinationId, "poi_restroom");
+  assert.ok(s.state.revision > revision);
+  assert.deepEqual(s.state.plan.route.nodeIds, ["b2_lift", "b2_dest"]);
+  const old = s.state.plan;
+  assert.notEqual(
+    s.applyContinuousAnchor("https://example.com/meet").type,
+    "success"
+  );
+  assert.equal(s.state.plan, old);
+  assert.equal(s.state.position.nodeId, "b2_lift");
+});
+
+test("native instruction actions require the current displayed guidance token, rejecting stale QR and double taps", () => {
+  const s = ready();
+  const first = s.guidanceToken();
+  assert.equal(s.advanceFromGuidance(first), true);
+  assert.equal(s.state.phase, "navigating");
+  assert.equal(s.advanceFromGuidance(first), false);
+  assert.equal(s.state.stepIndex, 0);
+  const old = s.guidanceToken();
+  s.applyContinuousAnchor(payload("qr_b2_lift"));
+  assert.equal(s.state.phase, "ready");
+  assert.equal(s.advanceFromGuidance(old), false);
+  assert.equal(s.state.phase, "ready");
+  assert.equal(s.advanceFromGuidance(s.guidanceToken()), true);
+});

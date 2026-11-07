@@ -4,6 +4,11 @@ import TestPage from "@/components/TestPage.vue";
 
 const routes = [
   {
+    path: "/meet",
+    name: "meeting",
+    component: () => import("../views/MeetingView.vue"),
+  },
+  {
     path: "/navigation-demo",
     name: "navigation-demo",
     component: () => import("../views/NavigationDemoView.vue"),

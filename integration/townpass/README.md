@@ -13,3 +13,6 @@ bash scripts/townpass-env.sh serve
 本地網址 `http://127.0.0.1:8765/` 只監聽 loopback，供這台 Mac 的 iOS Simulator 使用，不對 LAN 或 Internet 開放。實機不能拿自己的 127.0.0.1 當這台 Mac；需要實機時另行設定可信測試網址，不應直接對外暴露全部服務。
 
 宿主的 `CodeFest 測試環境` 服務入口修改會以 patch 保存於本目錄，保留 TownPass GPL 及著作權聲明。套用前核對基準 commit、工作目錄乾淨與 `git apply --check`，不要覆蓋其他宿主修改。環境實測與啟動方式見 [測試環境](../../docs/測試環境.md)。
+
+
+持續模式使用新版 `qr_scan_session` handler，非循環呼叫舊掃碼頁。patch 另含原生單一相機、指引區與 session／guidance 版本防護，來源限制與操作方式見 [集合點與持續掃碼指南](../../docs/集合點與持續掃碼開發指南.md)。未套新版 patch 的宿主能力探測會失敗，網頁不會假稱常駐掃碼可用。
