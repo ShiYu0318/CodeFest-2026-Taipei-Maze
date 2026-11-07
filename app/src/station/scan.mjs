@@ -139,14 +139,19 @@ export function createStationScanSession(data, graph) {
       return true;
     },
     scan(payload) {
-      if (!state.destinationId) return { type: "DestinationRequired" };
       const parsed = parseAnchor(payload, anchors);
       if (parsed.type !== "success") return parsed;
-      const point = byId.get(parsed.anchor.pointId);
+      return this.locatePoint(parsed.anchor.pointId, "qr");
+    },
+    locatePoint(pointId, source = "url") {
+      const point = byId.get(pointId);
+      if (!point || point.enabled === false) return { type: "UnknownPoint" };
+      if (!["qr", "url"].includes(source)) return { type: "InvalidSource" };
       state.position = {
         pointId: point.id,
         floor: point.floor,
-        confirmedAt: new Date().toISOString(),
+        source,
+        confirmedAt: source === "qr" ? new Date().toISOString() : null,
       };
       state.arrived = false;
       revision++;
