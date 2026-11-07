@@ -4,6 +4,7 @@ import {
   createChatBridge,
   buildChatPrompt,
   shouldSendOnEnter,
+  isUsableChatReply,
 } from "../src/chat/bridge.mjs";
 function host() {
   const sent = [],
@@ -91,4 +92,11 @@ test("IME Enter accepts composition without sending; Shift Enter stays a newline
   assert.equal(shouldSendOnEnter({ key: "Enter", keyCode: 229 }), false);
   assert.equal(shouldSendOnEnter({ key: "Enter", shiftKey: true }), false);
   assert.equal(shouldSendOnEnter({ key: "Enter" }), true);
+});
+
+test("repeated model output is rejected instead of displayed as a useful answer", () => {
+  assert.equal(isUsableChatReply("可以先選擇目的地，再掃描定位碼。"), true);
+  assert.equal(isUsableChatReply(""), false);
+  assert.equal(isUsableChatReply("地、".repeat(40)), false);
+  assert.equal(isUsableChatReply("abcdef".repeat(10)), false);
 });

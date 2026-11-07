@@ -137,3 +137,12 @@ export function shouldSendOnEnter(event) {
     event.keyCode !== 229
   );
 }
+
+export function isUsableChatReply(text) {
+  return (
+    typeof text === "string" &&
+    !!text.trim() &&
+    text.length <= 6000 &&
+    !/(.{1,12})\1{7,}/su.test(text)
+  );
+}

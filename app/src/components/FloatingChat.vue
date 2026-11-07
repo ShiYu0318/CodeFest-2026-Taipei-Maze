@@ -186,6 +186,7 @@ import {
   buildChatPrompt,
   createChatBridge,
   shouldSendOnEnter,
+  isUsableChatReply,
 } from "../chat/bridge.mjs";
 const opened = ref(false),
   draft = ref(""),
@@ -321,11 +322,14 @@ async function send() {
   if (
     result.status === "success" &&
     typeof result.text === "string" &&
-    result.text.trim()
+    isUsableChatReply(result.text)
   )
     messages.value.push({ id: ++serial, role: "assistant", text: result.text });
   else {
-    notice.value = explain(result);
+    notice.value =
+      result.status === "success"
+        ? "這次回覆出現重複或不完整內容，請縮短問題後重試；導航請以地圖提示為準。"
+        : explain(result);
     if (!draft.value) draft.value = text;
   }
   scroll();
