@@ -89,10 +89,6 @@
                 aria-describedby="map-gesture-help"
                 tabindex="0"
                 @wheel="zoomWithWheel"
-                @touchstart="startPinch"
-                @touchmove="movePinch"
-                @touchend="endPinch"
-                @touchcancel="endPinch"
                 @keydown.self="zoomWithKeyboard"
               >
                 <div class="map-board" :style="{ width: zoom * 100 + '%' }">
@@ -417,7 +413,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StationMapIcon from "../components/StationMapIcon.vue";
 import StationTransferMap from "../components/StationTransferMap.vue";
@@ -460,13 +456,35 @@ const selected = ref(null);
 const zoom = ref(1);
 const viewport = ref(null);
 let pinch = null;
+let webkitPinch = null;
 let zoomRevision = 0;
+const captureGesture = { capture: true, passive: false };
+const webkitGestures = ["gesturestart", "gesturechange", "gestureend"];
 const mapSection = ref(null);
 const startZone = ref("");
 const targetZone = ref("");
 const previewSteps = ref([]);
 const routeMessage = ref("");
 const previewHeading = ref(null);
+
+onMounted(() => {
+  document.addEventListener("touchstart", startPinch, captureGesture);
+  document.addEventListener("touchend", endPinch, captureGesture);
+  document.addEventListener("touchcancel", endPinch, captureGesture);
+  for (const type of webkitGestures) {
+    document.addEventListener(type, handleWebkitGesture, captureGesture);
+  }
+});
+
+onBeforeUnmount(() => {
+  clearPinch();
+  document.removeEventListener("touchstart", startPinch, true);
+  document.removeEventListener("touchend", endPinch, true);
+  document.removeEventListener("touchcancel", endPinch, true);
+  for (const type of webkitGestures) {
+    document.removeEventListener(type, handleWebkitGesture, true);
+  }
+});
 
 const startOptions = computed(() =>
   zones.filter((zone) => zone.floor === level.value)
@@ -652,16 +670,17 @@ async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
 }
 
 function resetZoom() {
-  pinch = null;
+  clearPinch();
+  webkitPinch = null;
   return zoomAt(1, [0, 0], [0, 0]);
 }
 
 function zoomWithWheel(event) {
+  // Chromium trackpad pinches arrive as Ctrl+wheel. Claim them only on the map.
+  const zoomGesture = event.ctrlKey || event.metaKey;
   if (
-    event.ctrlKey ||
-    event.metaKey ||
-    event.shiftKey ||
-    Math.abs(event.deltaX) > Math.abs(event.deltaY)
+    !zoomGesture &&
+    (event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY))
   )
     return;
   const unit =
@@ -673,15 +692,12 @@ function zoomWithWheel(event) {
   const scale = constrainZoom(
     zoom.value * Math.exp((-event.deltaY * unit) / 600)
   );
+  if (zoomGesture || scale !== zoom.value) event.preventDefault();
   if (scale === zoom.value) return;
-  event.preventDefault();
   zoomAt(scale, viewportPoint(event.clientX, event.clientY));
 }
 
-function pinchPosition(event) {
-  const touches = Array.from(event.touches).filter((touch) =>
-    viewport.value.contains(touch.target)
-  );
+function pinchPosition(touches) {
   if (touches.length !== 2) return null;
   const [first, second] = touches;
   const distance = Math.hypot(
@@ -697,29 +713,81 @@ function pinchPosition(event) {
 }
 
 function startPinch(event) {
-  const position = pinchPosition(event);
-  if (!position) return;
+  if (event.touches.length < 2) return;
+  // The second finger may land outside the map and dispatch its own touchstart there.
+  if (
+    !pinch &&
+    !Array.from(event.touches).some((touch) =>
+      viewport.value.contains(touch.target)
+    )
+  )
+    return;
   if (event.cancelable) event.preventDefault();
+  const position = pinchPosition(event.touches);
+  if (!position) return;
+  if (webkitPinch) webkitPinch.usesTouch = true;
   pinch = {
     distance: position.distance,
     scale: zoom.value,
     anchor: zoomAnchor(position.center),
   };
+  document.addEventListener("touchmove", movePinch, captureGesture);
 }
 
 function movePinch(event) {
   if (!pinch) return;
-  const position = pinchPosition(event);
-  if (!position) return;
   if (event.cancelable) event.preventDefault();
+  const position = pinchPosition(event.touches);
+  if (!position) return;
   const scale = constrainZoom(
     (pinch.scale * position.distance) / pinch.distance
   );
   zoomAt(scale, position.center, pinch.anchor);
 }
 
-function endPinch() {
+function endPinch(event) {
+  if (!pinch) return;
+  if (event.cancelable) event.preventDefault();
+  clearPinch();
+}
+
+function clearPinch() {
   pinch = null;
+  document.removeEventListener("touchmove", movePinch, true);
+}
+
+function handleWebkitGesture(event) {
+  // WebKit can also send native gesture events for the same pinch.
+  if (event.type === "gesturestart") {
+    webkitPinch = null;
+    const frame = viewport.value;
+    if (!pinch && !frame.contains(event.target)) return;
+    const center =
+      Number.isFinite(event.clientX) && Number.isFinite(event.clientY)
+        ? viewportPoint(event.clientX, event.clientY)
+        : [frame.clientWidth / 2, frame.clientHeight / 2];
+    webkitPinch = {
+      center,
+      anchor: zoomAnchor(center),
+      scale: zoom.value,
+      usesTouch: Boolean(pinch),
+    };
+  }
+  if (!webkitPinch && !pinch) return;
+  if (event.cancelable) event.preventDefault();
+  if (event.type === "gestureend") webkitPinch = null;
+  if (
+    event.type === "gesturechange" &&
+    webkitPinch &&
+    !webkitPinch.usesTouch &&
+    Number.isFinite(event.scale)
+  ) {
+    zoomAt(
+      constrainZoom(webkitPinch.scale * event.scale),
+      webkitPinch.center,
+      webkitPinch.anchor
+    );
+  }
 }
 
 function zoomWithKeyboard(event) {
