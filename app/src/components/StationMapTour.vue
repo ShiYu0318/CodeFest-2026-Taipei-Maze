@@ -17,8 +17,15 @@
       class="map-tour-spotlight"
       :style="spotlight"
       aria-hidden="true"
-    ></div>
-    <section class="map-tour-card" :style="cardStyle" :data-side="side">
+    >
+      <span :key="targetId" class="map-tour-pulse"></span>
+    </div>
+    <section
+      :key="targetId"
+      class="map-tour-card"
+      :style="cardStyle"
+      :data-side="side"
+    >
       <header class="map-tour-header">
         <span>{{ t("tour.step", { step: index + 1, total }) }}</span>
         <button type="button" class="map-tour-skip" @click="finish">
@@ -217,6 +224,18 @@ onBeforeUnmount(() => {
   border: 2px solid var(--tp-primary-500);
   border-radius: 9px;
   box-shadow: 0 0 0 150vmax rgb(8 19 21 / 66%);
+  pointer-events: none;
+  transition: top 260ms ease, left 260ms ease, width 260ms ease,
+    height 260ms ease;
+}
+.map-tour-pulse {
+  position: absolute;
+  inset: -2px;
+  border: 2px solid var(--tp-primary-500);
+  border-radius: inherit;
+  pointer-events: none;
+  animation: map-tour-pulse 900ms ease-out 2;
+  opacity: 0;
 }
 .map-tour-card {
   position: absolute;
@@ -229,6 +248,10 @@ onBeforeUnmount(() => {
   border-radius: 12px;
   background: var(--surface);
   box-shadow: 0 6px 24px rgb(8 19 21 / 30%);
+  animation: map-tour-card-in 240ms ease-out;
+}
+.map-tour-card[data-side="below"] {
+  --map-tour-entry-offset: -8px;
 }
 .map-tour-card[data-side]::before {
   position: absolute;
@@ -291,6 +314,35 @@ onBeforeUnmount(() => {
   flex: none;
   background: var(--tp-primary-100);
   color: var(--tp-primary-900);
+}
+@keyframes map-tour-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--map-tour-entry-offset, 8px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes map-tour-pulse {
+  from {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-tour-spotlight {
+    transition: none;
+  }
+  .map-tour-card,
+  .map-tour-pulse {
+    animation: none;
+  }
 }
 @media (max-height: 420px) {
   .map-tour-card {
