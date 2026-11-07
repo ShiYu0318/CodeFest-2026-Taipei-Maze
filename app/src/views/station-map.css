@@ -794,3 +794,12 @@
     padding-inline: 16px;
   }
 }
+
+/* QR-confirmed position and chosen destination are independent of browsing. */
+.map-pin.pin-scan-position {
+  outline: 3px solid #198263;
+  outline-offset: 3px;
+}
+.map-pin.pin-scan-target {
+  box-shadow: 0 0 0 3px #a36b17;
+}
