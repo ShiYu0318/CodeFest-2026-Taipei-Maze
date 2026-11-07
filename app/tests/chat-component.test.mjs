@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+/* global globalThis */
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
+import { webcrypto } from "node:crypto";
 import { compileScript, parse } from "@vue/compiler-sfc";
 import { transformSync } from "@babel/core";
 import * as Vue from "vue";
@@ -11,6 +13,13 @@ import * as answers from "../src/chat/answers.mjs";
 import * as stream from "../src/chat/stream.mjs";
 import * as i18n from "../src/i18n/index.mjs";
 import * as scan from "../src/station/scan.mjs";
+// Node 18 file execution lacks the browser Web Crypto global.
+// Supply the real standard implementation for the simulated WebView.
+if (!globalThis.crypto)
+  Object.defineProperty(globalThis, "crypto", {
+    value: webcrypto,
+    configurable: true,
+  });
 const require = createRequire(import.meta.url);
 const source = readFileSync(
   new URL("../src/components/FloatingChat.vue", import.meta.url),
