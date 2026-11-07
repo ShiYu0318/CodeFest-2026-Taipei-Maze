@@ -2,6 +2,7 @@
 // Reference catalog. Every other locale must provide exactly these keys and
 // the same {placeholders}; tests/i18n.test.mjs enforces it.
 export default {
+  "type.platform": "月台",
   "tour.helper": "點右下角的小幫手，可以詢問站內設施或地圖操作方式。",
   "tour.reopen": "點左上角的圓框問號，就能從第一步重看功能導覽。",
   "tour.step": "導覽 {step}／{total}",

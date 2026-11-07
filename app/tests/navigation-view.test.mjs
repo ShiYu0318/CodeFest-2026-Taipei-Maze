@@ -20,6 +20,7 @@ const connections = JSON.parse(
   )
 );
 const points = stationPoints(data);
+const isQrPoint = (point) => [point.type].flat().includes("qrcode");
 
 test("browsing and destination picking keep the normal facility filter", () => {
   const session = createStationScanSession(data, connections);
@@ -59,7 +60,7 @@ test("navigation keeps endpoints and only its validated transfer points, plus ev
     navigationPointVisible(point, view, false)
   );
   assert.equal(visible.length, 36);
-  assert.equal(visible.filter((point) => point.type === "qrcode").length, 32);
+  assert.equal(visible.filter(isQrPoint).length, 32);
   assert.equal(
     navigationPointVisible(
       points.find((point) => point.id === "b1-e7"),
@@ -69,7 +70,7 @@ test("navigation keeps endpoints and only its validated transfer points, plus ev
   );
   assert.ok(
     visible
-      .filter((point) => point.type !== "qrcode")
+      .filter((point) => !isQrPoint(point))
       .every((point) => view.pointIds.includes(point.id))
   );
   // Hidden facility icons are still valid scan anchors when someone is lost.

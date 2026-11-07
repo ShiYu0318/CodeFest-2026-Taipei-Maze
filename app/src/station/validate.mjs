@@ -40,13 +40,14 @@ export function validateStationData(pointData, connectionData) {
       byId.set(point.id, { ...point, floor });
       if (typeof point.name !== "string" || !point.name.trim())
         issues.push(`${where}: missing name`);
-      for (const type of [point.type].flat())
+      const types = [point.type].flat();
+      for (const type of types)
         if (!knownTypes.has(type))
           issues.push(`${where}: unknown type ${type}`);
       if (![point.x, point.y].every((n) => Number.isFinite(n) && n >= 0))
         issues.push(`${where}: invalid coordinates`);
       const boundaryDemo =
-        point.type === "qrcode" && point.placement === "boundary-demo";
+        types.includes("qrcode") && point.placement === "boundary-demo";
       if (
         point.placement === "boundary-demo" &&
         (!boundaryDemo ||

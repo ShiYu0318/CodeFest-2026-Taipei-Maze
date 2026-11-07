@@ -5,6 +5,11 @@
       "colorToken": "primary-700",
       "iconColor": "#496b75"
     },
+    "platform": {
+      "name": "月台",
+      "colorToken": "primary-900",
+      "iconColor": "#AC3BFF"
+    },
     "restroom": {
       "name": "廁所",
       "colorToken": "primary-800",
@@ -1137,7 +1142,10 @@
       },
       {
         "id": "b3-qr-05",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 05 號示意定位點",
         "x": 561.39,
         "y": 1209,
@@ -1152,7 +1160,10 @@
       },
       {
         "id": "b3-qr-06",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 06 號示意定位點",
         "x": 999.54,
         "y": 1209,
@@ -1167,7 +1178,10 @@
       },
       {
         "id": "b3-qr-07",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 07 號示意定位點",
         "x": 1092.96,
         "y": 1308,
@@ -1182,7 +1196,10 @@
       },
       {
         "id": "b3-qr-08",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 08 號示意定位點",
         "x": 725.57,
         "y": 1308,
@@ -1284,7 +1301,10 @@
       },
       {
         "id": "b4-qr-01",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 01 號示意定位點",
         "x": 1110.06,
         "y": 459.5,
@@ -1299,7 +1319,10 @@
       },
       {
         "id": "b4-qr-02",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 02 號示意定位點",
         "x": 1100.99,
         "y": 550.14,
@@ -1314,7 +1337,10 @@
       },
       {
         "id": "b4-qr-03",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 03 號示意定位點",
         "x": 1043.51,
         "y": 851.28,
@@ -1329,7 +1355,10 @@
       },
       {
         "id": "b4-qr-04",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 04 號示意定位點",
         "x": 1018.59,
         "y": 981.89,
@@ -1344,7 +1373,10 @@
       },
       {
         "id": "b4-qr-05",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 05 號示意定位點",
         "x": 960.08,
         "y": 1095.25,
@@ -1359,7 +1391,10 @@
       },
       {
         "id": "b4-qr-06",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 06 號示意定位點",
         "x": 921.52,
         "y": 937.25,
@@ -1374,7 +1409,10 @@
       },
       {
         "id": "b4-qr-07",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 07 號示意定位點",
         "x": 967.38,
         "y": 697.33,
@@ -1389,7 +1427,10 @@
       },
       {
         "id": "b4-qr-08",
-        "type": "qrcode",
+        "type": [
+          "qrcode",
+          "platform"
+        ],
         "name": "QR 08 號示意定位點",
         "x": 995.83,
         "y": 548.52,

@@ -354,8 +354,11 @@
 .active-with-layers {
   opacity: 0.87;
 }
-.map-pin {
+.map-pin,
+.pin-platform-icon {
   --marker-color: var(--marker-base-color);
+}
+.map-pin {
   position: absolute;
   touch-action: pan-x pan-y;
   display: flex;
@@ -369,7 +372,7 @@
   transform: translate(-50%, -50%);
   background: transparent;
 }
-.station-page[data-theme="dark"] .map-pin {
+.station-page[data-theme="dark"] :is(.map-pin, .pin-platform-icon) {
   --marker-color: color-mix(in srgb, var(--marker-base-color) 75%, white);
 }
 .map-pin.pin-filtered-out {
@@ -435,6 +438,10 @@
   width: 9px;
   height: 9px;
   color: #fff;
+}
+.pin-platform-icon {
+  position: absolute;
+  transform: translate(-50%, -50%) scale(var(--platform-icon-scale));
 }
 .pin-arrival .point-pin {
   outline: 2px solid var(--marker-color);
@@ -732,32 +739,29 @@
   color: var(--tp-gray-700);
 }
 .station-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px 12px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  margin: 30px 30px 20px;
   padding-top: 14px;
-  color: var(--muted);
-  font-size: 0.75rem;
+  color: #9d9d9d;
+  font-size: 12px;
   line-height: 1.6;
+  text-align: center;
 }
 .station-footer > div {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0 12px;
 }
 .station-footer a {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  color: var(--tp-primary-700);
-}
-.station-data-status {
-  flex-basis: 100%;
+  color: inherit;
 }
 .station-footer .station-about-link {
-  flex-basis: 100%;
   font-weight: 600;
   text-decoration: none;
 }
@@ -900,10 +904,6 @@
   height: 24px;
   flex-shrink: 0;
 }
-.station-page:not([data-display-mode="standard"]) .station-footer {
-  font-size: var(--display-secondary-size);
-  line-height: 1.65;
-}
 .station-page:not([data-display-mode="standard"]) .station-footer a {
   min-height: var(--display-control-height);
 }
@@ -951,7 +951,9 @@
   width: 96px;
   height: 96px;
 }
-.station-page[data-display-mode="senior"] .map-pin :is(.point-pin, .pin-icon) {
+.station-page[data-display-mode="senior"]
+  .map-pin
+  :is(.point-pin:not(.pin-platform-icon), .pin-icon) {
   transform: scale(2);
 }
 .display-facility-detail h3 {

@@ -7,6 +7,8 @@ import { scatterBoundary } from "../app/src/station/boundary.mjs";
 const file = new URL("../app/src/views/station-points.json", import.meta.url);
 const original = readFileSync(file, "utf8");
 const data = JSON.parse(original);
+// B3 also has a concourse outline. B4 consists of its platform outline.
+const platformOutline = { B3: 1, B4: 0 };
 data.categories.qrcode = {
   name: "QR 定位點",
   colorToken: "primary-900",
@@ -14,7 +16,11 @@ data.categories.qrcode = {
 };
 for (const [floor, points] of Object.entries(data.points)) {
   const existing = points.filter(
-    (point) => !(point.type === "qrcode" && point.placement === "boundary-demo")
+    (point) =>
+      !(
+        [point.type].flat().includes("qrcode") &&
+        point.placement === "boundary-demo"
+      )
   );
   const positions = scatterBoundary(plans[floor], {
     seed: 20261108 + Number(floor.slice(1)),
@@ -27,7 +33,10 @@ for (const [floor, points] of Object.entries(data.points)) {
       throw new Error(`Point ID already exists: ${id}`);
     return {
       id,
-      type: "qrcode",
+      type:
+        platformOutline[floor] === position.boundary.outline
+          ? ["qrcode", "platform"]
+          : "qrcode",
       name: `QR ${number} 號示意定位點`,
       x: position.x,
       y: position.y,

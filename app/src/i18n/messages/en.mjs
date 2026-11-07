@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Draft translation (team-authored, not yet language-reviewed).
 export default {
+  "type.platform": "Platform",
   "tour.helper":
     "Tap the helper in the bottom-right corner to ask about station facilities or how to use the map.",
   "tour.reopen":
