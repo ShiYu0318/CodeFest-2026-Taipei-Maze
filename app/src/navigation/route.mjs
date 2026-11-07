@@ -23,7 +23,7 @@ class MinHeap {
     if (a.length) {
       a[0] = last;
       let i = 0;
-      while (true) {
+      while (i < a.length) {
         const l = i * 2 + 1,
           r = l + 1;
         let next = i;

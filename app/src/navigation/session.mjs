@@ -76,6 +76,7 @@ export function createSession(input) {
   const state = {
     phase: errors.length ? "data_error" : "unlocated",
     position: null,
+    needsLocationConfirmation: false,
     pendingAnchorId: null,
     destinationId: null,
     mobilityProfile: "standard",
@@ -101,6 +102,11 @@ export function createSession(input) {
     }
     if (!state.position) {
       state.phase = "unlocated";
+      return;
+    }
+    if (state.needsLocationConfirmation) {
+      state.pendingAnchorId = state.position.anchorId;
+      state.phase = "confirm_location";
       return;
     }
     if (!state.destinationId) {
@@ -154,6 +160,7 @@ export function createSession(input) {
   function reconfirm() {
     invalidate();
     if (state.position) {
+      state.needsLocationConfirmation = true;
       state.pendingAnchorId = state.position.anchorId;
       state.phase = "confirm_location";
       previousPhase = null;
@@ -182,6 +189,7 @@ export function createSession(input) {
         confirmedAt: new Date().toISOString(),
       };
       state.pendingAnchorId = null;
+      state.needsLocationConfirmation = false;
       previousPhase = null;
       recompute();
     },
@@ -243,12 +251,15 @@ export function createSession(input) {
     cancelRelocation() {
       if (!["relocating", "confirm_location"].includes(state.phase)) return;
       state.pendingAnchorId = null;
-      state.phase = previousPhase ?? (state.position ? "located" : "unlocated");
+      state.phase = state.needsLocationConfirmation
+        ? "relocating"
+        : previousPhase ?? (state.position ? "located" : "unlocated");
       previousPhase = null;
     },
     end() {
       invalidate();
       state.position = null;
+      state.needsLocationConfirmation = false;
       state.pendingAnchorId = null;
       state.destinationId = null;
       state.unavailableConnectorIds = [];

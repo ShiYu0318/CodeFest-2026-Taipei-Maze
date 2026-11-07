@@ -128,3 +128,15 @@ test("new scan at B2 rebuilds from anchor, and end clears session position", () 
   assert.equal(s.state.plan, null);
   assert.equal(s.state.phase, "unlocated");
 });
+
+test("cancelling required reconfirmation cannot silently reuse a stale position via destination selection", () => {
+  const s = ready();
+  s.start();
+  s.setMobility("stepFree");
+  s.cancelRelocation();
+  s.selectDestination("poi_entry");
+  assert.equal(s.state.phase, "confirm_location");
+  assert.equal(s.state.plan, null);
+  s.confirmLocation();
+  assert.equal(s.state.phase, "arrival_confirmation");
+});

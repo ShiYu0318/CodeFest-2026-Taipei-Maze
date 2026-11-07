@@ -22,11 +22,16 @@ export function validateGraph(graph) {
   for (const name of groups)
     if (!Array.isArray(graph[name])) fail(`${name}: expected array`);
   if (errors.length) return errors;
-  if (!/^1\.\d+\.\d+$/.test(graph.schema_version ?? ""))
+  if (
+    typeof graph.schema_version !== "string" ||
+    !/^1\.\d+\.\d+$/.test(graph.schema_version)
+  )
     fail("Unsupported schema major");
   if (
-    !/^\d+\.\d+\.\d+$/.test(graph.graph_version ?? "") ||
-    !idPattern.test(graph.site_id ?? "")
+    typeof graph.graph_version !== "string" ||
+    !/^\d+\.\d+\.\d+$/.test(graph.graph_version) ||
+    typeof graph.site_id !== "string" ||
+    !idPattern.test(graph.site_id)
   )
     fail("Invalid graph identity");
   if (
@@ -40,7 +45,11 @@ export function validateGraph(graph) {
   for (const group of groups) {
     maps[group] = new Map();
     for (const item of graph[group]) {
-      if (!object(item) || !idPattern.test(item.id ?? "")) {
+      if (
+        !object(item) ||
+        typeof item.id !== "string" ||
+        !idPattern.test(item.id)
+      ) {
         fail(`${group}: invalid item ID`);
         continue;
       }
@@ -58,6 +67,10 @@ export function validateGraph(graph) {
       fail(`${context}: missing message`);
   };
   const ref = (group, value, context) => {
+    if (typeof value !== "string") {
+      fail(`${context}: reference must be a string`);
+      return;
+    }
     if (!maps[group].has(value)) fail(`${context}: missing ${group} ${value}`);
   };
   const refs = (group, values, context) => {
@@ -94,6 +107,7 @@ export function validateGraph(graph) {
     )
       fail(`${floor.id}: invalid viewBox`);
   }
+  if (errors.length) return errors;
   for (const node of graph.nodes) {
     ref("floors", node.floor_id, node.id);
     key(node.label_key, node.id);

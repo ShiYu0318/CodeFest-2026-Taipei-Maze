@@ -68,3 +68,19 @@ test("disposing resolves in-flight request and never leaves an active listener",
   assert.equal(n.listeners, 0);
   assert.equal((await b.scan()).type, "Unavailable");
 });
+
+test("adapter remount on same native channel drains old reply before a fresh request", async () => {
+  const n = native(),
+    first = createQrBridge(n, 100),
+    old = first.scan();
+  first.dispose();
+  assert.equal((await old).type, "Cancelled");
+  const second = createQrBridge(n, 100);
+  assert.equal((await second.scan()).type, "WaitingForDrain");
+  n.reply(JSON.stringify({ name: "qr_code_scan", data: "old-payload" }));
+  const fresh = second.scan();
+  n.reply(JSON.stringify({ name: "qr_code_scan", data: "new-payload" }));
+  assert.equal((await fresh).payload, "new-payload");
+  second.dispose();
+  assert.equal(n.listeners, 0);
+});

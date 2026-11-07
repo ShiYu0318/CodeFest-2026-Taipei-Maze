@@ -153,3 +153,27 @@ test("malformed nested arrays never throw at the graph boundary", () => {
     assert.equal(planRoute(graph, request()).type, "InvalidGraph");
   }
 });
+
+test("JSON objects in primitive identity and reference fields return InvalidGraph, never throw", () => {
+  const invalid = { toString: null };
+  for (const mutate of [
+    (g) => (g.nodes[0].id = invalid),
+    (g) => (g.schema_version = invalid),
+    (g) => (g.graph_version = invalid),
+    (g) => (g.site_id = invalid),
+    (g) => (g.edges[0].source_ids = [invalid]),
+    (g) => (g.edges[0].to_node_id = invalid),
+  ]) {
+    const graph = fixture();
+    mutate(graph);
+    assert.doesNotThrow(() => validateGraph(graph));
+    assert.equal(planRoute(graph, request()).type, "InvalidGraph");
+  }
+});
+
+test("invalid floor viewBox stops before node coordinate arithmetic", () => {
+  const graph = fixture();
+  graph.floors[0].view_box.x = { toString: null };
+  assert.doesNotThrow(() => validateGraph(graph));
+  assert.equal(planRoute(graph, request()).type, "InvalidGraph");
+});
