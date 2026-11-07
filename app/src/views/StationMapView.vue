@@ -47,29 +47,31 @@
             {{ floor }}
           </button>
         </div>
-        <button
-          class="display-icon-button"
-          type="button"
-          role="switch"
-          :aria-checked="showLayers"
-          :aria-label="t('map.layersAria')"
-          :title="t('map.layers')"
-          :disabled="floorChanging"
-          @click="toggleLayers"
-        >
-          <StationMapIcon name="layers" />
-        </button>
-        <button
-          class="display-icon-button"
-          type="button"
-          :aria-label="t('map.locate')"
-          aria-haspopup="dialog"
-          :title="t('map.locate')"
-          :disabled="floorChanging"
-          @click="openEndpointPicker"
-        >
-          <StationMapIcon name="locate" />
-        </button>
+        <div class="floor-actions">
+          <button
+            class="display-icon-button"
+            type="button"
+            role="switch"
+            :aria-checked="showLayers"
+            :aria-label="t('map.layersAria')"
+            :title="t('map.layers')"
+            :disabled="floorChanging"
+            @click="toggleLayers"
+          >
+            <StationMapIcon name="layers" />
+          </button>
+          <button
+            class="display-icon-button"
+            type="button"
+            :aria-label="t('map.locate')"
+            aria-haspopup="dialog"
+            :title="t('map.locate')"
+            :disabled="floorChanging"
+            @click="openEndpointPicker"
+          >
+            <StationMapIcon name="locate" />
+          </button>
+        </div>
       </div>
 
       <div

@@ -156,6 +156,7 @@
 .floor-controls {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   margin-bottom: 10px;
   overflow-x: auto;
@@ -167,8 +168,12 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
-  flex: 1 0 172px;
-  max-width: 244px;
+  flex: 0 0 clamp(172px, 45%, 244px);
+}
+.floor-actions {
+  display: flex;
+  flex: none;
+  gap: 4px;
 }
 .floor-switch button {
   min-height: 44px;
@@ -896,7 +901,6 @@
 }
 .station-page:not([data-display-mode="standard"]) .floor-switch {
   flex-basis: 220px;
-  max-width: 300px;
   gap: 6px;
 }
 .station-page:not([data-display-mode="standard"])
