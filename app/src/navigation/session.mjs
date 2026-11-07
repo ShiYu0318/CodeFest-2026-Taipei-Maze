@@ -81,6 +81,7 @@ export function createSession(input) {
     destinationId: null,
     mobilityProfile: "standard",
     unavailableConnectorIds: [],
+    excludedEdgeTypes: [],
     plan: null,
     stepIndex: 0,
     revision: 0,
@@ -126,6 +127,7 @@ export function createSession(input) {
       destinationId: poi.node_id,
       mobilityProfile: state.mobilityProfile,
       unavailableConnectorIds: state.unavailableConnectorIds,
+      excludedEdgeTypes: state.excludedEdgeTypes,
     });
     if (result.type !== "success") {
       state.phase = result.type === "InvalidGraph" ? "data_error" : "no_route";
@@ -166,6 +168,23 @@ export function createSession(input) {
       previousPhase = null;
     } else state.phase = "unlocated";
   }
+  function selectDestination(id) {
+    if (errors.length) return;
+    if (!graph.pois.some((p) => p.id === id && p.enabled)) {
+      state.error = "UnknownDestination";
+      return;
+    }
+    const moving = [
+      "navigating",
+      "arrival_confirmation",
+      "arrived",
+      "relocating",
+      "confirm_location",
+    ].includes(state.phase);
+    state.destinationId = id;
+    if (moving && state.position) reconfirm();
+    else recompute();
+  }
   return {
     state,
     acceptQr(payload) {
@@ -193,22 +212,57 @@ export function createSession(input) {
       previousPhase = null;
       recompute();
     },
-    selectDestination(id) {
-      if (errors.length) return;
-      if (!graph.pois.some((p) => p.id === id && p.enabled)) {
+    selectDestination,
+    applySearchSelection(selection) {
+      const proposal = selection?.proposedOptions;
+      if (
+        errors.length ||
+        !proposal ||
+        !["standard", "stepFree"].includes(proposal.mobilityProfile) ||
+        !Array.isArray(proposal.excludedEdgeTypes) ||
+        proposal.excludedEdgeTypes.some(
+          (type) =>
+            !["walkway", "stairs", "elevator", "escalator", "gate"].includes(
+              type
+            )
+        ) ||
+        !Array.isArray(proposal.unavailableConnectorIds) ||
+        proposal.unavailableConnectorIds.some(
+          (id) => !graph.connectors.some((c) => c.id === id)
+        )
+      ) {
+        state.error = "UnsupportedOptions";
+        return;
+      }
+      if (!graph.pois.some((p) => p.id === selection.poiId && p.enabled)) {
         state.error = "UnknownDestination";
         return;
       }
-      const moving = [
-        "navigating",
-        "arrival_confirmation",
-        "arrived",
-        "relocating",
-        "confirm_location",
-      ].includes(state.phase);
-      state.destinationId = id;
-      if (moving && state.position) reconfirm();
-      else recompute();
+      const profile =
+        state.mobilityProfile === "stepFree" ||
+        proposal.mobilityProfile === "stepFree"
+          ? "stepFree"
+          : "standard";
+      const excluded = [
+        ...new Set([...state.excludedEdgeTypes, ...proposal.excludedEdgeTypes]),
+      ];
+      const unavailable = [
+        ...new Set([
+          ...state.unavailableConnectorIds,
+          ...proposal.unavailableConnectorIds,
+        ]),
+      ];
+      const changed =
+        profile !== state.mobilityProfile ||
+        excluded.length !== state.excludedEdgeTypes.length ||
+        unavailable.length !== state.unavailableConnectorIds.length;
+      state.mobilityProfile = profile;
+      state.excludedEdgeTypes = excluded;
+      state.unavailableConnectorIds = unavailable;
+      if (changed) {
+        state.destinationId = selection.poiId;
+        reconfirm();
+      } else selectDestination(selection.poiId);
     },
     setMobility(profile) {
       if (
@@ -263,6 +317,7 @@ export function createSession(input) {
       state.pendingAnchorId = null;
       state.destinationId = null;
       state.unavailableConnectorIds = [];
+      state.excludedEdgeTypes = [];
       state.phase = errors.length ? "data_error" : "unlocated";
       previousPhase = null;
     },

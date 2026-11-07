@@ -47,9 +47,15 @@ export function planRoute(graph, request = {}) {
     destinationId,
     mobilityProfile = "standard",
     unavailableConnectorIds = [],
+    excludedEdgeTypes = [],
   } = request;
   if (
     !["standard", "stepFree"].includes(mobilityProfile) ||
+    !Array.isArray(excludedEdgeTypes) ||
+    excludedEdgeTypes.some(
+      (type) =>
+        !["walkway", "stairs", "elevator", "escalator", "gate"].includes(type)
+    ) ||
     !Array.isArray(unavailableConnectorIds) ||
     unavailableConnectorIds.some((id) => typeof id !== "string")
   )
@@ -62,6 +68,7 @@ export function planRoute(graph, request = {}) {
   for (const edge of graph.edges) {
     let reason = null;
     if (edge.status !== "open") reason = "status";
+    else if (excludedEdgeTypes.includes(edge.type)) reason = "excludedEdgeType";
     else if (unavailableConnectorIds.includes(edge.connector_id))
       reason = "unavailableConnector";
     else if (
@@ -112,6 +119,7 @@ export function planRoute(graph, request = {}) {
           ],
           optionsSnapshot: {
             mobilityProfile,
+            excludedEdgeTypes: [...excludedEdgeTypes],
             unavailableConnectorIds: [...unavailableConnectorIds],
           },
         },

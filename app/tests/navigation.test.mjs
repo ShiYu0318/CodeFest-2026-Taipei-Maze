@@ -177,3 +177,22 @@ test("invalid floor viewBox stops before node coordinate arithmetic", () => {
   assert.doesNotThrow(() => validateGraph(graph));
   assert.equal(planRoute(graph, request()).type, "InvalidGraph");
 });
+
+test("explicit edge exclusions add hard limits independently of mobility", () => {
+  const graph = fixture();
+  const r = planRoute(graph, request({ excludedEdgeTypes: ["stairs"] }));
+  assert.equal(r.type, "success");
+  assert.ok(r.route.edgeIds.includes("e_lift_up"));
+  assert.equal(r.route.optionsSnapshot.mobilityProfile, "standard");
+  assert.deepEqual(r.route.optionsSnapshot.excludedEdgeTypes, ["stairs"]);
+  assert.equal(
+    planRoute(graph, request({ excludedEdgeTypes: ["stairs", "elevator"] }))
+      .type,
+    "NoRoute"
+  );
+  for (const excludedEdgeTypes of [null, ["teleport"], {}])
+    assert.equal(
+      planRoute(graph, request({ excludedEdgeTypes })).type,
+      "UnsupportedOptions"
+    );
+});

@@ -140,3 +140,52 @@ test("cancelling required reconfirmation cannot silently reuse a stale position 
   s.confirmLocation();
   assert.equal(s.state.phase, "arrival_confirmation");
 });
+
+test("explicit search selection adds restrictions, preserves stronger current requirements and never starts walking", () => {
+  const s = ready();
+  s.start();
+  s.applySearchSelection({
+    poiId: "poi_restroom",
+    proposedOptions: {
+      mobilityProfile: "standard",
+      excludedEdgeTypes: ["stairs"],
+      unavailableConnectorIds: [],
+    },
+  });
+  assert.equal(s.state.phase, "confirm_location");
+  assert.equal(s.state.plan, null);
+  assert.deepEqual(s.state.excludedEdgeTypes, ["stairs"]);
+  s.confirmLocation();
+  assert.equal(s.state.phase, "ready");
+  assert.ok(s.state.plan.route.edgeIds.includes("e_lift_up"));
+  s.setMobility("stepFree");
+  s.confirmLocation();
+  s.applySearchSelection({
+    poiId: "poi_restroom",
+    proposedOptions: {
+      mobilityProfile: "standard",
+      excludedEdgeTypes: [],
+      unavailableConnectorIds: [],
+    },
+  });
+  assert.equal(s.state.mobilityProfile, "stepFree");
+  assert.deepEqual(s.state.excludedEdgeTypes, ["stairs"]);
+});
+test("invalid search choices do not replace an active destination or plan", () => {
+  const s = ready();
+  s.start();
+  const old = s.state.plan;
+  for (const selection of [
+    null,
+    { poiId: "missing", proposedOptions: {} },
+    {
+      poiId: "poi_restroom",
+      proposedOptions: { excludedEdgeTypes: ["teleport"] },
+    },
+  ]) {
+    s.applySearchSelection(selection);
+    assert.equal(s.state.plan, old);
+    assert.equal(s.state.destinationId, "poi_restroom");
+    assert.equal(s.state.phase, "navigating");
+  }
+});
