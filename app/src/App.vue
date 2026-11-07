@@ -1,8 +1,5 @@
 <template>
-  <nav
-    v-if="!['station-map', 'navigation-demo', 'meeting'].includes($route.name)"
-    class="app-nav"
-  >
+  <nav v-if="!['station-map', 'meeting'].includes($route.name)" class="app-nav">
     <router-link to="/">Home</router-link>
     <router-link to="/test">Test</router-link>
     <router-link to="/station-map">台北車站 B1–B4 地圖</router-link>
