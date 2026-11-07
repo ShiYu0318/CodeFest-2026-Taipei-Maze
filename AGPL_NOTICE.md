@@ -26,7 +26,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 專案原始碼位置：[Taipei-Codefest-2026-Big-Dumb](https://github.com/yoyo899843/Taipei-Codefest-2026-Big-Dumb)。
 
-2026-11-07 設定檢查時 repository 為 private；以上位置目前不代表匿名使用者能取得原始碼。依競賽要求公開後，須以未登入狀態確認可讀取及下載。正式部署畫面須提供顯著的「原始碼與授權」入口，指向與部署版本相符的 commit／tag 及對應建置說明；只有 README 的連結不能代替尚未實作的產品入口。
+依使用者 2026-11-07 最新決定，repository 先保持 private；以上位置目前不代表匿名使用者能取得原始碼。競賽公開要求尚未完成，待另行明確授權後公開，並以未登入狀態確認可讀取及下載。正式部署畫面須提供顯著的「原始碼與授權」入口，指向與部署版本相符的 commit／tag 及對應建置說明；只有 README 的連結不能代替尚未實作的產品入口。
 
 ## 適用範圍
 

@@ -15,6 +15,6 @@ Taipei Maze 北車不迷路：QR 定位、局部跨樓層路網、圖像指引�
 
 原創程式碼採 **AGPL-3.0-or-later**，完整條款見 [LICENSE](./LICENSE)，主辦格式聲明見 [AGPL_NOTICE.md](./AGPL_NOTICE.md)。第三方及官方文件、地圖、字型、音檔等保留各自權利，見 [第三方紀錄](./THIRD_PARTY_NOTICES.md)。TownPass 上游仍保留 GPL-3.0 聲明。
 
-[原始碼 repository](https://github.com/yoyo899843/Taipei-Codefest-2026-Big-Dumb)。2026-11-07 查驗時為 private，尚未完成競賽要求的公開原始碼設定；公開後需匿名驗證。未來部署畫面須顯著提供對應版本的「原始碼與授權」連結，包含必要建置與安裝資訊。
+[原始碼 repository](https://github.com/yoyo899843/Taipei-Codefest-2026-Big-Dumb)。依使用者 2026-11-07 最新決定，**先保持 private**；競賽要求的公開原始碼設定尚未完成，待另行明確授權後才公開並匿名驗證。未來部署畫面須顯著提供對應版本的「原始碼與授權」連結，包含必要建置與安裝資訊。
 
 得獎公布後 repo 至少公開一年，並依主辦通知協助整併城市通。此一年是競賽最低維持期間，不代表 AGPL 授權到期。

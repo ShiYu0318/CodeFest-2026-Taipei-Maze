@@ -27,6 +27,9 @@
 
 ## Git
 
+- 使用者最新決定：repository **先保持 private**。不要自行改為 public；競賽公開義務保留為未完成交付事項，待使用者另行明確授權。
+- 經常同步遠端與分段 commit：開始工作、重要工作階段及 push 前先 fetch，工作乾淨且可快轉時 pull --ff-only；有本地 commits 時確認差異後 rebase 最新 origin/main。保護未提交工作，不為同步執行 reset／clean 或覆蓋他人變更。
+- 將完成且可檢查的變更以有意義的小段 commit 保存，不等到整個任務結束；只 stage 當次範圍，不把使用者的其他檔案一併提交。
 - 保留使用者未提交工作，僅提交當次範圍；不改寫遠端歷史、不 force push。
 - commit message 使用英文 Conventional Commits。課堂作業另遵守使用者指定的 `work/hwN`、Draft PR 及繁體中文 PR 流程。
 - 不得將 key、token、`.env`、簽章私鑰、真實個資或未核准素材提交到 repo。
