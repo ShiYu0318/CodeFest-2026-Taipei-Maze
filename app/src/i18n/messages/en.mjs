@@ -364,4 +364,37 @@ export default {
     "Exits are not on the map yet. These places lead toward exit {code} — from there, follow the {code} exit signs:",
   "chat.answer.otherFloors":
     "There is no {type} on {floor}, but other floors have one — tap to see it on the map:",
+  "about.version": "Deployed version",
+  "about.versionLabel": "Version",
+  "about.builtOn": "(built on {date})",
+  "about.fullCommit": "Full commit",
+  "about.unknownBuild":
+    "This build did not record a git commit, so it cannot be matched to a source version.",
+  "about.source": "Source code",
+  "about.licenseIntro":
+    "The original code is licensed as below; you may use, modify and share it under its terms:",
+  "about.repository": "Source repository: ",
+  "about.privateRepo":
+    "The repository is still private and cannot be downloaded anonymously yet. Once public, the version above will lead to the matching source and build notes.",
+  "about.noticeSummary": "Full license notice",
+  "about.data": "Data sources and verification",
+  "about.points": "{count} facility places on {floors}",
+  "about.connections":
+    "{count} floor links, {unverified} of them not yet checked on site for type or direction",
+  "about.networkYes": "A walking network checked on site is included.",
+  "about.networkNo":
+    "No walking network checked on site yet; the map only shows areas and floor links, not step-by-step distances.",
+  "about.mapSource":
+    "Station maps are redrawn from Taipei Metro public information. Positions are approximate; follow the signs on site:",
+  "about.linkFacilities": "Station facilities",
+  "about.linkInfo": "Station information map",
+  "about.openData":
+    "Research open data comes from the Taipei City open data platform (Taipei Rapid Transit Corporation, Department of Environmental Protection) under the terms below; including it here does not make it AGPL:",
+  "about.openDataLicense": "Open Government Data License, version 1.0",
+  "about.thirdParty": "Third-party components",
+  "about.gemmaNote":
+    "The Gemma model is downloaded only after you accept the Gemma Terms of Use in the app. Its weights are not covered by this project's AGPL license.",
+  "about.compLitert": "Google LiteRT-LM (in the app)",
+  "about.compGemma": "Google Gemma 3 1B (optional download)",
+  "about.compTownpass": "TownPass host app",
 };

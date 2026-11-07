@@ -2,12 +2,16 @@
 <template>
   <main
     class="about-page display-page"
-    lang="zh-Hant"
+    :lang="htmlLang(locale)"
     :data-theme="theme"
     :data-display-mode="displayMode"
   >
     <div class="about-toolbar">
-      <router-link to="/station-map" class="about-back"
+      <router-link
+        to="/station-map"
+        class="about-back"
+        :aria-label="t('meeting.back')"
+        :title="t('meeting.back')"
         ><svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             d="m15 5-7 7 7 7"
@@ -17,142 +21,142 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           /></svg
-        >回車站地圖</router-link
-      >
+      ></router-link>
       <DisplayControls />
     </div>
 
-    <h1>原始碼與授權</h1>
+    <h1>{{ t("title.about") }}</h1>
 
     <section class="about-card" aria-labelledby="about-version">
-      <h2 id="about-version">部署版本</h2>
+      <h2 id="about-version">{{ t("about.version") }}</h2>
       <dl>
-        <dt>版本</dt>
+        <dt>{{ t("about.versionLabel") }}</dt>
         <dd>
           <code>{{ build.short }}</code>
-          <span v-if="build.date" class="about-date"
-            >（建置於 {{ build.date }}）</span
-          >
+          <span v-if="build.date" class="about-date">{{
+            t("about.builtOn", { date: build.date })
+          }}</span>
         </dd>
         <template v-if="build.known">
-          <dt>完整 commit</dt>
+          <dt>{{ t("about.fullCommit") }}</dt>
           <dd>
             <code class="about-hash">{{ build.commit }}</code>
           </dd>
         </template>
       </dl>
       <p v-if="!build.known" class="about-note">
-        此建置未記錄 git commit，無法對應到特定原始碼版本。
+        {{ t("about.unknownBuild") }}
       </p>
     </section>
 
     <section class="about-card" aria-labelledby="about-source">
-      <h2 id="about-source">原始碼</h2>
+      <h2 id="about-source">{{ t("about.source") }}</h2>
+      <p>{{ t("about.licenseIntro") }}</p>
       <p>
-        原創程式碼採
         <a
           href="https://www.gnu.org/licenses/agpl-3.0.html"
           target="_blank"
           rel="noopener noreferrer"
           >GNU AGPL-3.0-or-later</a
         >
-        授權，你可以依條款使用、修改與再散布。
       </p>
       <p>
-        原始碼儲存庫：<strong>{{ repository }}</strong>
+        {{ t("about.repository") }}<strong>{{ repository }}</strong>
       </p>
-      <p class="about-warning">
-        儲存庫目前仍為私人狀態，尚未開放匿名下載。公開後，可依上方版本號取得與此畫面相符的原始碼與建置說明。
-      </p>
+      <p class="about-warning">{{ t("about.privateRepo") }}</p>
       <details>
-        <summary>授權聲明全文</summary>
+        <summary>{{ t("about.noticeSummary") }}</summary>
         <pre lang="en">{{ notice }}</pre>
       </details>
     </section>
 
     <section class="about-card" aria-labelledby="about-data">
-      <h2 id="about-data">資料來源與驗證狀態</h2>
+      <h2 id="about-data">{{ t("about.data") }}</h2>
       <ul class="about-facts">
         <li>
-          <strong>{{ data.points }}</strong> 個設施標點，涵蓋
-          {{ data.floors.join("、") }}
-        </li>
-        <li>
-          <strong>{{ data.connections }}</strong> 條樓層連接，其中
-          <strong>{{ data.unverifiedConnections }}</strong>
-          條的種類或方向仍待現場核對
+          {{
+            t("about.points", {
+              count: data.points,
+              floors: data.floors.join(" · "),
+            })
+          }}
         </li>
         <li>
           {{
-            data.walkingNetwork
-              ? "已提供現場核對過的步行路網。"
-              : "尚未建立經現場核對的步行路網，地圖只顯示區域與樓層關係，不提供逐步步行距離。"
+            t("about.connections", {
+              count: data.connections,
+              unverified: data.unverifiedConnections,
+            })
+          }}
+        </li>
+        <li>
+          {{
+            data.walkingNetwork ? t("about.networkYes") : t("about.networkNo")
           }}
         </li>
       </ul>
-      <p>
-        站內圖依台北捷運公開的
+      <p>{{ t("about.mapSource") }}</p>
+      <p class="about-links">
         <a
           href="https://web.metro.taipei/pages2026/WebStation/051/1"
           target="_blank"
           rel="noopener noreferrer"
-          >車站設施</a
-        >與
+          >{{ t("about.linkFacilities") }}</a
+        >
         <a
           href="https://web.metro.taipei/img/ALL/INFOPDF/051.pdf"
           target="_blank"
           rel="noopener noreferrer"
-          >車站資訊圖</a
-        >重繪，位置為示意，請依現場指標。
+          >{{ t("about.linkInfo") }}</a
+        >
       </p>
+      <p>{{ t("about.openData") }}</p>
       <p>
-        研究用開放資料來自臺北市資料大平臺（臺北捷運公司、臺北市環保局），依
         <a
           href="https://data.gov.tw/license"
           target="_blank"
           rel="noopener noreferrer"
-          >政府資料開放授權條款－第 1 版</a
+          >{{ t("about.openDataLicense") }}</a
         >
-        使用，不因收錄於本專案而改為 AGPL。
       </p>
     </section>
 
     <section class="about-card" aria-labelledby="about-third">
-      <h2 id="about-third">第三方元件</h2>
+      <h2 id="about-third">{{ t("about.thirdParty") }}</h2>
       <ul class="about-list">
         <li v-for="item in components" :key="item.name">
           <span>{{ item.name }}</span>
           <small>{{ item.license }}</small>
         </li>
       </ul>
-      <p class="about-note">
-        Gemma 模型只在你於 App 內同意 Gemma
-        使用條款後才下載，模型權重不屬於本專案的 AGPL 授權範圍。
-      </p>
+      <p class="about-note">{{ t("about.gemmaNote") }}</p>
     </section>
   </main>
 </template>
 
 <script setup>
+import { computed } from "vue";
 import DisplayControls from "../components/DisplayControls.vue";
+import { htmlLang, useI18n } from "../i18n/index.mjs";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { buildInfo, summarizeStationData } from "../about/about.mjs";
 import points from "./station-points.json";
 import connections from "./station-connections.json";
 
 const { theme, displayMode } = useDisplayPreferences();
+const { locale, t } = useI18n();
 const build = buildInfo;
 const data = summarizeStationData(points, connections);
 const repository = "github.com/yoyo899843/Taipei-Codefest-2026-Big-Dumb";
-const components = [
+const components = computed(() => [
   { name: "Vue 3.5", license: "MIT" },
   { name: "Vue Router 4.6", license: "MIT" },
   { name: "Vuex 4.1", license: "MIT" },
   { name: "core-js 3.51", license: "MIT" },
-  { name: "Google LiteRT-LM（App 端）", license: "Apache-2.0" },
-  { name: "Google Gemma 3 1B（選配下載）", license: "Gemma Terms of Use" },
-  { name: "台北通 TownPass 宿主", license: "GPL-3.0" },
-];
+  { name: t("about.compLitert"), license: "Apache-2.0" },
+  { name: t("about.compGemma"), license: "Gemma Terms of Use" },
+  { name: t("about.compTownpass"), license: "GPL-3.0" },
+]);
 const notice = `Taipei Maze - QR-based indoor wayfinding with multilingual accessible guidance.
 Copyright (C) 2026 Taipei Maze contributors
 
@@ -205,10 +209,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.`;
   box-shadow: 0 1px 0 var(--tp-gray-100);
 }
 .about-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
   min-height: 44px;
+  border-radius: 10px;
   color: var(--tp-primary-700);
   font-weight: 600;
   text-decoration: none;
@@ -256,7 +262,9 @@ code {
   font-size: 0.9em;
 }
 .about-date {
-  white-space: nowrap;
+  display: block;
+  color: var(--muted);
+  font-size: 0.875rem;
 }
 .about-hash {
   overflow-wrap: anywhere;
@@ -295,6 +303,11 @@ pre {
   font-size: 0.75rem;
   line-height: 1.5;
   white-space: pre-wrap;
+}
+.about-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
 }
 .about-facts,
 .about-list {

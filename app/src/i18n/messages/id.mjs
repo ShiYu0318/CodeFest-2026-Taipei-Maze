@@ -371,4 +371,38 @@ export default {
     "Pintu keluar belum ada di peta. Tempat-tempat ini mengarah ke pintu keluar {code}; dari sana ikuti papan petunjuk {code}:",
   "chat.answer.otherFloors":
     "Tidak ada {type} di {floor}, tetapi ada di lantai lain. Ketuk untuk melihat di peta:",
+  "about.version": "Versi yang dipasang",
+  "about.versionLabel": "Versi",
+  "about.builtOn": "(dibangun pada {date})",
+  "about.fullCommit": "Commit lengkap",
+  "about.unknownBuild":
+    "Build ini tidak mencatat git commit sehingga tidak dapat dicocokkan dengan versi kode sumber.",
+  "about.source": "Kode sumber",
+  "about.licenseIntro":
+    "Kode asli dilisensikan seperti di bawah ini; Anda boleh memakai, mengubah, dan membagikannya sesuai ketentuan:",
+  "about.repository": "Repositori kode sumber: ",
+  "about.privateRepo":
+    "Repositori masih bersifat privat dan belum bisa diunduh secara anonim. Setelah publik, versi di atas akan mengarah ke kode sumber dan catatan build yang sesuai.",
+  "about.noticeSummary": "Teks lengkap pemberitahuan lisensi",
+  "about.data": "Sumber data dan status verifikasi",
+  "about.points": "{count} tempat fasilitas di {floors}",
+  "about.connections":
+    "{count} penghubung antarlantai, {unverified} di antaranya belum dicek di lokasi untuk jenis atau arahnya",
+  "about.networkYes":
+    "Jaringan jalan kaki yang sudah dicek di lokasi tersedia.",
+  "about.networkNo":
+    "Belum ada jaringan jalan kaki yang dicek di lokasi; peta hanya menunjukkan area dan penghubung antarlantai, tanpa jarak langkah demi langkah.",
+  "about.mapSource":
+    "Peta stasiun digambar ulang dari informasi publik Taipei Metro. Posisi hanya perkiraan; ikuti papan petunjuk di lokasi:",
+  "about.linkFacilities": "Fasilitas stasiun",
+  "about.linkInfo": "Peta informasi stasiun",
+  "about.openData":
+    "Data terbuka untuk riset berasal dari platform data terbuka Kota Taipei (Taipei Rapid Transit Corporation, Dinas Lingkungan Hidup) dengan ketentuan di bawah; dimasukkannya ke proyek ini tidak menjadikannya AGPL:",
+  "about.openDataLicense": "Lisensi Data Terbuka Pemerintah, versi 1.0",
+  "about.thirdParty": "Komponen pihak ketiga",
+  "about.gemmaNote":
+    "Model Gemma hanya diunduh setelah Anda menyetujui Ketentuan Penggunaan Gemma di aplikasi. Bobot modelnya tidak termasuk lisensi AGPL proyek ini.",
+  "about.compLitert": "Google LiteRT-LM (di aplikasi)",
+  "about.compGemma": "Google Gemma 3 1B (unduhan opsional)",
+  "about.compTownpass": "Aplikasi induk TownPass",
 };

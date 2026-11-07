@@ -363,4 +363,37 @@ export default {
     "Lối ra chưa có trên bản đồ. Đây là các điểm dẫn về hướng lối ra {code}; đến đó hãy theo biển chỉ dẫn lối ra {code}:",
   "chat.answer.otherFloors":
     "Tầng {floor} không có {type}, nhưng tầng khác có. Chạm để xem trên bản đồ:",
+  "about.version": "Phiên bản triển khai",
+  "about.versionLabel": "Phiên bản",
+  "about.builtOn": "(xây dựng ngày {date})",
+  "about.fullCommit": "Commit đầy đủ",
+  "about.unknownBuild":
+    "Bản dựng này không ghi lại git commit nên không thể đối chiếu với phiên bản mã nguồn.",
+  "about.source": "Mã nguồn",
+  "about.licenseIntro":
+    "Mã gốc được cấp phép như dưới đây; bạn có thể dùng, sửa và chia sẻ theo điều khoản:",
+  "about.repository": "Kho mã nguồn: ",
+  "about.privateRepo":
+    "Kho mã hiện vẫn ở chế độ riêng tư, chưa thể tải xuống ẩn danh. Khi công khai, phiên bản ở trên sẽ dẫn đến mã nguồn và hướng dẫn xây dựng tương ứng.",
+  "about.noticeSummary": "Toàn văn thông báo giấy phép",
+  "about.data": "Nguồn dữ liệu và trạng thái kiểm tra",
+  "about.points": "{count} địa điểm tiện ích trên {floors}",
+  "about.connections":
+    "{count} lối nối giữa các tầng, trong đó {unverified} lối chưa kiểm tra tại chỗ về loại hoặc hướng",
+  "about.networkYes": "Đã có mạng lưới đường đi bộ được kiểm tra tại chỗ.",
+  "about.networkNo":
+    "Chưa có mạng lưới đường đi bộ được kiểm tra tại chỗ; bản đồ chỉ thể hiện khu vực và lối nối giữa các tầng, không có khoảng cách từng bước.",
+  "about.mapSource":
+    "Bản đồ ga được vẽ lại từ thông tin công khai của Taipei Metro. Vị trí chỉ mang tính minh họa; hãy theo biển chỉ dẫn tại chỗ:",
+  "about.linkFacilities": "Tiện ích nhà ga",
+  "about.linkInfo": "Bản đồ thông tin nhà ga",
+  "about.openData":
+    "Dữ liệu mở dùng cho nghiên cứu lấy từ nền tảng dữ liệu mở của thành phố Đài Bắc (Công ty Tàu điện ngầm Đài Bắc, Sở Bảo vệ Môi trường), dùng theo điều khoản dưới đây; việc đưa vào dự án không biến chúng thành AGPL:",
+  "about.openDataLicense": "Giấy phép dữ liệu mở của chính phủ, phiên bản 1.0",
+  "about.thirdParty": "Thành phần bên thứ ba",
+  "about.gemmaNote":
+    "Mô hình Gemma chỉ được tải sau khi bạn đồng ý Điều khoản sử dụng Gemma trong ứng dụng. Trọng số mô hình không thuộc giấy phép AGPL của dự án.",
+  "about.compLitert": "Google LiteRT-LM (trong ứng dụng)",
+  "about.compGemma": "Google Gemma 3 1B (tải tùy chọn)",
+  "about.compTownpass": "Ứng dụng nền TownPass",
 };
