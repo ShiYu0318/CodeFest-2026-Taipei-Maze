@@ -30,6 +30,15 @@ export function osaDistance(left, right, budget = { remaining: Infinity }) {
   }
   return previous[b.length];
 }
+function unambiguous(tokens, target) {
+  const seen = new Map();
+  for (const token of tokens) {
+    const text = normalizeQuery(token.text);
+    if (seen.has(text) && seen.get(text) !== token[target]) return false;
+    seen.set(text, token[target]);
+  }
+  return true;
+}
 function validDictionary(d) {
   if (
     !record(d) ||
@@ -76,7 +85,9 @@ function validDictionary(d) {
         validToken(t) &&
         ["accessible", "avoid_stairs", "nearest"].includes(t.intent_id)
     ) &&
-    d.fillers.every(validToken)
+    d.fillers.every(validToken) &&
+    unambiguous(d.aliases, "concept_id") &&
+    unambiguous(d.intent_aliases, "intent_id")
   );
 }
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -100,10 +111,12 @@ const clean = (s) =>
     .replace(/\s+/gu, " ")
     .trim();
 const codeLike = (s) =>
-  /^(?:[a-z]{1,4}\d+[a-z]?|[a-z][a-z0-9]*[_-][a-z0-9_-]+)$/i.test(s);
+  /[0-9_]/u.test(s) ||
+  /^[a-z][a-z0-9]*-[a-z0-9_-]+$/i.test(s) ||
+  /^(?:toilet|restroom|elevator|lift|exit|gate)[a-z0-9]+$/i.test(s);
 const tokenOrder = (locale) => (a, b) =>
   [...normalizeQuery(b.text)].length - [...normalizeQuery(a.text)].length ||
-  (a.locale === locale ? -1 : b.locale === locale ? 1 : 0) ||
+  Number(b.locale === locale) - Number(a.locale === locale) ||
   (a.text < b.text ? -1 : a.text > b.text ? 1 : 0);
 
 /** Search only supplied POIs. Prototype mode admits visibly labeled draft seed words; release excludes them. */
@@ -128,6 +141,12 @@ export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
   )
     return base;
   base.normalizedQuery = normalized;
+  if (
+    !record(options) ||
+    (options.workBudget !== undefined &&
+      (!Number.isInteger(options.workBudget) || options.workBudget < 0))
+  )
+    return base;
   const current = options.currentOptions ?? {};
   if (
     !record(current) ||
@@ -216,6 +235,21 @@ export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
     };
   const exact = enabled.filter((p) => normalizeQuery(p.name) === normalized);
   if (!concepts.size && !exact.length && remaining && !codeLike(remaining)) {
+    if (
+      aliases.some(
+        (alias) =>
+          alias.locale === "en" &&
+          ["no", "not", "without"].some(
+            (prefix) => remaining === prefix + normalizeQuery(alias.text)
+          )
+      )
+    )
+      return {
+        ...base,
+        status: "needsClarification",
+        reason: "unparsedTerms",
+        unparsedTerms: [remaining],
+      };
     const budget = { remaining: options.workBudget ?? 100_000 };
     let best = Infinity,
       candidates = [];

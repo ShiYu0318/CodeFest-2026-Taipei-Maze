@@ -416,7 +416,8 @@
       "name_key": "node_b2_dest",
       "original_signage": "測試廁所",
       "enabled": true,
-      "source_ids": ["src_fixture"]
+      "source_ids": ["src_fixture"],
+      "accessible_facility": true
     },
     {
       "id": "poi_entry",

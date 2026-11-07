@@ -196,3 +196,111 @@ test("an exact supplied POI name wins over alias fragments within its name", () 
   );
   assert.equal(r.matches[0].matchType, "exact");
 });
+
+test("conflicting normalized aliases are rejected rather than picking the first array entry", () => {
+  const d = structuredClone(dictionary);
+  d.aliases.push({
+    ...d.aliases.find((a) => a.text === "toilet"),
+    concept_id: "facility.elevator",
+  });
+  assert.equal(
+    searchCatalog("toilet", catalog, d, { prototype: true }).status,
+    "invalidDictionary"
+  );
+});
+test("fuzzy ties across concepts require clarification", () => {
+  const d = structuredClone(dictionary);
+  d.aliases = [
+    {
+      locale: "en",
+      text: "ramp",
+      concept_id: "facility.exit",
+      review_status: "approved",
+      source_ids: ["team_seed"],
+    },
+    {
+      locale: "en",
+      text: "lamp",
+      concept_id: "facility.elevator",
+      review_status: "approved",
+      source_ids: ["team_seed"],
+    },
+  ];
+  const r = searchCatalog("camp", catalog, d);
+  assert.equal(r.status, "needsClarification");
+  assert.equal(r.matches.length, 0);
+});
+
+test("accessible search selection feeds the same synthetic session planner and uses the elevator", async () => {
+  const { createSession } = await import("../src/navigation/session.mjs");
+  const s = createSession(graph);
+  s.acceptQr(
+    JSON.stringify({
+      type: "taipei_maze_anchor",
+      v: 1,
+      site_id: graph.site_id,
+      graph_major: 1,
+      anchor_id: "qr_a",
+    })
+  );
+  s.confirmLocation();
+  const r = searchCatalog(
+    "accessible toilet",
+    navigationCatalog(graph),
+    dictionary,
+    { prototype: true }
+  );
+  assert.equal(r.status, "matched");
+  assert.deepEqual(
+    r.matches.map((m) => m.poiId),
+    ["poi_restroom"]
+  );
+  s.applySearchSelection({
+    poiId: r.matches[0].poiId,
+    proposedOptions: r.proposedOptions,
+  });
+  assert.equal(s.state.phase, "confirm_location");
+  s.confirmLocation();
+  assert.equal(s.state.phase, "ready");
+  assert.ok(s.state.plan.route.edgeIds.includes("e_lift_up"));
+  assert.ok(!s.state.plan.route.edgeIds.includes("e_stairs_up"));
+});
+
+test("unknown numbered and lettered facility identifiers never degrade to generic fuzzy facilities", () => {
+  for (const q of [
+    "toilet1",
+    "restroom0",
+    "elevator2",
+    "exitA",
+    "elevatorB",
+    "gate12",
+  ]) {
+    const r = search(q);
+    assert.equal(r.status, "noMatch", q);
+    assert.equal(r.matches.length, 0);
+  }
+  const exact = searchCatalog(
+    "exitA",
+    [
+      {
+        id: "exita",
+        name: "exitA",
+        category: "exit",
+        floorId: "B1",
+        enabled: true,
+        accessibleFacility: null,
+      },
+    ],
+    dictionary,
+    { prototype: true }
+  );
+  assert.equal(exact.status, "matched");
+  assert.equal(exact.matches[0].matchType, "exact");
+});
+test("joined recognizable English negation is not repaired into a positive fuzzy destination", () => {
+  for (const q of ["norestroom", "noelevator", "notoilet"]) {
+    const r = search(q);
+    assert.equal(r.status, "needsClarification", q);
+    assert.equal(r.matches.length, 0);
+  }
+});
