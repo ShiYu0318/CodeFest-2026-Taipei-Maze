@@ -319,7 +319,7 @@ export default {
   "trip.step": "步驟 {step}／2",
   "trip.cancel": "取消行程",
   "trip.confirmTitle": "確定要取消行程嗎？",
-  "trip.faceQr": "請面向QRcode面板",
+  "trip.faceQr": "請面向 QR Code 面板",
   "trip.cancelNote": "取消後會清除起點、目的地和這次的定位。",
   "trip.keep": "保留行程",
   "trip.confirmCancel": "確認取消",

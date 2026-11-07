@@ -41,3 +41,14 @@ test("dictionary results are left untouched", () => {
 test("unknown words still report no match", () => {
   assert.equal(search("spaceship").status, "noMatch");
 });
+
+test("gate names match with or without the spaces typography adds", () => {
+  for (const query of ["北1門", "北 1 門", "北1 門"]) {
+    const result = search(query);
+    assert.equal(result.status, "matched", query);
+    assert.ok(
+      result.matches.some((m) => /北 1 門/.test(m.name)),
+      `${query} → ${result.matches.map((m) => m.name).join(", ")}`
+    );
+  }
+});

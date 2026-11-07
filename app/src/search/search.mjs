@@ -233,7 +233,19 @@ export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
       reason: "nearestUnavailable",
       unparsedTerms: remaining ? [remaining] : [],
     };
-  const exact = enabled.filter((p) => normalizeQuery(p.name) === normalized);
+  // Typography adds spaces between Chinese and numbers ("北 1 門"); visitors
+  // may type "北1門" and leave off the exit code, so compare without spaces.
+  const compact = normalized.replace(/\s+/gu, "");
+  const exact = enabled.filter((p) => {
+    const name = normalizeQuery(p.name);
+    return (
+      name === normalized ||
+      (compact.length >= 2 &&
+        [name, name.replace(/\s+[a-z]+\d+$/u, "")].some(
+          (candidate) => candidate.replace(/\s+/gu, "") === compact
+        ))
+    );
+  });
   if (!concepts.size && !exact.length && remaining && !codeLike(remaining)) {
     if (
       aliases.some(
