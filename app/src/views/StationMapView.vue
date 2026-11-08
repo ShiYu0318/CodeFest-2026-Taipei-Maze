@@ -234,6 +234,9 @@
                     'map-dragging': dragging,
                   }"
                   :style="{
+                    '--map-height': adaptiveMapHeight
+                      ? adaptiveMapHeight + 'px'
+                      : undefined,
                     '--map-aspect': bounds[2] / bounds[3],
                     '--map-rotated-aspect': mapShape.aspect,
                     '--map-rotated-width': mapShape.width,
@@ -608,6 +611,7 @@
 
 <script setup>
 import { displayPlainZhuyin } from "../display/zhuyin.mjs";
+import { availableMapHeight } from "../station/map-layout.mjs";
 import {
   computed,
   nextTick,
@@ -821,6 +825,7 @@ let floorAnimation = null;
 let cameraAnimation = null;
 const zoom = ref(level.value === "1F" ? 1 : initialMapZoom);
 const guideCamera = ref(null);
+const adaptiveMapHeight = ref(null);
 const viewport = ref(null);
 const dragging = ref(false);
 let mapDrag = null;
@@ -836,6 +841,8 @@ const mapTop = ref(0);
 const mapBoard = ref(null);
 const mapBoardWidth = ref(0);
 let mapBoardObserver;
+let mapLayoutObserver;
+let mapLayoutFrame = null;
 
 // Walking network: routes, nearest facilities and the first-step arrow.
 const walkRouter = walkingRouter(walkingNetwork);
@@ -1190,6 +1197,11 @@ watch(displayMode, async () => {
 
 onMounted(() => {
   updateMapLayout();
+  mapLayoutObserver = new ResizeObserver(scheduleMapLayout);
+  mapLayoutObserver.observe(stationPage.value.querySelector(".station-shell"));
+  window.addEventListener("scroll", scheduleMapLayout, { passive: true });
+  window.visualViewport?.addEventListener("resize", scheduleMapLayout);
+  window.visualViewport?.addEventListener("scroll", scheduleMapLayout);
   mapBoardObserver = new ResizeObserver(([entry]) => {
     mapBoardWidth.value = entry.contentRect.width;
   });
@@ -1211,6 +1223,11 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   mapBoardObserver?.disconnect();
+  mapLayoutObserver?.disconnect();
+  if (mapLayoutFrame !== null) cancelAnimationFrame(mapLayoutFrame);
+  window.removeEventListener("scroll", scheduleMapLayout);
+  window.visualViewport?.removeEventListener("resize", scheduleMapLayout);
+  window.visualViewport?.removeEventListener("scroll", scheduleMapLayout);
   scanFocusRevision++;
   zoomRevision++;
   window.removeEventListener("resize", updateMapLayout);
@@ -1880,7 +1897,28 @@ function toggleLayers() {
 //   mapSection.value?.scrollIntoView({ block: "start" });
 // }
 
+function scheduleMapLayout() {
+  if (mapLayoutFrame !== null) return;
+  mapLayoutFrame = requestAnimationFrame(() => {
+    mapLayoutFrame = null;
+    updateMapLayout();
+  });
+}
+
 function updateMapLayout() {
+  if (!mapStage.value || !viewport.value) return;
+  const frame = viewport.value.getBoundingClientRect();
+  const shell = stationPage.value.querySelector(".station-shell");
+  const visual = window.visualViewport;
+  adaptiveMapHeight.value = availableMapHeight({
+    height: visual?.height ?? window.innerHeight,
+    top: frame.top - (visual?.offsetTop ?? 0),
+    below: Math.max(0, shell.getBoundingClientRect().bottom - frame.bottom),
+    bottom: Math.max(
+      24,
+      parseFloat(getComputedStyle(stationPage.value).paddingBottom) || 0
+    ),
+  });
   mapTop.value = mapStage.value.getBoundingClientRect().top + window.scrollY;
   enforceZoomLimit();
 }

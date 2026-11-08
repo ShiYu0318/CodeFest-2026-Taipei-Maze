@@ -15,6 +15,7 @@ import * as zhuyin from "../src/display/zhuyin.mjs";
 import * as floorPlans from "../src/views/station-floor-plans.mjs";
 import * as navigation from "../src/station/navigation-view.mjs";
 import * as scan from "../src/station/scan.mjs";
+import * as mapLayout from "../src/station/map-layout.mjs";
 import * as mapFocus from "../src/station/map-focus.mjs";
 import * as demoScenarios from "../src/station/demo-scenarios.mjs";
 import * as nearestAction from "../src/station/nearest-action.mjs";
@@ -110,6 +111,7 @@ function component(name) {
     "navigation-view.mjs": navigation,
     "scan.mjs": scan,
     "map-focus.mjs": mapFocus,
+    "map-layout.mjs": mapLayout,
     "walk-route.mjs": walkRoute,
     "step-text.mjs": stepText,
     "nearest-action.mjs": nearestAction,
