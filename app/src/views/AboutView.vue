@@ -214,7 +214,7 @@ const mapSources = computed(() => {
   const floor = floors.includes(props.floor) ? props.floor : "B2";
   return [
     {
-      label: t("map.sourceInfo", { floor }),
+      label: t("map.sourceInfo"),
       url:
         "https://web.metro.taipei/img/ALL/INFOPDF/051.pdf#page=" +
         (floors.indexOf(floor) + 1),

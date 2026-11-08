@@ -117,7 +117,7 @@ export default {
   "map.dataStatus":
     "データ：{points}か所、階をつなぐ経路{connections}本（うち{unverified}本は現地未確認）、歩行ネットワークはまだありません。",
   "map.about": "ソースコードとライセンス · バージョン {version}",
-  "map.sourceInfo": "台北メトロ {floor} 案内図",
+  "map.sourceInfo": "台北駅案内図",
   "map.sourceFacilities": "台北メトロ 駅の設備",
   "map.sourceSection": "台北メトロ 駅断面図",
   "map.connectorUnknown":

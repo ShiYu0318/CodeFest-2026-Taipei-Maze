@@ -120,7 +120,7 @@ export default {
   "map.dataStatus":
     "Dữ liệu: {points} địa điểm, {connections} lối nối giữa các tầng ({unverified} lối chưa kiểm tra tại chỗ), chưa có mạng lưới đường đi bộ.",
   "map.about": "Mã nguồn và giấy phép · phiên bản {version}",
-  "map.sourceInfo": "Bản đồ thông tin {floor} của Taipei Metro",
+  "map.sourceInfo": "Bản đồ thông tin Ga Trung tâm Đài Bắc",
   "map.sourceFacilities": "Tiện ích nhà ga Taipei Metro",
   "map.sourceSection": "Mặt cắt nhà ga Taipei Metro",
   "map.connectorUnknown":

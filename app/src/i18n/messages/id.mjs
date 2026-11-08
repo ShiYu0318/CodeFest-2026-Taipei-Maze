@@ -120,7 +120,7 @@ export default {
   "map.dataStatus":
     "Data: {points} tempat, {connections} penghubung antarlantai ({unverified} belum dicek di lokasi), belum ada jaringan jalan kaki.",
   "map.about": "Kode sumber & lisensi · versi {version}",
-  "map.sourceInfo": "Peta informasi {floor} Taipei Metro",
+  "map.sourceInfo": "Peta informasi Stasiun Utama Taipei",
   "map.sourceFacilities": "Fasilitas stasiun Taipei Metro",
   "map.sourceSection": "Penampang stasiun Taipei Metro",
   "map.connectorUnknown":

@@ -121,7 +121,7 @@ export default {
   "map.dataStatus":
     "Data: {points} places, {connections} floor links ({unverified} not yet checked on site), no walking network yet.",
   "map.about": "Source code & licenses · version {version}",
-  "map.sourceInfo": "Taipei Metro {floor} information map",
+  "map.sourceInfo": "Taipei Main Station information map",
   "map.sourceFacilities": "Taipei Metro station facilities",
   "map.sourceSection": "Taipei Metro station cross-section",
   "map.connectorUnknown":

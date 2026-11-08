@@ -117,7 +117,7 @@ export default {
   "map.dataStatus":
     "데이터: 장소 {points}곳, 층간 연결 {connections}개(현장 미확인 {unverified}개), 보행 경로망은 아직 없습니다.",
   "map.about": "소스 코드 및 라이선스 · 버전 {version}",
-  "map.sourceInfo": "타이베이 지하철 {floor} 안내도",
+  "map.sourceInfo": "타이베이 중앙역 안내도",
   "map.sourceFacilities": "타이베이 지하철 역 편의시설",
   "map.sourceSection": "타이베이 지하철 역 단면도",
   "map.connectorUnknown":

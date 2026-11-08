@@ -113,7 +113,7 @@ export default {
   "map.dataStatus":
     "ข้อมูล: {points} จุด เส้นเชื่อมระหว่างชั้น {connections} เส้น (ยังไม่ได้ตรวจที่หน้างาน {unverified} เส้น) ยังไม่มีเครือข่ายทางเดิน",
   "map.about": "ซอร์สโค้ดและสัญญาอนุญาต · เวอร์ชัน {version}",
-  "map.sourceInfo": "แผนที่ข้อมูล {floor} ของ Taipei Metro",
+  "map.sourceInfo": "แผนที่ข้อมูลสถานีหลักไทเป",
   "map.sourceFacilities": "สิ่งอำนวยความสะดวกในสถานี Taipei Metro",
   "map.sourceSection": "ภาพตัดขวางสถานี Taipei Metro",
   "map.connectorUnknown": "ผังแสดงทางขึ้นลง แต่ยังไม่ยืนยันประเภทและทิศทาง",

@@ -104,7 +104,7 @@ export default {
   "map.dataStatus":
     "資料狀態：{points} 個標點、{connections} 條樓層連接（{unverified} 條待現場核對），尚無步行路網。",
   "map.about": "原始碼與授權 · 版本 {version}",
-  "map.sourceInfo": "台北捷運 {floor} 資訊圖",
+  "map.sourceInfo": "台北車站資訊圖",
   "map.sourceFacilities": "台北捷運車站設施",
   "map.sourceSection": "台北捷運剖面圖",
   "map.connectorUnknown": "平面圖顯示梯口，梯種及通行方向待確認。",
