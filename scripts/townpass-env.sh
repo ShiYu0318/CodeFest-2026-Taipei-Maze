@@ -33,7 +33,7 @@ if [[ ! -f "$townpass_dir/pubspec.yaml" || ! -f "$townpass_dir/.fvmrc" ]]; then
   exit 1
 fi
 if ! command -v fvm >/dev/null 2>&1; then
-  printf 'FVM is not on PATH. See docs/測試環境.md.\n' >&2
+  printf 'FVM is not on PATH. See integration/townpass/README.md.\n' >&2
   exit 1
 fi
 

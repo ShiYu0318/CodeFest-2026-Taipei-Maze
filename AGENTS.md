@@ -2,7 +2,7 @@
 
 ## 開始前
 
-- 先讀 `docs/城市通開發指南.md`、`docs/SPEC.md` 與 `AGPL_NOTICE.md`；最新使用者指示優先。
+- 先讀 `README.md`、`.github/ARCHITECTURE.md` 與 `AGPL_NOTICE.md`；`docs/` 為不納入 Git 的本地歷史文件，存在時可參考，最新使用者指示優先。
 - 正式產品是城市通 Flutter App 的 WebView 微服務網頁，前端語言與框架不限。預設以 HTML／CSS／TypeScript、SVG 及本地 JSON 實作；Flutter 是宿主，不另建一套獨立導航 App。
 - 七語優先：繁體中文、英文、越南文、印尼文、泰文、韓文、日文。不要將「印」當成印地文。
 - 使用者已授權建置 TownPass 本地測試環境；宿主獨立於相鄰 checkout，整合 patch 與診斷頁放在本 repo。導航核心已有獨立合成測試入口，真實北車路網與完整 P0 仍待完成；未經實測不得宣稱橋接、語音、雙平台或部署已完成。

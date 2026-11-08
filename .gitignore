@@ -8,3 +8,6 @@ __pycache__/
 
 # Approved model release files live outside Git; source/manifest are tracked.
 .models/
+
+# Local competition reports, research notes and reference PDFs.
+/docs/

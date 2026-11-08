@@ -1,7 +1,7 @@
 # 資料來源索引
 
 查閱日：2026-11-07。48 項候選；只有 D01–D10 官方 CSV 已納入本 repo 研究快照。
-其他地圖、OSM、服務與素材僅列參考，不代表已核准使用或再散布。產品需求以 docs/SPEC.md 1.1 為準。
+其他地圖、OSM、服務與素材僅列參考，不代表已核准使用或再散布。產品範圍與實作界線見 [README](../README.md) 與 [架構指南](../.github/ARCHITECTURE.md)；歷史 SPEC 保留於不納入 Git 的本地 docs/。
 
 ## D01 北捷車站設施
 - 來源：[原始入口](https://data.taipei/dataset/detail?id=659b9f55-a687-4e55-a17b-ceca5743c514)

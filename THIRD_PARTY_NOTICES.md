@@ -9,7 +9,7 @@
 | AGPL 完整條款 | [GNU 官方純文字](https://www.gnu.org/licenses/agpl-3.0.txt)，存為根目錄 LICENSE | 原文逐字複製；授權文本本身之版權聲明保留 |
 | TownPass | [taipei-doit/TownPass](https://github.com/taipei-doit/TownPass)，宿主與橋接參考 | 上游 LICENSE 為 GPL 第 3 版；目前未將上游專案複製進本 repo |
 | TownPass-Services | [官方微服務範例](https://github.com/taipei-doit/TownPass-Services)，協定與結構參考 | 實際複製程式前逐檔核對 LICENSE、版權與來源；不假設與宿主同授權 |
-| 2026 城市通入門指引 PDF | [使用者提供的原檔](<./docs/2026 城市通入門指引.pdf>)，作為開發文件來源 | 依使用者明確指示納入 private repo；不是本專案原創作品，不套用本專案 AGPL，公開再散布權利仍須另行確認 |
+| 2026 城市通入門指引 PDF | 使用者提供的本地原檔 `docs/2026 城市通入門指引.pdf`（目前版本不再追蹤），作為開發文件來源 | 依使用者明確指示納入 private repo；不是本專案原創作品，不套用本專案 AGPL，公開再散布權利仍須另行確認 |
 | 官方站圖、設施資料 | 見開發指南與 SPEC 的資料來源 | 尚未納入產品資產；使用及再散布前逐項核對 |
 | 翻譯、語音、字型及模型候選 | 見 SPEC 第 13–16 節 | 尚無已生成音檔或已核准模型；不得將候選列成已安裝／已授權 |
 
@@ -37,11 +37,11 @@ MIT、常見 BSD-2-Clause／BSD-3-Clause、Apache-2.0 可作優先候選，但�
 
 ## 2026-11-07 Webview 地圖原型
 
-- `app/` 地圖原型和 `backend/` 本機診斷 API 來自 [Team10 Webview 快照 `d88e71e`](https://github.com/Clare0808/team10_townpass_webview/commit/d88e71e)。匯入版本保留程式來源紀錄，原倉庫無獨立授權檔，公開交付前須釐清各部分的再散布權利。
+- `app/` 地圖原型和歷史 `backend/` 本機診斷 API（目前已移除）來自 [Team10 Webview 快照 `d88e71e`](https://github.com/Clare0808/team10_townpass_webview/commit/d88e71e)。匯入版本保留程式來源紀錄，原倉庫無獨立授權檔，公開交付前須釐清各部分的再散布權利。
 - 地圖 SVG 與 JSON 為依 [臺北捷運站圖](https://web.metro.taipei/img/ALL/INFOPDF/051.pdf) 和 [臺北捷運剖面圖](https://web.metro.taipei/pages2026/WebStation/051/4) 重繪的示意原型。官方原圖及原 Webview 的示範圖片、favicon、環境檔與 Python 快取未匯入。站圖和衍生資料的公開交付權利仍待核對。
 - 2026-11-08 新增的 `qrcode` SVG 圖示、邊界抽樣程式、固定 seed 產生的 32 個示意點及七語名稱為團隊原創，採 AGPL-3.0-or-later；座標依上項既有站圖外輪廓計算，原圖與衍生資料的權利限制仍適用。未新增外部圖資、圖示套件或執行期依賴；示意點不是現地設置或通行認證。
 - 1F SVG 與公共設施點位以使用者提供的「台北車站 1F 平面圖」照片（圖上署名「萬俊廷攝」）為參考，採獨立的北向示意座標。原照片及圖中商店、品牌與 QR 圖案未納入。照片授權與衍生資料的公開交付權利待核對，示意位置待現地驗證。
-- npm 直接依賴見 `app/package.json`，鎖定版本、下載來源、完整性摘要及上游宣告授權見 `app/package-lock.json`。目前 lockfile 的下載來源為 `registry.npmjs.org`。`backend/requirements.txt` 為原有 Flask 診斷工具依賴，與地圖執行分開。以上均為 private 原型，供應鏈及發行授權審查仍待完成。
+- npm 直接依賴見 `app/package.json`，鎖定版本、下載來源、完整性摘要及上游宣告授權見 `app/package-lock.json`。目前 lockfile 的下載來源為 `registry.npmjs.org`。原有 Flask 範例後端與其依賴已移除；目前核心服務為靜態網頁。供應鏈及發行授權審查仍待完成。
 
 
 ## 2026-11-07 合成導航核心
@@ -85,3 +85,9 @@ B2 新增四個月台的原創幾何示意（高鐵 1／2、台鐵 3／4），�
 依[臺鐵臺北站官方 B2 平面圖](https://tip.railway.gov.tw/tra-tip-web/tip/img/0a00114c-3667-4e2f-a897-78b2864d8eba/1140x900)核對：由北到南是臺鐵 4、臺鐵 3、高鐵 2、高鐵 1。前次高鐵順序與過小的局部位置已修正；依捷運 051.pdf 的灰色臺鐵／高鐵參考站區調整相對布局及視野，長軸約為東西向。SVG 與 JSON 均為原型示意座標，不是測繪或核准布點；16 個新增 QR／紫色月台標記沿用 boundary-demo 格式、zone=null，不建立任何虛構步行連結。官方圖僅下載於 repository 外供核對，沒有納入交付。
 
 依上述臺鐵 B2 圖及高鐵平面圖補上四個月台的電扶梯、電梯、樓梯、高鐵 AED 和公用電話。高鐵月台的捷運轉乘樓梯採臺鐵 B2 圖所示位置。各點依官方圖的相對順序配置於既有示意圖，未新增跨樓層通行連結。B2、B3 和 B4 原有的月台 QR 與紫色標記均保留。官方圖檔及圖示未納入專案。
+
+## Repository cleanup and README screenshot (2026-11-08)
+
+- `assets/screenshots/station-map-b4.png` is an unretouched, actual application screenshot supplied by the project owner, captured 2026-11-08 08:47:46 (Asia/Taipei). It predates the adaptive-height adjustment; it is not a synthetic rendering or a claim of current-device validation. Underlying diagram/prototype rights remain subject to the entries above.
+- Local competition reports, proposals and the reference PDF under `docs/` are no longer tracked in the current tree; their copies remain on the developer machine and may still exist in Git history. This does not grant new redistribution rights.
+- Empty Vuex scaffolding, its direct dependencies and the unused Flask/API example were removed. Existing project-source and upstream notices remain in place; no third-party runtime dependency or hosted AI service was added.

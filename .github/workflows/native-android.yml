@@ -1,12 +1,6 @@
 name: Android host integration
 
 on:
-  pull_request:
-    paths:
-      - app/**
-      - tools/package-townpass-web.py
-      - integration/townpass/test-env.patch
-      - .github/workflows/native-android.yml
   workflow_dispatch:
 
 permissions:
