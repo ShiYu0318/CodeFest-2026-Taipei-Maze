@@ -40,6 +40,31 @@
 
 *使用者提供的實際開發截圖，拍攝於 2026-11-08 08:47（臺北時間），未修圖；呈現 B4 設施與地圖操作。此畫面早於後續自適應高度調整，不作最新裝置驗收證據。[截圖來源與範圍](./assets/screenshots/README.md)。*
 
+### iPhone 模擬器實際操作
+
+以下為 2026-11-08 10:10 的原始開發截圖，保留 Xcode／模擬器外框，未生成、修圖或裁切。點開後可檢查完整畫面；這些截圖不取代實機或現地驗證。小幫手上的 Gemma 標示亦不單獨證明回答由模型生成。
+
+<details>
+<summary>起終點與無障礙路線：B4 輪椅候車區（北）→ B1 M8 出口</summary>
+
+[![iPhone 模擬器：起終點、無障礙勾選與單一帶我去入口](./assets/screenshots/ios-endpoints-step-free.png)](./assets/screenshots/ios-endpoints-step-free.png)
+
+</details>
+
+<details>
+<summary>地圖與方向同頁：第 10／12 步、上一步／下一步、重掃與求助</summary>
+
+[![iPhone 模擬器：M8 地圖與方向圖示、前後步驟及行程操作](./assets/screenshots/ios-inline-route-steps.png)](./assets/screenshots/ios-inline-route-steps.png)
+
+</details>
+
+<details>
+<summary>小幫手：設施回答、樓層卡片與可繼續點選的建議問題</summary>
+
+[![iPhone 模擬器：小幫手廁所問答、設施卡片與建議問題](./assets/screenshots/ios-local-facility-helper.png)](./assets/screenshots/ios-local-facility-helper.png)
+
+</details>
+
 ## 功能與完成範圍
 
 - **搜尋起點與終點：** 樓層選單可收合，支援設施類別、出口碼、部分名稱、編號、多語同義詞與有界錯字容忍。

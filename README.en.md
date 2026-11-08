@@ -40,6 +40,31 @@ These are design goals. No formal user study or measured percentage improvement 
 
 *Unretouched application screenshot supplied by the project owner, captured 2026-11-08 at 08:47 Asia/Taipei. It predates subsequent adaptive-height changes and is not evidence of current device validation. [Provenance](./assets/screenshots/README.md).*
 
+### Actual iPhone simulator walkthrough
+
+Original development captures from 2026-11-08 at 10:10 Asia/Taipei. The Xcode/simulator frame is retained; no generated content, retouching or cropping. Expand and open the original to inspect the layout. These are not physical-device or field-validation evidence. A Gemma label in the helper alone does not prove model-generated answers.
+
+<details>
+<summary>Endpoints and step-free option: B4 north wheelchair waiting area → B1 M8 exit</summary>
+
+[![iPhone simulator endpoints, step-free checkbox and single Go action](./assets/screenshots/ios-endpoints-step-free.png)](./assets/screenshots/ios-endpoints-step-free.png)
+
+</details>
+
+<details>
+<summary>Inline map and direction: step 10 of 12, previous/next, rescan and assistance</summary>
+
+[![iPhone simulator M8 map, direction icon, route steps and trip controls](./assets/screenshots/ios-inline-route-steps.png)](./assets/screenshots/ios-inline-route-steps.png)
+
+</details>
+
+<details>
+<summary>Facility helper: answers, floor cards and reusable suggestions</summary>
+
+[![iPhone simulator restroom question, facility cards and suggested questions](./assets/screenshots/ios-local-facility-helper.png)](./assets/screenshots/ios-local-facility-helper.png)
+
+</details>
+
 ## Features and scope
 
 - **Searchable endpoints:** collapsible floor groups, category/name/operator/exit-code/number matching, multilingual synonyms and bounded typo tolerance.
