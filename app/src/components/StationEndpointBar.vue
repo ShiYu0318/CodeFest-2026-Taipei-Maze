@@ -122,7 +122,12 @@ const describe = (point, role) =>
 <style scoped>
 .endpoint-bar {
   display: grid;
-  gap: 4px;
+  grid-template-columns: max-content minmax(0, 1fr) repeat(
+      2,
+      var(--display-control-height, 44px)
+    );
+  align-items: center;
+  gap: 4px 8px;
   margin: 0 0 12px;
   padding: 12px;
   border-radius: var(--tp-radius-card, 12px);
@@ -130,14 +135,7 @@ const describe = (point, role) =>
   box-shadow: var(--tp-shadow-card);
 }
 .endpoint-bar-field {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr) repeat(
-      2,
-      var(--display-control-height, 44px)
-    );
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
+  display: contents;
 }
 .endpoint-bar-label {
   display: flex;
