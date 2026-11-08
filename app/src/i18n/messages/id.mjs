@@ -216,7 +216,7 @@ export default {
   "title.station": "Peta Stasiun Utama Taipei",
   "title.meeting": "Titik temu",
   "title.about": "Kode sumber & lisensi",
-  "title.default": "Taipei Maze",
+  "title.default": "北車不迷路",
   "chat.open": "Buka obrolan Asisten Stasiun Taipei",
   "chat.launcher": "Asisten Stasiun Taipei",
   "chat.close": "Tutup obrolan",
@@ -495,6 +495,7 @@ export default {
   "walk.arrowNote":
     "Ponsel tidak tahu arah hadap Anda. Bandingkan peta dengan papan petunjuk.",
   "share.place": "Bagikan tempat",
+  "share.start": "Bagikan titik awal",
   "share.destination": "Bagikan tujuan",
   "share.title": "Bagikan ke teman",
   "share.intro":

@@ -72,7 +72,25 @@
         @open="(role, event) => openEndpointPicker(event, role)"
         @swap="swapEndpoints"
         @scan="scanGuide"
+        @share="sharePoint = $event"
       />
+      <div
+        v-if="walkDestinationPoint"
+        class="trip-actions"
+        role="group"
+        :aria-label="t('scan.actions')"
+      >
+        <button type="button" @click="staffPoint = walkDestinationPoint">
+          <StationMapIcon name="help" /><ZhuyinText :text="t('staff.short')" />
+        </button>
+        <button
+          type="button"
+          :disabled="location.view.value.active || demoBusy"
+          @click="openTripDialog('cancel')"
+        >
+          <StationMapIcon name="close" /><ZhuyinText :text="t('trip.cancel')" />
+        </button>
+      </div>
       <p v-if="!location.view.value.available" class="scan-app-hint">
         {{ t("scan.needAppShort") }}
       </p>
@@ -81,7 +99,9 @@
         :category="activeTheme"
         :points="stationCatalogPoints"
         :destination-id="walkDestination"
-        :busy="location.view.value.active || nearestBusy"
+        :busy="location.view.value.active || nearestBusy || demoBusy"
+        :step-free="location.view.value.stepFree"
+        @step-free="location.setStepFree"
         @category="toggleTheme"
         @go="goFacilityCategory"
       />
@@ -499,12 +519,6 @@
                   {{ t("share.place") }}
                 </button>
               </div>
-              <StaffCard
-                v-if="staffPoint"
-                :point="staffPoint"
-                :step-free="location.view.value.stepFree"
-                @close="staffPoint = null"
-              />
             </section>
           </section>
         </div>
@@ -533,28 +547,6 @@
           @demo-advance="advanceDemo"
           @demo-arrive="arriveDemo"
         />
-        <button
-          v-if="walkDestinationPoint"
-          type="button"
-          class="walk-share"
-          @click="sharePoint = walkDestinationPoint"
-        >
-          {{ t("share.destination") }}
-        </button>
-        <div v-if="walkDestinationPoint" class="route-tools">
-          <button type="button" @click="staffPoint = walkDestinationPoint">
-            <StationMapIcon name="help" /><ZhuyinText
-              :text="t('staff.short')"
-            />
-          </button>
-          <button
-            type="button"
-            :disabled="location.view.value.active"
-            @click="openTripDialog('cancel')"
-          >
-            <ZhuyinText :text="t('map.cancel')" />
-          </button>
-        </div>
       </section>
     </div>
     <StationInformationDialog
@@ -575,6 +567,12 @@
       @close="closeEndpointPicker"
       @select="selectEndpoints"
       @map-pick="startMapPicking"
+    />
+    <StaffCard
+      v-if="staffPoint"
+      :point="staffPoint"
+      :step-free="location.view.value.stepFree"
+      @close="staffPoint = null"
     />
     <PlaceShareSheet
       v-if="sharePoint"

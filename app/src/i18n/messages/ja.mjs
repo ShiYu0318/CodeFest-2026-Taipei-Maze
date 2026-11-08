@@ -215,7 +215,7 @@ export default {
   "title.station": "台北駅構内図",
   "title.meeting": "待ち合わせ場所",
   "title.about": "ソースコードとライセンス",
-  "title.default": "Taipei Maze",
+  "title.default": "北車不迷路",
   "chat.open": "台北駅ヘルパーとチャットする",
   "chat.launcher": "台北駅ヘルパー",
   "chat.close": "チャットを閉じる",
@@ -488,6 +488,7 @@ export default {
   "walk.arrowNote":
     "スマホはあなたの向きを知りません。地図と現地の案内表示を見比べてください。",
   "share.place": "場所を共有",
+  "share.start": "出発地を共有",
   "share.destination": "目的地を共有",
   "share.title": "友だちに共有",
   "share.intro":

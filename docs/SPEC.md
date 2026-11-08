@@ -1,4 +1,4 @@
-# Taipei Maze 北車不迷路產品與技術規格
+# 北車不迷路產品與技術規格
 
 版本：1.2｜更新日期：2026-11-07｜文件狀態：開發規格，尚非完成實作或現場安全認證
 
@@ -149,7 +149,7 @@
   ├── WebView／flutterObject 雙向橋接
   └── 原生 QR 掃描及必要的本地 bundle 載入
            ↕ JSON 字串 {name,data}
-Taipei Maze 微服務網頁（HTML／CSS／TypeScript）
+北車不迷路 微服務網頁（HTML／CSS／TypeScript）
   ├── SVG／Canvas 地圖與路線
   ├── Dijkstra、無障礙過濾、導航狀態
   ├── 七語 JSON 與 HTMLAudioElement

@@ -215,7 +215,7 @@ export default {
   "title.station": "Taipei Main Station map",
   "title.meeting": "Meeting point",
   "title.about": "Source code & licenses",
-  "title.default": "Taipei Maze",
+  "title.default": "北車不迷路",
   "chat.open": "Open the Taipei Main Helper chat",
   "chat.launcher": "Taipei Main Helper",
   "chat.close": "Close chat",
@@ -487,6 +487,7 @@ export default {
   "walk.arrowNote":
     "Your phone does not know which way you face. Compare the map with the signs.",
   "share.place": "Share place",
+  "share.start": "Share starting point",
   "share.destination": "Share destination",
   "share.title": "Share with a friend",
   "share.intro":

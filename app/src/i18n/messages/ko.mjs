@@ -211,7 +211,7 @@ export default {
   "title.station": "타이베이역 지도",
   "title.meeting": "만남 장소",
   "title.about": "소스 코드 및 라이선스",
-  "title.default": "Taipei Maze",
+  "title.default": "北車不迷路",
   "chat.open": "타이베이역 도우미 채팅 열기",
   "chat.launcher": "타이베이역 도우미",
   "chat.close": "채팅 닫기",
@@ -477,6 +477,7 @@ export default {
   "walk.arrowNote":
     "휴대폰은 내가 어느 쪽을 보고 있는지 몰라요. 지도와 현장 안내판을 비교하세요.",
   "share.place": "장소 공유",
+  "share.start": "출발지 공유",
   "share.destination": "목적지 공유",
   "share.title": "친구에게 공유",
   "share.intro":

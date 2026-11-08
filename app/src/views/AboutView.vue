@@ -241,8 +241,8 @@ const components = computed(() => [
   { name: t("about.compGemma"), license: "Gemma Terms of Use" },
   { name: t("about.compTownpass"), license: "GPL-3.0" },
 ]);
-const notice = `Taipei Maze - QR-based indoor wayfinding with multilingual accessible guidance.
-Copyright (C) 2026 Taipei Maze contributors
+const notice = `北車不迷路 - QR-based indoor wayfinding with multilingual accessible guidance.
+Copyright (C) 2026 北車不迷路 contributors
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by

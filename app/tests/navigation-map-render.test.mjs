@@ -743,3 +743,167 @@ test("inline guidance shares route steps, with no arrow before a route exists or
     language.setLocale(previous);
   }
 });
+
+test("endpoint rows expose separate share buttons and facility controls expose step-free routing", async () => {
+  const startPoint = {
+    ...data.points.B1.find((p) => p.id === "b1-e4"),
+    floor: "B1",
+  };
+  const targetPoint = {
+    ...data.points.B1.find((p) => p.id === "b1-wc-m5"),
+    floor: "B1",
+  };
+  const html = await renderToString(
+    Vue.createSSRApp(component("StationEndpointBar"), {
+      startPoint,
+      targetPoint,
+    })
+  );
+  assert.match(html, /data-endpoint-share="start"/);
+  assert.match(html, /data-endpoint-share="destination"/);
+  const empty = await renderToString(
+    Vue.createSSRApp(component("StationEndpointBar"))
+  );
+  assert.equal(
+    (
+      empty.match(
+        /data-endpoint-share="(?:start|destination)"[^>]*disabled/g
+      ) ?? []
+    ).length,
+    2
+  );
+  const controls = await renderToString(
+    Vue.createSSRApp(component("StationFacilityPicker"), {
+      categories: Object.keys(data.categories),
+      points: scan.stationPoints(data),
+      stepFree: true,
+    })
+  );
+  assert.match(controls, /data-route-step-free[^>]*checked/);
+});
+
+test("sharing preserves the chosen endpoint and the step-free checkbox controls actual routing constraints", async () => {
+  const elements = [];
+  const renderer = Vue.createRenderer({
+    createElement: (tag) => {
+      const node = {
+        tag,
+        children: [],
+        addEventListener() {},
+        removeEventListener() {},
+      };
+      elements.push(node);
+      return node;
+    },
+    createText: (text) => ({ text }),
+    createComment: (text) => ({ text }),
+    insert(node, parent) {
+      parent.children.push(node);
+      node.parent = parent;
+    },
+    remove(node) {
+      const index = node.parent?.children.indexOf(node);
+      if (index >= 0) node.parent.children.splice(index, 1);
+    },
+    setText(node, text) {
+      node.text = text;
+    },
+    setElementText(node, text) {
+      node.text = text;
+    },
+    parentNode: (node) => node.parent,
+    nextSibling: () => null,
+    patchProp(node, key, previous, value) {
+      node[key] = value;
+    },
+  });
+  const endpoints = Vue.reactive({
+    startPoint: null,
+    targetPoint: null,
+    busy: false,
+  });
+  const shared = [];
+  const endpointApp = renderer.createApp({
+    render: () =>
+      Vue.h(component("StationEndpointBar"), {
+        ...endpoints,
+        onShare: (point) => shared.push(point.id),
+      }),
+  });
+  endpointApp.mount({ children: [] });
+  try {
+    const shares = elements.filter((node) => node["data-endpoint-share"]);
+    assert.equal(shares.length, 2);
+    assert.ok(shares.every((node) => node.disabled));
+    endpoints.startPoint = {
+      ...data.points.B1.find((point) => point.id === "b1-e4"),
+      floor: "B1",
+    };
+    endpoints.targetPoint = {
+      ...data.points.B1.find((point) => point.id === "b1-wc-m5"),
+      floor: "B1",
+    };
+    await Vue.nextTick();
+    shares[0].onClick();
+    shares[1].onClick();
+    assert.deepEqual(shared, ["b1-e4", "b1-wc-m5"]);
+    endpoints.busy = true;
+    await Vue.nextTick();
+    assert.ok(shares.every((node) => node.disabled));
+  } finally {
+    endpointApp.unmount();
+  }
+  elements.length = 0;
+  const view = Vue.shallowRef(null);
+  const location = createStationLocation({
+    data,
+    connections,
+    onChange: (state) => {
+      view.value = state;
+    },
+  });
+  view.value = location.snapshot();
+  const facilityApp = renderer.createApp({
+    render: () =>
+      Vue.h(component("StationFacilityPicker"), {
+        categories: Object.keys(data.categories),
+        points: scan.stationPoints(data),
+        stepFree: view.value.stepFree,
+        onStepFree: (checked) => location.setStepFree(checked),
+      }),
+  });
+  facilityApp.mount({ children: [] });
+  const router = walkRoute.walkingRouter(
+    JSON.parse(
+      readFileSync(
+        new URL("../src/station/walking-network.json", import.meta.url)
+      )
+    )
+  );
+  const request = () => ({
+    startId: "b1-e4",
+    destinationId: "b1-wc-m5",
+    stepFree: view.value.stepFree,
+  });
+  try {
+    const checkbox = elements.find((node) =>
+      Object.hasOwn(node, "data-route-step-free")
+    );
+    assert.equal(walkRoute.planWalk(router, request()).type, "success");
+    checkbox.onChange({ target: { checked: true } });
+    await Vue.nextTick();
+    assert.equal(view.value.stepFree, true);
+    assert.equal(checkbox.checked, true);
+    assert.equal(
+      walkRoute.planWalk(router, request()).type,
+      "NoRoute",
+      "unknown entrance must stay excluded"
+    );
+    checkbox.onChange({ target: { checked: false } });
+    await Vue.nextTick();
+    assert.equal(walkRoute.planWalk(router, request()).type, "success");
+  } finally {
+    facilityApp.unmount();
+    location.dispose();
+  }
+});

@@ -45,7 +45,9 @@ const router = createRouter({
 
 // TownPass shows the WebView document title in its native app bar.
 export function pageTitle(route) {
-  return useI18n().t(route.meta?.titleKey ?? "title.default");
+  const { t } = useI18n();
+  const key = route.meta?.titleKey ?? "title.default";
+  return key === "title.default" ? t(key) : `${t("title.default")}｜${t(key)}`;
 }
 router.afterEach((to) => {
   document.title = pageTitle(to);

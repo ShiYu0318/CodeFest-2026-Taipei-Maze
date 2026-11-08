@@ -425,6 +425,7 @@ export default {
   "walk.arrowDown": "搭{via}往下到 {floor}。",
   "walk.arrowNote": "手機不知道你面向哪裡，請對照地圖和現場指標。",
   "share.place": "分享地點",
+  "share.start": "分享起點",
   "share.destination": "分享目的地",
   "share.title": "分享給朋友",
   "share.intro":

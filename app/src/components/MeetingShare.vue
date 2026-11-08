@@ -108,7 +108,7 @@ async function copy() {
 }
 async function share() {
   try {
-    await navigator.share({ title: "Taipei Maze 合成集合點", url: link.value });
+    await navigator.share({ title: "北車不迷路 合成集合點", url: link.value });
     notice.value = "系統分享流程已結束；無法確認對方是否收到或仍在場。";
   } catch {
     notice.value = "分享未完成或已取消，集合卡仍保留，可手動複製連結。";

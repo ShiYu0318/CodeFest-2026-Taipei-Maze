@@ -213,7 +213,7 @@ export default {
   "title.station": "Bản đồ ga chính Đài Bắc",
   "title.meeting": "Điểm hẹn",
   "title.about": "Mã nguồn và giấy phép",
-  "title.default": "Taipei Maze",
+  "title.default": "北車不迷路",
   "chat.open": "Mở trò chuyện với Trợ lý Ga Đài Bắc",
   "chat.launcher": "Trợ lý Ga Đài Bắc",
   "chat.close": "Đóng trò chuyện",
@@ -486,6 +486,7 @@ export default {
   "walk.arrowNote":
     "Điện thoại không biết bạn đang quay mặt hướng nào. Hãy so bản đồ với biển chỉ dẫn.",
   "share.place": "Chia sẻ địa điểm",
+  "share.start": "Chia sẻ điểm xuất phát",
   "share.destination": "Chia sẻ điểm đến",
   "share.title": "Chia sẻ với bạn bè",
   "share.intro":

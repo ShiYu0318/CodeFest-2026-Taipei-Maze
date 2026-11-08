@@ -1,12 +1,12 @@
-# Taipei Maze 授權聲明
+# 北車不迷路 授權聲明
 
 SPDX-License-Identifier: AGPL-3.0-or-later
 
 下列聲明依競賽須知的 AGPL 聲明格式填入專案名稱、年份與貢獻者稱呼；完整授權條款見 [LICENSE](./LICENSE)。個別檔案的第三方著作權及既有授權仍須保留，見 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
 
 ```text
-Taipei Maze - QR-based indoor wayfinding with multilingual accessible guidance.
-Copyright (C) 2026 Taipei Maze contributors
+北車不迷路 - QR-based indoor wayfinding with multilingual accessible guidance.
+Copyright (C) 2026 北車不迷路 contributors
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by

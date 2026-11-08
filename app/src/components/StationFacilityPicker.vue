@@ -20,10 +20,23 @@
       </button>
     </div>
     <div class="facility-choice">
-      <label class="facility-nearest-option"
-        ><input v-model="nearest" type="checkbox" :disabled="busy" /><ZhuyinText
-          :text="t('facility.nearest')"
-      /></label>
+      <div class="facility-options">
+        <label class="facility-nearest-option"
+          ><input
+            v-model="nearest"
+            type="checkbox"
+            :disabled="busy" /><ZhuyinText :text="t('facility.nearest')"
+        /></label>
+        <label class="facility-step-free-option"
+          ><input
+            type="checkbox"
+            data-route-step-free
+            :checked="stepFree"
+            :disabled="busy"
+            @change="emit('step-free', $event.target.checked)" /><StationMapIcon
+            name="accessible" /><ZhuyinText :text="t('scan.stepFree')"
+        /></label>
+      </div>
       <label v-if="!nearest && category" class="facility-destination">
         <ZhuyinText :text="t('scan.chooseDestination')" />
         <select v-model="chosenPointId" :disabled="busy || !category">
@@ -61,8 +74,9 @@ const props = defineProps({
   points: { type: Array, required: true },
   busy: { type: Boolean, default: false },
   destinationId: { type: String, default: null },
+  stepFree: { type: Boolean, default: false },
 });
-const emit = defineEmits(["category", "go"]);
+const emit = defineEmits(["category", "go", "step-free"]);
 const i18n = useI18n();
 const { t } = i18n;
 const nearest = ref(!props.destinationId),
@@ -135,14 +149,16 @@ watch(
   align-items: center;
   gap: 12px;
 }
-.facility-nearest-option {
+.facility-nearest-option,
+.facility-step-free-option {
   display: flex;
   align-items: center;
   gap: 8px;
   min-height: var(--display-control-height, 44px);
   overflow-wrap: anywhere;
 }
-.facility-nearest-option input {
+.facility-nearest-option input,
+.facility-step-free-option input {
   width: 22px;
   height: 22px;
   flex: none;
@@ -189,5 +205,19 @@ watch(
   .facility-choice {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+.facility-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  min-width: 0;
+}
+.facility-step-free-option svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+}
+.facility-options label {
+  cursor: pointer;
 }
 </style>

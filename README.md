@@ -1,6 +1,6 @@
-# 2026 臺北秋季程式設計節城市通微服務大黑客松
+# 北車不迷路
 
-Taipei Maze 北車不迷路：QR 定位、局部跨樓層路網、圖像指引與七語預生成語音，交付為城市通 WebView 微服務網頁。
+北車不迷路：QR 定位、局部跨樓層路網、圖像指引與七語預生成語音，交付為城市通 WebView 微服務網頁。
 
 ## 開發文件
 
@@ -30,7 +30,7 @@ npm run serve -- --port 8082
 
 ## 部署站
 
-正式部署入口：[Taipei Maze](http://home.yoyo899843.com:8000/)，地圖路徑為 `/station-map`。`main` push 觸發既有部署 workflow；應以對應 workflow 結果及站點資源核對發布成功，未合併分支的功能不代表已在正式站提供。
+正式部署入口：[北車不迷路](https://codefest.yoyo899843.com/)，地圖路徑為 `/station-map`。`main` push 觸發既有部署 workflow；應以對應 workflow 結果及站點資源核對發布成功，未合併分支的功能不代表已在正式站提供。
 
 ## 授權與原始碼
 

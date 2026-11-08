@@ -32,6 +32,17 @@
       >
         <StationMapIcon name="qrcode" />
       </button>
+      <button
+        type="button"
+        class="endpoint-bar-share"
+        data-endpoint-share="start"
+        :disabled="busy || !startPoint"
+        :aria-label="t('share.start')"
+        :title="t('share.start')"
+        @click="emit('share', startPoint)"
+      >
+        <StationMapIcon name="share" />
+      </button>
     </div>
 
     <div class="endpoint-bar-field">
@@ -67,6 +78,17 @@
           <path d="M8 4v15M4 8l4-4 4 4M16 20V5M12 16l4 4 4-4" />
         </svg>
       </button>
+      <button
+        type="button"
+        class="endpoint-bar-share"
+        data-endpoint-share="destination"
+        :disabled="busy || !targetPoint"
+        :aria-label="t('share.destination')"
+        :title="t('share.destination')"
+        @click="emit('share', targetPoint)"
+      >
+        <StationMapIcon name="share" />
+      </button>
     </div>
   </section>
 </template>
@@ -84,7 +106,7 @@ defineProps({
   scanAvailable: { type: Boolean, default: false },
   busy: { type: Boolean, default: false },
 });
-const emit = defineEmits(["open", "swap", "scan"]);
+const emit = defineEmits(["open", "swap", "scan", "share"]);
 const i18n = useI18n();
 const { t } = i18n;
 const describe = (point, role) =>
@@ -109,9 +131,9 @@ const describe = (point, role) =>
 }
 .endpoint-bar-field {
   display: grid;
-  grid-template-columns: 4.5em minmax(0, 1fr) var(
-      --display-control-height,
-      44px
+  grid-template-columns: 3.5em minmax(0, 1fr) repeat(
+      2,
+      var(--display-control-height, 44px)
     );
   align-items: center;
   gap: 8px;
@@ -199,7 +221,9 @@ const describe = (point, role) =>
   }
 }
 .endpoint-bar-label {
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 .endpoint-bar-dot {
   flex: none;
@@ -207,7 +231,8 @@ const describe = (point, role) =>
 .endpoint-bar-value {
   min-width: 0;
 }
-.endpoint-bar-scan {
+.endpoint-bar-scan,
+.endpoint-bar-share {
   display: grid;
   place-items: center;
   width: var(--display-control-height, 44px);
@@ -219,7 +244,8 @@ const describe = (point, role) =>
   background: var(--surface);
   cursor: pointer;
 }
-.endpoint-bar-scan svg {
+.endpoint-bar-scan svg,
+.endpoint-bar-share svg {
   width: 24px;
   height: 24px;
 }

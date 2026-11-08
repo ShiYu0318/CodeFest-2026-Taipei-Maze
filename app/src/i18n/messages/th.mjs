@@ -203,7 +203,7 @@ export default {
   "title.station": "แผนที่สถานีหลักไทเป",
   "title.meeting": "จุดนัดพบ",
   "title.about": "ซอร์สโค้ดและสัญญาอนุญาต",
-  "title.default": "Taipei Maze",
+  "title.default": "北車不迷路",
   "chat.open": "เปิดแชตผู้ช่วยสถานีไทเป",
   "chat.launcher": "ผู้ช่วยสถานีไทเป",
   "chat.close": "ปิดแชต",
@@ -464,6 +464,7 @@ export default {
   "walk.arrowNote":
     "โทรศัพท์ไม่รู้ว่าคุณหันไปทางไหน โปรดเทียบแผนที่กับป้ายในสถานที่จริง",
   "share.place": "แชร์สถานที่",
+  "share.start": "แชร์จุดเริ่มต้น",
   "share.destination": "แชร์จุดหมาย",
   "share.title": "แชร์ให้เพื่อน",
   "share.intro":

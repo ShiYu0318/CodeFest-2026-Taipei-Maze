@@ -1308,3 +1308,8 @@
   );
   margin-inline: auto;
 }
+
+.trip-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin: -4px 0 12px; }
+.trip-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 0; min-height: var(--display-control-height, 44px); padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; overflow-wrap: anywhere; }
+.trip-actions svg { width: 22px; height: 22px; flex: none; }
+.trip-actions button:disabled { opacity: .5; }
