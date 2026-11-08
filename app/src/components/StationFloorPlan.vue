@@ -26,13 +26,6 @@
           :class="`plan-${kind}`"
           :d="path"
         />
-        <path
-          v-for="path in plan.outlineDetails"
-          :key="path"
-          class="plan-outline"
-          :d="path"
-          fill-rule="evenodd"
-        />
         <ZhuyinSvgText
           v-for="[x, y, label] in plan.labels"
           :key="label"
@@ -96,10 +89,8 @@ export default {
       return plans[this.floor];
     },
     outlines() {
-      const { outlines, outlineDetails } = this.plan;
-      return this.outlineOnly || !outlineDetails
-        ? outlines
-        : outlines.filter((_, index) => !outlineDetails[index]);
+      const { outlines, detailOutlines } = this.plan;
+      return this.outlineOnly ? outlines : detailOutlines ?? outlines;
     },
     stairways() {
       return stationData.points[this.floor].filter(

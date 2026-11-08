@@ -44,6 +44,28 @@ test("every corridor segment stays inside the drawn walkable area", () => {
   }
 });
 
+test("B1 routes use the open north concourse and go around the K Mall kiosk", () => {
+  const areas = walkAreas("B1");
+  assert.ok(segmentInWalkAreas([900, 910], [899, 978], areas));
+  assert.ok(!segmentInWalkAreas([889, 1006], [800, 1006], areas));
+
+  for (const startPointId of ["b1-north-gate-east", "b1-k-upper-a"]) {
+    const result = router.route({
+      startPointId,
+      destinationId: "b1-exit-m3",
+    });
+    assert.equal(result.type, "success", startPointId);
+    for (const edge of result.route.edges) {
+      assert.equal(edge.type, "walkway");
+      assert.ok(!edge.entranceInferred, edge.id);
+      assert.ok(
+        segmentInWalkAreas(edge.geometry[0], edge.geometry[1], areas),
+        edge.id
+      );
+    }
+  }
+});
+
 test("routes cross floors only through recorded connectors", () => {
   const result = router.route({
     startPointId: "b1-e4",

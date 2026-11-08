@@ -75,6 +75,14 @@ export const stackBounds = [-65, 235, 1385, 1190];
 
 const b1LowerConcourse =
   "216 2v-29h34v15l-19 8v75l-213-2v45h-27v-33l-19-16H770l-39 25h-72v24h-24l-16-47H488v-99h-19v-23h58v50h142v-43h8v-25h26v25";
+const b1NorthApproach =
+  "M222 647l289-25-4-46 25-2 5 45 221-18-3-43 18-2 5 43 140-11 13-39-21 3-4-17 30-6 21-75 66 18-12 50 23-4 4 17-31 5-12 42 29-3 2 17-100 4-22 19 24 281-9 12-6 20";
+const b1WestReturn = "6 43-25 3-6-43-291 27 6 44-23 3-48-418 26-4Z";
+const b1NorthHoles =
+  "M225 673l30 273 290-27-27-272Z M541 647l26 271 129-11-26-272Z M699 633l28 271 176-16-25-271Z";
+const b1WestContext = "M47 605l134-4 20 163-154 50Z";
+const b1EastContext =
+  "M1024 579 1061 575 1085 902 936 915 912 1051 888 1047 910 946 917 923 928 911 904 636 927 602 1026 597Z";
 
 export const plans = {
   // The reference plan shows south at the top. The schematic is north-up.
@@ -110,23 +118,21 @@ export const plans = {
     outlines: [b2Outline, ...railOutlines],
   },
   B1: {
+    // The overview outlines retain the original QR anchor edges and indices.
     outlines: [
-      "M47 605l134-4 20 163-154 50Z",
-      "M222 647l289-25-4-46 25-2 5 45 221-18-3-43 18-2 5 43 140-11 13-39-21 3-4-17 30-6 21-75 66 18-12 50 23-4 4 17-31 5-12 42 29-3 2 17-100 4-22 19 24 281-9 12-6 20-345 31 6 43-25 3-6-43-291 27 6 44-23 3-48-418 26-4Z M225 673l30 273 290-27-27-272Z M541 647l26 271 129-11-26-272Z M699 633l28 271 176-16-25-271Z",
+      b1WestContext,
+      `${b1NorthApproach}-345 31 ${b1WestReturn} ${b1NorthHoles}`,
       "M1024 579l37-4 24 327-149 13-25 143-28-6 45-141-24-275 23-34 99-5Z",
       `M818 929l87-8 11 18-28 108 60 10-13 80-25-5 7-38-15-3-14 89 ${b1LowerConcourse}h94l14-47-13-148h-35v-25h54Z M824 965l-12 65 53 13 13-59-28-26Z M814 1059l-25 122h34l25-114Z`,
     ],
-    // The B1 illustration has finer K Mall / M3 wall detail. Keep the
-    // navigation and QR geometry tied to the original outlines.
-    outlineDetails: {
-      3: `M818 929 905 921 916 939 910 946 888 1047 948 1057 935 1137 910 1132 917 1094 898 1090 892 1113 874 1110 861 1180H888l${b1LowerConcourse}H796L787 1180H811V1153L836 1156 853 1068 809 1060 797 1124H758L755 1100H763V1078H752L746 1018H763V944H811L814 1005H818L820 994 814 942Z M821 972 824 960 850 958 875 980 865 1041 813 1031 824 994Z M827 950 875 945 881 933 879 951 875 969 871 969 851 951 827 954Z`,
-    },
-    regions: [
-      [
-        "context",
-        "M47 605l134-4 20 163-154 50Z M225 673l30 273 290-27-27-272Z M541 647l26 271 129-11-26-272Z M699 633l28 271 176-16-25-271Z M1024 579l37-4 24 327-149 13-25 143-28-6 45-141-24-275 23-34 99-5Z",
-      ],
+    // The north concourse and the K Mall / M3 passage are one continuous
+    // area. The detailed drawing and the walking network share this outline.
+    detailOutlines: [
+      b1WestContext,
+      b1EastContext,
+      `${b1NorthApproach}L910 946 888 1047 948 1057 935 1137 910 1132 917 1094 898 1090 892 1113 874 1110 861 1180H888l${b1LowerConcourse}H796L787 1180H811V1153L836 1156 853 1068 809 1060 797 1124H758L755 1100H763V1078H752L746 1018H763V944H811L814 1005H818L820 994 814 943 856 939 868 935 869 930 815 934 813 925 704 951 568 963l${b1WestReturn} ${b1NorthHoles} M821 972 824 960 850 958 875 980 865 1041 813 1031 824 994Z M827 950 864 946 876 934 872 945 869 951 869 963 864 965 849 952 827 954Z`,
     ],
+    regions: [["context", `${b1WestContext} ${b1NorthHoles} ${b1EastContext}`]],
     labels: [
       [122, 695, "桃園機場捷運"],
       [367, 787, "西區停車場"],

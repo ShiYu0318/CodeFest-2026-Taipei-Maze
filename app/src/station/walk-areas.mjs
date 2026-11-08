@@ -41,7 +41,8 @@ export function walkAreas(floor) {
     scale = plan.scale ?? 1,
     [ox, oy] = plan.offset ?? [0, 0],
     move = ([px, py]) => [ox + px * scale, oy + py * scale];
-  const outlines = floor === "B2" ? [b2Outline] : plan.outlines;
+  const outlines =
+    floor === "B2" ? [b2Outline] : plan.detailOutlines ?? plan.outlines;
   const holes = (plan.regions ?? [])
     .filter(([kind]) => kind === "context")
     .flatMap(([, d]) => parsePath(d).map((ring) => ring.map(move)));
