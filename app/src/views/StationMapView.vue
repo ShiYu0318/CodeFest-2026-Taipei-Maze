@@ -621,8 +621,6 @@ import {
   watch,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
-// import DestinationSearch from "../components/DestinationSearch.vue";
-// import { stationCatalog } from "../search/catalog.mjs";
 import StationFloorPlan from "../components/StationFloorPlan.vue";
 import StaffCard from "../components/StaffCard.vue";
 import PlaceShareSheet from "../components/PlaceShareSheet.vue";
@@ -713,8 +711,6 @@ const currentPoint = computed(() =>
   stationById.get(route.query.start ?? location.view.value.position?.pointId)
 );
 const targetPoint = computed(() => stationById.get(route.query.destination));
-// const searchCatalogEntries = stationCatalog(stationData);
-// let searchPointRevision = 0;
 const mobileZoomQuery = window.matchMedia(
   "(max-width: 719px), (pointer: coarse)"
 );
@@ -1880,22 +1876,6 @@ function toggleLayers() {
   showLayers.value = !showLayers.value;
   resetZoom();
 }
-
-// async function selectSearchPoint({ poiId }) {
-//   const requestRevision = ++searchPointRevision;
-//   const entry = searchCatalogEntries.find((p) => p.id === poiId);
-//   if (!entry) return;
-//   const point = points[entry.floorId].find((p) => p.id === poiId);
-//   if (!point) return;
-//   await showFloor(entry.floorId);
-//   if (requestRevision !== searchPointRevision || level.value !== entry.floorId)
-//     return;
-//   activeTheme.value = null;
-//   selected.value = point;
-//   await nextTick();
-//   if (zoom.value > 1) centerOn(...normalizedPoint(point));
-//   mapSection.value?.scrollIntoView({ block: "start" });
-// }
 
 function scheduleMapLayout() {
   if (mapLayoutFrame !== null) return;

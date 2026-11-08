@@ -1,12 +1,11 @@
 {
-  "name": "team10_townpass_webview",
-  "version": "0.1.0",
+  "name": "taipei-main-station-wayfinding",
+  "version": "0.1.0-rc.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.mjs,.vue src tests scripts",
-    "backend": "python ../backend/app.py",
     "dev": "npm run serve",
     "test": "node --test tests/*.test.mjs",
     "validate:assets": "node scripts/validate-assets.mjs && node ../tools/scatter-station-qrcode.mjs --check && node scripts/build-walking-network.mjs --check",
@@ -15,8 +14,7 @@
   "dependencies": {
     "core-js": "^3.8.3",
     "vue": "^3.2.13",
-    "vue-router": "^4.0.3",
-    "vuex": "^4.0.0"
+    "vue-router": "^4.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -24,7 +22,6 @@
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-plugin-router": "~5.0.0",
-    "@vue/cli-plugin-vuex": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
