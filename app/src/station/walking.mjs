@@ -36,9 +36,12 @@ export function validateWalkingNetwork(network) {
     } catch {
       /* reported below */
     }
+    // A source is a public HTTPS document, or a written citation for
+    // material without a URL (e.g. a photo supplied by the team).
+    const cited = typeof source.citation === "string" && !!source.citation;
     if (
       sources.has(source.id) ||
-      url?.protocol !== "https:" ||
+      (url ? url.protocol !== "https:" : !cited) ||
       !Number.isInteger(source.pages) ||
       source.pages < 1
     )

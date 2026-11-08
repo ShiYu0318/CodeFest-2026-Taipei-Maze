@@ -78,11 +78,11 @@ MIT、常見 BSD-2-Clause／BSD-3-Clause、Apache-2.0 可作優先候選，但�
 
 ## 2026-11-08 B2 月台示意與捷運配色
 
-B2 新增四個月台的原創幾何示意（高鐵 1／2、台鐵 3／4），參考使用者提供的樓層指示照片及[高鐵台北站平面圖](https://www.thsrc.com.tw/event/map/Taipei2.pdf)、[台鐵臺北站轉乘資訊](https://www.railway.gov.tw/tra-tip-web/tip/tip00H/tipH41/viewTransfer/1000)。未收錄照片、標誌或官方圖檔；示意位置未經測繪，不納入通行路網或現地定位。捷運識別色依使用者指定紅線 `#d12d33`、藍線 `#0072c6`，不宣稱台鐵／高鐵示意配色為官方標準色。未新增依賴或外部素材。
+B2 新增四個月台的原創幾何示意（高鐵 1／2、台鐵 3／4），參考使用者提供的樓層指示照片及[高鐵台北站平面圖](https://www.thsrc.com.tw/event/map/Taipei2.pdf)、[台鐵臺北站轉乘資訊](https://www.railway.gov.tw/tra-tip-web/tip/tip00H/tipH41/viewTransfer/1000)。未收錄照片、標誌或官方圖檔；示意位置未經測繪，不作現地定位依據。捷運識別色依使用者指定紅線 `#d12d33`、藍線 `#0072c6`，不宣稱台鐵／高鐵示意配色為官方標準色。未新增依賴或外部素材。
 
 ### 2026-11-08 月台位置核對修正
 
-依[臺鐵臺北站官方 B2 平面圖](https://tip.railway.gov.tw/tra-tip-web/tip/img/0a00114c-3667-4e2f-a897-78b2864d8eba/1140x900)核對：由北到南是臺鐵 4、臺鐵 3、高鐵 2、高鐵 1。前次高鐵順序與過小的局部位置已修正；依捷運 051.pdf 的灰色臺鐵／高鐵參考站區調整相對布局及視野，長軸約為東西向。SVG 與 JSON 均為原型示意座標，不是測繪或核准布點；16 個新增 QR／紫色月台標記沿用 boundary-demo 格式、zone=null，不建立任何虛構步行連結。官方圖僅下載於 repository 外供核對，沒有納入交付。
+依[臺鐵臺北站官方 B2 平面圖](https://tip.railway.gov.tw/tra-tip-web/tip/img/0a00114c-3667-4e2f-a897-78b2864d8eba/1140x900)核對：由北到南是臺鐵 4、臺鐵 3、高鐵 2、高鐵 1。前次高鐵順序與過小的局部位置已修正；依捷運 051.pdf 的灰色臺鐵／高鐵參考站區調整相對布局及視野，長軸約為東西向。SVG 與 JSON 均為原型示意座標，不是測繪或核准布點；16 個新增 QR／紫色月台標記沿用 boundary-demo 格式、zone=null。官方圖僅下載於 repository 外供核對，沒有納入交付。
 
 依上述臺鐵 B2 圖及高鐵平面圖補上四個月台的電扶梯、電梯、樓梯、高鐵 AED 和公用電話。高鐵月台的捷運轉乘樓梯採臺鐵 B2 圖所示位置。各點依官方圖的相對順序配置於既有示意圖，未新增跨樓層通行連結。B2、B3 和 B4 原有的月台 QR 與紫色標記均保留。官方圖檔及圖示未納入專案。
 
@@ -99,3 +99,14 @@ B2 新增四個月台的原創幾何示意（高鐵 1／2、台鐵 3／4），�
 - Current README images are direct captures of the running project website using Microsoft Playwright 1.65.0 (Apache-2.0; https://github.com/microsoft/playwright) and the locally installed Google Chrome in an isolated browser context. Playwright is installed only in ignored local tooling, not added to the application runtime or distributed as a binary.
 - The image collection covers endpoints/search, step-free routing, inline floor guidance, sharing, staff assistance, local facility answers, reading modes, English and information views. The manifest records the actual source revision and browser viewport; it is not physical-device or field validation.
 - These captures replace the earlier owner-provided desktop/simulator screenshots in the current README. Original owner files remain local and earlier captures remain in their historical Git revisions. Existing map/prototype rights and notices continue to apply.
+
+### 步行路網：1F 與 B2 月台（2026-11-08）
+
+依使用者最新指示，`walking-network.json` 將 1F 大廳與 B2 四個月台的示意外框納入步行圖，讓這些區域內的點位可在同一區內規劃路線：
+
+- 1F 路段來源記為 `taipei-1f-photo`（上述使用者提供的 1F 照片，無公開網址，以文字出處記錄）；B2 月台路段來源記為 `tra-taipei-b2`（上述臺鐵官方 B2 平面圖）。這些路段在資料中標示 `schematic`，是依示意重繪推算，不是測繪結果。
+- 不新增任何跨層連結：1F 與月台目前沒有可靠來源可接回捷運 B1～B4 路網，系統不會自行編造樓梯、電扶梯或電梯連結；跨區求路會照實回報無路線。
+- 遠離走道的設施（例如 1F 洗手間、售票處）以「推定入口」接上，可及性未知，無障礙路線不使用。
+- `b1-qr-01`（桃園機場捷運區塊外角）與 `b1-qr-05`（東區停車場東緣）兩個示意 QR 點的座標依既有決策固定，附近沒有捷運走道，維持未綁定。
+- 未新增依賴、圖片或外部素材。
+

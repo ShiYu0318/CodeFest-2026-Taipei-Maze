@@ -3,7 +3,10 @@
 // geometry rebuilt from node coordinates) and expanded here into the full,
 // validated format that createWalkingRouter expects.
 const FLAG_STEPPED = 1,
-  FLAG_ENTRANCE = 2;
+  FLAG_ENTRANCE = 2,
+  // Drawn from a schematic redraw (1F hall, railway platforms), not the
+  // metro station plan; kept routable but labelled as such.
+  FLAG_SCHEMATIC = 4;
 
 export function expandWalkingNetwork(compact) {
   const nodes = compact.nodes.map(([id, floor, x, y]) => ({ id, floor, x, y }));
@@ -13,7 +16,8 @@ export function expandWalkingNetwork(compact) {
     const from = byId.get(a),
       to = byId.get(b);
     const stepped = (flags & FLAG_STEPPED) !== 0,
-      entrance = (flags & FLAG_ENTRANCE) !== 0;
+      entrance = (flags & FLAG_ENTRANCE) !== 0,
+      schematic = (flags & FLAG_SCHEMATIC) !== 0;
     for (const [x, y] of [
       [from, to],
       [to, from],
@@ -30,14 +34,17 @@ export function expandWalkingNetwork(compact) {
           stepFree: entrance ? null : !stepped,
           wheelchairPassable: entrance ? null : !stepped,
           requiresTicket: false,
-          sourceId: compact.sourceId,
-          page: compact.pages[x.floor],
+          sourceId: schematic
+            ? compact.schematicSources[x.floor]
+            : compact.sourceId,
+          page: schematic ? 1 : compact.pages[x.floor],
           verification: "desk_checked",
           geometry: [
             [x.x, x.y],
             [y.x, y.y],
           ],
           ...(entrance ? { entranceInferred: true } : {}),
+          ...(schematic ? { schematic: true } : {}),
         });
   }
   return {

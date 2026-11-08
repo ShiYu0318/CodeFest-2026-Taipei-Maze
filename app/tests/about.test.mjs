@@ -70,5 +70,5 @@ test("summary distinguishes partial diagram coverage from field verification", (
     graph
   );
   assert.equal(summary.walkingNetwork, false);
-  assert.equal(summary.diagramPoints, 125);
+  assert.equal(summary.diagramPoints, 226);
 });

@@ -24,14 +24,32 @@ const stationData = read("views/station-points.json");
 const connections = read("views/station-connections.json");
 const output = new URL("station/walking-network.json", root);
 
-const FLOORS = ["B1", "B2", "B3", "B4"];
+const FLOORS = ["1F", "B1", "B2", "B3", "B4"];
 const PAGE = { B1: 1, B2: 2, B3: 3, B4: 4 };
 const SOURCE = {
   id: "metro-051",
   url: "https://web.metro.taipei/img/ALL/INFOPDF/051.pdf",
   pages: 4,
 };
+// Areas redrawn from other references (see THIRD_PARTY_NOTICES.md). Their
+// corridors are routable within the area but flagged as schematic.
+const SCHEMATIC_SOURCES = [
+  {
+    id: "taipei-1f-photo",
+    citation:
+      "使用者提供的「台北車站 1F 平面圖」照片（萬俊廷攝），獨立北向示意座標，未經現地驗證",
+    pages: 1,
+  },
+  {
+    id: "tra-taipei-b2",
+    url: "https://tip.railway.gov.tw/tra-tip-web/tip/img/0a00114c-3667-4e2f-a897-78b2864d8eba/1140x900",
+    pages: 1,
+  },
+];
+const SCHEMATIC_BY_FLOOR = { "1F": "taipei-1f-photo", B2: "tra-taipei-b2" };
 const ENTRANCE_MAX = 25; // diagram units from an icon to its corridor
+// 1F rooms (restrooms, ticket offices) sit deeper off the hall.
+const ENTRANCE_MAX_BY_FLOOR = { "1F": 50 };
 const CORNER_INSET = 6;
 const NEIGHBOURS = 8;
 const SHORT_STAIR_RADIUS = 18;
@@ -65,9 +83,9 @@ function nearestBoundaryPoint(p, areas) {
 const EDGE_MARGIN = 2; // points closer than this to a wall get an entrance
 /** Step a boundary point far enough into the walkable area to route from. */
 function inside(q, areas) {
-  for (const r of [3, 4, 6, 8, 10, 12])
-    for (let k = 0; k < 16; k++) {
-      const a = (k / 16) * Math.PI * 2,
+  for (const r of [3, 4, 6, 8, 10, 12, 16, 20, 24, 32, 40])
+    for (let k = 0; k < 32; k++) {
+      const a = (k / 32) * Math.PI * 2,
         p = [round(q[0] + Math.cos(a) * r), round(q[1] + Math.sin(a) * r)];
       if (
         pointInWalkAreas(p, areas) &&
@@ -85,6 +103,23 @@ function inside(q, areas) {
   return null;
 }
 
+/** Fallback: the nearest roomy walkable spot within max, by grid search. */
+function nearestInterior(p, areas, max) {
+  let best = null;
+  for (let dx = -max; dx <= max; dx += 1)
+    for (let dy = -max; dy <= max; dy += 1) {
+      const d = Math.hypot(dx, dy);
+      if (d > max || (best && d >= best.d)) continue;
+      const q = [round(p[0] + dx), round(p[1] + dy)];
+      if (
+        pointInWalkAreas(q, areas) &&
+        nearestBoundaryPoint(q, areas).d >= EDGE_MARGIN
+      )
+        best = { d, q };
+    }
+  return best?.q ?? null;
+}
+
 export function buildWalkingNetwork() {
   const nodes = [],
     edges = [],
@@ -93,15 +128,22 @@ export function buildWalkingNetwork() {
     coverage = {};
   const walkways = [];
   // Each corridor pair is stored once; flags: 1 = passes short stairs,
-  // 2 = inferred entrance with unknown accessibility.
+  // 2 = inferred entrance with unknown accessibility, 4 = schematic area.
+  // Area index per node: 0 is the main outline; on B2, 1-4 are platforms.
+  const areaOf = new Map();
   const walkway = (from, to, flags = 0) => {
+    if (schematicNode(from) || schematicNode(to)) flags |= 4;
     const cost = round(Math.hypot(to.x - from.x, to.y - from.y)) || 0.1;
     walkways.push(
       flags ? [from.id, to.id, cost, flags] : [from.id, to.id, cost]
     );
   };
+  const schematicNode = (node) =>
+    node.floor === "1F" ||
+    (node.floor === "B2" && (areaOf.get(node.id) ?? 0) > 0);
   for (const floor of FLOORS) {
     const areas = walkAreas(floor),
+      areaIndex = (p) => areas.findIndex((area) => pointInWalkAreas(p, [area])),
       points = stationData.points[floor] ?? [],
       shortStairs = points.filter((p) => /短梯/.test(p.name)),
       floorNodes = [],
@@ -115,6 +157,7 @@ export function buildWalkingNetwork() {
         nearestBoundaryPoint(p, areas).d >= EDGE_MARGIN
       ) {
         const node = { id: point.id, floor, x: point.x, y: point.y };
+        areaOf.set(node.id, areaIndex(p));
         nodes.push(node);
         floorNodes.push(node);
         bindings[point.id] = point.id;
@@ -122,8 +165,12 @@ export function buildWalkingNetwork() {
         continue;
       }
       const near = nearestBoundaryPoint(p, areas);
+      const reach = ENTRANCE_MAX_BY_FLOOR[floor] ?? ENTRANCE_MAX;
       const door =
-        near && near.d <= ENTRANCE_MAX ? inside(near.q, areas) : null;
+        (near && near.d <= reach ? inside(near.q, areas) : null) ??
+        // Points drawn exactly on a shared edge: step to the nearest
+        // walkable spot instead (still an inferred, unknown-access entrance).
+        nearestInterior(p, areas, 8);
       if (!door) {
         uncovered.push(point.id);
         continue;
@@ -136,6 +183,8 @@ export function buildWalkingNetwork() {
         x: door[0],
         y: door[1],
       };
+      areaOf.set(entry.id, areaIndex(door));
+      areaOf.set(node.id, areaIndex(door));
       nodes.push(node, entry);
       floorNodes.push(entry);
       bindings[point.id] = point.id;
@@ -171,6 +220,7 @@ export function buildWalkingNetwork() {
         x: c[0],
         y: c[1],
       };
+      areaOf.set(node.id, areaIndex(c));
       nodes.push(node);
       floorNodes.push(node);
     });
@@ -267,9 +317,10 @@ export function buildWalkingNetwork() {
     schemaVersion: 1,
     version: "2026.11.08-diagram",
     routingUnit: "relative",
-    note: "Diagram-derived from the redrawn Taipei Metro station plans; not a field survey. Costs are relative diagram units. Fare gates are not modelled.",
-    sources: [SOURCE],
+    note: "Diagram-derived from the redrawn Taipei Metro station plans; 1F and the B2 railway platforms come from schematic redraws (flag 4). Not a field survey. Costs are relative diagram units. Fare gates are not modelled. No vertical links exist yet between the metro area and 1F or the railway platforms.",
+    sources: [SOURCE, ...SCHEMATIC_SOURCES],
     sourceId: SOURCE.id,
+    schematicSources: SCHEMATIC_BY_FLOOR,
     pages: PAGE,
     floors: FLOORS,
     nodes: nodes.map((n) => [n.id, n.floor, n.x, n.y]),

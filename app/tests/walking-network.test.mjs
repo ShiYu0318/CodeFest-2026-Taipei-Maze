@@ -138,3 +138,59 @@ test("unconfirmed stair types and escalator directions never carry a route", () 
     if (edge.verification === "unverified")
       assert.ok(["stairs", "escalator"].includes(edge.type), edge.id);
 });
+
+test("every point is bound except the two demo QR anchors on non-metro blocks", () => {
+  const points = JSON.parse(
+    readFileSync(
+      new URL("../src/views/station-points.json", import.meta.url),
+      "utf8"
+    )
+  ).points;
+  const unbound = Object.values(points)
+    .flat()
+    .map((point) => point.id)
+    .filter((id) => !compact.bound.includes(id));
+  // b1-qr-01 sits on the airport MRT block, b1-qr-05 on the east car park;
+  // their coordinates are pinned, and no metro corridor reaches them.
+  assert.deepEqual(unbound.sort(), ["b1-qr-01", "b1-qr-05"]);
+});
+
+test("1F and railway platform corridors are schematic and sourced", () => {
+  const sources = new Map(network.sources.map((s) => [s.id, s]));
+  const schematic = network.edges.filter((edge) => edge.schematic);
+  assert.ok(schematic.length > 0);
+  for (const edge of schematic) {
+    const floor = nodes.get(edge.from).floor;
+    assert.ok(["1F", "B2"].includes(floor), edge.id);
+    assert.equal(
+      edge.sourceId,
+      floor === "1F" ? "taipei-1f-photo" : "tra-taipei-b2"
+    );
+    assert.ok(sources.get(edge.sourceId), edge.sourceId);
+  }
+  for (const edge of network.edges.filter((e) => e.type === "walkway"))
+    if (nodes.get(edge.from).floor === "1F") assert.ok(edge.schematic, edge.id);
+});
+
+test("no invented vertical links reach 1F or the railway platforms", () => {
+  for (const edge of network.edges.filter((e) => e.connectorId))
+    for (const id of [edge.from, edge.to]) {
+      assert.notEqual(nodes.get(id).floor, "1F", edge.id);
+      assert.ok(!/^b2-(tra|hsr)-/.test(id), edge.id);
+    }
+});
+
+test("routes work inside 1F and stay on a railway platform", () => {
+  const hall = router.route({
+    startPointId: "1f-exit-n1",
+    destinationId: "1f-toilet-west",
+  });
+  assert.equal(hall.type, "success");
+  assert.ok(hall.route.edges.every((edge) => edge.schematic));
+  const platform = router.route({
+    startPointId: "b2-tra-4-escalator-1",
+    destinationId: "b2-tra-4-elevator-8",
+  });
+  assert.equal(platform.type, "success");
+  assert.ok(platform.route.edges.every((edge) => edge.schematic));
+});

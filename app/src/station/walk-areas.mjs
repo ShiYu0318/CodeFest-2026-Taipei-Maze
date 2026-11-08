@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Walkable areas of each floor, derived from the redrawn plan outlines.
 // Non-metro "context" blocks (parking, other operators) are holes.
-import { plans, b2Outline } from "../views/station-floor-plans.mjs";
+import { plans } from "../views/station-floor-plans.mjs";
 
 /** Minimal parser for the M/L/H/V/Z path commands used by the plans. */
 export function parsePath(d) {
@@ -41,8 +41,8 @@ export function walkAreas(floor) {
     scale = plan.scale ?? 1,
     [ox, oy] = plan.offset ?? [0, 0],
     move = ([px, py]) => [ox + px * scale, oy + py * scale];
-  const outlines =
-    floor === "B2" ? [b2Outline] : plan.detailOutlines ?? plan.outlines;
+  // B2 includes the concourse and the four schematic railway platforms.
+  const outlines = plan.detailOutlines ?? plan.outlines;
   const holes = (plan.regions ?? [])
     .filter(([kind]) => kind === "context")
     .flatMap(([, d]) => parsePath(d).map((ring) => ring.map(move)));
