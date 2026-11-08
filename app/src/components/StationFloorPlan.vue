@@ -13,7 +13,7 @@
       "
     >
       <path
-        v-for="path in plan.outlines"
+        v-for="path in outlines"
         :key="path"
         class="plan-outline"
         :d="path"
@@ -25,6 +25,13 @@
           :key="path"
           :class="`plan-${kind}`"
           :d="path"
+        />
+        <path
+          v-for="path in plan.outlineDetails"
+          :key="path"
+          class="plan-outline"
+          :d="path"
+          fill-rule="evenodd"
         />
         <ZhuyinSvgText
           v-for="[x, y, label] in plan.labels"
@@ -87,6 +94,12 @@ export default {
   computed: {
     plan() {
       return plans[this.floor];
+    },
+    outlines() {
+      const { outlines, outlineDetails } = this.plan;
+      return this.outlineOnly || !outlineDetails
+        ? outlines
+        : outlines.filter((_, index) => !outlineDetails[index]);
     },
     stairways() {
       return stationData.points[this.floor].filter(
