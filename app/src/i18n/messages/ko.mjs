@@ -542,4 +542,15 @@ export default {
   "tour.route-actions":
     "여기에서 다시 스캔하거나 도움을 요청하고 경로를 취소하세요.",
   "tour.information": "정보 아이콘에서 도움말, 출처와 라이선스를 확인하세요.",
+  "progress.source": "위치 출처",
+  "progress.source.qr": "QR 스캔",
+  "progress.source.manual": "직접 선택한 출발지",
+  "progress.source.link": "장소 링크",
+  "progress.source.demo": "모의 위치",
+  "progress.source.none": "위치 미확인",
+  "progress.lastScan": "마지막 QR 스캔",
+  "progress.confirm": "도착했어요",
+  "progress.confirmed": "직접 도착을 확인했습니다",
+  "progress.finish": "경로 종료",
+  "progress.confirmedAt": "확인 시간",
 };

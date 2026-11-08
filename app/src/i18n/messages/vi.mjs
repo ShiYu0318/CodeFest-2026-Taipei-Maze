@@ -550,4 +550,15 @@ export default {
   "tour.route-actions": "Quét lại, nhờ trợ giúp hoặc hủy chuyến tại đây.",
   "tour.information":
     "Mở biểu tượng thông tin để xem trợ giúp, nguồn và giấy phép.",
+  "progress.source": "Nguồn vị trí",
+  "progress.source.qr": "Quét QR",
+  "progress.source.manual": "Điểm đi thủ công",
+  "progress.source.link": "Liên kết địa điểm",
+  "progress.source.demo": "Vị trí mô phỏng",
+  "progress.source.none": "Chưa định vị",
+  "progress.lastScan": "Lần quét QR cuối",
+  "progress.confirm": "Tôi đã đến",
+  "progress.confirmed": "Bạn đã xác nhận đến nơi",
+  "progress.finish": "Kết thúc chuyến",
+  "progress.confirmedAt": "Thời gian xác nhận",
 };

@@ -560,4 +560,15 @@ export default {
   "tour.route-actions":
     "Pindai ulang, minta bantuan, atau batalkan perjalanan di sini.",
   "tour.information": "Buka ikon info untuk bantuan, sumber dan lisensi.",
+  "progress.source": "Sumber posisi",
+  "progress.source.qr": "Pindai QR",
+  "progress.source.manual": "Titik awal manual",
+  "progress.source.link": "Tautan lokasi",
+  "progress.source.demo": "Posisi simulasi",
+  "progress.source.none": "Belum ditentukan",
+  "progress.lastScan": "Pindai QR terakhir",
+  "progress.confirm": "Saya sudah tiba",
+  "progress.confirmed": "Kedatangan dikonfirmasi oleh Anda",
+  "progress.finish": "Selesaikan perjalanan",
+  "progress.confirmedAt": "Waktu konfirmasi",
 };

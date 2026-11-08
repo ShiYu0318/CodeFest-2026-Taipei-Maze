@@ -527,4 +527,15 @@ export default {
   "tour.route-actions": "สแกนใหม่ ขอความช่วยเหลือ หรือยกเลิกการเดินทางที่นี่",
   "tour.information":
     "เปิดไอคอนข้อมูลเพื่อดูคำแนะนำ แหล่งข้อมูล และสัญญาอนุญาต",
+  "progress.source": "ที่มาของตำแหน่ง",
+  "progress.source.qr": "สแกน QR",
+  "progress.source.manual": "จุดเริ่มต้นที่เลือกเอง",
+  "progress.source.link": "ลิงก์สถานที่",
+  "progress.source.demo": "ตำแหน่งจำลอง",
+  "progress.source.none": "ยังไม่ระบุตำแหน่ง",
+  "progress.lastScan": "สแกน QR ล่าสุด",
+  "progress.confirm": "ฉันถึงแล้ว",
+  "progress.confirmed": "คุณยืนยันว่าถึงแล้ว",
+  "progress.finish": "จบการเดินทาง",
+  "progress.confirmedAt": "เวลายืนยัน",
 };

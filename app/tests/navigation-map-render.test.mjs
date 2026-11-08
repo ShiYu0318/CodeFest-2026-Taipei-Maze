@@ -21,6 +21,7 @@ import * as nearestAction from "../src/station/nearest-action.mjs";
 import * as stepText from "../src/station/step-text.mjs";
 import * as walkRoute from "../src/station/walk-route.mjs";
 import * as placeShare from "../src/station/place-share.mjs";
+import * as tripProgress from "../src/station/trip-progress.mjs";
 import * as mapTour from "../src/station/map-tour.mjs";
 import * as about from "../src/about/about.mjs";
 import * as searchCatalog from "../src/search/catalog.mjs";
@@ -121,6 +122,7 @@ function component(name) {
       )
     ),
     "map-tour.mjs": mapTour,
+    "trip-progress.mjs": tripProgress,
     "about.mjs": about,
     "catalog.mjs": searchCatalog,
     "search.mjs": searchEngine,
@@ -254,7 +256,11 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
     );
     assert.equal(browsing.includes('class="navigation-rescan-bar"'), false);
     const trip = await render({ start: "b1-e4", destination: "m-e4" });
-    assert.equal((trip.match(/class="map-pin\b/g) ?? []).length, 9);
+    assert.equal(
+      (trip.match(/class="map-pin\b/g) ?? []).length,
+      data.points.B1.length,
+      "All shows every facility even with an active trip"
+    );
     assert.ok(trip.includes('class="endpoint-bar-scan"'));
     assert.equal(trip.includes('class="theme-group'), true);
     assert.ok(trip.includes('class="facility-nearest-option"'));
@@ -262,7 +268,7 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
     const actions = trip.slice(trip.indexOf('class="inline-route-actions"'));
     assert.ok(actions.includes('data-route-action="help"'));
     assert.ok(actions.includes('data-route-action="cancel"'));
-    assert.equal(trip.includes('class="plan-stairs"'), false);
+    assert.equal(trip.includes('class="plan-stairs"'), true);
     assert.ok(trip.includes('class="endpoint-bar-scan"'));
     assert.equal((trip.match(/class="facility-category-go"/g) ?? []).length, 1);
     assert.equal(trip.includes('class="navigation-guide"'), false);
@@ -1025,4 +1031,39 @@ test("facility filters do not add a second destination selector or replace the m
   assert.doesNotMatch(html, /facility-destination/);
   assert.match(html, /class="facility-category-go"/);
   assert.doesNotMatch(html, /class="facility-category-go"[^>]*disabled/);
+});
+
+test("guide exposes arrival confirmation and a distinct finish state without inventing scan time", async () => {
+  const pointsById = new Map(
+    scan.stationPoints(data).map((point) => [point.id, point])
+  );
+  const steps = [{ kind: "arrive", toId: "b1-wc-m5", floor: "B1", index: 0 }];
+  const render = (props) =>
+    renderToString(
+      Vue.createSSRApp(component("StationRouteGuide"), {
+        steps,
+        index: 0,
+        pointsById,
+        ...props,
+      })
+    );
+  const ready = await render({
+    canConfirmArrival: true,
+    arrivalToken: "trip-1",
+    positionInfo: { kind: "manual", confirmedAt: null },
+  });
+  assert.match(ready, /class="confirm-trip-arrival"/);
+  assert.doesNotMatch(ready, /class="finish-trip"/);
+  assert.doesNotMatch(ready, /2026-11-08/);
+  const done = await render({
+    arrivalReceipt: {
+      source: "manual",
+      identity: "trip-1",
+      confirmedAt: "2026-11-08T00:30:00Z",
+    },
+  });
+  assert.match(done, /class="arrival-confirmed"/);
+  assert.match(done, /class="finish-trip"/);
+  assert.doesNotMatch(done, /class="confirm-trip-arrival"/);
+  assert.doesNotMatch(done, /route-step-arrow/);
 });

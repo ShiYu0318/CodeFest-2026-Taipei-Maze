@@ -277,7 +277,9 @@
                         <StationFloorPlan
                           :floor="level"
                           :visible-point-ids="
-                            navigationMap.active ? navigationMap.pointIds : null
+                            activeTheme
+                              ? floorPoints.map((point) => point.id)
+                              : null
                           "
                         />
                       </g>
@@ -526,6 +528,12 @@
           :demo="demoEnabled"
           :demo-busy="demoBusy"
           :trip-actions="!!walkDestinationPoint"
+          :arrival-token="tripKey"
+          :arrival-receipt="arrivalReceipt"
+          :can-confirm-arrival="canConfirmArrival"
+          :position-info="positionInfo"
+          @arrive="confirmManualTripArrival"
+          @finish="finishTrip"
           @help="staffPoint = walkDestinationPoint"
           @cancel="openTripDialog('cancel')"
           @update:index="goWalkStep"
@@ -630,6 +638,12 @@ import { stationPoints } from "../station/scan.mjs";
 import { htmlLang, useI18n } from "../i18n/index.mjs";
 import { placeLabel, placeName } from "../i18n/places.mjs";
 import { useMapFocus } from "../station/map-focus.mjs";
+import {
+  tripIdentity,
+  confirmManualArrival as makeManualArrival,
+  isCurrentArrival,
+  positionDetails,
+} from "../station/trip-progress.mjs";
 import { findNearestFacility } from "../station/nearest-action.mjs";
 import walkingNetwork from "../station/walking-network.json";
 import {
@@ -836,11 +850,69 @@ const walkLines = computed(() =>
 const walkSteps = computed(() =>
   walk.value.type === "success" ? routeSteps(walk.value.route) : []
 );
+const tripContext = computed(() => ({
+  startId: walkStart.value,
+  destinationId: walkDestination.value,
+  positionToken: location.view.value.token,
+  stepFree: location.view.value.stepFree,
+  excludedEdgeTypes: location.view.value.excludedEdgeTypes,
+  unavailableConnectorIds: location.view.value.unavailableConnectorIds,
+}));
+const tripKey = computed(() => tripIdentity(tripContext.value));
+const manualArrival = ref(null);
+const arrivalReceipt = computed(() =>
+  isCurrentArrival(manualArrival.value, tripKey.value)
+    ? manualArrival.value
+    : null
+);
+const positionInfo = computed(() =>
+  positionDetails({
+    startId: walkStart.value,
+    position: location.view.value.position,
+    demo: demoEnabled.value,
+  })
+);
+watch(tripKey, () => {
+  manualArrival.value = null;
+});
 const walkStepIndex = ref(0);
 watch(walkSteps, () => (walkStepIndex.value = 0));
 const currentWalkStep = computed(
   () => walkSteps.value[walkStepIndex.value] ?? null
 );
+const canConfirmArrival = computed(
+  () =>
+    !arrivalReceipt.value &&
+    (walk.value.type === "Arrived" ||
+      (walk.value.type === "success" &&
+        currentWalkStep.value?.kind === "arrive"))
+);
+function confirmManualTripArrival(expectedIdentity) {
+  if (location.view.value.active || demoBusy.value || arrivalReceipt.value)
+    return;
+  const result = makeManualArrival({
+    trip: tripContext.value,
+    expectedIdentity,
+    routeType: walk.value.type,
+    stepKind: currentWalkStep.value?.kind,
+  });
+  if (result.type === "success") manualArrival.value = result.receipt;
+}
+async function finishTrip(expectedIdentity) {
+  if (
+    location.view.value.active ||
+    demoBusy.value ||
+    expectedIdentity !== tripKey.value ||
+    !arrivalReceipt.value
+  )
+    return;
+  const startId = walkStart.value;
+  if (!location.choose(null)) return;
+  manualArrival.value = null;
+  await saveEndpoints(startId, null);
+  await nextTick();
+  mapSection.value?.scrollIntoView({ block: "start" });
+}
 const walkCheckpoints = computed(() => {
   const step = currentWalkStep.value;
   if (!step || step.floor !== level.value) return [];
@@ -1063,16 +1135,7 @@ const allFloorPoints = computed(() => {
     ...current.filter((point) => isConnector(point)),
   ];
 });
-const floorPoints = computed(() =>
-  allFloorPoints.value.filter((point) =>
-    navigationPointVisible(
-      point,
-      navigationMap.value,
-      !activeTheme.value || matchesTheme(point, activeTheme.value),
-      !!activeTheme.value
-    )
-  )
-);
+const floorPoints = computed(() => allFloorPoints.value.filter(isPointVisible));
 const availableThemes = computed(() => Object.keys(categories));
 
 const bounds = computed(() => {
@@ -1178,6 +1241,7 @@ function matchesTheme(point, type) {
 }
 
 function isPointVisible(point) {
+  if (!activeTheme.value) return true;
   return navigationPointVisible(
     point,
     navigationMap.value,

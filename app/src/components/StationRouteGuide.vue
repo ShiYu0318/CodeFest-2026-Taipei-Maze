@@ -7,6 +7,11 @@
   >
     <p v-if="demo" class="route-demo-note">{{ t("demo.notice") }}</p>
     <p v-if="active" role="status">{{ t("scan.waiting") }}</p>
+    <div v-else-if="arrivalReceipt" class="arrival-confirmed" role="status">
+      <StationMapIcon name="check" /><ZhuyinText
+        :text="t('progress.confirmed')"
+      />
+    </div>
     <StationRouteSteps
       v-else-if="steps.length"
       :steps="steps"
@@ -22,6 +27,27 @@
         @click="emit('scan')"
       >
         <StationMapIcon name="qrcode" /><ZhuyinText :text="t('scan.rescan')" />
+      </button>
+      <button
+        v-if="canConfirmArrival && !arrivalReceipt"
+        type="button"
+        class="confirm-trip-arrival"
+        :disabled="active || demoBusy"
+        @click="confirmAction"
+      >
+        <StationMapIcon name="check" /><ZhuyinText
+          :text="t('progress.confirm')"
+        />
+      </button>
+      <button
+        v-if="arrivalReceipt"
+        type="button"
+        class="finish-trip"
+        ref="finishButton"
+        :disabled="active || demoBusy"
+        @click="finishAction"
+      >
+        <ZhuyinText :text="t('progress.finish')" />
       </button>
       <template v-if="tripActions">
         <button
@@ -63,6 +89,20 @@
         </button>
       </template>
       <InfoDisclosure :label="t('guide.help')">
+        <dl class="position-information">
+          <dt>{{ t("progress.source") }}</dt>
+          <dd>
+            <ZhuyinText :text="t('progress.source.' + positionInfo.kind)" />
+          </dd>
+          <template v-if="positionInfo.confirmedAt"
+            ><dt>{{ t("progress.lastScan") }}</dt>
+            <dd>{{ formatTime(positionInfo.confirmedAt) }}</dd></template
+          >
+          <template v-if="arrivalReceipt"
+            ><dt>{{ t("progress.confirmedAt") }}</dt>
+            <dd>{{ formatTime(arrivalReceipt.confirmedAt) }}</dd></template
+          >
+        </dl>
         <p><ZhuyinText :text="t('walk.arrowNote')" /></p>
         <p><ZhuyinText :text="t('scan.caveat')" /></p>
       </InfoDisclosure>
@@ -71,12 +111,13 @@
 </template>
 <script setup>
 /* global defineProps, defineEmits */
+import { computed, nextTick, ref, watch } from "vue";
 import InfoDisclosure from "./InfoDisclosure.vue";
 import StationRouteSteps from "./StationRouteSteps.vue";
 import StationMapIcon from "./StationMapIcon.vue";
 import ZhuyinText from "./ZhuyinText.vue";
-import { useI18n } from "../i18n/index.mjs";
-defineProps({
+import { htmlLang, useI18n } from "../i18n/index.mjs";
+const props = defineProps({
   steps: { type: Array, required: true },
   index: { type: Number, required: true },
   pointsById: { type: Map, required: true },
@@ -86,16 +127,44 @@ defineProps({
   demo: { type: Boolean, default: false },
   demoBusy: { type: Boolean, default: false },
   tripActions: { type: Boolean, default: false },
+  arrivalToken: { type: String, default: null },
+  arrivalReceipt: { type: Object, default: null },
+  canConfirmArrival: { type: Boolean, default: false },
+  positionInfo: {
+    type: Object,
+    default: () => ({ kind: "none", confirmedAt: null }),
+  },
 });
 const emit = defineEmits([
   "scan",
+  "arrive",
+  "finish",
   "help",
   "cancel",
   "update:index",
   "demo-advance",
   "demo-arrive",
 ]);
-const { t } = useI18n();
+const { t, locale } = useI18n();
+const confirmAction = computed(() => {
+  const token = props.arrivalToken;
+  return () => emit("arrive", token);
+});
+const finishAction = computed(() => {
+  const token = props.arrivalToken;
+  return () => emit("finish", token);
+});
+const finishButton = ref(null);
+watch(
+  () => props.arrivalReceipt,
+  async (receipt) => {
+    if (!receipt) return;
+    await nextTick();
+    finishButton.value?.focus({ preventScroll: true });
+  }
+);
+const formatTime = (value) =>
+  new Date(value).toLocaleString(htmlLang(locale.value));
 </script>
 <style scoped>
 .station-route-guide {
@@ -141,5 +210,37 @@ const { t } = useI18n();
 .inline-route-actions :focus-visible {
   outline: 3px solid var(--tp-primary-600);
   outline-offset: 2px;
+}
+.arrival-confirmed {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 2px solid var(--tp-primary-500);
+  border-radius: 12px;
+  font-weight: 700;
+}
+.arrival-confirmed svg {
+  width: 48px;
+  height: 48px;
+  flex: none;
+}
+.inline-route-actions > .confirm-trip-arrival,
+.inline-route-actions > .finish-trip {
+  background: var(--tp-primary-600);
+  color: #fff;
+  font-weight: 700;
+}
+.position-information {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  margin: 0 0 12px;
+}
+.position-information dt {
+  font-weight: 700;
+}
+.position-information dd {
+  margin: 0 0 8px;
 }
 </style>

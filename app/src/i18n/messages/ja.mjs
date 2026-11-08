@@ -552,4 +552,15 @@ export default {
   "tour.route-actions":
     "ここで再スキャン、ヘルプ、経路のキャンセルができます。",
   "tour.information": "情報アイコンから説明、出典、ライセンスを確認できます。",
+  "progress.source": "位置の取得方法",
+  "progress.source.qr": "QRスキャン",
+  "progress.source.manual": "手動の出発地",
+  "progress.source.link": "場所のリンク",
+  "progress.source.demo": "模擬位置",
+  "progress.source.none": "位置未確認",
+  "progress.lastScan": "最後のQRスキャン",
+  "progress.confirm": "到着しました",
+  "progress.confirmed": "手動で到着を確認しました",
+  "progress.finish": "案内を終了",
+  "progress.confirmedAt": "確認時刻",
 };
