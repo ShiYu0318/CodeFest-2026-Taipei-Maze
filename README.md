@@ -18,7 +18,7 @@
 
 ## 內容導覽
 
-[解決的問題](#解決的問題) · [實際畫面](#實際畫面) · [功能](#功能與完成範圍) · [快速開始](#快速開始) · [操作與-demo](#操作與-demo) · [技術架構](#技術架構) · [最短路徑](#我們如何計算最短路徑) · [資料與路網](#資料與路網) · [測試](#測試與品質) · [部署](#部署與版本) · [授權](#授權與致謝)
+[解決的問題](#解決的問題) · [實際畫面](#實際畫面) · [地圖全貌](#各樓層地圖全貌) · [功能](#功能與完成範圍) · [快速開始](#快速開始) · [操作與-demo](#操作與-demo) · [技術架構](#技術架構) · [最短路徑](#我們如何計算最短路徑) · [資料與路網](#資料與路網) · [測試](#測試與品質) · [部署](#部署與版本) · [授權](#授權與致謝)
 
 ## 解決的問題
 
@@ -69,6 +69,32 @@
 <p align="center"><a href="./assets/screenshots/mobile-information.png"><img src="./assets/screenshots/mobile-information.png" alt="地圖說明與資料來源" width="360"></a></p>
 
 [![資料來源與寬螢幕導航](./assets/screenshots/desktop-route.png)](./assets/screenshots/desktop-route.png)
+
+## 各樓層地圖全貌
+
+左欄是 App 內的完整樓層地圖（縮放 1 倍）；右欄是同一層的步行路網覆蓋圖，由 [`render-walking-maps.mjs`](./app/scripts/render-walking-maps.mjs) 依 `walking-network.json` 產生。圖例如下：
+
+- 青色實線：依捷運站圖推算的走道。
+- 橘色虛線：依示意重繪推算的走道（1F 與 B2 月台）。
+- 灰色點線：推定入口，可及性未知，無障礙路線不使用。
+- 灰色區塊：停車場等非捷運區域，路線不穿越。
+- 深色點：已綁定的地點。
+- 紅圈：未綁定的地點。
+
+<table>
+<tr><th>樓層</th><th>App 地圖</th><th>步行路網</th></tr>
+<tr><td align="center"><b>1F</b><br>46／46</td><td><a href="./assets/maps/floor-1f.png"><img src="./assets/maps/floor-1f.png" alt="1F 車站大廳完整地圖" width="420"></a></td><td><a href="./assets/maps/walk-1f.svg"><img src="./assets/maps/walk-1f.svg" alt="1F 步行路網覆蓋圖" width="420"></a></td></tr>
+<tr><td align="center"><b>B1</b><br>42／44</td><td><a href="./assets/maps/floor-b1.png"><img src="./assets/maps/floor-b1.png" alt="B1 完整地圖" width="420"></a></td><td><a href="./assets/maps/walk-b1.svg"><img src="./assets/maps/walk-b1.svg" alt="B1 步行路網覆蓋圖" width="420"></a></td></tr>
+<tr><td align="center"><b>B2</b><br>86／86</td><td><a href="./assets/maps/floor-b2.png"><img src="./assets/maps/floor-b2.png" alt="B2 板南線大廳與台鐵、高鐵月台完整地圖" width="420"></a></td><td><a href="./assets/maps/walk-b2.svg"><img src="./assets/maps/walk-b2.svg" alt="B2 步行路網覆蓋圖" width="420"></a></td></tr>
+<tr><td align="center"><b>B3</b><br>35／35</td><td><a href="./assets/maps/floor-b3.png"><img src="./assets/maps/floor-b3.png" alt="B3 完整地圖" width="420"></a></td><td><a href="./assets/maps/walk-b3.svg"><img src="./assets/maps/walk-b3.svg" alt="B3 步行路網覆蓋圖" width="420"></a></td></tr>
+<tr><td align="center"><b>B4</b><br>17／17</td><td><a href="./assets/maps/floor-b4.png"><img src="./assets/maps/floor-b4.png" alt="B4 完整地圖" width="420"></a></td><td><a href="./assets/maps/walk-b4.svg"><img src="./assets/maps/walk-b4.svg" alt="B4 步行路網覆蓋圖" width="420"></a></td></tr>
+</table>
+
+```bash
+cd app
+npm run build:walking       # 重建步行圖
+npm run render:walking-maps # 重新產生右欄的路網覆蓋圖
+```
 
 ## 功能與完成範圍
 
@@ -208,7 +234,7 @@ flowchart TB
 
 我們把站內導航表達為帶權重的有向圖 `G = (V, E)`：節點代表設施、走道轉折與設備對端；邊代表走道或跨樓層連線。使用者選擇的點位 ID 先透過 binding 對到節點，再進入求路流程。
 
-目前圖資料展開後有 **359 個節點、3162 條有向邊**，包含 1562 組走道連線與 38 條跨層有向邊；其中只有 125 個節點綁定可選地點，其餘多為入口與轉折輔助點。我們不把這些輔助節點全部顯示為設施或 QR 定位點。
+目前圖資料展開後有 **519 個節點、4458 條有向邊**，包含 2210 組走道連線（其中 640 組來自 1F 與 B2 月台的示意重繪）與 38 條跨層有向邊；其中 226 個節點綁定可選地點，其餘多為入口與轉折輔助點。我們不把這些輔助節點全部顯示為設施或 QR 定位點。
 
 #### 1. 從圖面產生可通行圖
 
@@ -365,14 +391,18 @@ JS
 
 | 樓層 | 地圖點位 | 已綁定步行圖 |
 | --- | ---: | ---: |
-| 1F | 46 | 0 |
-| B1 | 44 | 41 |
-| B2 | 86 | 32 |
+| 1F | 46 | 46（示意重繪） |
+| B1 | 44 | 42 |
+| B2 | 86 | 86（含四個月台的示意重繪） |
 | B3 | 35 | 35 |
 | B4 | 17 | 17 |
-| **合計** | **228** | **125** |
+| **合計** | **228** | **226** |
 
-我們使用版本化圖資料，另整理 19 筆跨樓層連線。路徑成本是**相對圖面單位**，不換算為實測公尺或步行時間。1F、B2 鐵路月台及部分 B1 不包含於本版可導航範圍。
+我們使用版本化圖資料，另整理 19 筆跨樓層連線。路徑成本是**相對圖面單位**，不換算為實測公尺或步行時間。
+
+- **1F 大廳與 B2 台鐵／高鐵月台：** 依示意重繪接上步行圖，路段標為 `schematic` 並記錄各自來源，可在同一區內求路。但目前沒有可靠來源能把它們和捷運 B1～B4 接起來，所以我們**沒有編造任何跨層連線**；從捷運區到 1F 或月台會照實回報無路線。
+- **未綁定的 2 個點：** `b1-qr-01`（桃園機場捷運區塊外角）與 `b1-qr-05`（東區停車場東緣）是示意 QR 點，座標依既有決策固定，附近沒有捷運走道，因此維持未綁定。
+- 每層的路網覆蓋圖見[各樓層地圖全貌](#各樓層地圖全貌)。
 
 我們依下列來源整理場域資料：
 
@@ -437,7 +467,7 @@ flowchart LR
 
 | 面向 | 本版範圍 |
 | --- | --- |
-| 導航資料 | 局部圖面步行圖，125 個綁定點位；地圖可顯示 228 個點位 |
+| 導航資料 | 圖面步行圖，228 個點位中 226 個已綁定；1F 與鐵路月台可區內求路，尚未接回捷運區 |
 | QR 定位 | 測試碼與固定點定位流程；標牌並未現地布設 |
 | 無障礙 | 依圖資料過濾樓梯及未知可及性；不提供現場通行認證 |
 | M8 情境 | 導引至 B1 出口點，不包含輪椅至地面的完整出站段 |
