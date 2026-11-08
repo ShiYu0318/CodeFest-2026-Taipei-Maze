@@ -8,7 +8,7 @@
 - 格式：CSV
 - 用途：電梯、廁所、售票機等描述，補 POI 與 connector
 - 限制：文字描述不是室內座標；內有舊商場地標，須對照新圖
-- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；產品使用仍待驗證
+- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；僅作研究參考，不作產品運行或現場通行證明
 - 已收錄：[raw/trtc_facilities.csv](raw/trtc_facilities.csv)
 - 取得方式：[資料端點](https://data.taipei/api/frontstage/tpeod/dataset/resource.download?rid=f69dfd66-3d8e-408a-9645-c02384bda5b8)
 
@@ -17,7 +17,7 @@
 - 格式：CSV
 - 用途：無障礙出口、廁所、詢問處與導盲設施
 - 限制：車站彙整，不能推導每條 edge 都可通行
-- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；產品使用仍待驗證
+- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；僅作研究參考，不作產品運行或現場通行證明
 - 已收錄：[raw/trtc_accessibility.csv](raw/trtc_accessibility.csv)
 - 取得方式：[資料端點](https://data.taipei/api/frontstage/tpeod/dataset/resource.download?rid=5d45ef49-d60d-4354-b634-8dcf7d28da07)
 
@@ -26,7 +26,7 @@
 - 格式：CSV
 - 用途：北車 M1–M8 出口坐標、出口編號、無障礙標記
 - 限制：地理經緯度不是室內底圖 x/y，也不是標牌朝向
-- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；產品使用仍待驗證
+- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；僅作研究參考，不作產品運行或現場通行證明
 - 已收錄：[raw/trtc_exits.csv](raw/trtc_exits.csv)
 - 取得方式：[資料端點](https://data.taipei/api/frontstage/tpeod/dataset/resource.download?rid=307a7f61-e302-4108-a817-877ccbfca7c1)
 
@@ -35,7 +35,7 @@
 - 格式：CSV
 - 用途：廁所名稱、地址、座標、無障礙與親子廁座數
 - 限制：同一建築可能多層多廁；座標不可直接當門口或室內 node
-- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；產品使用仍待驗證
+- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；僅作研究參考，不作產品運行或現場通行證明
 - 已收錄：[raw/taipei_toilets.csv](raw/taipei_toilets.csv)
 - 取得方式：[資料端點](https://data.taipei/api/frontstage/tpeod/dataset/resource.download?rid=9e0e6ad4-b9f9-4810-8551-0cffd1b915b3)
 
@@ -44,7 +44,7 @@
 - 格式：CSV
 - 用途：編號、服務樓層與文字位置，建立 connector 候選
 - 限制：R10/BL12 兩列描述可重複；不是兩套不同電梯
-- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；產品使用仍待驗證
+- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；僅作研究參考，不作產品運行或現場通行證明
 - 已收錄：[raw/trtc_lift_locations.csv](raw/trtc_lift_locations.csv)
 - 取得方式：[資料端點](https://data.taipei/api/frontstage/tpeod/dataset/resource.download?rid=87708f6a-a1a0-49ce-9b68-35ae4b135292)
 
@@ -53,7 +53,7 @@
 - 格式：CSV
 - 用途：補 M2、M4 地面可及入口位置
 - 限制：與出口中心點位置不同；不代表所有室內設備位置
-- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；產品使用仍待驗證
+- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；僅作研究參考，不作產品運行或現場通行證明
 - 已收錄：[raw/trtc_exit_lifts_ramps.csv](raw/trtc_exit_lifts_ramps.csv)
 - 取得方式：[資料端點](https://data.taipei/api/frontstage/tpeod/dataset/resource.download?rid=61792c82-6609-41b2-9775-3a346934826d)
 
@@ -62,7 +62,7 @@
 - 格式：CSV
 - 用途：公告快照與已修復／停用描述
 - 限制：實際欄位為項次、日期時間、路線、車站、說明；無北車列不等於所有設備正常
-- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；產品使用仍待驗證
+- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；僅作研究參考，不作產品運行或現場通行證明
 - 已收錄：[raw/trtc_accessibility_anomalies.csv](raw/trtc_accessibility_anomalies.csv)
 - 取得方式：[資料端點](https://data.taipei/api/frontstage/tpeod/dataset/resource.download?rid=649c44eb-60b5-4746-a353-cbdc6651fc09)
 
@@ -71,7 +71,7 @@
 - 格式：CSV
 - 用途：115 年 11 月維修日期與設備編號
 - 限制：計畫排程，不含全部臨時故障；民國年及 D/N 時段代碼需解讀
-- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；產品使用仍待驗證
+- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；僅作研究參考，不作產品運行或現場通行證明
 - 已收錄：[raw/trtc_lift_maintenance_11511.csv](raw/trtc_lift_maintenance_11511.csv)
 - 取得方式：[資料端點](https://data.taipei/api/frontstage/tpeod/dataset/resource.download?rid=d93aadfb-9f78-4000-a73e-48870481bafc)
 
@@ -80,7 +80,7 @@
 - 格式：CSV
 - 用途：北車 M6 與凱撒飯店連通案件線索
 - 限制：是案件／進度清冊，不是室內連接 edge；商業空間權限與時段另查
-- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；產品使用仍待驗證
+- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；僅作研究參考，不作產品運行或現場通行證明
 - 已收錄：[raw/trtc_connections.csv](raw/trtc_connections.csv)
 - 取得方式：[資料端點](https://data.taipei/api/frontstage/tpeod/dataset/resource.download?rid=ce068c0f-099c-4f73-9498-3d60b1e4947f)
 
@@ -89,7 +89,7 @@
 - 格式：CSV
 - 用途：車站層級轉乘時間參考
 - 限制：不能拆成每條 edge 的速度，亦不適用所有無障礙使用者
-- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；產品使用仍待驗證
+- 授權與狀態：已核對個別 metadata：政府資料開放授權條款－第1版；顯名及處理紀錄見 ATTRIBUTION.md；僅作研究參考，不作產品運行或現場通行證明
 - 已收錄：[raw/trtc_transfer_walk_times.csv](raw/trtc_transfer_walk_times.csv)
 - 取得方式：[資料端點](https://data.taipei/api/frontstage/tpeod/dataset/resource.download?rid=14fd1af0-dc2b-4174-87d4-fcb9de783496)
 

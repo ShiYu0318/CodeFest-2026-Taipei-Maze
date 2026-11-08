@@ -14,7 +14,7 @@
 
 我們以本地資料完成核心搜尋與路徑計算；你可以先用一般瀏覽器選擇起終點體驗，再透過台北通的原生橋接使用掃碼。
 
-我們已推出 **`v0.1.0-rc.1` 預發行版**，完成局部路網與主要操作流程。目前我們仍在補齊全站資料與現地驗證，服務尚不適用於緊急避難或作為輪椅通行認證。
+我們以 **`v0.1.0`** 保存競賽作品，完成局部路網與主要操作流程。這份成果呈現我們對站內尋路、易讀介面與通行條件的技術實作，不作緊急避難或輪椅通行認證使用。
 
 ## 內容導覽
 
@@ -32,38 +32,53 @@
 | 字小、長文字或語言增加負擔 | 七語、本地詞典、注音／大字偏好、說明收進資訊視窗 |
 | 集合地點與求助難描述 | 分享固定起點／目的地，提供給站務看的溝通卡 |
 
-我們接下來會透過任務完成率、找路時間與求助次數，檢驗這些設計是否確實降低使用負擔。
+我們以「每次都知道下一步能做什麼」作為介面與流程設計的共同目標。
 
 ## 實際畫面
 
-<p align="center">
-  <img src="./assets/screenshots/station-map-b4.png" alt="實際 B4 地圖操作截圖：樓層切換、設施圖示、方向標記、縮放控制與浮動小幫手" width="460">
-</p>
+我們把找設施、選路與位置恢復整合在同一個介面。以下展示手機版與寬螢幕的實際操作，點選圖片即可查看原圖。
 
-*我們以這張 B4 操作畫面呈現樓層切換、設施與地圖控制；拍攝時間為 2026-11-08 08:47（臺北時間），早於自適應高度更新。[截圖紀錄](./assets/screenshots/README.md)。*
-
-### iPhone 模擬器實際操作
-
-我們在以下三張 iPhone 模擬器畫面中展示選路、逐步導引與設施問答。拍攝時間為 2026-11-08 10:10（臺北時間），點開即可查看完整操作畫面。
+<table>
+<tr><th>找設施與樓層地圖</th><th>搜尋目的地</th><th>地圖與方向同頁</th></tr>
+<tr><td align="center"><a href="./assets/screenshots/mobile-home.png"><img src="./assets/screenshots/mobile-home.png" alt="找設施與樓層地圖" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-destination-search.png"><img src="./assets/screenshots/mobile-destination-search.png" alt="搜尋目的地" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-route-m8.png"><img src="./assets/screenshots/mobile-route-m8.png" alt="地圖與方向同頁" width="250"></a></td></tr>
+</table>
 
 <details>
-<summary>起終點與無障礙路線：B4 輪椅候車區（北）→ B1 M8 出口</summary>
+<summary>無障礙選路與跨樓層導引</summary>
 
-[![iPhone 模擬器：起終點、無障礙勾選與單一帶我去入口](./assets/screenshots/ios-endpoints-step-free.png)](./assets/screenshots/ios-endpoints-step-free.png)
+<table>
+<tr><th>起終點與無障礙選項</th><th>B4 路線起步</th><th>電梯跨樓層</th></tr>
+<tr><td align="center"><a href="./assets/screenshots/mobile-step-free.png"><img src="./assets/screenshots/mobile-step-free.png" alt="起終點與無障礙選項" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-route-b4.png"><img src="./assets/screenshots/mobile-route-b4.png" alt="B4 路線起步" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-floor-transfer.png"><img src="./assets/screenshots/mobile-floor-transfer.png" alt="電梯跨樓層" width="250"></a></td></tr>
+</table>
 
 </details>
 
 <details>
-<summary>地圖與方向同頁：第 10／12 步、上一步／下一步、重掃與求助</summary>
+<summary>小幫手、分享與求助</summary>
 
-[![iPhone 模擬器：M8 地圖與方向圖示、前後步驟及行程操作](./assets/screenshots/ios-inline-route-steps.png)](./assets/screenshots/ios-inline-route-steps.png)
+<table>
+<tr><th>本地設施問答</th><th>分享固定地點</th><th>站務溝通卡</th></tr>
+<tr><td align="center"><a href="./assets/screenshots/mobile-helper.png"><img src="./assets/screenshots/mobile-helper.png" alt="本地設施問答" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-share.png"><img src="./assets/screenshots/mobile-share.png" alt="分享固定地點" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-staff-help.png"><img src="./assets/screenshots/mobile-staff-help.png" alt="站務溝通卡" width="250"></a></td></tr>
+</table>
 
 </details>
 
 <details>
-<summary>小幫手：設施回答、樓層卡片與可繼續點選的建議問題</summary>
+<summary>兒童、長輩與英文介面</summary>
 
-[![iPhone 模擬器：小幫手廁所問答、設施卡片與建議問題](./assets/screenshots/ios-local-facility-helper.png)](./assets/screenshots/ios-local-facility-helper.png)
+<table>
+<tr><th>兒童注音模式</th><th>長輩大字模式</th><th>英文介面</th></tr>
+<tr><td align="center"><a href="./assets/screenshots/mobile-child.png"><img src="./assets/screenshots/mobile-child.png" alt="兒童注音模式" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-senior.png"><img src="./assets/screenshots/mobile-senior.png" alt="長輩大字模式" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-english.png"><img src="./assets/screenshots/mobile-english.png" alt="英文介面" width="250"></a></td></tr>
+</table>
+
+</details>
+
+<details>
+<summary>資料來源與寬螢幕導航</summary>
+
+<p align="center"><a href="./assets/screenshots/mobile-information.png"><img src="./assets/screenshots/mobile-information.png" alt="地圖說明與資料來源" width="360"></a></p>
+
+[![資料來源與寬螢幕導航](./assets/screenshots/desktop-route.png)](./assets/screenshots/desktop-route.png)
 
 </details>
 
@@ -78,7 +93,7 @@
 - **閱讀與語言偏好：** 預設／兒童／長輩模式、注音、大字、主題與減少動態效果；繁中、英文、越南文、印尼文、泰文、韓文、日文。
 - **本地小幫手：** 設施問答、處理狀態、逐段文字與設施卡片；其他建議問題可繼續點選。
 
-我們目前優先完成路網核對、七語校對與 Android／iPhone WebView 驗證；完整語音、離線啟動與多候選路線比較則列在後續工作中。下方的[已知限制與後續方向](#已知限制與後續方向)說明我們的驗證範圍。
+我們以本地搜尋、圖面選路、同頁指引與位置恢復作為競賽版核心。[競賽版本範圍](#競賽版本範圍)整理各項功能的使用界線。
 
 ## 快速開始
 
@@ -274,7 +289,7 @@ flowchart LR
 
 以 `V` 為節點、`E` 為有向邊，lazy-heap 版本的基本佇列工作可概括為 `O((V + E) log E)`。我們目前也保存候選的節點／邊陣列與路徑鍵，因此另有隨路徑長度增加的複製、比較及記憶體成本，不能直接把它當成只有距離陣列的教科書實作。
 
-我們選擇這個版本，是為了讓目前規模下的結果與除錯紀錄容易追蹤。擴大場域時，我們會評估以前驅索引重建路徑、重用 adjacency list，以及量測真機延遲與記憶體。A* 則需要與成本模型相容的啟發式；目前我們尚未實作，也不把更換演算法當成補齊資料的替代方案。
+我們選擇這個版本，是為了讓目前規模下的結果與除錯紀錄容易追蹤。前驅索引重建路徑與重用 adjacency list 能減少複製與重建開銷；本競賽版保留較容易追蹤完整路徑的實作。A* 需要與成本模型相容的啟發式，不在本版實作範圍內。
 
 ### 我們如何找「最近可達」
 
@@ -285,7 +300,7 @@ flowchart LR
          → 保留成功路線 → 依 graph cost 排序 → 取前 k 個
 ```
 
-我們目前採逐候選求路，`K` 個候選大約會執行 `K` 次單點求路，再加上排序成本；因此沒有宣稱最近查詢只需一次 Dijkstra。候選增加時，我們可改用同一起點的單源最短距離結果服務多個終點；若要跨使用者或大量起點找同類設施，也可再評估反向圖的多源搜尋。
+我們目前採逐候選求路，`K` 個候選大約會執行 `K` 次單點求路，再加上排序成本；因此沒有宣稱最近查詢只需一次 Dijkstra。我們選擇逐候選求路，讓每個候選都能沿用同一個條件驗證入口。單源距離重用與反向圖多源搜尋則是不同規模下可比較的工程取捨，不屬本版實作。
 
 這套條件分成兩層：**走得到設施附近**與**設施本身符合需求**。我們不會因設施叫做電梯或廁所，就自動把所有入口判定成輪椅可通行。
 
@@ -357,7 +372,7 @@ console.log({
 JS
 ```
 
-目前圖版本的結果為 `success`、相對成本 `1316.7`、`12` 步。我們在這個範例中只規劃到 B1 的 M8 出口點；地面段仍需另行核對。
+目前圖版本的結果為 `success`、相對成本 `1316.7`、`12` 步。我們在這個範例中只規劃到 B1 的 M8 出口點；本版不包含地面段。
 
 </details>
 
@@ -372,7 +387,7 @@ JS
 | B4 | 17 | 17 |
 | **合計** | **228** | **125** |
 
-我們目前維護 `2026.11.08-diagram` 圖版本，另整理 19 筆跨樓層資料。路徑成本使用**相對圖面單位**；我們尚未將它校準為公尺或步行時間。1F、B2 鐵路月台及部分 B1 仍待補圖，點位綁定也需要進一步核對實際通行關係。
+我們使用版本化圖資料，另整理 19 筆跨樓層連線。路徑成本是**相對圖面單位**，不換算為實測公尺或步行時間。1F、B2 鐵路月台及部分 B1 不包含於本版可導航範圍。
 
 我們依下列來源整理場域資料：
 
@@ -389,7 +404,7 @@ npm run build:walking    # 修改來源後重建步行圖
 npm run validate:assets # 確認資料、七語、QR 保留與圖產物一致
 ```
 
-我們逐段核對走道、入口、設施與跨層對端，再擴充路網；無障礙路線也需要延伸到出口至地面的完整段落。
+我們把走道、入口、設施與跨層對端分開建模，並保留各段通行條件；出口至地面段不會因地圖上有出口圖示就自動連通。
 
 ## 測試與品質
 
@@ -406,7 +421,7 @@ git diff --check
 
 我們以 Web checks 執行網頁與 Python 工具檢查，涵蓋路徑／限制、搜尋、橋接狀態、定位連結、分享、抵達與 Vue renderer。建置產物位於 `app/dist/`；瀏覽器版面、手機相機、輔具、背景恢復與現地路線則另外驗證。
 
-我們於 2026-11-08 執行相依安全稽核：runtime 套件未回報警示，開發工具鏈仍有 18 項（8 high、10 moderate），後續會處理 Vue CLI 工具鏈升級。我們將開發伺服器綁定 loopback，正式環境以 nginx 提供靜態檔案；詳細狀態見 [Security](./.github/SECURITY.md)。
+我們的相依安全稽核中，runtime 套件未回報警示，開發工具鏈有 18 項（8 high、10 moderate）。我們將開發伺服器綁定 loopback，正式環境以 nginx 提供靜態檔案；詳細狀態見 [Security](./.github/SECURITY.md)。
 
 ## 部署與版本
 
@@ -431,24 +446,32 @@ flowchart LR
 
 我們另外保留可手動執行的 Android 宿主整合檢查；原生模型、語音與裝置行為採獨立驗證流程。
 
-## 已知限制與後續方向
+## 競賽版本範圍
 
-我們目前的路線仍以圖面模型為基礎。QR 標牌尚未現地布設，手機模型／語音、完整音檔、七語人工校對及全新安裝離線能力仍待驗證；Gemma 介面標示不能單獨證明模型推論成功。我們會依以下順序推進：
+我們將北車不迷路保留為競賽成果與可重現的技術作品，沒有持續擴充功能的開發計畫。本版的使用界線如下：
 
-1. 先挑連續區域完成現地走查、設備／入口／QR 核對，再擴大路網。
-2. 補 Android／iPhone WebView、返回／背景、輔具與不同閱讀模式驗收。
-3. 七語人工校對、完整語音資產與離線條件分別驗證。
-4. 建立設備停用、施工與標牌巡查維護責任，未接即時資料前不承諾即時可用。
-5. 再評估多候選認知友善路線、裝置端模型與更多公共場域。
+| 面向 | 本版範圍 |
+| --- | --- |
+| 導航資料 | 局部圖面步行圖，125 個綁定點位；地圖可顯示 228 個點位 |
+| QR 定位 | 測試碼與固定點定位流程；標牌並未現地布設 |
+| 無障礙 | 依圖資料過濾樓梯及未知可及性；不提供現場通行認證 |
+| M8 情境 | 導引至 B1 出口點，不包含輪椅至地面的完整出站段 |
+| 七語與閱讀模式 | 七語文字、注音與大字介面；沒有正式語言或輔具認證 |
+| 小幫手 | 本地設施規則問答與逐段顯示；介面標示不能作為模型推論證明 |
+| 模型與語音 | 保留選配介面與整合資料；雙平台實機效能、完整語音資產不屬本版已驗收成果 |
+| 離線 | 核心運算使用本地資料；全新安裝離線啟動不在本版保證範圍 |
+| 測試 | 自動測試與瀏覽器版面檢查；不等同現地走查、實機相機或輪椅通行驗證 |
+
+我們提供原始碼、資料來源及建置方法，方便理解設計取捨、重現競賽流程，或自行 fork 研究。
 
 ## 參與與安全
 
-我們歡迎透過 Issue 或 PR 一起改善服務，開發方式見 [Contributing](./.github/CONTRIBUTING.md) 與 [Security](./.github/SECURITY.md)。回報問題請附版本、裝置、語系／模式、起終點 ID、路線條件與重現步驟；不要貼個資、Token 或私人掃碼內容。Commit 使用英文 Conventional Commits，PR 沿用開源專案範本。
+我們保留程式與貢獻規範供重現及 fork 參考，開發方式見 [Contributing](./.github/CONTRIBUTING.md) 與 [Security](./.github/SECURITY.md)。回報問題請附版本、裝置、語系／模式、起終點 ID、路線條件與重現步驟；不要貼個資、Token 或私人掃碼內容。Commit 使用英文 Conventional Commits，PR 沿用開源專案範本。
 
 ## 授權與致謝
 
 我們以 **AGPL-3.0-or-later** 發佈原創程式碼，完整條款見 [LICENSE](./LICENSE) 與 [AGPL_NOTICE](./AGPL_NOTICE.md)。我們保留 TownPass 及第三方程式、資料、圖面與模型各自的授權；AGPL 不涵蓋所有第三方內容。
 
-我們將研究資料顯名整理在 [data/ATTRIBUTION.md](./data/ATTRIBUTION.md)，並持續核對匯入原型與圖面衍生資料的再散布權利。各項來源、條款與審查狀態見 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
+我們將研究資料顯名整理在 [data/ATTRIBUTION.md](./data/ATTRIBUTION.md)；匯入原型與圖面衍生資料的再散布範圍依各自權利處理。各項來源、條款與審查狀態見 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
 
 我們感謝 TownPass、臺北捷運、臺鐵、高鐵與臺北市開放資料提供參考與基礎。本作品由團隊開發，未代表上述單位的官方服務或背書。

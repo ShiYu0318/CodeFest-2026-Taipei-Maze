@@ -15,7 +15,7 @@
 
 ## 實際依賴與素材登錄
 
-目前 repository 包含文件、研究資料工具、本地環境 helper 與橋接診斷頁；診斷伺服器只使用 Node.js built-ins，未新增 npm 依賴。`integration/townpass/test-env.patch` 含 TownPass 原檔脈絡，保留上游 GPL 與著作權；宿主完整 checkout、SDK 與套件快取均未納入本 repo。前端既有依賴及鎖定資訊現已位於 app/package.json 與 app/package-lock.json；完整產品來源與發行審查仍待完成。實作時每項新增依賴或素材必須補上：
+目前 repository 包含文件、研究資料工具、本地環境 helper 與橋接診斷頁；診斷伺服器只使用 Node.js built-ins，未新增 npm 依賴。`integration/townpass/test-env.patch` 含 TownPass 原檔脈絡，保留上游 GPL 與著作權；宿主完整 checkout、SDK 與套件快取均未納入本 repo。前端既有依賴及鎖定資訊現已位於 app/package.json 與 app/package-lock.json；本版未涵蓋完整供應鏈與發行權利認證。每項依賴或素材的紀錄欄位如下：
 
 - 名稱、版本、檔案或 package 路徑、上游來源與實際提供者。
 - SPDX 授權或條款連結、應保留的 Copyright／NOTICE。
@@ -38,10 +38,10 @@ MIT、常見 BSD-2-Clause／BSD-3-Clause、Apache-2.0 可作優先候選，但�
 ## 2026-11-07 Webview 地圖原型
 
 - `app/` 地圖原型和歷史 `backend/` 本機診斷 API（目前已移除）來自 [Team10 Webview 快照 `d88e71e`](https://github.com/Clare0808/team10_townpass_webview/commit/d88e71e)。匯入版本保留程式來源紀錄，原倉庫無獨立授權檔，公開交付前須釐清各部分的再散布權利。
-- 地圖 SVG 與 JSON 為依 [臺北捷運站圖](https://web.metro.taipei/img/ALL/INFOPDF/051.pdf) 和 [臺北捷運剖面圖](https://web.metro.taipei/pages2026/WebStation/051/4) 重繪的示意原型。官方原圖及原 Webview 的示範圖片、favicon、環境檔與 Python 快取未匯入。站圖和衍生資料的公開交付權利仍待核對。
+- 地圖 SVG 與 JSON 為依 [臺北捷運站圖](https://web.metro.taipei/img/ALL/INFOPDF/051.pdf) 和 [臺北捷運剖面圖](https://web.metro.taipei/pages2026/WebStation/051/4) 重繪的示意原型。官方原圖及原 Webview 的示範圖片、favicon、環境檔與 Python 快取未匯入。本版沒有站圖和衍生資料的完整公開再散布權利確認紀錄。
 - 2026-11-08 新增的 `qrcode` SVG 圖示、邊界抽樣程式、固定 seed 產生的 32 個示意點及七語名稱為團隊原創，採 AGPL-3.0-or-later；座標依上項既有站圖外輪廓計算，原圖與衍生資料的權利限制仍適用。未新增外部圖資、圖示套件或執行期依賴；示意點不是現地設置或通行認證。
-- 1F SVG 與公共設施點位以使用者提供的「台北車站 1F 平面圖」照片（圖上署名「萬俊廷攝」）為參考，採獨立的北向示意座標。原照片及圖中商店、品牌與 QR 圖案未納入。照片授權與衍生資料的公開交付權利待核對，示意位置待現地驗證。
-- npm 直接依賴見 `app/package.json`，鎖定版本、下載來源、完整性摘要及上游宣告授權見 `app/package-lock.json`。目前 lockfile 的下載來源為 `registry.npmjs.org`。原有 Flask 範例後端與其依賴已移除；目前核心服務為靜態網頁。供應鏈及發行授權審查仍待完成。
+- 1F SVG 與公共設施點位以使用者提供的「台北車站 1F 平面圖」照片（圖上署名「萬俊廷攝」）為參考，採獨立的北向示意座標。原照片及圖中商店、品牌與 QR 圖案未納入。本版沒有照片及衍生資料的完整公開再散布權利確認紀錄；示意位置未經現地驗證。
+- npm 直接依賴見 `app/package.json`，鎖定版本、下載來源、完整性摘要及上游宣告授權見 `app/package-lock.json`。目前 lockfile 的下載來源為 `registry.npmjs.org`。原有 Flask 範例後端與其依賴已移除；目前核心服務為靜態網頁。本版不宣稱已完成完整供應鏈及發行授權認證。
 
 
 ## 2026-11-07 合成導航核心
@@ -93,3 +93,9 @@ B2 新增四個月台的原創幾何示意（高鐵 1／2、台鐵 3／4），�
 - Empty Vuex scaffolding, its direct dependencies and the unused Flask/API example were removed. Existing project-source and upstream notices remain in place; no third-party runtime dependency or hosted AI service was added.
 
 - README gallery includes three additional unmodified iPhone simulator screenshots from the owner's referenced screenshot folder, dated 2026-11-08 10:10:09/26/40 (Asia/Taipei). Their Xcode/simulator frames are retained; provenance and limitations are recorded in `assets/screenshots/README.md`. They do not add new runtime code, grant rights to depicted third-party content or prove model/field validation.
+
+## Browser screenshots and layout capture
+
+- Current README images are direct captures of the running project website using Microsoft Playwright 1.65.0 (Apache-2.0; https://github.com/microsoft/playwright) and the locally installed Google Chrome in an isolated browser context. Playwright is installed only in ignored local tooling, not added to the application runtime or distributed as a binary.
+- The image collection covers endpoints/search, step-free routing, inline floor guidance, sharing, staff assistance, local facility answers, reading modes, English and information views. The manifest records the actual source revision and browser viewport; it is not physical-device or field validation.
+- These captures replace the earlier owner-provided desktop/simulator screenshots in the current README. Original owner files remain local and earlier captures remain in their historical Git revisions. Existing map/prototype rights and notices continue to apply.

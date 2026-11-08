@@ -1,0 +1,189 @@
+{
+  "browser": "156.0.8078.80",
+  "source": "https://codefest.yoyo899843.com",
+  "sourceLink": "https://github.com/yoyo899843/CodeFest-2026-Taipei-Maze/tree/5d5134db8dcd7c3e3764c35287fd2ec6a6207123",
+  "shots": [
+    {
+      "name": "mobile-home",
+      "url": "https://codefest.yoyo899843.com/station-map",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 0,
+      "mode": "standard",
+      "dialogs": []
+    },
+    {
+      "name": "mobile-destination-search",
+      "url": "https://codefest.yoyo899843.com/station-map",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 0,
+      "mode": "standard",
+      "dialogs": [
+        {
+          "class": "endpoint-dialog",
+          "left": 12,
+          "right": 418,
+          "top": 116.5,
+          "bottom": 815.5
+        }
+      ]
+    },
+    {
+      "name": "mobile-step-free",
+      "url": "https://codefest.yoyo899843.com/station-map?start=b4-wait-n&destination=b1-exit-m8",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 0,
+      "mode": "standard",
+      "dialogs": [],
+      "region": "endpoint and route options"
+    },
+    {
+      "name": "mobile-route-b4",
+      "url": "https://codefest.yoyo899843.com/station-map?start=b4-wait-n&destination=b1-exit-m8",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 304,
+      "mode": "standard",
+      "dialogs": []
+    },
+    {
+      "name": "mobile-floor-transfer",
+      "url": "https://codefest.yoyo899843.com/station-map?start=b4-wait-n&destination=b1-exit-m8",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 304,
+      "mode": "standard",
+      "dialogs": []
+    },
+    {
+      "name": "mobile-route-m8",
+      "url": "https://codefest.yoyo899843.com/station-map?start=b4-wait-n&destination=b1-exit-m8",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 304,
+      "mode": "standard",
+      "dialogs": []
+    },
+    {
+      "name": "mobile-staff-help",
+      "url": "https://codefest.yoyo899843.com/station-map?start=b4-wait-n&destination=b1-exit-m8",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 304,
+      "mode": "standard",
+      "dialogs": [
+        {
+          "class": "staff-card",
+          "left": 16,
+          "right": 414,
+          "top": 288.546875,
+          "bottom": 643.453125
+        }
+      ]
+    },
+    {
+      "name": "mobile-share",
+      "url": "https://codefest.yoyo899843.com/station-map?start=b4-wait-n&destination=b1-exit-m8",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 0,
+      "mode": "standard",
+      "dialogs": [
+        {
+          "class": "share-sheet",
+          "left": 0,
+          "right": 430,
+          "top": 646,
+          "bottom": 932
+        }
+      ]
+    },
+    {
+      "name": "mobile-helper",
+      "url": "https://codefest.yoyo899843.com/station-map",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 0,
+      "mode": "standard",
+      "dialogs": [
+        {
+          "class": "maze-chat-panel",
+          "left": 0,
+          "right": 430,
+          "top": 24,
+          "bottom": 932
+        }
+      ]
+    },
+    {
+      "name": "mobile-information",
+      "url": "https://codefest.yoyo899843.com/station-map",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 0,
+      "mode": "standard",
+      "dialogs": [
+        {
+          "class": "station-information",
+          "left": 0,
+          "right": 430,
+          "top": 0,
+          "bottom": 932
+        }
+      ]
+    },
+    {
+      "name": "mobile-senior",
+      "url": "https://codefest.yoyo899843.com/station-map",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 0,
+      "mode": "senior",
+      "dialogs": []
+    },
+    {
+      "name": "mobile-child",
+      "url": "https://codefest.yoyo899843.com/station-map",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 0,
+      "mode": "child",
+      "dialogs": []
+    },
+    {
+      "name": "mobile-english",
+      "url": "https://codefest.yoyo899843.com/station-map",
+      "width": 430,
+      "scrollWidth": 430,
+      "height": 932,
+      "scrollY": 0,
+      "mode": "standard",
+      "dialogs": []
+    },
+    {
+      "name": "desktop-route",
+      "url": "https://codefest.yoyo899843.com/station-map?start=b4-wait-n&destination=b1-exit-m8",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "height": 1000,
+      "scrollY": 199,
+      "mode": "standard",
+      "dialogs": []
+    }
+  ],
+  "pageErrors": []
+}

@@ -14,7 +14,7 @@ We built **Taipei Main Station Wayfinding**, a **TownPass WebView microservice**
 
 We run core search and routing against local data. You can try manually selected endpoints in a browser, then use native QR scanning through TownPass.
 
-We have published **`v0.1.0-rc.1`**, with a partial diagram graph and the main interaction flow. We are still extending coverage and field validation; this prerelease is not an emergency navigation service or a certified wheelchair route.
+We preserve our competition work as **`v0.1.0`**, including a partial diagram graph and the main interaction flow. It records our implementation of station wayfinding, readable interfaces and access constraints; it is not an emergency navigation service or a certified wheelchair route.
 
 ## Contents
 
@@ -32,38 +32,53 @@ Station navigation involves more than finding a dot: a nearby restroom may be se
 | Reduce reading and language barriers | Seven languages, local synonyms, Zhuyin/large-text preferences and expandable information |
 | Meet friends or explain a problem to staff | Share a fixed place and show a staff-facing assistance card |
 
-We plan to evaluate these choices through task completion, journey time and requests for assistance.
+We use “understand what to do next” as the shared goal behind our interface and navigation flow.
 
 ## Actual screenshot
 
-<p align="center">
-  <img src="./assets/screenshots/station-map-b4.png" alt="Actual B4 application screenshot showing floor controls, facility markers, direction marker, zoom and floating helper" width="460">
-</p>
+We bring facility search, routing and position recovery into one interface. Explore the actual mobile and wide-screen views below; select an image to open the original.
 
-*We use this B4 view to show floor controls, facilities and map interaction. Captured 2026-11-08 at 08:47 Asia/Taipei, before the adaptive-height update. [Capture record](./assets/screenshots/README.md).*
-
-### Actual iPhone simulator walkthrough
-
-We show route selection, inline guidance and facility questions in these iPhone simulator captures from 2026-11-08 at 10:10 Asia/Taipei. Expand a section to inspect the original view.
+<table>
+<tr><th>Facilities and floor map</th><th>Destination search</th><th>Inline map and directions</th></tr>
+<tr><td align="center"><a href="./assets/screenshots/mobile-home.png"><img src="./assets/screenshots/mobile-home.png" alt="Facilities and floor map" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-destination-search.png"><img src="./assets/screenshots/mobile-destination-search.png" alt="Destination search" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-route-m8.png"><img src="./assets/screenshots/mobile-route-m8.png" alt="Inline map and directions" width="250"></a></td></tr>
+</table>
 
 <details>
-<summary>Endpoints and step-free option: B4 north wheelchair waiting area → B1 M8 exit</summary>
+<summary>Step-free routing and floor changes</summary>
 
-[![iPhone simulator endpoints, step-free checkbox and single Go action](./assets/screenshots/ios-endpoints-step-free.png)](./assets/screenshots/ios-endpoints-step-free.png)
+<table>
+<tr><th>Endpoints and step-free option</th><th>Starting on B4</th><th>Elevator floor change</th></tr>
+<tr><td align="center"><a href="./assets/screenshots/mobile-step-free.png"><img src="./assets/screenshots/mobile-step-free.png" alt="Endpoints and step-free option" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-route-b4.png"><img src="./assets/screenshots/mobile-route-b4.png" alt="Starting on B4" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-floor-transfer.png"><img src="./assets/screenshots/mobile-floor-transfer.png" alt="Elevator floor change" width="250"></a></td></tr>
+</table>
 
 </details>
 
 <details>
-<summary>Inline map and direction: step 10 of 12, previous/next, rescan and assistance</summary>
+<summary>Facility helper, sharing and assistance</summary>
 
-[![iPhone simulator M8 map, direction icon, route steps and trip controls](./assets/screenshots/ios-inline-route-steps.png)](./assets/screenshots/ios-inline-route-steps.png)
+<table>
+<tr><th>Local facility answers</th><th>Fixed-place sharing</th><th>Staff assistance card</th></tr>
+<tr><td align="center"><a href="./assets/screenshots/mobile-helper.png"><img src="./assets/screenshots/mobile-helper.png" alt="Local facility answers" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-share.png"><img src="./assets/screenshots/mobile-share.png" alt="Fixed-place sharing" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-staff-help.png"><img src="./assets/screenshots/mobile-staff-help.png" alt="Staff assistance card" width="250"></a></td></tr>
+</table>
 
 </details>
 
 <details>
-<summary>Facility helper: answers, floor cards and reusable suggestions</summary>
+<summary>Child, elder and English interfaces</summary>
 
-[![iPhone simulator restroom question, facility cards and suggested questions](./assets/screenshots/ios-local-facility-helper.png)](./assets/screenshots/ios-local-facility-helper.png)
+<table>
+<tr><th>Child / Zhuyin mode</th><th>Elder / large-text mode</th><th>English interface</th></tr>
+<tr><td align="center"><a href="./assets/screenshots/mobile-child.png"><img src="./assets/screenshots/mobile-child.png" alt="Child / Zhuyin mode" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-senior.png"><img src="./assets/screenshots/mobile-senior.png" alt="Elder / large-text mode" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-english.png"><img src="./assets/screenshots/mobile-english.png" alt="English interface" width="250"></a></td></tr>
+</table>
+
+</details>
+
+<details>
+<summary>Information and wide-screen guidance</summary>
+
+<p align="center"><a href="./assets/screenshots/mobile-information.png"><img src="./assets/screenshots/mobile-information.png" alt="Map notes and references" width="360"></a></p>
+
+[![Information and wide-screen guidance](./assets/screenshots/desktop-route.png)](./assets/screenshots/desktop-route.png)
 
 </details>
 
@@ -79,7 +94,7 @@ We show route selection, inline guidance and facility questions in these iPhone 
 - **Seven local catalogs:** Traditional Chinese, English, Vietnamese, Indonesian, Thai, Korean and Japanese.
 - **Local facility helper:** factual station-data answers, progress events, incremental text and facility cards; suggestions remain reusable.
 
-We are prioritizing graph verification, translation review and Android/iPhone WebView validation. Full audio, offline startup and multiple-route comparison remain on our roadmap; the [Roadmap](#roadmap) describes the remaining validation scope.
+We center this competition version on local search, diagram routing, inline guidance and position recovery. Our [Competition version scope](#competition-version-scope) describes the boundaries of each capability.
 
 ## Quick start
 
@@ -271,7 +286,7 @@ Our [core](./app/src/navigation/dijkstra.mjs) uses an adjacency list, `MinHeap`,
 
 With `V` nodes and `E` directed edges, basic lazy-heap work is approximately `O((V + E) log E)`. We also copy candidate node/edge arrays and compare path keys, adding route-length-dependent time and memory overhead beyond the textbook distance-only version.
 
-We favor traceable behavior at the current scale. For larger venues, we plan to evaluate predecessor-based reconstruction, adjacency reuse and device latency/memory measurements. We have not implemented A*: it would need a heuristic compatible with our cost model, and it would not resolve missing field data.
+We favor traceable behavior at the current scale. Predecessor-based reconstruction and adjacency reuse reduce copying and rebuilding overhead; this competition version favors directly traceable full-path candidates. A* requires a compatible heuristic and is outside this implementation.
 
 ### How we find the nearest reachable facility
 
@@ -282,7 +297,7 @@ candidate facilities → same start and access options → route each candidate
                      → keep successful routes → sort by graph cost → top k
 ```
 
-With `K` candidates, we currently perform roughly `K` point-to-point searches plus sorting. We do not claim that this is already a single Dijkstra traversal. At larger scale, we could reuse one single-source result for multiple destinations; reverse-graph multi-source search is another option for repeated nearest-category queries.
+With `K` candidates, we currently perform roughly `K` point-to-point searches plus sorting. We do not claim that this is already a single Dijkstra traversal. We choose per-candidate routing to reuse one access-validation entry point. Single-source distance reuse and reverse-graph multi-source search are engineering alternatives for different scales, rather than implemented features here.
 
 We distinguish reaching a facility from the facility itself meeting a requirement. A familiar name does not establish accessible entrances or corridors.
 
@@ -352,7 +367,7 @@ console.log({
 JS
 ```
 
-With the current graph we get `success`, cost `1316.7` and `12` steps. We route only to the B1 M8 diagram point; the street-level segment still needs separate verification.
+With the current graph we get `success`, cost `1316.7` and `12` steps. We route only to the B1 M8 diagram point; this version does not include the street-level segment.
 
 </details>
 
@@ -367,14 +382,14 @@ With the current graph we get `success`, cost `1316.7` and `12` steps. We route 
 | B4 | 17 | 17 |
 | **Total** | **228** | **125** |
 
-We currently maintain graph version `2026.11.08-diagram` and 19 recorded floor connections. We use **relative diagram costs**, which we have not calibrated to meters or journey time. 1F, B2 railway platforms and some B1 points remain unbound; bindings also need field checks for actual connectivity.
+We use versioned graph data with 19 recorded floor connections and **relative diagram costs**, without converting them to surveyed meters or journey time. 1F, B2 railway platforms and some B1 points are outside this version's routable coverage.
 
 We use the following sources to build and review the station data:
 
 - **Taipei Metro station plans, facilities and cross-sections:** relative floor, corridor and equipment geometry.
 - **TRA/THSR official plans:** railway platform order and equipment checks; preserve red/purple markers without fabricating track crossings.
 - **Taipei Open Data:** 10 official CSV research snapshots and station subsets; a 48-source index does not mean 48 live integrations.
-- **Owner-supplied 1F plan photograph:** diagram reference only; the original photo is not bundled and derivative rights review remains pending.
+- **Owner-supplied 1F plan photograph:** diagram reference only; the source and derivative terms are recorded in our third-party notices.
 
 [Research data](./data/README.md) · [Attribution](./data/ATTRIBUTION.md) · [Source catalog](./data/SOURCE_CATALOG.md) · [Third-party notices](./THIRD_PARTY_NOTICES.md)
 
@@ -384,7 +399,7 @@ npm run build:walking
 npm run validate:assets
 ```
 
-We expand coverage by verifying corridors, entrances, facilities and connector endpoints. Step-free routes also need verification of the full exit-to-street segment.
+We model corridors, entrances, facilities and connector endpoints separately. An exit marker does not automatically establish an exit-to-street connection.
 
 ## Tests and quality
 
@@ -401,7 +416,7 @@ git diff --check
 
 We run web and Python checks through Web checks, covering routes/restrictions, search, bridge state, location links, sharing, arrival and Vue renderer output. We build production files into `app/dist/` and separately validate browser visuals, native camera, assistive technology, lifecycle and field behavior.
 
-We audited dependencies on 2026-11-08: runtime-only checks reported no findings, while the development toolchain retained 18 (8 high, 10 moderate). We plan to modernize the Vue CLI toolchain. We bind development to loopback and serve production through nginx; see [Security](./.github/SECURITY.md) for the audit scope.
+Our dependency audit reported no runtime findings and 18 development-toolchain findings (8 high, 10 moderate). We bind development to loopback and serve production through nginx; see [Security](./.github/SECURITY.md) for the audit scope.
 
 ## Deployment and versioning
 
@@ -426,24 +441,32 @@ flowchart LR
 
 We also retain a manually triggered Android host integration check. Native models, voice and device behavior have their own validation process.
 
-## Roadmap
+## Competition version scope
 
-We currently rely on a diagram model. QR labels are not installed on site; native model/voice, full audio, translation review and fresh-install offline behavior still need validation. A Gemma UI label alone is not inference evidence. We are moving forward in this order:
+We retain this project as a competition artifact and reproducible technical implementation, with no ongoing feature-development plan. This version has the following boundaries:
 
-1. Field-check a continuous area, including equipment, entrances and QR placement.
-2. Validate Android/iPhone WebView, lifecycle, assistive technology and reading modes.
-3. Review all translations and separately verify audio/offline behavior.
-4. Establish equipment-closure, construction and label-inspection responsibilities.
-5. Evaluate cognitive multi-route comparison, on-device models and other public venues.
+| Area | Included scope |
+| --- | --- |
+| Navigation data | Partial diagram graph with 125 bound places; 228 displayed places |
+| QR position | Test codes and fixed-point positioning; labels are not installed on site |
+| Step-free access | Graph filters for stairs and unknown accessibility; no field-access certification |
+| M8 scenario | Routing ends at the B1 exit point and does not cover the full wheelchair journey to street level |
+| Languages and reading | Seven text catalogs, Zhuyin and large text; no formal linguistic or assistive-technology certification |
+| Facility helper | Local rule-based answers and progressive text; a UI label is not inference evidence |
+| Models and voice | Optional interfaces/integration references; dual-platform device performance and complete audio assets are outside the accepted results |
+| Offline use | Local core computation; fresh-install offline startup is not guaranteed |
+| Verification | Automated tests and browser layout checks; these do not establish field, native-camera or wheelchair-access validation |
+
+We provide source, attribution and build instructions so you can understand the design, reproduce the competition flow or study it in your own fork.
 
 ## Contributing and security
 
-We welcome issues and contributions. See [Contributing](./.github/CONTRIBUTING.md) and [Security](./.github/SECURITY.md). Reports should include revision, device, locale/mode, point IDs, route options and reproduction steps. Do not publish personal data, tokens or private scan contents. Use English Conventional Commits and the open-source PR template.
+We preserve development and contribution guidance for reproduction and independent forks. See [Contributing](./.github/CONTRIBUTING.md) and [Security](./.github/SECURITY.md). Reports should include revision, device, locale/mode, point IDs, route options and reproduction steps. Do not publish personal data, tokens or private scan contents. Use English Conventional Commits and the open-source PR template.
 
 ## Provenance and licensing
 
 We publish our original code under **AGPL-3.0-or-later**: [LICENSE](./LICENSE), [AGPL_NOTICE](./AGPL_NOTICE.md). We preserve the separate terms of TownPass and third-party code, data, maps and models; our AGPL license does not cover all third-party content.
 
-We record research attribution in [data/ATTRIBUTION.md](./data/ATTRIBUTION.md) and continue reviewing redistribution rights for imported prototype code and map derivatives. Sources, terms and review status are listed in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
+We record research attribution in [data/ATTRIBUTION.md](./data/ATTRIBUTION.md); imported prototype code and map derivatives retain their respective redistribution terms. Sources, terms and review status are listed in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
 
 We thank TownPass, Taipei Metro, TRA, THSR and Taipei Open Data for references and foundations. We develop this project independently; these organizations have not endorsed it as an official service.

@@ -8,6 +8,6 @@ Useful reports include revision, affected component, impact and a minimal reprod
 
 Before operating a deployment, check HTTPS, host bridge origin controls, dependency provenance, ignored secrets and the model download allowlist. Published QR content is untrusted input; checking a point ID does not prove that the physical label is in the right place.
 
-## Dependency audit snapshot — 2026-11-08
+## Dependency audit snapshot
 
-The clean-install full npm audit reported 18 findings (8 high, 10 moderate, 0 critical), associated with the existing Vue CLI development/build toolchain. `npm audit --omit=dev` reported 0 findings. Neither result certifies safety. Do not expose the development server publicly; production serves built files through nginx. Toolchain modernization remains pending, and this release is a prerelease rather than an audited production distribution. No `npm audit fix --force` or unreviewed major upgrades were applied.
+The clean-install full npm audit reported 18 findings (8 high, 10 moderate, 0 critical), associated with the existing Vue CLI development/build toolchain. `npm audit --omit=dev` reported 0 findings. Neither result certifies safety. Do not expose the development server publicly; production serves built files through nginx. The competition snapshot retains this legacy development toolchain and is not an audited production distribution. No `npm audit fix --force` or unreviewed major upgrades were applied.
