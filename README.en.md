@@ -43,44 +43,32 @@ We bring facility search, routing and position recovery into one interface. Expl
 <tr><td align="center"><a href="./assets/screenshots/mobile-home.png"><img src="./assets/screenshots/mobile-home.png" alt="Facilities and floor map" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-destination-search.png"><img src="./assets/screenshots/mobile-destination-search.png" alt="Destination search" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-route-m8.png"><img src="./assets/screenshots/mobile-route-m8.png" alt="Inline map and directions" width="250"></a></td></tr>
 </table>
 
-<details>
-<summary>Step-free routing and floor changes</summary>
+### Step-free routing and floor changes
 
 <table>
 <tr><th>Endpoints and step-free option</th><th>Starting on B4</th><th>Elevator floor change</th></tr>
 <tr><td align="center"><a href="./assets/screenshots/mobile-step-free.png"><img src="./assets/screenshots/mobile-step-free.png" alt="Endpoints and step-free option" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-route-b4.png"><img src="./assets/screenshots/mobile-route-b4.png" alt="Starting on B4" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-floor-transfer.png"><img src="./assets/screenshots/mobile-floor-transfer.png" alt="Elevator floor change" width="250"></a></td></tr>
 </table>
 
-</details>
-
-<details>
-<summary>Facility helper, sharing and assistance</summary>
+### Facility helper, sharing and assistance
 
 <table>
 <tr><th>Local facility answers</th><th>Fixed-place sharing</th><th>Staff assistance card</th></tr>
 <tr><td align="center"><a href="./assets/screenshots/mobile-helper.png"><img src="./assets/screenshots/mobile-helper.png" alt="Local facility answers" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-share.png"><img src="./assets/screenshots/mobile-share.png" alt="Fixed-place sharing" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-staff-help.png"><img src="./assets/screenshots/mobile-staff-help.png" alt="Staff assistance card" width="250"></a></td></tr>
 </table>
 
-</details>
-
-<details>
-<summary>Child, elder and English interfaces</summary>
+### Child, elder and English interfaces
 
 <table>
 <tr><th>Child / Zhuyin mode</th><th>Elder / large-text mode</th><th>English interface</th></tr>
 <tr><td align="center"><a href="./assets/screenshots/mobile-child.png"><img src="./assets/screenshots/mobile-child.png" alt="Child / Zhuyin mode" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-senior.png"><img src="./assets/screenshots/mobile-senior.png" alt="Elder / large-text mode" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-english.png"><img src="./assets/screenshots/mobile-english.png" alt="English interface" width="250"></a></td></tr>
 </table>
 
-</details>
-
-<details>
-<summary>Information and wide-screen guidance</summary>
+### Information and wide-screen guidance
 
 <p align="center"><a href="./assets/screenshots/mobile-information.png"><img src="./assets/screenshots/mobile-information.png" alt="Map notes and references" width="360"></a></p>
 
 [![Information and wide-screen guidance](./assets/screenshots/desktop-route.png)](./assets/screenshots/desktop-route.png)
-
-</details>
 
 ## Features and scope
 
@@ -288,6 +276,37 @@ With `V` nodes and `E` directed edges, basic lazy-heap work is approximately `O(
 
 We favor traceable behavior at the current scale. Predecessor-based reconstruction and adjacency reuse reduce copying and rebuilding overhead; this competition version favors directly traceable full-path candidates. A* requires a compatible heuristic and is outside this implementation.
 
+### Reproduce the B4 wheelchair waiting area → M8 step-free query locally
+
+Run from `app/`:
+
+```bash
+node --input-type=module <<'JS'
+import { readFileSync } from "node:fs";
+import {
+  walkingRouter,
+  planWalk,
+  routeSteps,
+} from "./src/station/walk-route.mjs";
+
+const graph = JSON.parse(
+  readFileSync("src/station/walking-network.json", "utf8")
+);
+const result = planWalk(walkingRouter(graph), {
+  startId: "b4-wait-n",
+  destinationId: "b1-exit-m8",
+  stepFree: true,
+});
+console.log({
+  status: result.type,
+  cost: result.route?.cost,
+  steps: routeSteps(result.route).length,
+});
+JS
+```
+
+With the current graph we get `success`, cost `1316.7` and `12` steps. We route only to the B1 M8 diagram point; this version does not include the street-level segment.
+
 ### How we find the nearest reachable facility
 
 We filter enabled candidates by category and, for step-free requests, require `accessibleFacility === true`. We then route to each candidate with identical restrictions, discard failures and sort successes by cost, using point IDs to break ties.
@@ -336,40 +355,6 @@ We separate QR, manual, link and Demo position sources. A manual arrival receipt
 The legacy TownPass scanner has no request ID, so we share a channel for same-name requests: one pending scan, a draining state after timeout, and quarantine of late replies before retry. We also handle duplicate iOS events and remount/HMR ownership so a reply is not reused accidentally.
 
 Our helper uses local `thinking`, `delta` and `done` events for processing status, text and cards, with stop/collapse cancellation. These UI events are separate from position updates and native model token streaming.
-
-<details>
-<summary>Reproduce the B4 wheelchair waiting area → M8 step-free query locally</summary>
-
-Run from `app/`:
-
-```bash
-node --input-type=module <<'JS'
-import { readFileSync } from "node:fs";
-import {
-  walkingRouter,
-  planWalk,
-  routeSteps,
-} from "./src/station/walk-route.mjs";
-
-const graph = JSON.parse(
-  readFileSync("src/station/walking-network.json", "utf8")
-);
-const result = planWalk(walkingRouter(graph), {
-  startId: "b4-wait-n",
-  destinationId: "b1-exit-m8",
-  stepFree: true,
-});
-console.log({
-  status: result.type,
-  cost: result.route?.cost,
-  steps: routeSteps(result.route).length,
-});
-JS
-```
-
-With the current graph we get `success`, cost `1316.7` and `12` steps. We route only to the B1 M8 diagram point; this version does not include the street-level segment.
-
-</details>
 
 ## Data and coverage
 

@@ -43,44 +43,32 @@
 <tr><td align="center"><a href="./assets/screenshots/mobile-home.png"><img src="./assets/screenshots/mobile-home.png" alt="找設施與樓層地圖" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-destination-search.png"><img src="./assets/screenshots/mobile-destination-search.png" alt="搜尋目的地" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-route-m8.png"><img src="./assets/screenshots/mobile-route-m8.png" alt="地圖與方向同頁" width="250"></a></td></tr>
 </table>
 
-<details>
-<summary>無障礙選路與跨樓層導引</summary>
+### 無障礙選路與跨樓層導引
 
 <table>
 <tr><th>起終點與無障礙選項</th><th>B4 路線起步</th><th>電梯跨樓層</th></tr>
 <tr><td align="center"><a href="./assets/screenshots/mobile-step-free.png"><img src="./assets/screenshots/mobile-step-free.png" alt="起終點與無障礙選項" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-route-b4.png"><img src="./assets/screenshots/mobile-route-b4.png" alt="B4 路線起步" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-floor-transfer.png"><img src="./assets/screenshots/mobile-floor-transfer.png" alt="電梯跨樓層" width="250"></a></td></tr>
 </table>
 
-</details>
-
-<details>
-<summary>小幫手、分享與求助</summary>
+### 小幫手、分享與求助
 
 <table>
 <tr><th>本地設施問答</th><th>分享固定地點</th><th>站務溝通卡</th></tr>
 <tr><td align="center"><a href="./assets/screenshots/mobile-helper.png"><img src="./assets/screenshots/mobile-helper.png" alt="本地設施問答" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-share.png"><img src="./assets/screenshots/mobile-share.png" alt="分享固定地點" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-staff-help.png"><img src="./assets/screenshots/mobile-staff-help.png" alt="站務溝通卡" width="250"></a></td></tr>
 </table>
 
-</details>
-
-<details>
-<summary>兒童、長輩與英文介面</summary>
+### 兒童、長輩與英文介面
 
 <table>
 <tr><th>兒童注音模式</th><th>長輩大字模式</th><th>英文介面</th></tr>
 <tr><td align="center"><a href="./assets/screenshots/mobile-child.png"><img src="./assets/screenshots/mobile-child.png" alt="兒童注音模式" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-senior.png"><img src="./assets/screenshots/mobile-senior.png" alt="長輩大字模式" width="250"></a></td><td align="center"><a href="./assets/screenshots/mobile-english.png"><img src="./assets/screenshots/mobile-english.png" alt="英文介面" width="250"></a></td></tr>
 </table>
 
-</details>
-
-<details>
-<summary>資料來源與寬螢幕導航</summary>
+### 資料來源與寬螢幕導航
 
 <p align="center"><a href="./assets/screenshots/mobile-information.png"><img src="./assets/screenshots/mobile-information.png" alt="地圖說明與資料來源" width="360"></a></p>
 
 [![資料來源與寬螢幕導航](./assets/screenshots/desktop-route.png)](./assets/screenshots/desktop-route.png)
-
-</details>
 
 ## 功能與完成範圍
 
@@ -291,6 +279,37 @@ flowchart LR
 
 我們選擇這個版本，是為了讓目前規模下的結果與除錯紀錄容易追蹤。前驅索引重建路徑與重用 adjacency list 能減少複製與重建開銷；本競賽版保留較容易追蹤完整路徑的實作。A* 需要與成本模型相容的啟發式，不在本版實作範圍內。
 
+### 在本機重現：B4 輪椅候車區到 M8 的無障礙求路
+
+在 `app/` 目錄執行：
+
+```bash
+node --input-type=module <<'JS'
+import { readFileSync } from "node:fs";
+import {
+  walkingRouter,
+  planWalk,
+  routeSteps,
+} from "./src/station/walk-route.mjs";
+
+const graph = JSON.parse(
+  readFileSync("src/station/walking-network.json", "utf8")
+);
+const result = planWalk(walkingRouter(graph), {
+  startId: "b4-wait-n",
+  destinationId: "b1-exit-m8",
+  stepFree: true,
+});
+console.log({
+  status: result.type,
+  cost: result.route?.cost,
+  steps: routeSteps(result.route).length,
+});
+JS
+```
+
+目前圖版本的結果為 `success`、相對成本 `1316.7`、`12` 步。我們在這個範例中只規劃到 B1 的 M8 出口點；本版不包含地面段。
+
 ### 我們如何找「最近可達」
 
 我們先依類別與 `enabled` 取出候選；無障礙請求還要求設施的 `accessibleFacility === true`。接著對每個候選套用同一組路線條件，排除無路可達者，再依路線成本排序，成本相同時以 point ID 穩定排序。
@@ -341,40 +360,6 @@ flowchart LR
 台北通舊掃碼橋接沒有 request ID，因此我們用共用 channel 管理同名請求：同時只允許一個 pending，逾時後進入 draining，先消化遲到回覆再允許新掃描。我們也處理 iOS 重複事件及 HMR／頁面重掛載，避免同一個回覆被誤用多次。
 
 小幫手則透過本地 `thinking`、`delta`、`done` 事件傳遞處理摘要、文字與卡片。我們將停止與收合連到中止流程；這些 UI 事件和 QR 定位、原生模型 token streaming 是不同的契約。
-
-<details>
-<summary>在本機重現：B4 輪椅候車區到 M8 的無障礙求路</summary>
-
-在 `app/` 目錄執行：
-
-```bash
-node --input-type=module <<'JS'
-import { readFileSync } from "node:fs";
-import {
-  walkingRouter,
-  planWalk,
-  routeSteps,
-} from "./src/station/walk-route.mjs";
-
-const graph = JSON.parse(
-  readFileSync("src/station/walking-network.json", "utf8")
-);
-const result = planWalk(walkingRouter(graph), {
-  startId: "b4-wait-n",
-  destinationId: "b1-exit-m8",
-  stepFree: true,
-});
-console.log({
-  status: result.type,
-  cost: result.route?.cost,
-  steps: routeSteps(result.route).length,
-});
-JS
-```
-
-目前圖版本的結果為 `success`、相對成本 `1316.7`、`12` 步。我們在這個範例中只規劃到 B1 的 M8 出口點；本版不包含地面段。
-
-</details>
 
 ## 資料與路網
 
