@@ -14,7 +14,7 @@ import urllib.request
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
-REPOSITORY = 'yoyo899843/Taipei-Codefest-2026-Big-Dumb'
+REPOSITORY = 'yoyo899843/CodeFest-2026-Taipei-Maze'
 TAG = 'model-gemma3-1b-it-int4-1325ae366d31'
 NAME = 'gemma3-1b-it-int4.litertlm'
 SHA = '1325ae366d31950f137c9c357b9fa89448b176d76998180c08ceaca78bba98be'

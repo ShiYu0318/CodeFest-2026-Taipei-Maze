@@ -233,7 +233,7 @@ const mapSources = computed(() => {
 });
 const build = buildInfo;
 const data = summarizeStationData(points, connections, walkingNetwork);
-const repository = "github.com/yoyo899843/Taipei-Codefest-2026-Big-Dumb";
+const repository = "github.com/yoyo899843/CodeFest-2026-Taipei-Maze";
 const sourceUrl = `https://${repository}/tree/${build.commit || "main"}`;
 const components = computed(() => [
   { name: "Vue 3.5", license: "MIT" },

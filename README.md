@@ -58,8 +58,8 @@
 驗證環境為 **Node.js 20、npm、Git**。不需要 Flutter、模型權重、API key、帳號或資料庫即可執行網頁主流程。
 
 ```bash
-git clone https://github.com/yoyo899843/Taipei-Codefest-2026-Big-Dumb.git
-cd Taipei-Codefest-2026-Big-Dumb/app
+git clone https://github.com/yoyo899843/CodeFest-2026-Taipei-Maze.git
+cd CodeFest-2026-Taipei-Maze/app
 npm ci
 npm run serve -- --host 127.0.0.1 --port 8082
 ```

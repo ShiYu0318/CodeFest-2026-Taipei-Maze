@@ -24,7 +24,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## 原始碼取得
 
-專案原始碼位置：[Taipei-Codefest-2026-Big-Dumb](https://github.com/yoyo899843/Taipei-Codefest-2026-Big-Dumb)。
+專案原始碼位置：[CodeFest-2026-Taipei-Maze](https://github.com/yoyo899843/CodeFest-2026-Taipei-Maze)。
 
 可依正式網頁顯示的 commit／tag 取得對應版本；建置與部署方式見 [README](./README.md)。原始碼可讀取不代表第三方素材、匯入程式及參考文件的權利審查均已完成，待辦與來源見 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
 

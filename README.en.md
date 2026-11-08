@@ -59,8 +59,8 @@ Still pending: full-station connectivity, field checks, installed QR labels, tra
 Verified tooling baseline: **Node.js 20, npm and Git**. The web flow does not require Flutter, model weights, an API key, an account or a database.
 
 ```bash
-git clone https://github.com/yoyo899843/Taipei-Codefest-2026-Big-Dumb.git
-cd Taipei-Codefest-2026-Big-Dumb/app
+git clone https://github.com/yoyo899843/CodeFest-2026-Taipei-Maze.git
+cd CodeFest-2026-Taipei-Maze/app
 npm ci
 npm run serve -- --host 127.0.0.1 --port 8082
 ```
