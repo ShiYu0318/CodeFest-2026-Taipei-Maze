@@ -5,7 +5,6 @@
     :lang="htmlLang(locale)"
     :data-theme="theme"
     :data-display-mode="displayMode"
-    :data-guiding="walkStart && walkDestination ? 'true' : null"
   >
     <div
       class="station-shell"
@@ -230,13 +229,14 @@
                   ref="viewport"
                   class="map-viewport"
                   data-tour-target="marker"
-                  :class="{ 'map-zoomed': zoom > 1, 'map-dragging': dragging }"
+                  :class="{
+                    'map-zoomed': zoom > 1 || guideCamera,
+                    'map-dragging': dragging,
+                  }"
                   :style="{
-                    '--map-aspect': bounds[2] + ' / ' + bounds[3],
+                    '--map-aspect': bounds[2] / bounds[3],
                     '--map-rotated-aspect': mapShape.aspect,
                     '--map-rotated-width': mapShape.width,
-                    '--map-viewport-aspect':
-                      bounds[2] + ' / ' + bounds[3] * 1.5,
                   }"
                   role="region"
                   :aria-label="t('map.interactiveAria', { floor: level })"
@@ -251,7 +251,15 @@
                   @lostpointercapture="endMapDrag"
                   @click.capture="ignoreDragClick"
                 >
-                  <div class="map-canvas" :style="{ '--map-zoom': zoom }">
+                  <div
+                    class="map-canvas"
+                    :style="{
+                      '--map-zoom': zoom,
+                      '--guide-board-width': guideCamera
+                        ? guideCamera.baseUnit * bounds[2] + 'px'
+                        : null,
+                    }"
+                  >
                     <div ref="mapBoard" class="map-board">
                       <svg
                         class="floor-plan"
@@ -810,7 +818,9 @@ const facilityDetails = ref(null);
 const floorChanging = ref(false);
 const arrivalPointId = ref(null);
 let floorAnimation = null;
+let cameraAnimation = null;
 const zoom = ref(level.value === "1F" ? 1 : initialMapZoom);
+const guideCamera = ref(null);
 const viewport = ref(null);
 const dragging = ref(false);
 let mapDrag = null;
@@ -883,9 +893,9 @@ const mapHeading = ref({ floor: null, angle: 0 });
 const mapAngle = computed(() =>
   mapHeading.value.floor === level.value ? mapHeading.value.angle : 0
 );
-watch(walkSteps, () => {
+watch(walkSteps, (steps) => {
   walkStepIndex.value = 0;
-  setMapAngle(0);
+  if (!steps.length) restoreGuideCamera();
 });
 const currentWalkStep = computed(
   () => walkSteps.value[walkStepIndex.value] ?? null
@@ -927,16 +937,23 @@ const walkStepOnMap = computed(
   () => currentWalkStep.value?.floor === level.value
 );
 
-function setMapAngle(target) {
-  // CSS interpolates numbers, so choose the equivalent angle closest to the
-  // current view before animating across north.
-  const delta = ((((target - mapAngle.value) % 360) + 540) % 360) - 180;
-  mapHeading.value = { floor: level.value, angle: mapAngle.value + delta };
+function nearestAngle(from, to) {
+  const delta = ((((to - from) % 360) + 540) % 360) - 180;
+  return from + delta;
 }
 
-function resetMapNorth() {
+function setMapAngle(target) {
+  mapHeading.value = {
+    floor: level.value,
+    angle: nearestAngle(mapAngle.value, target),
+  };
+}
+
+async function resetMapNorth() {
+  const before = readMapPose();
   setMapAngle(0);
-  resetZoom(constrainZoom(1));
+  await resetZoom(constrainZoom(1));
+  animateMapFrom(before);
 }
 
 const walkCheckpoints = computed(() => {
@@ -948,35 +965,85 @@ const walkCheckpoints = computed(() => {
       : [step.kind === "floor" ? step.fromId : step.toId];
   return ids.map((id) => stationById.get(id)).filter(Boolean);
 });
-async function goWalkStep(index) {
+async function goWalkStep(index, { zoomIn = false } = {}) {
   await nextTick();
   const step = walkSteps.value[index];
-  if (!Number.isInteger(index) || !step) return;
+  if (!Number.isInteger(index) || !step || floorChanging.value) return;
+  const board = mapBoard.value;
+  if (!board?.clientWidth || !viewport.value?.isConnected) return;
+  if (!guideCamera.value) {
+    guideCamera.value = {
+      floor: level.value,
+      center: zoomAnchor(viewportCenter()),
+      zoom: zoom.value,
+      baseUnit: board.clientWidth / bounds.value[2] / zoom.value,
+      preferredZoom: zoom.value,
+    };
+  }
+  if (zoomIn)
+    guideCamera.value.preferredZoom = Math.min(
+      3,
+      guideCamera.value.zoom * 1.15
+    );
   walkStepIndex.value = index;
   // A pending zoom to a scanned point must not move the current step offscreen.
   scanFocusRevision++;
-  zoomRevision++;
-  if (step.floor !== level.value) await showFloor(step.floor);
-  await nextTick();
-  if (
-    walkSteps.value[index] !== step ||
-    walkStepIndex.value !== index ||
-    level.value !== step.floor
-  )
-    return;
+  if (step.floor !== level.value) {
+    await showFloor(step.floor, {
+      prepare: () => {
+        if (currentWalkStep.value === step) return frameWalkStep(step);
+      },
+    });
+  } else {
+    await frameWalkStep(step, readMapPose());
+  }
+}
+
+async function frameWalkStep(step, before) {
+  const frame = viewport.value;
+  const camera = guideCamera.value;
+  if (!camera || !frame?.isConnected) return;
   setMapAngle(step.kind === "walk" ? -step.angle : 0);
-  await nextTick();
-  // Bring this step's stretch of the route (or its lift/stairs) into view.
+  const { cos, sin } = mapShape.value;
   const anchor = stationById.get(step.fromId) ?? stationById.get(step.toId);
   const line = step.line ?? (anchor ? [[anchor.x, anchor.y]] : []);
   if (!line.length) return;
-  const xs = line.map((p) => p[0]),
-    ys = line.map((p) => p[1]);
-  const [x, y] = normalizedPoint({
-    x: (Math.min(...xs) + Math.max(...xs)) / 2,
-    y: (Math.min(...ys) + Math.max(...ys)) / 2,
-  });
-  centerOn(x, y);
+  const rotated = line.map(([x, y]) => [x * cos - y * sin, x * sin + y * cos]);
+  const xs = rotated.map(([x]) => x);
+  const ys = rotated.map(([, y]) => y);
+  const minX = Math.min(...xs),
+    maxX = Math.max(...xs);
+  const minY = Math.min(...ys),
+    maxY = Math.max(...ys);
+  // Leave space for the endpoint dots and keep the preferred scale on short steps.
+  const gutter = 48;
+  zoom.value = Math.min(
+    camera.preferredZoom,
+    Math.max(1, frame.clientWidth - gutter) / ((maxX - minX) * camera.baseUnit),
+    Math.max(1, frame.clientHeight - gutter) / ((maxY - minY) * camera.baseUnit)
+  );
+  camera.fitZoom = zoom.value;
+  const revision = ++zoomRevision;
+  await nextTick();
+  if (revision !== zoomRevision || !frame.isConnected) return;
+  const x = (minX + maxX) / 2;
+  const y = (minY + maxY) / 2;
+  centerOn(...normalizedPoint({ x: x * cos + y * sin, y: -x * sin + y * cos }));
+  animateMapFrom(before);
+}
+
+async function restoreGuideCamera() {
+  const camera = guideCamera.value;
+  const before = camera ? readMapPose() : null;
+  guideCamera.value = null;
+  setMapAngle(0);
+  if (!camera) return;
+  zoom.value = constrainZoom(camera.zoom);
+  const revision = ++zoomRevision;
+  await nextTick();
+  if (revision !== zoomRevision) return;
+  centerOn(...(camera.floor === level.value ? camera.center : [0.5, 0.5]));
+  animateMapFrom(before);
 }
 const walkStatus = computed(() => {
   const type = walk.value.type;
@@ -1149,6 +1216,7 @@ onBeforeUnmount(() => {
   window.removeEventListener("resize", updateMapLayout);
   mobileZoomQuery.removeEventListener("change", enforceZoomLimit);
   floorAnimation?.cancel();
+  cameraAnimation?.cancel();
   clearMapDrag();
   clearPinch();
   document.removeEventListener("touchstart", startPinch, true);
@@ -1410,6 +1478,54 @@ function mapScrollPoint([x, y]) {
   return [centerX + dx * cos - dy * sin, centerY + dx * sin + dy * cos];
 }
 
+function readMapPose() {
+  const board = mapBoard.value;
+  if (
+    !board?.isConnected ||
+    !board.animate ||
+    !window.DOMMatrixReadOnly ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  )
+    return null;
+  const rect = board.getBoundingClientRect();
+  const matrix = new window.DOMMatrixReadOnly(
+    getComputedStyle(board).transform
+  );
+  return {
+    x: rect.left + rect.width / 2,
+    y: rect.top + rect.height / 2,
+    angle: (Math.atan2(matrix.b, matrix.a) * 180) / Math.PI,
+    unit:
+      (board.clientWidth / bounds.value[2]) * Math.hypot(matrix.a, matrix.b),
+  };
+}
+
+function animateMapFrom(before) {
+  cameraAnimation?.cancel();
+  if (!before) return;
+  const after = readMapPose();
+  if (!after?.unit) return;
+  // The layout and scroll offsets are already final. Animate the artwork from
+  // its last visible pose so the frame and the dotted background stay still.
+  const transform = (x, y, angle, scale) =>
+    `translate(-50%, -50%) translate(${x}px, ${y}px) rotate(${angle}deg) scale(${scale})`;
+  const angle = mapAngle.value;
+  cameraAnimation = mapBoard.value.animate(
+    [
+      {
+        transform: transform(
+          before.x - after.x,
+          before.y - after.y,
+          nearestAngle(angle, before.angle),
+          before.unit / after.unit
+        ),
+      },
+      { transform: transform(0, 0, angle, 1) },
+    ],
+    { duration: 360, easing: "cubic-bezier(0.2, 0, 0.2, 1)" }
+  );
+}
+
 function centerOn(x, y) {
   const frame = viewport.value;
   if (!frame?.isConnected || !mapBoard.value) return;
@@ -1425,7 +1541,11 @@ function focusVisiblePin(point, event) {
 }
 
 function constrainZoom(scale) {
-  const minZoom = mobileZoomQuery.matches && level.value !== "1F" ? 1.5 : 1;
+  const minZoom = guideCamera.value
+    ? Math.min(1, guideCamera.value.fitZoom ?? 1)
+    : mobileZoomQuery.matches && level.value !== "1F"
+    ? 1.5
+    : 1;
   return Math.min(3, Math.max(minZoom, scale));
 }
 
@@ -1456,7 +1576,9 @@ function zoomAnchor([x, y]) {
   ];
 }
 
-async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
+async function zoomAt(scale, [x, y], anchor) {
+  cameraAnimation?.cancel();
+  anchor ??= zoomAnchor([x, y]);
   scale = constrainZoom(scale);
   clearMapDrag();
   const frame = viewport.value;
@@ -1464,7 +1586,7 @@ async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
   zoom.value = scale;
   await nextTick();
   if (revision !== zoomRevision || !frame.isConnected) return;
-  if (scale === 1) frame.scrollTo(0, 0);
+  if (scale === 1 && !guideCamera.value) frame.scrollTo(0, 0);
   else {
     const [left, top] = mapScrollPoint(anchor);
     frame.scrollTo(left - x, top - y);
@@ -1473,7 +1595,11 @@ async function zoomAt(scale, [x, y], anchor = zoomAnchor([x, y])) {
 
 function startMapDrag(event) {
   ignoreMouseClick = false;
-  if (event.pointerType !== "mouse" || event.button !== 0 || zoom.value <= 1)
+  if (
+    event.pointerType !== "mouse" ||
+    event.button !== 0 ||
+    (zoom.value <= 1 && !guideCamera.value)
+  )
     return;
   const frame = viewport.value;
   mapDrag = {
@@ -1665,7 +1791,7 @@ function zoomWithKeyboard(event) {
   zoomAt(scale, viewportCenter());
 }
 
-async function showFloor(floor, { arrival, origin } = {}) {
+async function showFloor(floor, { arrival, origin, prepare } = {}) {
   if (floorChanging.value || (floor === level.value && !origin)) return;
   const frame = viewport.value;
   const currentFloor = floorIds.indexOf(level.value);
@@ -1677,6 +1803,7 @@ async function showFloor(floor, { arrival, origin } = {}) {
   const goingUp = targetFloor < currentFloor;
   const scale = zoom.value;
   floorChanging.value = true;
+  cameraAnimation?.cancel();
   clearMapDrag();
   clearPinch();
   webkitPinch = null;
@@ -1704,7 +1831,8 @@ async function showFloor(floor, { arrival, origin } = {}) {
     } else if (!availableThemes.value.includes(activeTheme.value)) {
       activeTheme.value = null;
     }
-    await resetZoom(floor === "1F" ? 1 : initialMapZoom);
+    if (prepare) await prepare();
+    else await resetZoom(floor === "1F" ? 1 : initialMapZoom);
     if (!frame.isConnected) return;
     if (origin) await zoomAt(origin.scale, viewportCenter(), origin.center);
     else if (arrival)
@@ -1871,7 +1999,7 @@ async function loadDemoScenario(id) {
     location.choose(scenario.destination);
     demoScenarioId.value = id;
     nearestNotice.value = "";
-    if (walkSteps.value.length) await goWalkStep(0);
+    if (walkSteps.value.length) await goWalkStep(0, { zoomIn: true });
   } catch {
     demoNotice.value = t("demo.error");
   } finally {
@@ -1948,7 +2076,8 @@ async function openGuide() {
   selected.value = null;
   mapPickStep.value = null;
   draftStart.value = null;
-  if (walkSteps.value.length) await goWalkStep(walkStepIndex.value);
+  if (walkSteps.value.length)
+    await goWalkStep(walkStepIndex.value, { zoomIn: true });
   await nextTick();
   mapSection.value?.scrollIntoView({ block: "start" });
   viewport.value?.focus({ preventScroll: true });
