@@ -120,6 +120,39 @@ const tokenOrder = (locale) => (a, b) =>
   (a.text < b.text ? -1 : a.text > b.text ? 1 : 0);
 
 /** Search only supplied POIs. Prototype mode admits visibly labeled draft seed words; release excludes them. */
+const facilityText = (value) =>
+  normalizeQuery(value)
+    .replace(/臺/gu, "台")
+    .replace(/[\s\p{P}]/gu, "");
+function floorQuery(query) {
+  const floors = new Set();
+  let text = query.replace(
+    /(^|[^a-z0-9])(1f|b[1-4])(?=$|[^a-z0-9])/gu,
+    (_, prefix, floor) => {
+      floors.add(floor);
+      return prefix + " ";
+    }
+  );
+  const numbers = { 一: 1, 二: 2, 三: 3, 四: 4 };
+  text = text.replace(/地下([一二三四1-4])(?:樓|層)/gu, (_, n) => {
+    floors.add("b" + (numbers[n] ?? n));
+    return " ";
+  });
+  text = text.replace(/(^|\s)(?:一|1)(?:樓|層)/gu, (_, prefix) => {
+    floors.add("1f");
+    return prefix + " ";
+  });
+  return { text: text.trim(), floors: [...floors] };
+}
+function codeMatches(name, query) {
+  const codes = query.match(/[a-z]+\d+/gu) ?? [];
+  return codes.every((code) =>
+    new RegExp("(^|[^a-z0-9])" + code + "(?=$|[^a-z0-9])", "u").test(
+      normalizeQuery(name)
+    )
+  );
+}
+
 export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
   const base = {
     status: "invalidInput",
@@ -181,7 +214,17 @@ export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
     new Set(catalog.map((p) => p.id)).size !== catalog.length
   )
     return { ...base, status: "invalidCatalog" };
-  const enabled = catalog.filter((p) => p.enabled);
+  const parsedFloor = floorQuery(normalized);
+  if (parsedFloor.floors.length > 1)
+    return { ...base, status: "needsClarification", reason: "multipleFloors" };
+  const requestedFloor = parsedFloor.floors[0];
+  if (requestedFloor) base.requestedFloor = requestedFloor;
+  const searchText = parsedFloor.text;
+  const enabled = catalog.filter(
+    (p) =>
+      p.enabled &&
+      (!requestedFloor || p.floorId.toLowerCase() === requestedFloor)
+  );
   const use = (t) =>
     t.review_status === "approved" ||
     (options.prototype === true && t.review_status === "draft");
@@ -191,7 +234,7 @@ export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
   const intents = dictionary.intent_aliases
     .filter(use)
     .sort(tokenOrder(options.uiLocale ?? "zh-TW"));
-  let remaining = clean(normalized);
+  let remaining = clean(searchText);
   const recognized = new Set();
   for (const token of intents) {
     const match = consume(remaining, token);
@@ -207,6 +250,7 @@ export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
     base.proposedOptions.excludedEdgeTypes = [
       ...new Set([...base.proposedOptions.excludedEdgeTypes, "stairs"]),
     ];
+  let nameSearchText = remaining;
   const concepts = new Map();
   for (const alias of aliases) {
     const match = consume(remaining, alias);
@@ -223,8 +267,10 @@ export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
   }
   for (const token of dictionary.fillers
     .filter(use)
-    .sort(tokenOrder(options.uiLocale ?? "zh-TW")))
+    .sort(tokenOrder(options.uiLocale ?? "zh-TW"))) {
     remaining = consume(remaining, token).rest;
+    nameSearchText = consume(nameSearchText, token).rest;
+  }
   remaining = clean(remaining);
   if (recognized.has("nearest"))
     return {
@@ -235,18 +281,81 @@ export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
     };
   // Typography adds spaces between Chinese and numbers ("北 1 門"); visitors
   // may type "北1門" and leave off the exit code, so compare without spaces.
-  const compact = normalized.replace(/\s+/gu, "");
+  const compact = searchText.replace(/\s+/gu, "");
   const exact = enabled.filter((p) => {
     const name = normalizeQuery(p.name);
     return (
-      name === normalized ||
+      name === searchText ||
       (compact.length >= 2 &&
         [name, name.replace(/\s+[a-z]+\d+$/u, "")].some(
           (candidate) => candidate.replace(/\s+/gu, "") === compact
         ))
     );
   });
-  if (!concepts.size && !exact.length && remaining && !codeLike(remaining)) {
+  const rawName = facilityText(nameSearchText),
+    restName = facilityText(remaining);
+  const selectedConcept = dictionary.concepts.find(
+    (c) => c.id === concepts.keys().next().value
+  );
+  const numberQuery = /^(?:第)?(\d+)(?:號)?$/u.exec(restName);
+  const categoryHasEntries = enabled.some((entry) =>
+    selectedConcept?.categories.includes(entry.category)
+  );
+  const numberedFacility = (name, category) => {
+    const nouns = {
+      elevator: "(?:無障礙)?電梯|升降機",
+      restroom: "廁所|洗手間",
+      stairs: "樓梯|階梯|梯口",
+      escalator: "電扶梯",
+      exit: "出口|門",
+    }[category];
+    if (!nouns || !numberQuery) return false;
+    const number = numberQuery[1];
+    return (
+      new RegExp("(^|[^0-9])" + number + "號(?:" + nouns + ")", "u").test(
+        name
+      ) ||
+      new RegExp(
+        "(?:" + nouns + ")(?:第)?" + number + "(?:號)?(?=$|[^0-9車])",
+        "u"
+      ).test(name)
+    );
+  };
+  const partial = enabled.filter((p) => {
+    const name = facilityText(p.name);
+    if (!searchText && requestedFloor) return true;
+    if (numberQuery && concepts.size === 1)
+      return (
+        selectedConcept?.categories.includes(p.category) &&
+        numberedFacility(name, p.category)
+      );
+    if (
+      (!concepts.size || remaining || !categoryHasEntries) &&
+      rawName.length >= 2 &&
+      name.includes(rawName) &&
+      codeMatches(p.name, nameSearchText)
+    )
+      return true;
+    if (
+      concepts.size !== 1 ||
+      !restName ||
+      ["no", "not", "without", "不要", "不"].includes(restName) ||
+      !selectedConcept?.categories.includes(p.category)
+    )
+      return false;
+    return (
+      restName.length >= 2 &&
+      name.includes(restName) &&
+      codeMatches(p.name, remaining)
+    );
+  });
+  const nameMatches = exact.length ? exact : partial;
+  if (
+    !concepts.size &&
+    !nameMatches.length &&
+    remaining &&
+    !codeLike(remaining)
+  ) {
     if (
       aliases.some(
         (alias) =>
@@ -290,20 +399,20 @@ export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
         });
     if (concepts.size) remaining = "";
   }
-  if (concepts.size > 1 && !exact.length)
+  if (concepts.size > 1 && !nameMatches.length)
     return {
       ...base,
       status: "needsClarification",
       reason: "multipleDestinations",
     };
-  if (concepts.size && remaining && !exact.length)
+  if (concepts.size && remaining && !nameMatches.length)
     return {
       ...base,
       status: "needsClarification",
       reason: "unparsedTerms",
       unparsedTerms: [remaining],
     };
-  if (!concepts.size && !exact.length)
+  if (!concepts.size && !nameMatches.length)
     return {
       ...base,
       status: recognized.size ? "needsClarification" : "noMatch",
@@ -312,8 +421,8 @@ export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
     };
   const [conceptId, evidence] = concepts.entries().next().value ?? [null, null];
   const concept = dictionary.concepts.find((c) => c.id === conceptId);
-  let matches = exact.length
-    ? exact
+  let matches = nameMatches.length
+    ? nameMatches
     : enabled.filter((p) => concept.categories.includes(p.category));
   if (recognized.has("accessible"))
     matches = matches.filter((p) => p.accessibleFacility === true);
@@ -326,7 +435,11 @@ export function searchCatalog(rawQuery, catalog, dictionary, options = {}) {
       conceptId,
       matchedAlias: evidence?.alias.text ?? p.name,
       aliasLocale: evidence?.alias.locale ?? null,
-      matchType: exact.length ? "exact" : evidence.matchType,
+      matchType: exact.length
+        ? "exact"
+        : nameMatches.length
+        ? "name"
+        : evidence.matchType,
       editDistance: evidence?.editDistance ?? 0,
       reachability: "unknown",
       graphCost: null,

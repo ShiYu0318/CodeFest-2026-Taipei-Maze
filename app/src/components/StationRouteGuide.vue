@@ -1,6 +1,10 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
-  <section class="station-route-guide" :aria-label="t('route.title')">
+  <section
+    class="station-route-guide"
+    data-tour-target="route"
+    :aria-label="t('route.title')"
+  >
     <p v-if="demo" class="route-demo-note">{{ t("demo.notice") }}</p>
     <p v-if="active" role="status">{{ t("scan.waiting") }}</p>
     <StationRouteSteps
@@ -11,7 +15,7 @@
       @update:index="emit('update:index', $event)"
     />
     <p v-else role="status"><ZhuyinText :text="status" /></p>
-    <div class="inline-route-actions">
+    <div class="inline-route-actions" data-tour-target="route-actions">
       <button
         type="button"
         :disabled="active || !available"
@@ -19,6 +23,24 @@
       >
         <StationMapIcon name="qrcode" /><ZhuyinText :text="t('scan.rescan')" />
       </button>
+      <template v-if="tripActions">
+        <button
+          type="button"
+          data-route-action="help"
+          :disabled="active || demoBusy"
+          @click="emit('help')"
+        >
+          <StationMapIcon name="help" /><ZhuyinText :text="t('staff.short')" />
+        </button>
+        <button
+          type="button"
+          data-route-action="cancel"
+          :disabled="active || demoBusy"
+          @click="emit('cancel')"
+        >
+          <StationMapIcon name="close" /><ZhuyinText :text="t('trip.cancel')" />
+        </button>
+      </template>
       <template v-if="demo">
         <button
           type="button"
@@ -63,9 +85,12 @@ defineProps({
   active: { type: Boolean, default: false },
   demo: { type: Boolean, default: false },
   demoBusy: { type: Boolean, default: false },
+  tripActions: { type: Boolean, default: false },
 });
 const emit = defineEmits([
   "scan",
+  "help",
+  "cancel",
   "update:index",
   "demo-advance",
   "demo-arrive",
@@ -87,10 +112,11 @@ const { t } = useI18n();
 .inline-route-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   margin-top: 8px;
 }
-.inline-route-actions button {
+.inline-route-actions > button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -104,7 +130,7 @@ const { t } = useI18n();
   font: inherit;
   overflow-wrap: anywhere;
 }
-.inline-route-actions svg {
+.inline-route-actions > button svg {
   width: 24px;
   height: 24px;
   flex: none;

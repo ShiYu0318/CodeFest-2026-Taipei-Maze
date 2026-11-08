@@ -26,9 +26,9 @@ export default {
   "tour.layers":
     "Aktifkan untuk melihat garis putus-putus lantai lain dan membandingkan posisinya.",
   "tour.locate":
-    "Cari atau pilih titik awal dan tujuan di bagian atas. Ketuk panah di tengah untuk menukar.",
+    "Atur titik awal dan tujuan. Gunakan ikon untuk memindai, berbagi atau menukar.",
   "tour.facilities":
-    "Pilih kategori, seperti toilet atau lift, untuk menemukan fasilitas di lantai ini.",
+    "Pilih jenis atau Semua untuk menyaring ikon tanpa mengubah tujuan.",
   "tour.marker":
     "Ketuk penanda untuk melihat detail. Tangga, eskalator, dan lift menampilkan lantai yang terhubung.",
   "tour.language": "Pilih bahasa antarmuka yang ingin Anda gunakan.",
@@ -551,4 +551,13 @@ export default {
   "guide.help": "Petunjuk arah",
   "walk.mapBearing": "Arah pada peta",
   "route.viaLabel": "Penanda jalan",
+  "search.name": "Nama cocok",
+  "tour.optionsTitle": "Pilihan rute",
+  "tour.route-options":
+    "Pilih tempat terdekat yang dapat dicapai atau rute tanpa tangga.",
+  "tour.go": "Ketuk Mulai untuk melihat petunjuk di bawah peta.",
+  "tour.route": "Sebelumnya dan Berikutnya memperbarui petunjuk serta peta.",
+  "tour.route-actions":
+    "Pindai ulang, minta bantuan, atau batalkan perjalanan di sini.",
+  "tour.information": "Buka ikon info untuk bantuan, sumber dan lisensi.",
 };

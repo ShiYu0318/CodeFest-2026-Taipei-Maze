@@ -9,6 +9,17 @@
       tabindex="0"
     >
       <button
+        type="button"
+        :disabled="busy"
+        :aria-pressed="category === null"
+        data-facility-all
+        @click="emit('category', null)"
+      >
+        <StationMapIcon name="map" /><ZhuyinText
+          :text="t('endpoint.allTypes')"
+        />
+      </button>
+      <button
         v-for="type in categories"
         :key="type"
         type="button"
@@ -20,7 +31,7 @@
       </button>
     </div>
     <div class="facility-choice">
-      <div class="facility-options">
+      <div class="facility-options" data-tour-target="route-options">
         <label class="facility-nearest-option"
           ><input
             v-model="nearest"
@@ -37,24 +48,12 @@
             name="accessible" /><ZhuyinText :text="t('scan.stepFree')"
         /></label>
       </div>
-      <label v-if="!nearest && category" class="facility-destination">
-        <ZhuyinText :text="t('scan.chooseDestination')" />
-        <select v-model="chosenPointId" :disabled="busy || !category">
-          <option value="" disabled>{{ t("scan.choosePlaceholder") }}</option>
-          <option
-            v-for="point in matchingPoints"
-            :key="point.id"
-            :value="point.id"
-          >
-            {{ point.floor }} · {{ placeName(point, i18n) }}
-          </option>
-        </select>
-      </label>
       <button
         type="button"
         class="facility-category-go"
-        :disabled="busy || (nearest ? !category : !chosenPointId)"
-        @click="emit('go', { category, nearest, pointId: chosenPointId })"
+        data-tour-target="go"
+        :disabled="busy || (nearest ? !category : !destinationId)"
+        @click="emit('go', { category, nearest, pointId: destinationId })"
       >
         <ZhuyinText :text="t('map.goHere')" />
       </button>
@@ -63,15 +62,13 @@
 </template>
 <script setup>
 /* global defineProps, defineEmits */
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import StationMapIcon from "./StationMapIcon.vue";
 import ZhuyinText from "./ZhuyinText.vue";
 import { useI18n } from "../i18n/index.mjs";
-import { placeName } from "../i18n/places.mjs";
 const props = defineProps({
   categories: { type: Array, required: true },
   category: { type: String, default: null },
-  points: { type: Array, required: true },
   busy: { type: Boolean, default: false },
   destinationId: { type: String, default: null },
   stepFree: { type: Boolean, default: false },
@@ -79,41 +76,12 @@ const props = defineProps({
 const emit = defineEmits(["category", "go", "step-free"]);
 const i18n = useI18n();
 const { t } = i18n;
-const nearest = ref(!props.destinationId),
-  pointId = ref("");
-const matchingPoints = computed(() =>
-  props.points.filter((point) => {
-    const types = [point.type].flat();
-    return (
-      point.enabled !== false &&
-      (types.includes(props.category) ||
-        (types.includes("stairs-escalator") &&
-          ["stairs", "escalator"].includes(props.category)))
-    );
-  })
-);
-const chosenPointId = computed({
-  get: () =>
-    pointId.value ||
-    (!props.category ||
-    matchingPoints.value.some((point) => point.id === props.destinationId)
-      ? props.destinationId
-      : null),
-  set: (value) => {
-    pointId.value = value;
-  },
-});
+// Categories filter the map; only the top endpoint row chooses a destination.
+const nearest = ref(!props.destinationId);
 watch(
   () => props.destinationId,
   () => {
     nearest.value = false;
-    pointId.value = "";
-  }
-);
-watch(
-  () => props.category,
-  () => {
-    pointId.value = "";
   }
 );
 </script>
@@ -163,18 +131,7 @@ watch(
   height: 22px;
   flex: none;
 }
-.facility-destination {
-  grid-column: 1 / -1;
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
-.facility-destination select {
-  width: 100%;
-  min-width: 0;
-}
-.facility-picker button,
-.facility-picker select {
+.facility-picker button {
   min-height: var(--display-control-height, 44px);
   padding: 10px 12px;
   border: 1px solid var(--border);

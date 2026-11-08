@@ -91,6 +91,7 @@
             :aria-pressed="browseType === type"
             @click="browseType = type"
           >
+            <StationMapIcon :name="type || 'map'" />
             <ZhuyinText
               :text="type ? t('type.' + type) : t('endpoint.allTypes')"
             />
@@ -152,6 +153,7 @@ import { useI18n } from "../i18n/index.mjs";
 import { useDisplayPreferences } from "../display/preferences.mjs";
 import { placeLabel, placeName } from "../i18n/places.mjs";
 import stationData from "../views/station-points.json";
+import StationMapIcon from "./StationMapIcon.vue";
 import DestinationSearch from "./DestinationSearch.vue";
 import { stationCatalog } from "../search/catalog.mjs";
 
@@ -460,5 +462,15 @@ function keepFocus(event) {
   border-color: var(--tp-primary-600);
   background: var(--tp-primary-600);
   color: #fff;
+}
+.endpoint-types button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.endpoint-types svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
 }
 </style>

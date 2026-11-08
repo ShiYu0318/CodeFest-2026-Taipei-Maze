@@ -50,6 +50,7 @@
               ref="informationButton"
               type="button"
               class="display-icon-button map-information-button"
+              data-tour-target="information"
               aria-haspopup="dialog"
               :aria-label="t('map.information')"
               :title="t('map.information')"
@@ -74,30 +75,12 @@
         @scan="scanGuide"
         @share="sharePoint = $event"
       />
-      <div
-        v-if="walkDestinationPoint"
-        class="trip-actions"
-        role="group"
-        :aria-label="t('scan.actions')"
-      >
-        <button type="button" @click="staffPoint = walkDestinationPoint">
-          <StationMapIcon name="help" /><ZhuyinText :text="t('staff.short')" />
-        </button>
-        <button
-          type="button"
-          :disabled="location.view.value.active || demoBusy"
-          @click="openTripDialog('cancel')"
-        >
-          <StationMapIcon name="close" /><ZhuyinText :text="t('trip.cancel')" />
-        </button>
-      </div>
       <p v-if="!location.view.value.available" class="scan-app-hint">
         {{ t("scan.needAppShort") }}
       </p>
       <StationFacilityPicker
         :categories="availableThemes"
         :category="activeTheme"
-        :points="stationCatalogPoints"
         :destination-id="walkDestination"
         :busy="location.view.value.active || nearestBusy || demoBusy"
         :step-free="location.view.value.stepFree"
@@ -542,6 +525,9 @@
           :active="location.view.value.active"
           :demo="demoEnabled"
           :demo-busy="demoBusy"
+          :trip-actions="!!walkDestinationPoint"
+          @help="staffPoint = walkDestinationPoint"
+          @cancel="openTripDialog('cancel')"
           @update:index="goWalkStep"
           @scan="scanGuide"
           @demo-advance="advanceDemo"
@@ -693,7 +679,6 @@ const demoBusy = ref(false),
 const stationById = new Map(
   stationPoints(stationData).map((point) => [point.id, point])
 );
-const stationCatalogPoints = [...stationById.values()];
 const location = useStationLocation(stationData, stationConnections);
 const currentPoint = computed(() =>
   stationById.get(route.query.start ?? location.view.value.position?.pointId)
@@ -953,12 +938,7 @@ async function goFacilityCategory({ category, nearest, pointId }) {
   if (location.view.value.active) return;
   if (nearest) return goNearest(category);
   const point = stationById.get(pointId);
-  if (
-    !point ||
-    point.enabled === false ||
-    (category && !matchesTheme(point, category))
-  )
-    return;
+  if (!point || point.enabled === false) return;
   return chooseEndpoint(walkStart.value, point.id, point, "destination");
 }
 const nearestNotice = ref("");

@@ -7,7 +7,7 @@ export function stationCatalog(data) {
       name: point.name,
       category: Array.isArray(point.type) ? point.type[0] : point.type,
       floorId,
-      enabled: true,
+      enabled: point.enabled !== false,
       accessibleFacility: null,
     }))
   );

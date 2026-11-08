@@ -26,9 +26,9 @@ export default {
   "tour.layers":
     "Bật để xem đường viền nét đứt của các tầng khác và so sánh vị trí.",
   "tour.locate":
-    "Tìm hoặc chọn điểm đi và điểm đến ở trên cùng. Chạm mũi tên ở giữa để đổi chỗ.",
+    "Chọn điểm đi và điểm đến. Dùng biểu tượng để quét, chia sẻ hoặc đổi chỗ.",
   "tour.facilities":
-    "Chọn một loại tiện ích, như nhà vệ sinh hay thang máy, để tìm trên tầng này.",
+    "Chọn loại hoặc Tất cả để lọc biểu tượng, không đổi điểm đến.",
   "tour.marker":
     "Chạm vào điểm đánh dấu để xem chi tiết. Cầu thang, thang cuốn và thang máy hiển thị các tầng kết nối.",
   "tour.language": "Chọn ngôn ngữ giao diện bạn muốn dùng.",
@@ -542,4 +542,12 @@ export default {
   "guide.help": "Giải thích hướng",
   "walk.mapBearing": "Hướng trên bản đồ",
   "route.viaLabel": "Mốc dọc đường",
+  "search.name": "Khớp tên",
+  "tour.optionsTitle": "Tùy chọn lộ trình",
+  "tour.route-options": "Chọn nơi gần nhất có thể đến hoặc lối đi không bậc.",
+  "tour.go": "Nhấn Đi để xem hướng dẫn bên dưới bản đồ.",
+  "tour.route": "Trước và Tiếp theo cập nhật hướng dẫn và bản đồ.",
+  "tour.route-actions": "Quét lại, nhờ trợ giúp hoặc hủy chuyến tại đây.",
+  "tour.information":
+    "Mở biểu tượng thông tin để xem trợ giúp, nguồn và giấy phép.",
 };

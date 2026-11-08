@@ -72,6 +72,8 @@
                 :text="
                   match.matchType === 'fuzzy'
                     ? t('search.typo')
+                    : match.matchType === 'name'
+                    ? t('search.name')
                     : match.matchType === 'exact'
                     ? t('search.exact')
                     : t('search.dictionary')

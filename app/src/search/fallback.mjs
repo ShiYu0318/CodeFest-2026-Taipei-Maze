@@ -11,7 +11,13 @@ export function withLocalizedFallback(result, query, catalog) {
   const type = detectType(query);
   if (!type) return result;
   const matches = catalog
-    .filter((entry) => entry.category === type && entry.enabled !== false)
+    .filter(
+      (entry) =>
+        entry.category === type &&
+        entry.enabled !== false &&
+        (!result.requestedFloor ||
+          entry.floorId.toLowerCase() === result.requestedFloor)
+    )
     .map((entry) => ({
       poiId: entry.id,
       name: entry.name,

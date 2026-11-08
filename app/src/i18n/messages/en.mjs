@@ -26,9 +26,9 @@ export default {
   "tour.layers":
     "Turn this on to see other floors as dashed outlines and compare their positions.",
   "tour.locate":
-    "Search or pick your start and destination at the top. Tap the arrows between them to swap.",
+    "Set start and destination. Use the icons to scan, share or swap.",
   "tour.facilities":
-    "Select a category, such as restrooms or elevators, to find those facilities on this floor.",
+    "Pick a type or All to filter map icons without changing your destination.",
   "tour.marker":
     "Tap a marker for details. Stairs, escalators, and elevators show which floors they connect to.",
   "tour.language": "Choose the language you want to use for the interface.",
@@ -543,4 +543,11 @@ export default {
   "guide.help": "Direction help",
   "walk.mapBearing": "Map direction",
   "route.viaLabel": "Landmarks",
+  "search.name": "Name match",
+  "tour.optionsTitle": "Route options",
+  "tour.route-options": "Choose nearest reachable or step-free routing.",
+  "tour.go": "Tap Go to see directions below the map.",
+  "tour.route": "Previous and Next update the instructions and map together.",
+  "tour.route-actions": "Rescan, ask for help or cancel the trip here.",
+  "tour.information": "Open the info icon for help, sources and licenses.",
 };

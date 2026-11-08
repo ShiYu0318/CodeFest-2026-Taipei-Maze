@@ -258,6 +258,10 @@ test("the map renders only needed icons during a trip, keeps QR markers and inli
     assert.ok(trip.includes('class="endpoint-bar-scan"'));
     assert.equal(trip.includes('class="theme-group'), true);
     assert.ok(trip.includes('class="facility-nearest-option"'));
+    assert.equal(trip.includes('class="trip-actions"'), false);
+    const actions = trip.slice(trip.indexOf('class="inline-route-actions"'));
+    assert.ok(actions.includes('data-route-action="help"'));
+    assert.ok(actions.includes('data-route-action="cancel"'));
     assert.equal(trip.includes('class="plan-stairs"'), false);
     assert.ok(trip.includes('class="endpoint-bar-scan"'));
     assert.equal((trip.match(/class="facility-category-go"/g) ?? []).length, 1);
@@ -721,7 +725,10 @@ test("inline guidance shares route steps, with no arrow before a route exists or
         })
       );
     const first = await render({});
-    assert.doesNotMatch(first, /<dialog/);
+    assert.doesNotMatch(first, /class="navigation-guide"/);
+    assert.match(first, /class="info-trigger"[^>]*aria-haspopup="dialog"/);
+    assert.match(first, /class="info-dialog"/);
+    assert.doesNotMatch(first, /<dialog[^>]* open/);
     assert.match(first, /station-route-guide/);
     assert.match(first, /class="info-disclosure"/);
     assert.doesNotMatch(first, /class="inline-route-help"/);
@@ -775,7 +782,6 @@ test("endpoint rows expose separate share buttons and facility controls expose s
   const controls = await renderToString(
     Vue.createSSRApp(component("StationFacilityPicker"), {
       categories: Object.keys(data.categories),
-      points: scan.stationPoints(data),
       stepFree: true,
     })
   );
@@ -867,7 +873,6 @@ test("sharing preserves the chosen endpoint and the step-free checkbox controls 
     render: () =>
       Vue.h(component("StationFacilityPicker"), {
         categories: Object.keys(data.categories),
-        points: scan.stationPoints(data),
         stepFree: view.value.stepFree,
         onStepFree: (checked) => location.setStepFree(checked),
       }),
@@ -906,4 +911,118 @@ test("sharing preserves the chosen endpoint and the step-free checkbox controls 
     facilityApp.unmount();
     location.dispose();
   }
+});
+
+test("info opens a bounded dialog, traps focus and closes back to its trigger", async () => {
+  const previousDocument = globalThis.document;
+  globalThis.document = { activeElement: null };
+  const elements = [];
+  const descendants = (node) => [
+    node,
+    ...(node.children ?? []).flatMap(descendants),
+  ];
+  const renderer = Vue.createRenderer({
+    createElement(tag) {
+      const node = { tag, children: [], isConnected: true, open: false };
+      node.focus = () => {
+        globalThis.document.activeElement = node;
+      };
+      node.showModal = () => {
+        node.open = true;
+      };
+      node.close = () => {
+        node.open = false;
+      };
+      node.querySelector = () =>
+        descendants(node).find((child) =>
+          Object.hasOwn(child, "data-info-close")
+        );
+      node.querySelectorAll = () =>
+        descendants(node).filter(
+          (child) =>
+            (child.tag === "button" && !child.disabled) ||
+            String(child.tabindex) === "0"
+        );
+      node.getClientRects = () => [1];
+      elements.push(node);
+      return node;
+    },
+    createText: (text) => ({ text }),
+    createComment: (text) => ({ text }),
+    insert(node, parent) {
+      parent.children.push(node);
+      node.parent = parent;
+    },
+    remove() {},
+    setText(node, text) {
+      node.text = text;
+    },
+    setElementText(node, text) {
+      node.text = text;
+    },
+    parentNode: (node) => node.parent,
+    nextSibling: () => null,
+    patchProp(node, key, previous, value) {
+      node[key] = value;
+    },
+  });
+  const app = renderer.createApp({
+    render: () =>
+      Vue.h(
+        component("InfoDisclosure"),
+        { label: "Direction help" },
+        { default: () => Vue.h("p", "Long information ".repeat(100)) }
+      ),
+  });
+  try {
+    app.mount({ children: [] });
+    const trigger = elements.find((node) => node.class === "info-trigger");
+    const dialog = elements.find((node) => node.tag === "dialog");
+    const close = elements.find((node) =>
+      Object.hasOwn(node, "data-info-close")
+    );
+    assert.equal(dialog.open, false);
+    await trigger.onClick({ currentTarget: trigger });
+    await Vue.nextTick();
+    assert.equal(dialog.open, true);
+    assert.equal(trigger["aria-expanded"], true);
+    assert.equal(globalThis.document.activeElement, close);
+    const body = elements.find(
+      (node) => node.class === "info-disclosure-panel"
+    );
+    assert.equal(String(body.tabindex), "0");
+    body.focus();
+    let prevented = false;
+    const listeners = [dialog.onKeydown].flat();
+    listeners.at(-1)({
+      key: "Tab",
+      shiftKey: false,
+      preventDefault() {
+        prevented = true;
+      },
+    });
+    assert.equal(prevented, true);
+    close.onClick();
+    await Vue.nextTick();
+    assert.equal(dialog.open, false);
+    assert.equal(trigger["aria-expanded"], false);
+    assert.equal(globalThis.document.activeElement, trigger);
+  } finally {
+    app.unmount();
+    globalThis.document = previousDocument;
+  }
+});
+
+test("facility filters do not add a second destination selector or replace the manually selected destination", async () => {
+  const html = await renderToString(
+    Vue.createSSRApp(component("StationFacilityPicker"), {
+      categories: Object.keys(data.categories),
+      category: "exit",
+      destinationId: "b1-wc-m5",
+    })
+  );
+  assert.doesNotMatch(html, /<select/);
+  assert.doesNotMatch(html, /facility-destination/);
+  assert.match(html, /class="facility-category-go"/);
+  assert.doesNotMatch(html, /class="facility-category-go"[^>]*disabled/);
 });

@@ -1,6 +1,7 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
   <dialog
+    v-if="total"
     ref="dialog"
     class="map-tour"
     :class="{ 'map-tour-unanchored': !spotlight }"
@@ -58,7 +59,7 @@
 /* global defineProps, defineEmits */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
 import { useI18n } from "../i18n/index.mjs";
-import { mapTourSteps } from "../station/map-tour.mjs";
+import { availableMapTourSteps } from "../station/map-tour.mjs";
 import ZhuyinText from "./ZhuyinText.vue";
 
 const props = defineProps({ root: { type: Object, required: true } });
@@ -70,9 +71,12 @@ const index = ref(0);
 const spotlight = ref(null);
 const cardStyle = ref(null);
 const side = ref(null);
-const total = mapTourSteps.length;
-const targetId = computed(() => mapTourSteps[index.value][0]);
-const titleKey = computed(() => mapTourSteps[index.value][1]);
+// Route instructions exist only after choosing a destination. Do not point
+// at missing controls during the first visit.
+const steps = availableMapTourSteps(props.root, document);
+const total = steps.length;
+const targetId = computed(() => steps[index.value]?.[0]);
+const titleKey = computed(() => steps[index.value]?.[1]);
 const descriptionKey = computed(() => "tour." + targetId.value);
 const gap = 12;
 let target;
@@ -181,6 +185,10 @@ function finish() {
 }
 
 onMounted(() => {
+  if (!total) {
+    emit("finish");
+    return;
+  }
   if (typeof dialog.value.showModal !== "function") {
     emit("finish");
     return;

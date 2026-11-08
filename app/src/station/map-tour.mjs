@@ -1,18 +1,27 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 export const mapTourSteps = [
-  ["scan", "scan.scan"],
-  ["floors", "map.floorGroup"],
-  ["layers", "map.layers"],
-  ["locate", "map.locate"],
+  ["locate", "endpoint.roles"],
   ["facilities", "tour.facilitiesTitle"],
+  ["route-options", "tour.optionsTitle"],
+  ["go", "map.goHere"],
+  ["floors", "map.floorGroup"],
   ["marker", "tour.markerTitle"],
+  ["route", "route.title"],
+  ["route-actions", "scan.actions"],
   ["language", "lang.label"],
-  ["theme", "tour.themeTitle"],
-  ["contrast", "display.contrast"],
   ["mode", "display.mode"],
   ["helper", "chat.launcher"],
-  ["reopen", "tour.replay"],
+  ["information", "map.information"],
 ];
+
+export function availableMapTourSteps(root, helperRoot = root) {
+  return mapTourSteps.filter(
+    ([id]) =>
+      !!(id === "helper" ? helperRoot : root)?.querySelector(
+        `[data-tour-target="${id}"]`
+      )
+  );
+}
 
 const storageKey = "taipei-maze.map-tour.v1";
 let seenInDocument = false;
