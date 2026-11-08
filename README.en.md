@@ -10,17 +10,19 @@
 
 </div>
 
-A **TownPass WebView microservice** for Taipei Main Station: facility search, nearest reachable destinations, QR position recovery, inline visual guidance, and fixed meeting-place sharing. Search and routing use local data rather than a remote generative model. A browser supports manually selected endpoints; native QR scanning requires the TownPass bridge.
+We built **Taipei Main Station Wayfinding**, a **TownPass WebView microservice**, to help people find facilities, understand their next step and recover when unsure of their position. We connect search, reachable routes, QR recovery, visual guidance and fixed meeting places in one flow.
 
-**`v0.1.0-rc.1` is a demonstration prerelease.** It includes a partial diagram-based graph and an integrated interaction flow, not a complete station survey, installed QR infrastructure, emergency navigation service, or certified wheelchair route.
+We run core search and routing against local data. You can try manually selected endpoints in a browser, then use native QR scanning through TownPass.
+
+We have published **`v0.1.0-rc.1`**, with a partial diagram graph and the main interaction flow. We are still extending coverage and field validation; this prerelease is not an emergency navigation service or a certified wheelchair route.
 
 ## Contents
 
-[Why](#why-this-project) · [Screenshot](#actual-screenshot) · [Features](#features-and-scope) · [Quick start](#quick-start) · [Walkthrough](#walkthrough-and-demo) · [Architecture](#architecture) · [Data](#data-and-coverage) · [Tests](#tests-and-quality) · [Deployment](#deployment-and-versioning) · [License](#provenance-and-licensing)
+[Why](#why-this-project) · [Screenshot](#actual-screenshot) · [Features](#features-and-scope) · [Quick start](#quick-start) · [Walkthrough](#walkthrough-and-demo) · [Architecture](#architecture) · [Shortest paths](#how-we-compute-shortest-paths) · [Data](#data-and-coverage) · [Tests](#tests-and-quality) · [Deployment](#deployment-and-versioning) · [License](#provenance-and-licensing)
 
 ## Why this project
 
-Station navigation involves more than finding a dot: a nearby restroom may be separated by a wall, a transfer may require a different floor, and a meeting place can be difficult to describe. The project connects these tasks into one recoverable flow.
+Station navigation involves more than finding a dot: a nearby restroom may be separated by a wall, a transfer may require a different floor, and a meeting place can be difficult to describe. We connect these tasks into one recoverable flow.
 
 | User need | Approach |
 | --- | --- |
@@ -30,7 +32,7 @@ Station navigation involves more than finding a dot: a nearby restroom may be se
 | Reduce reading and language barriers | Seven languages, local synonyms, Zhuyin/large-text preferences and expandable information |
 | Meet friends or explain a problem to staff | Share a fixed place and show a staff-facing assistance card |
 
-These are design goals. No formal user study or measured percentage improvement has been established.
+We plan to evaluate these choices through task completion, journey time and requests for assistance.
 
 ## Actual screenshot
 
@@ -38,11 +40,11 @@ These are design goals. No formal user study or measured percentage improvement 
   <img src="./assets/screenshots/station-map-b4.png" alt="Actual B4 application screenshot showing floor controls, facility markers, direction marker, zoom and floating helper" width="460">
 </p>
 
-*Unretouched application screenshot supplied by the project owner, captured 2026-11-08 at 08:47 Asia/Taipei. It predates subsequent adaptive-height changes and is not evidence of current device validation. [Provenance](./assets/screenshots/README.md).*
+*We use this B4 view to show floor controls, facilities and map interaction. Captured 2026-11-08 at 08:47 Asia/Taipei, before the adaptive-height update. [Capture record](./assets/screenshots/README.md).*
 
 ### Actual iPhone simulator walkthrough
 
-Original development captures from 2026-11-08 at 10:10 Asia/Taipei. The Xcode/simulator frame is retained; no generated content, retouching or cropping. Expand and open the original to inspect the layout. These are not physical-device or field-validation evidence. A Gemma label in the helper alone does not prove model-generated answers.
+We show route selection, inline guidance and facility questions in these iPhone simulator captures from 2026-11-08 at 10:10 Asia/Taipei. Expand a section to inspect the original view.
 
 <details>
 <summary>Endpoints and step-free option: B4 north wheelchair waiting area → B1 M8 exit</summary>
@@ -77,11 +79,11 @@ Original development captures from 2026-11-08 at 10:10 Asia/Taipei. The Xcode/si
 - **Seven local catalogs:** Traditional Chinese, English, Vietnamese, Indonesian, Thai, Korean and Japanese.
 - **Local facility helper:** factual station-data answers, progress events, incremental text and facility cards; suggestions remain reusable.
 
-Still pending: full-station connectivity, field checks, installed QR labels, translation review, complete audio assets, Android/iPhone WebView and assistive-technology validation, and fresh-install offline behavior. Historical optional Gemma/voice integration is not proof of tested on-device inference, native token streaming or microphone behavior. Multiple “fastest/easiest to understand” route comparison is also unfinished.
+We are prioritizing graph verification, translation review and Android/iPhone WebView validation. Full audio, offline startup and multiple-route comparison remain on our roadmap; the [Roadmap](#roadmap) describes the remaining validation scope.
 
 ## Quick start
 
-Verified tooling baseline: **Node.js 20, npm and Git**. The web flow does not require Flutter, model weights, an API key, an account or a database.
+We develop and verify the web app with **Node.js 20, npm and Git**. You can run search and routing without first setting up Flutter, model weights, an API key or a database.
 
 ```bash
 git clone https://github.com/yoyo899843/CodeFest-2026-Taipei-Maze.git
@@ -94,9 +96,11 @@ Open <http://127.0.0.1:8082/>. `/` redirects to `/station-map`; `/about` provide
 
 ### Browser versus TownPass
 
-Browsers support manual endpoints, search, routing, map interaction, steps, fixed-point sharing and local facility answers. Inside TownPass, `flutterObject` calls `qr_code_scan`. Without the bridge, select a start manually. **GPS is not indoor QR positioning; scanning is not a guaranteed persistent camera session; the page does not know the phone's heading.**
+We support manual endpoints, search, routing, map interaction, steps, fixed-point sharing and local answers in a browser. Inside TownPass, we use `flutterObject` to call `qr_code_scan`; manual selection remains available without that bridge.
 
-This is not a separate Flutter navigation app. Do not modify the adjacent TownPass checkout for routine web changes. [Historical integration notes](./integration/townpass/README.md) describe experiments, not guarantees about the official host.
+We confirm position at scan time and express directions in map bearings. Our current flow does not use GPS for indoor positioning or continuously track the phone's position or heading.
+
+We keep the navigation UI and core logic on the web and reuse the host's native scanning capability. Our [TownPass integration notes](./integration/townpass/README.md) describe bridge and optional capability boundaries.
 
 ## Walkthrough and Demo
 
@@ -157,12 +161,12 @@ flowchart TB
     State <-->|flutterObject JSON| QR
 ```
 
-- **UI:** Vue 3, Vue Router, JavaScript ES modules, HTML/CSS and SVG. No new remote LLM, translation or TTS runtime dependency.
-- **Routing:** expand compact JSON into a directed graph; apply hard access filters, then Dijkstra. Nearest-facility queries use the same restrictions.
-- **Search:** Unicode normalization, a local synonym/intent dictionary and Optimal String Alignment; not embedding-based model search.
-- **State:** QR, manual, link and Demo sources remain distinct. Manual arrival is tied to the current trip and invalidated by relevant changes.
-- **Assistant:** internal `thinking`, `delta` and `done` events, not network SSE. Basic facility answers do not need a native model.
-- **Delivery:** Docker multi-stage build to nginx static hosting; GitHub Actions web checks and deployment. No Flask backend is required.
+- **UI:** We combine Vue 3, Vue Router, JavaScript ES modules, HTML/CSS and SVG.
+- **Routing:** We expand compact JSON into a directed graph, apply hard access filters, then run Dijkstra with the same restrictions for nearest facilities.
+- **Search:** We use Unicode normalization, a local synonym/intent dictionary and Optimal String Alignment.
+- **State:** We separate QR, manual, link and Demo sources and tie manual arrival to the current trip.
+- **Assistant:** We use internal `thinking`, `delta` and `done` events to keep local queries separate from progressive UI rendering.
+- **Delivery:** We build static assets through Docker, serve them with nginx and run checks/deployment through GitHub Actions.
 
 ### Repository layout
 
@@ -191,11 +195,166 @@ flowchart TB
 ├── .github/                # CI and contributor/architecture/security guides
 ├── compose.yml
 ├── README.md               # default Traditional Chinese documentation
-├── README.en.md
-└── docs/                   # local only; ignored and absent from fresh clones
+└── README.en.md            # English edition
 ```
 
-See [Architecture](./.github/ARCHITECTURE.md) for contracts and boundaries. Local competition proposals, reports and the reference PDF remain on the original developer machine. Public development instructions do not depend on them. Ignoring `docs/` does not remove old commits.
+We separate navigation, search, position state and presentation by feature so that we can test and maintain them independently. See [Architecture](./.github/ARCHITECTURE.md) for contracts and boundaries.
+
+### How we compute shortest paths
+
+We model navigation as a weighted directed graph `G = (V, E)`. Nodes represent facilities, corridor turns and connector endpoints. We resolve a selected place ID through a binding before routing.
+
+Our current expanded graph has **359 nodes and 3,162 directed edges**, comprising 1,562 corridor pairs and 38 vertical directed edges. Only 125 nodes bind selectable places; the others mainly support entrances and turns. We do not expose every helper node as a facility or QR anchor.
+
+#### 1. Building a walkable diagram graph
+
+We explicitly run `npm run build:walking` after changing diagram sources to invoke our [graph builder](./app/scripts/build-walking-network.mjs). The regular `npm run build` only builds the web app and does not regenerate the graph:
+
+1. Load walkable floor polygons and exclude context regions outside the modeled station space.
+2. Add bound facilities and helper nodes inset from corners.
+3. Validate ordinary same-floor segments with `segmentInWalkAreas` and diagram clearance checks.
+4. Retain up to eight nearest visible neighbors per node and deduplicate pairs. Other nodes can link back, so final degree can exceed eight.
+5. Add separate inferred entrance edges for some off-corridor icons, with unknown accessibility; step-free requests reject them.
+6. Add vertical edges only from recorded connector endpoints, then validate IDs, positive costs, floors, provenance and access fields.
+
+We store each two-way corridor once and expand both directions at runtime. This is a sparse diagram graph: our result is the **minimum-cost path in that graph**, not necessarily the geometric optimum in continuous space or the actual station's complete route network.
+
+#### 2. Defining cost
+
+```text
+corridor cost = round(hypot(x₂ − x₁, y₂ − y₁), 1 decimal place)
+elevator floor-change cost = 120
+stairs / escalator floor-change cost = 90
+route cost = sum of allowed edge costs
+```
+
+We use fixed floor-change costs to express switching overhead. We have not calibrated them against walking, elevator waits or congestion, so we report diagram cost rather than fastest journey minutes.
+
+For step-free routing, we remove unsuitable edges instead of assigning stairs a large penalty. A costly alternative must not make stairs admissible.
+
+#### 3. Filtering before Dijkstra
+
+Our [walking router](./app/src/station/walking.mjs) constructs an allowed subgraph for each request:
+
+| Condition | Our action |
+| --- | --- |
+| Not open, or explicitly unverified | Exclude |
+| Ticket required but not allowed | Exclude; fare gates/paid areas are not fully modeled yet |
+| User-excluded edge type | Exclude |
+| Unavailable connector ID | Exclude |
+| Step-free request with stairs/escalator | Exclude |
+| Step-free request without both `stepFree === true` and `wheelchairPassable === true` | Exclude |
+
+We admit diagram-checked edges without describing them as field-verified. Ordinary and step-free requests therefore share the same data but use different permitted subgraphs.
+
+```mermaid
+flowchart LR
+    A[Selected endpoints] --> B[Resolve bindings and options]
+    B --> C[Filter closed / unknown / unsuitable edges]
+    C --> D[Build adjacency list]
+    D --> E[MinHeap: lowest cost candidate]
+    E --> F{Destination reached?}
+    F -->|No| G[Relax edges and update best paths]
+    G --> E
+    F -->|Yes| H[Node IDs / edge IDs / cost / revision]
+```
+
+#### 4. Dijkstra implementation choices
+
+Our [core](./app/src/navigation/dijkstra.mjs) uses an adjacency list, `MinHeap`, `best` candidates and a `settled` set:
+
+- We initialize the start with zero cost and pop the lowest cumulative-cost candidate.
+- We relax neighbors using `candidate = current.cost + edge.cost` and push improvements.
+- We use lazy updates rather than decrease-key: stale heap entries are discarded when popped.
+- We treat costs within `1e-9` as approximately equal and use edge-ID path keys for stable tie decisions.
+- We return when the destination is popped, `NoRoute` when the queue empties, and `InvalidGraph` for non-finite accumulated cost.
+
+With `V` nodes and `E` directed edges, basic lazy-heap work is approximately `O((V + E) log E)`. We also copy candidate node/edge arrays and compare path keys, adding route-length-dependent time and memory overhead beyond the textbook distance-only version.
+
+We favor traceable behavior at the current scale. For larger venues, we plan to evaluate predecessor-based reconstruction, adjacency reuse and device latency/memory measurements. We have not implemented A*: it would need a heuristic compatible with our cost model, and it would not resolve missing field data.
+
+### How we find the nearest reachable facility
+
+We filter enabled candidates by category and, for step-free requests, require `accessibleFacility === true`. We then route to each candidate with identical restrictions, discard failures and sort successes by cost, using point IDs to break ties.
+
+```text
+candidate facilities → same start and access options → route each candidate
+                     → keep successful routes → sort by graph cost → top k
+```
+
+With `K` candidates, we currently perform roughly `K` point-to-point searches plus sorting. We do not claim that this is already a single Dijkstra traversal. At larger scale, we could reuse one single-source result for multiple destinations; reverse-graph multi-source search is another option for repeated nearest-category queries.
+
+We distinguish reaching a facility from the facility itself meeting a requirement. A familiar name does not establish accessible entrances or corridors.
+
+### Turning routes into visual instructions
+
+Our [presentation helpers](./app/src/station/walk-route.mjs) produce per-floor polylines and `walk`, `floor` and `arrive` steps:
+
+- We split walking sections at named places or turns of at least **35°**, ignoring vectors shorter than **two diagram units** to reduce coordinate noise.
+- We end highlighted geometry at the actual turn while naming the next recognizable checkpoint. Internal `corner-*` and `*-entrance` IDs are not public facilities or QR points.
+- We close the current walking section before a vertical edge and show the connector, target floor and up/down direction separately.
+- We derive map bearings with `atan2(Δx, -Δy)`: 0° points up the diagram and angles increase clockwise. These are not measured phone headings.
+- We size the map using the visible viewport and measured surrounding controls, favor the map as the main visual area and allow normal page scrolling when crowded.
+
+Several consecutive steps can refer toward the same named facility while highlighting distinct corridor turns. We derive steps from geometry rather than playing a fixed instruction script.
+
+### Multilingual search and typo tolerance
+
+In our [search module](./app/src/search/search.mjs), we normalize NFKC, case and spacing, then combine floor parsing, dictionary synonyms, intents and name/exit-code matching. Only eligible unresolved queries enter fuzzy matching.
+
+We use **Optimal String Alignment** over Unicode code points for insertion, deletion, substitution and adjacent transposition costs. A comparison of lengths `m` and `n` takes `O(mn)` work; we retain only recent rows rather than a full matrix.
+
+| Alias length | Maximum edit distance |
+| --- | ---: |
+| Under four code points | No fuzzy correction |
+| Four to seven | 1 |
+| Eight or more | 2 |
+
+We also cap the distance ratio at 0.3, exclude code/number-like aliases from this correction and share a default budget of **100,000 DP cell operations** across a query. Exhaustion returns `incomplete`; fuzzy matches are suggestions, and unresolved modifiers or conflicts request clarification.
+
+Search candidates start with `reachability: "unknown"`; the routing engine establishes graph reachability separately. Our search core requests further handling for nearest intent, and the UI delegates that task to the nearest-facility router rather than treating text matching as path ranking.
+
+### Keeping position and trip state consistent
+
+We separate QR, manual, link and Demo position sources. A manual arrival receipt is tied to endpoints, position token, step-free options, excluded edge types and unavailable connectors; relevant changes invalidate it.
+
+The legacy TownPass scanner has no request ID, so we share a channel for same-name requests: one pending scan, a draining state after timeout, and quarantine of late replies before retry. We also handle duplicate iOS events and remount/HMR ownership so a reply is not reused accidentally.
+
+Our helper uses local `thinking`, `delta` and `done` events for processing status, text and cards, with stop/collapse cancellation. These UI events are separate from position updates and native model token streaming.
+
+<details>
+<summary>Reproduce the B4 wheelchair waiting area → M8 step-free query locally</summary>
+
+Run from `app/`:
+
+```bash
+node --input-type=module <<'JS'
+import { readFileSync } from "node:fs";
+import {
+  walkingRouter,
+  planWalk,
+  routeSteps,
+} from "./src/station/walk-route.mjs";
+
+const graph = JSON.parse(
+  readFileSync("src/station/walking-network.json", "utf8")
+);
+const result = planWalk(walkingRouter(graph), {
+  startId: "b4-wait-n",
+  destinationId: "b1-exit-m8",
+  stepFree: true,
+});
+console.log({
+  status: result.type,
+  cost: result.route?.cost,
+  steps: routeSteps(result.route).length,
+});
+JS
+```
+
+With the current graph we get `success`, cost `1316.7` and `12` steps. We route only to the B1 M8 diagram point; the street-level segment still needs separate verification.
+
+</details>
 
 ## Data and coverage
 
@@ -208,9 +367,9 @@ See [Architecture](./.github/ARCHITECTURE.md) for contracts and boundaries. Loca
 | B4 | 17 | 17 |
 | **Total** | **228** | **125** |
 
-Graph version: `2026.11.08-diagram`; 19 recorded floor connections. Coverage does not establish mutual reachability or field verification of every device/direction. Costs use **relative diagram units**, not surveyed meters or estimated seconds. 1F, B2 railway platforms and some B1 points remain unbound.
+We currently maintain graph version `2026.11.08-diagram` and 19 recorded floor connections. We use **relative diagram costs**, which we have not calibrated to meters or journey time. 1F, B2 railway platforms and some B1 points remain unbound; bindings also need field checks for actual connectivity.
 
-Sources and roles:
+We use the following sources to build and review the station data:
 
 - **Taipei Metro station plans, facilities and cross-sections:** relative floor, corridor and equipment geometry.
 - **TRA/THSR official plans:** railway platform order and equipment checks; preserve red/purple markers without fabricating track crossings.
@@ -225,7 +384,7 @@ npm run build:walking
 npm run validate:assets
 ```
 
-Do not inflate coverage by snapping across unknown space or inventing connector endpoints. Step-free access needs separate evidence for corridors, entrances, facilities and exit-to-street segments.
+We expand coverage by verifying corridors, entrances, facilities and connector endpoints. Step-free routes also need verification of the full exit-to-street segment.
 
 ## Tests and quality
 
@@ -240,9 +399,9 @@ python3 -m unittest discover -s tools -p 'test_*.py'
 git diff --check
 ```
 
-The Web checks workflow runs web and Python tooling checks. Tests cover routes/restrictions, search, bridge state, location links, sharing, trip completion and Vue renderer output. Production files are in `app/dist/`. These tests do not replace browser visuals, native camera, screen-reader, lifecycle or field-route validation.
+We run web and Python checks through Web checks, covering routes/restrictions, search, bridge state, location links, sharing, arrival and Vue renderer output. We build production files into `app/dist/` and separately validate browser visuals, native camera, assistive technology, lifecycle and field behavior.
 
-Dependency audit on 2026-11-08: `npm audit --omit=dev` reported no runtime advisories; the full audit still reported 18 development-toolchain findings (8 high, 10 moderate). This prerelease does not force potentially breaking upgrades/downgrades; Vue CLI toolchain modernization remains pending. Bind the development server to loopback and serve production through nginx. Audit results are not a security guarantee.
+We audited dependencies on 2026-11-08: runtime-only checks reported no findings, while the development toolchain retained 18 (8 high, 10 moderate). We plan to modernize the Vue CLI toolchain. We bind development to loopback and serve production through nginx; see [Security](./.github/SECURITY.md) for the audit scope.
 
 ## Deployment and versioning
 
@@ -252,9 +411,9 @@ export CODEFEST_BUILD_DATE="$(date -u +%Y-%m-%d)"
 docker compose up -d --build
 ```
 
-Compose exposes ports `8000` and `8001`. Deployment-side HTTPS uses the existing Cloudflare Tunnel or reverse proxy; credentials are not included. The main-push Deploy workflow pulls, builds, starts services and checks both ports. Web checks run independently and do not gate deployment; run local checks before pushing.
+We expose ports `8000` and `8001` through Compose and provide HTTPS using Cloudflare Tunnel or an existing reverse proxy. Our main-push Deploy workflow pulls, builds, starts services and checks both ports. Web checks run independently, so we also complete local validation before pushing.
 
-Production builds receive the source revision/date, and the information page links to matching source. A direct `docker build app` without revision arguments retains an unknown version instead of inventing a SHA.
+We pass the revision and build date into production containers so that the information page can link to matching source. Local Git checkouts can detect their SHA automatically; a container without a passed commit or Git metadata displays an unknown revision.
 
 ```mermaid
 flowchart LR
@@ -265,9 +424,11 @@ flowchart LR
     E --> F[HTTPS entry]
 ```
 
-The Android integration workflow is a historical opt-in host check, not proof of current official-host changes or device validation. Model publishing has separate terms; model weights are not web prerelease assets.
+We also retain a manually triggered Android host integration check. Native models, voice and device behavior have their own validation process.
 
 ## Roadmap
+
+We currently rely on a diagram model. QR labels are not installed on site; native model/voice, full audio, translation review and fresh-install offline behavior still need validation. A Gemma UI label alone is not inference evidence. We are moving forward in this order:
 
 1. Field-check a continuous area, including equipment, entrances and QR placement.
 2. Validate Android/iPhone WebView, lifecycle, assistive technology and reading modes.
@@ -277,12 +438,12 @@ The Android integration workflow is a historical opt-in host check, not proof of
 
 ## Contributing and security
 
-Read [Contributing](./.github/CONTRIBUTING.md) and [Security](./.github/SECURITY.md). Reports should include revision, device, locale/mode, point IDs, route options and reproduction steps. Do not publish personal data, tokens or private scan contents. Use English Conventional Commits and the open-source PR template.
+We welcome issues and contributions. See [Contributing](./.github/CONTRIBUTING.md) and [Security](./.github/SECURITY.md). Reports should include revision, device, locale/mode, point IDs, route options and reproduction steps. Do not publish personal data, tokens or private scan contents. Use English Conventional Commits and the open-source PR template.
 
 ## Provenance and licensing
 
-Original project code is **AGPL-3.0-or-later**: [LICENSE](./LICENSE), [AGPL_NOTICE](./AGPL_NOTICE.md). TownPass and third-party code, data, map derivatives, models and documents retain their own rights; they are not all relicensed under AGPL.
+We publish our original code under **AGPL-3.0-or-later**: [LICENSE](./LICENSE), [AGPL_NOTICE](./AGPL_NOTICE.md). We preserve the separate terms of TownPass and third-party code, data, maps and models; our AGPL license does not cover all third-party content.
 
-Research CSV attribution is recorded in [data/ATTRIBUTION.md](./data/ATTRIBUTION.md). Imported prototype code and some map derivatives still require redistribution-rights review. Repository access and a prerelease label do not establish clearance or completion of every delivery obligation. Untracking `docs/` does not remove historical PDFs or other old content; release review must include history.
+We record research attribution in [data/ATTRIBUTION.md](./data/ATTRIBUTION.md) and continue reviewing redistribution rights for imported prototype code and map derivatives. Sources, terms and review status are listed in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md).
 
-Thanks to TownPass, Taipei Metro, TRA, THSR and Taipei Open Data for references and foundations. These names do not imply official endorsement or approved deployment.
+We thank TownPass, Taipei Metro, TRA, THSR and Taipei Open Data for references and foundations. We develop this project independently; these organizations have not endorsed it as an official service.
