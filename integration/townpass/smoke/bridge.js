@@ -56,7 +56,7 @@ function onReply(event) {
 }
 
 if (!bridge || typeof bridge.postMessage !== 'function' || typeof bridge.addEventListener !== 'function') {
-  status.textContent = '一般瀏覽器：無 flutterObject。請由城市通的「CodeFest 測試環境」開啟。';
+  status.textContent = '一般瀏覽器：無 flutterObject。請由台北通的「CodeFest 測試環境」開啟。';
   record('網頁載入成功；App 橋接尚未驗證。');
 } else {
   bridge.addEventListener('message', onReply);

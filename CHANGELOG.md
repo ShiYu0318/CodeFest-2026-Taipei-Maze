@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Corrected the Chinese host name from 城市通 to 台北通 in current documentation, UI, diagnostics and QR tooling; historical source titles and integration patches are preserved.
+
 ## v0.1.0-rc.1 — 2026-11-08
 
 First repository readiness prerelease of 北車不迷路 / Taipei Main Station Wayfinding.
