@@ -23,9 +23,9 @@
           stroke-width="1.7"
         />
       </svg>
-      <span class="display-language-code" aria-hidden="true"
-        ><ZhuyinText :text="shortCode"
-      /></span>
+      <span class="display-language-code" aria-hidden="true">{{
+        shortCode
+      }}</span>
       <select :value="locale" @change="setLocale($event.target.value)">
         <option
           v-for="item in LOCALES"
@@ -48,13 +48,13 @@
         @change="setDisplayMode($event.target.value)"
       >
         <option value="standard">
-          <ZhuyinText :text="t('display.standard')" plain />
+          {{ t("display.standard") }}
         </option>
         <option value="child">
-          <ZhuyinText :text="t('display.child')" plain />
+          {{ t("display.child") }}
         </option>
         <option value="senior">
-          <ZhuyinText :text="t('display.senior')" plain />
+          {{ t("display.senior") }}
         </option>
       </select>
     </label>

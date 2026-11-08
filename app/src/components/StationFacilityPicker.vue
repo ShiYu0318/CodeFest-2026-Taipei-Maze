@@ -1,6 +1,10 @@
 <!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <template>
-  <section class="facility-picker" :aria-label="t('facility.category')">
+  <section
+    class="facility-picker"
+    :data-display-mode="displayMode"
+    :aria-label="t('facility.category')"
+  >
     <div
       class="theme-group horizontal-scroll"
       data-tour-target="facilities"
@@ -66,6 +70,7 @@ import { ref, watch } from "vue";
 import StationMapIcon from "./StationMapIcon.vue";
 import ZhuyinText from "./ZhuyinText.vue";
 import { useI18n } from "../i18n/index.mjs";
+import { useDisplayPreferences } from "../display/preferences.mjs";
 const props = defineProps({
   categories: { type: Array, required: true },
   category: { type: String, default: null },
@@ -74,6 +79,7 @@ const props = defineProps({
   stepFree: { type: Boolean, default: false },
 });
 const emit = defineEmits(["category", "go", "step-free"]);
+const { displayMode } = useDisplayPreferences();
 const i18n = useI18n();
 const { t } = i18n;
 // Categories filter the map; only the top endpoint row chooses a destination.
@@ -176,5 +182,12 @@ watch(
 }
 .facility-options label {
   cursor: pointer;
+}
+.facility-picker[data-display-mode="child"] .facility-choice {
+  grid-template-columns: minmax(0, 1fr);
+}
+.facility-picker[data-display-mode="child"] .facility-options label {
+  white-space: nowrap;
+  overflow-wrap: normal;
 }
 </style>

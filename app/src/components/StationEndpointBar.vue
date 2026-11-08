@@ -131,7 +131,7 @@ const describe = (point, role) =>
 }
 .endpoint-bar-field {
   display: grid;
-  grid-template-columns: 3.5em minmax(0, 1fr) repeat(
+  grid-template-columns: max-content minmax(0, 1fr) repeat(
       2,
       var(--display-control-height, 44px)
     );
@@ -142,7 +142,7 @@ const describe = (point, role) =>
 .endpoint-bar-label {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
   color: var(--muted);
   font-size: var(--display-secondary-size, 0.8125rem);
@@ -221,8 +221,8 @@ const describe = (point, role) =>
   }
 }
 .endpoint-bar-label {
-  white-space: normal;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  overflow-wrap: normal;
   min-width: 0;
 }
 .endpoint-bar-dot {
