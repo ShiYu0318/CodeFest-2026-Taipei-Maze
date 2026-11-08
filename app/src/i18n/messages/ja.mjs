@@ -437,8 +437,10 @@ export default {
   "about.licenseIntro":
     "オリジナルのコードは次のライセンスです。条件に従って利用・改変・再配布できます：",
   "about.repository": "ソースリポジトリ：",
-  "about.privateRepo":
-    "リポジトリはまだ非公開で、匿名ではダウンロードできません。公開後は、上のバージョンからこの画面と一致するソースとビルド手順を入手できます。",
+  "about.sourceNotice":
+    "公開バージョンに対応するソースコードとビルド手順を確認できます。第三者のデータとモデルにはそれぞれのライセンスが適用されます。",
+  "about.diagramCoverage":
+    "図面上の歩行経路網は{count}か所に対応しています。現地確認は未完了です。",
   "about.noticeSummary": "ライセンス表示の全文",
   "about.data": "データの出典と確認状況",
   "about.points": "{floors} の設備 {count} か所",

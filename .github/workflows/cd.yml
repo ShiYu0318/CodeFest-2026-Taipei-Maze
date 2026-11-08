@@ -32,6 +32,8 @@ jobs:
         run: |
           cd "$DEPLOY_DIR"
           mkdir -p .models
+          export CODEFEST_COMMIT="$(git rev-parse HEAD)"
+          export CODEFEST_BUILD_DATE="$(date -u +%Y-%m-%d)"
           docker compose up -d --build --remove-orphans
 
       - name: Health check

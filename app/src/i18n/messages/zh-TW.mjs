@@ -377,8 +377,10 @@ export default {
   "about.licenseIntro":
     "原創程式碼採以下授權，你可以依條款使用、修改與再散布：",
   "about.repository": "原始碼儲存庫：",
-  "about.privateRepo":
-    "儲存庫目前仍為私人狀態，尚未開放匿名下載。公開後，可依上方版本號取得與此畫面相符的原始碼與建置說明。",
+  "about.sourceNotice":
+    "可依部署版本連結取得對應原始碼與建置說明；第三方資料與模型依各自授權處理。",
+  "about.diagramCoverage":
+    "圖面步行路網涵蓋 {count} 個點位，尚未完成現地核對。",
   "about.noticeSummary": "授權聲明全文",
   "about.data": "資料來源與驗證狀態",
   "about.points": "{count} 個設施標點，涵蓋 {floors}",

@@ -441,8 +441,10 @@ export default {
   "about.licenseIntro":
     "Kode asli dilisensikan seperti di bawah ini; Anda boleh memakai, mengubah, dan membagikannya sesuai ketentuan:",
   "about.repository": "Repositori kode sumber: ",
-  "about.privateRepo":
-    "Repositori masih bersifat privat dan belum bisa diunduh secara anonim. Setelah publik, versi di atas akan mengarah ke kode sumber dan catatan build yang sesuai.",
+  "about.sourceNotice":
+    "Lihat kode sumber dan petunjuk build sesuai versi yang diterapkan. Data dan model pihak ketiga memakai lisensinya masing-masing.",
+  "about.diagramCoverage":
+    "Graf jalan kaki berdasarkan diagram mencakup {count} tempat dan belum diverifikasi di lapangan.",
   "about.noticeSummary": "Teks lengkap pemberitahuan lisensi",
   "about.data": "Sumber data dan status verifikasi",
   "about.points": "{count} tempat fasilitas di {floors}",

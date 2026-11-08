@@ -12,6 +12,10 @@ CMD ["npm", "run", "serve", "--", "--host", "0.0.0.0", "--port", "5173"]
 
 # ---- build: produce static files in dist/ ----
 FROM base AS build
+ARG VUE_APP_COMMIT
+ARG VUE_APP_BUILD_DATE
+ENV VUE_APP_COMMIT=$VUE_APP_COMMIT
+ENV VUE_APP_BUILD_DATE=$VUE_APP_BUILD_DATE
 COPY . .
 RUN npm run build
 

@@ -1,7 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 /** Facts shown on the 原始碼與授權 page, derived from shipped data. */
-export function summarizeStationData(pointData = {}, connectionData = {}) {
+export function summarizeStationData(
+  pointData = {},
+  connectionData = {},
+  diagram = null
+) {
   const byFloor = pointData.points ?? {};
   const connections = Array.isArray(connectionData.connections)
     ? connectionData.connections
@@ -17,7 +21,8 @@ export function summarizeStationData(pointData = {}, connectionData = {}) {
     unverifiedConnections: connections.filter(
       (item) => "typeStatus" in item && item.typeStatus !== "verified"
     ).length,
-    // Zones and floor links only: no surveyed corridor graph ships yet.
+    // Diagram coverage is separate from a field-verified walking network.
+    ...(diagram ? { diagramPoints: new Set(diagram.bound ?? []).size } : {}),
     walkingNetwork: false,
   };
 }

@@ -2,6 +2,9 @@ services:
   codefest:
     build:
       context: ./app
+      args:
+        VUE_APP_COMMIT: ${CODEFEST_COMMIT:-}
+        VUE_APP_BUILD_DATE: ${CODEFEST_BUILD_DATE:-}
     ports:
       - "8000:80"
       - "8001:80"

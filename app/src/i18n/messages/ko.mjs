@@ -425,8 +425,10 @@ export default {
   "about.licenseIntro":
     "직접 만든 코드는 아래 라이선스를 따르며, 조건에 따라 사용·수정·재배포할 수 있어요:",
   "about.repository": "소스 저장소: ",
-  "about.privateRepo":
-    "저장소는 아직 비공개라 익명으로 내려받을 수 없어요. 공개되면 위 버전으로 이 화면과 같은 소스와 빌드 안내를 찾을 수 있어요.",
+  "about.sourceNotice":
+    "배포 버전에 맞는 소스 코드와 빌드 지침을 확인하세요. 제삼자 데이터와 모델에는 별도 라이선스가 적용됩니다.",
+  "about.diagramCoverage":
+    "도면 기반 보행 경로망은 {count}개 장소를 포함하며 현장 검증은 완료되지 않았습니다.",
   "about.noticeSummary": "라이선스 고지 전문",
   "about.data": "데이터 출처와 검증 상태",
   "about.points": "{floors}의 편의시설 {count}곳",

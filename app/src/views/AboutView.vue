@@ -108,11 +108,14 @@
         >
       </p>
       <p>
-        <ZhuyinText :text="t('about.repository')" /><strong>{{
+        <ZhuyinText :text="t('about.repository')" />
+        <a :href="sourceUrl" target="_blank" rel="noopener noreferrer">{{
           repository
-        }}</strong>
+        }}</a>
       </p>
-      <p class="about-warning"><ZhuyinText :text="t('about.privateRepo')" /></p>
+      <p class="about-warning">
+        <ZhuyinText :text="t('about.sourceNotice')" />
+      </p>
       <details>
         <summary><ZhuyinText :text="t('about.noticeSummary')" /></summary>
         <pre lang="en">{{ notice }}</pre>
@@ -144,9 +147,7 @@
         </li>
         <li>
           <ZhuyinText
-            :text="
-              data.walkingNetwork ? t('about.networkYes') : t('about.networkNo')
-            "
+            :text="t('about.diagramCoverage', { count: data.diagramPoints })"
           />
         </li>
       </ul>
@@ -200,6 +201,7 @@ import { useDisplayPreferences } from "../display/preferences.mjs";
 import { buildInfo, summarizeStationData } from "../about/about.mjs";
 import points from "./station-points.json";
 import connections from "./station-connections.json";
+import walkingNetwork from "../station/walking-network.json";
 
 const props = defineProps({
   embedded: { type: Boolean, default: false },
@@ -230,8 +232,9 @@ const mapSources = computed(() => {
   ];
 });
 const build = buildInfo;
-const data = summarizeStationData(points, connections);
+const data = summarizeStationData(points, connections, walkingNetwork);
 const repository = "github.com/yoyo899843/Taipei-Codefest-2026-Big-Dumb";
+const sourceUrl = `https://${repository}/tree/${build.commit || "main"}`;
 const components = computed(() => [
   { name: "Vue 3.5", license: "MIT" },
   { name: "Vue Router 4.6", license: "MIT" },

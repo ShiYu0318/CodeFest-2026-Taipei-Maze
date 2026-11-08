@@ -61,3 +61,14 @@ test("build description shortens a commit and never invents a version", () => {
   });
   assert.equal(describeBuild().known, false);
 });
+
+test("summary distinguishes partial diagram coverage from field verification", () => {
+  const graph = read("../src/station/walking-network.json");
+  const summary = summarizeStationData(
+    read("../src/views/station-points.json"),
+    read("../src/views/station-connections.json"),
+    graph
+  );
+  assert.equal(summary.walkingNetwork, false);
+  assert.equal(summary.diagramPoints, 125);
+});

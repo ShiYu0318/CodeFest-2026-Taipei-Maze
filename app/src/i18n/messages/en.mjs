@@ -434,8 +434,10 @@ export default {
   "about.licenseIntro":
     "The original code is licensed as below; you may use, modify and share it under its terms:",
   "about.repository": "Source repository: ",
-  "about.privateRepo":
-    "The repository is still private and cannot be downloaded anonymously yet. Once public, the version above will lead to the matching source and build notes.",
+  "about.sourceNotice":
+    "Use the deployed revision to find matching source and build instructions. Third-party data and models retain their own licenses.",
+  "about.diagramCoverage":
+    "The diagram walking graph covers {count} places and has not been field-verified.",
   "about.noticeSummary": "Full license notice",
   "about.data": "Data sources and verification",
   "about.points": "{count} facility places on {floors}",

@@ -433,8 +433,10 @@ export default {
   "about.licenseIntro":
     "Mã gốc được cấp phép như dưới đây; bạn có thể dùng, sửa và chia sẻ theo điều khoản:",
   "about.repository": "Kho mã nguồn: ",
-  "about.privateRepo":
-    "Kho mã hiện vẫn ở chế độ riêng tư, chưa thể tải xuống ẩn danh. Khi công khai, phiên bản ở trên sẽ dẫn đến mã nguồn và hướng dẫn xây dựng tương ứng.",
+  "about.sourceNotice":
+    "Xem mã nguồn và hướng dẫn xây dựng theo phiên bản triển khai. Dữ liệu và mô hình bên thứ ba giữ giấy phép riêng.",
+  "about.diagramCoverage":
+    "Mạng lưới đi bộ theo sơ đồ có {count} địa điểm, chưa được xác minh thực địa.",
   "about.noticeSummary": "Toàn văn thông báo giấy phép",
   "about.data": "Nguồn dữ liệu và trạng thái kiểm tra",
   "about.points": "{count} địa điểm tiện ích trên {floors}",
