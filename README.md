@@ -4,6 +4,12 @@
 
 **在台北通裡找設施、選路線，用看得懂的指引穿過台北車站。**
 
+[![Web checks](https://github.com/yoyo899843/CodeFest-2026-Taipei-Maze/actions/workflows/web-ci.yml/badge.svg)](https://github.com/yoyo899843/CodeFest-2026-Taipei-Maze/actions/workflows/web-ci.yml)
+[![License: AGPL-3.0-or-later](https://img.shields.io/badge/License-AGPL--3.0--or--later-blue.svg)](./LICENSE)
+![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?logo=vuedotjs)
+![Node.js 20](https://img.shields.io/badge/Node.js-20-5FA04E?logo=nodedotjs)
+![七語介面](https://img.shields.io/badge/介面-七語-468d9b)
+
 **繁體中文** · [English](./README.en.md)
 
 [線上體驗](https://codefest.yoyo899843.com/station-map) · [版本紀錄](./CHANGELOG.md) · [參與開發](./.github/CONTRIBUTING.md) · [架構指南](./.github/ARCHITECTURE.md)
@@ -18,7 +24,7 @@
 
 ## 內容導覽
 
-[解決的問題](#解決的問題) · [實際畫面](#實際畫面) · [地圖全貌](#各樓層地圖全貌) · [功能](#功能與完成範圍) · [快速開始](#快速開始) · [操作與-demo](#操作與-demo) · [技術架構](#技術架構) · [最短路徑](#我們如何計算最短路徑) · [資料與路網](#資料與路網) · [測試](#測試與品質) · [部署](#部署與版本) · [授權](#授權與致謝)
+[解決的問題](#解決的問題) · [實際畫面](#實際畫面) · [地圖全貌](#各樓層地圖全貌) · [功能](#功能與完成範圍) · [隱私](#隱私與權限) · [快速開始](#快速開始) · [操作與-demo](#操作與-demo) · [技術架構](#技術架構) · [最短路徑](#我們如何計算最短路徑) · [資料與路網](#資料與路網) · [測試](#測試與品質) · [部署](#部署與版本) · [授權](#授權與致謝) · [貢獻者](#貢獻者)
 
 ## 解決的問題
 
@@ -37,6 +43,8 @@
 ## 實際畫面
 
 我們把找設施、選路與位置恢復整合在同一個介面。以下展示手機版與寬螢幕的實際操作，點選圖片即可查看原圖。
+
+> 截圖以 Playwright 驅動 Chrome 拍攝正式網站（手機 430 × 932、寬螢幕 1440 × 1000），呈現實際操作後的畫面；不是 Android／iPhone WebView 實機或現地驗證紀錄。拍攝版本、網址與版面數據記錄在 [`assets/screenshots/manifest.json`](./assets/screenshots/manifest.json)。
 
 <table>
 <tr><th>找設施與樓層地圖</th><th>搜尋目的地</th><th>地圖與方向同頁</th></tr>
@@ -109,6 +117,17 @@ npm run render:walking-maps # 重新產生右欄的路網覆蓋圖
 
 我們以本地搜尋、圖面選路、同頁指引與位置恢復作為競賽版核心。[競賽版本範圍](#競賽版本範圍)整理各項功能的使用界線。
 
+## 隱私與權限
+
+我們讓主流程在不交出個人資料的情況下就能完成：
+
+- **不需要帳號、GPS 或通知：** 搜尋、選路與導引都不要求登入；室內位置只由使用者主動掃描的 QR 決定，不使用 GPS，也不在背景持續追蹤位置或手機朝向。
+- **QR 只代表掃碼當下：** 掃碼結果只用來確認「現在在哪裡」，不從 QR 推測使用者面向，也不保存移動軌跡。
+- **分享的是固定地點：** 分享連結只帶地點 ID，不帶分享者的位置、時間或路線，不是即時位置分享。
+- **沒有遠端 AI、翻譯或語音服務：** 七語文字、注音與小幫手回答都在本地資料中完成，不把問題送到雲端模型。
+- **麥克風只在主動操作時請求：** 選配的語音輸入要由使用者按下才會要求權限，並保留純文字入口。
+- **站務溝通卡不上傳資料：** 給站務人員看的畫面只在手機上顯示。
+
 ## 快速開始
 
 我們使用 **Node.js 20、npm 與 Git** 開發及驗證網頁。你可以直接啟動搜尋與導航流程，無須先準備 Flutter、模型權重、API key 或資料庫。
@@ -129,6 +148,22 @@ npm run serve -- --host 127.0.0.1 --port 8082
 我們以 QR 確認掃碼當下的位置，方向圖示則對應地圖方位。這套流程目前不使用 GPS 作室內定位，也不持續追蹤手機位置或朝向。
 
 我們把導航介面與核心維持在網頁端，沿用台北通已有的原生掃碼能力。[TownPass 整合說明](./integration/townpass/README.md)記錄橋接與選配能力的範圍。
+
+### 在台北通裡測試（本地模擬器）
+
+台北通是**另一個獨立的 checkout**，本專案不修改它；`integration/townpass/` 只保存先前的整合實驗與授權紀錄，不會自動套用。若你的本地 TownPass 已有測試入口，可以這樣對應：
+
+| 入口 | 網頁來源 | 適合用在 |
+| --- | --- | --- |
+| CodeFest 即時開發預覽 | 開發電腦上的 `127.0.0.1:8082`（上面的 `npm run serve`） | 模擬器；改完程式碼重新整理即可看到 |
+| CodeFest 測試環境 | 打包進 App 的網頁，由手機本機 `127.0.0.1:8766` 提供 | 真機或離線情境；改網頁後要重新打包 |
+
+```bash
+bash scripts/townpass-env.sh bundle-web   # 把目前的 app/dist 打包進 TownPass 的 assets
+bash scripts/townpass-env.sh build-ios --no-pub
+```
+
+真機的 `127.0.0.1` 指的是手機自己，連不到電腦的 8082，所以真機只能用打包版本。掃碼、返回、背景恢復與雙平台行為仍需實機驗證，見[整合說明](./integration/townpass/README.md)。
 
 ## 操作與 Demo
 
@@ -197,6 +232,17 @@ flowchart TB
 - **狀態：** 我們分開管理 QR、手動起點、連結與 Demo，讓手動抵達只適用於當前行程。
 - **小幫手：** 我們以內部 `thinking`／`delta`／`done` 事件呈現本地設施回答，保持查詢與畫面更新解耦。
 - **部署：** 我們透過 Docker 多階段建置輸出 nginx 靜態網站，以 GitHub Actions 執行檢查與部署。
+
+### 技術棧
+
+| 層 | 技術 |
+| --- | --- |
+| 網頁 | Vue 3、Vue Router、JavaScript ES Modules、HTML／CSS、SVG（Vue CLI 建置） |
+| 導航與搜尋 | 自製 Dijkstra 求路與通行過濾、Unicode 正規化、Optimal String Alignment 錯字容忍、本地多語詞典 |
+| 資料 | 版本化 JSON（點位、跨層連線、Compact 步行圖）、七語訊息檔、注音詞庫 |
+| 宿主整合 | 台北通 TownPass（Flutter）WebView、`flutterObject` JSON 橋接、原生 `qr_code_scan` |
+| 品質 | Node.js 內建 test runner、Vue SFC renderer 測試、ESLint、Prettier、資產一致性驗證、Python `unittest`、GitHub Actions |
+| 部署 | Docker 多階段建置、nginx 靜態網站、Docker Compose、Cloudflare Tunnel 或既有反向代理 |
 
 ### 專案結構
 
@@ -406,10 +452,17 @@ JS
 
 我們依下列來源整理場域資料：
 
-- **臺北捷運台北車站資訊圖、設施與剖面：** 圖面、走道與設備相對位置參考。
-- **臺鐵／高鐵官方平面資料：** 鐵路月台順序及設備位置核對；保留紅色與紫色標記，不任意補跨軌道連線。
-- **臺北市資料大平臺：** 10 份官方 CSV 研究副本及北車子集；48 項索引不代表全部已接入服務。
-- **使用者提供的 1F 圖面照片：** 衍生示意參考，原照片未納入；權利審查未完成。
+| 資料 | 提供者 | 連結 | 用途 |
+| --- | --- | --- | --- |
+| 台北車站站圖（B1～B4） | 臺北大眾捷運股份有限公司 | [051.pdf](https://web.metro.taipei/img/ALL/INFOPDF/051.pdf) | 重繪捷運各層圖面、走道與設備相對位置；步行圖主要來源 |
+| 台北車站剖面圖 | 臺北大眾捷運股份有限公司 | [車站資訊](https://web.metro.taipei/pages2026/WebStation/051/4) | 樓層關係與跨層設備對照 |
+| 臺北車站 B2 平面圖 | 國營臺灣鐵路股份有限公司 | [官方平面圖](https://tip.railway.gov.tw/tra-tip-web/tip/img/0a00114c-3667-4e2f-a897-78b2864d8eba/1140x900) | 台鐵、高鐵月台順序與 B2 月台示意 |
+| 高鐵台北站平面圖 | 台灣高速鐵路股份有限公司 | [Taipei2.pdf](https://www.thsrc.com.tw/event/map/Taipei2.pdf) | 高鐵月台設備位置核對 |
+| 臺北站轉乘資訊 | 國營臺灣鐵路股份有限公司 | [轉乘資訊](https://www.railway.gov.tw/tra-tip-web/tip/tip00H/tipH41/viewTransfer/1000) | 鐵路與捷運轉乘關係核對 |
+| D01～D10 官方開放資料 | 臺北大眾捷運股份有限公司、臺北市政府環境保護局 | [臺北市資料大平臺](https://data.taipei)，逐筆見 [ATTRIBUTION](./data/ATTRIBUTION.md) | 車站設施、無障礙設施與電梯、出入口、公廁、轉乘步行時間的研究副本與北車子集 |
+| 台北車站 1F 平面圖照片 | 使用者提供（圖上署名「萬俊廷攝」） | 原照片未納入 repo | 1F 大廳示意重繪；權利審查未完成 |
+
+開放資料依[《政府資料開放授權條款－第1版》](https://data.gov.tw/license)顯名，資料與衍生結果保留原授權，不因放入本 repo 就改成 AGPL。站圖與照片的衍生圖面只作競賽原型示意，再散布權利仍待確認；48 項來源索引不代表全部已接入服務。
 
 [研究資料說明](./data/README.md) · [顯名與授權](./data/ATTRIBUTION.md) · [來源索引](./data/SOURCE_CATALOG.md) · [第三方紀錄](./THIRD_PARTY_NOTICES.md)
 
@@ -433,6 +486,15 @@ cd ..
 python3 -m unittest discover -s tools -p 'test_*.py'
 git diff --check
 ```
+
+| 範圍 | 指令 | 現況 |
+| --- | --- | --- |
+| 網頁單元與渲染測試 | `npm test` | 264 個測試通過 |
+| 程式風格 | `npm run lint` | ESLint＋Prettier，無問題 |
+| 資料一致性 | `npm run validate:assets` | 站點資料、七語訊息、QR 座標與步行圖產物一致 |
+| 建置 | `npm run build` | 成功，產物在 `app/dist/` |
+| 資料工具 | `python3 -m unittest discover -s tools -p 'test_*.py'` | 10 個測試通過 |
+| CI | [Web checks](./.github/workflows/web-ci.yml) | 推送到 `main` 與每個 PR 時自動執行 |
 
 我們以 Web checks 執行網頁與 Python 工具檢查，涵蓋路徑／限制、搜尋、橋接狀態、定位連結、分享、抵達與 Vue renderer。建置產物位於 `app/dist/`；瀏覽器版面、手機相機、輔具、背景恢復與現地路線則另外驗證。
 
@@ -481,7 +543,7 @@ flowchart LR
 
 ## 參與與安全
 
-我們保留程式與貢獻規範供重現及 fork 參考，開發方式見 [Contributing](./.github/CONTRIBUTING.md) 與 [Security](./.github/SECURITY.md)。回報問題請附版本、裝置、語系／模式、起終點 ID、路線條件與重現步驟；不要貼個資、Token 或私人掃碼內容。Commit 使用英文 Conventional Commits，PR 沿用開源專案範本。
+我們保留程式與貢獻規範供重現及 fork 參考，開發方式見 [Contributing](./.github/CONTRIBUTING.md) 與 [Security](./.github/SECURITY.md)。回報問題請附版本、裝置、語系／模式、起終點 ID、路線條件與重現步驟；不要貼個資、Token 或私人掃碼內容。Commit 使用英文 Conventional Commits，PR 沿用[開源專案範本](./.github/PULL_REQUEST_TEMPLATE.md)。給 AI coding agent 的專案規範在 [AGENTS.md](./AGENTS.md)，版本變更見 [CHANGELOG](./CHANGELOG.md)。
 
 ## 授權與致謝
 
@@ -489,4 +551,19 @@ flowchart LR
 
 我們將研究資料顯名整理在 [data/ATTRIBUTION.md](./data/ATTRIBUTION.md)；匯入原型與圖面衍生資料的再散布範圍依各自權利處理。各項來源、條款與審查狀態見 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
 
-我們感謝 TownPass、臺北捷運、臺鐵、高鐵與臺北市開放資料提供參考與基礎。本作品由團隊開發，未代表上述單位的官方服務或背書。
+- **台北通 TownPass：** 宿主 App 是臺北市政府資訊局開源的 [TownPass](https://github.com/taipei-doit/TownPass)（GPL-3.0），本 repo 不包含宿主程式碼；`integration/townpass/` 保留的歷史整合紀錄沿用上游 GPL 聲明，見 [`integration/townpass/licenses/`](./integration/townpass/licenses/)。
+- **字型：** 網頁不內嵌任何字型檔，只呼叫裝置已有的系統字型（如 PingFang TC、系統 UI 字型）。
+- **模型：** 選配的裝置端模型權重不包含在本 repo 或網頁中，使用時依各自的授權與條款。
+- **圖面與資料：** 依上方[資料來源](#資料與路網)各自的授權處理，完整紀錄見 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
+
+### 致謝
+
+- **臺北市政府資訊局**開源 [TownPass](https://github.com/taipei-doit/TownPass)，並提供城市通開發文件與設計資源。
+- **場域資料提供者：** 臺北大眾捷運股份有限公司、國營臺灣鐵路股份有限公司、台灣高速鐵路股份有限公司、臺北市政府環境保護局，以及[臺北市資料大平臺](https://data.taipei)。
+- **開源專案：** [Vue](https://vuejs.org/)、[Vue Router](https://router.vuejs.org/)、[Vue CLI](https://cli.vuejs.org/)、[ESLint](https://eslint.org/)、[Prettier](https://prettier.io/)、[Playwright](https://playwright.dev/)（截圖）、[nginx](https://nginx.org/) 與 Docker 社群。
+
+本作品由團隊開發，未代表上述單位的官方服務或背書。
+
+### 貢獻者
+
+[ShiYu0318](https://github.com/ShiYu0318) · [Jerryguo888](https://github.com/Jerryguo888) · [yoyo899843](https://github.com/yoyo899843) · [Clare0808](https://github.com/Clare0808) · [enkai0630](https://github.com/enkai0630)（完整清單見 [Contributors](https://github.com/yoyo899843/CodeFest-2026-Taipei-Maze/graphs/contributors)）
